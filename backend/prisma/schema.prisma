@@ -1,0 +1,1485 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  CUSTOMER
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  REFURBISHED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROOF_SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  SELECT
+  BOOLEAN
+}
+
+enum SlotType {
+  CPU
+  MOTHERBOARD
+  RAM
+  GPU
+  STORAGE
+  PSU
+  CASE
+  COOLER
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum DeliveryType {
+  PRESENCIAL
+  DELIVERY
+  ENVIO
+  RETIRO
+  PERMUTA
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  passwordHash       String
+firstName          String
+lastName           String
+phone              String?
+profileImage       String?
+bio                String?
+role               Role      @default(CUSTOMER)
+storeName          String?
+storeDescription   String?
+storeLogo          String?
+storeBanner        String?
+storeCategory      String?
+country            String?
+locationCity       String?
+locationState      String?
+locationPostalCode String?
+latitude           Float?
+longitude          Float?
+locationVerified   Boolean   @default(false)
+paymentQrUrl       String?
+youtubeUrl         String?
+tiktokUrl          String?
+instagramUrl       String?
+facebookUrl        String?
+whatsappPhone      String?
+  rating             Float     @default(0)
+  totalSales         Int       @default(0)
+  freeShippingThreshold Decimal? @db.Decimal(12, 2)
+  isVerified         Boolean   @default(false)
+  nit                String?
+  isVerificationRequested Boolean @default(false)
+  verificationNote   String?
+  isApproved         Boolean   @default(false)
+  isActive           Boolean   @default(true)
+  storePaused        Boolean   @default(false)
+  storeRole          String?   @default("OWNER")
+  storeOwnerId       Int?
+  storeOwner         User?     @relation("StoreEmployees", fields: [storeOwnerId], references: [id], onDelete: SetNull)
+  storeEmployees     User[]    @relation("StoreEmployees")
+  gamerCoins         Int       @default(0)
+  pushToken          String?
+  inviteCode         String?   @unique
+  referredById       Int?
+  referredBy         User?     @relation("ReferredUsers", fields: [referredById], references: [id], onDelete: SetNull)
+  referredUsers      User[]    @relation("ReferredUsers")
+  coinTransactions   CoinTransaction[]
+  forumProfile       ForumProfile?
+  userRoles          UserRole[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  products         Product[]
+  giftPromotions   GiftPromotion[]  @relation("GiftPromotions")
+  cart             Cart?
+  ordersBought     Order[]   @relation("OrdersBought")
+  ordersSold       Order[]   @relation("OrdersSold")
+  addresses        Address[]
+  builds           Build[]
+  wishlistItems    WishlistItem[]
+  reviewsWritten   Review[]  @relation("ProductReviews")
+  sellerReviews    Review[]  @relation("SellerReviews")
+  sellerTagVotesGiven   ReviewTagVote[] @relation("UserTagVotes")
+  sellerTagVotesReceived ReviewTagVote[] @relation("SellerTagVotes")
+  refreshTokens    RefreshToken[]
+  conversationsAsBuyer  Conversation[] @relation("ConversationBuyer")
+  conversationsAsSeller Conversation[] @relation("ConversationSeller")
+  messagesSent          Message[]      @relation("MessageSender")
+  auctionsCreated       Auction[]      @relation("AuctionSeller")
+  auctionsWon           Auction[]      @relation("AuctionWinner")
+  auctionBids           AuctionBid[]   @relation("Bidder")
+  proxyBids             AuctionProxyBid[] @relation("ProxyBidder")
+  auctionWatchlist      AuctionWatchlist[] @relation("AuctionWatcher")
+  notifications         Notification[]
+  returnsAsBuyer        ReturnRequest[]  @relation("ReturnBuyer")
+  returnsAsSeller       ReturnRequest[]  @relation("ReturnSeller")
+  affiliateAccount      Affiliate?
+  affiliateReferrals    AffiliateReferral[] @relation("AffiliateReferred")
+  productAudits         ProductAudit[]
+  privilegedBuyers      PrivilegedBuyer[] @relation("PrivilegedSellers")
+  privilegedAtSellers   PrivilegedBuyer[] @relation("PrivilegedBuyers")
+  couponsCreated        Coupon[]          @relation("CouponSeller")
+  couponUsages          CouponUsage[]
+  sellerPromotions      Promotion[]       @relation("SellerPromotions")
+  payoutAccount         PayoutAccount?
+  payouts               Payout[]
+  knownProducts         KnownProduct[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tokenHash String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  parentId  Int?
+  parent    Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+  icon      String?
+  imageUrl  String?
+  order     Int       @default(0)
+  isActive  Boolean   @default(true)
+
+  products           Product[]
+  attributeDefs      AttributeDefinition[]
+  knownProducts      KnownProduct[]
+  auctions           Auction[]
+  taxRates           TaxRate[]
+
+  @@map("categories")
+}
+
+model KnownProduct {
+  id         Int                   @id @default(autoincrement())
+  categoryId Int
+  category   Category              @relation(fields: [categoryId], references: [id])
+  sellerId   Int?
+  seller     User?                 @relation(fields: [sellerId], references: [id])
+  name       String
+  isActive   Boolean               @default(true)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  attributes KnownProductAttribute[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@map("known_products")
+}
+
+model KnownProductAttribute {
+  id                   Int                 @id @default(autoincrement())
+  knownProductId       Int
+  knownProduct         KnownProduct        @relation(fields: [knownProductId], references: [id], onDelete: Cascade)
+  attributeDefinitionId Int
+  attributeDefinition  AttributeDefinition @relation(fields: [attributeDefinitionId], references: [id])
+  defaultValue         String?
+  isRequired           Boolean             @default(false)
+
+  @@unique([knownProductId, attributeDefinitionId])
+  @@map("known_product_attributes")
+}
+
+model AttributeDefinition {
+  id           Int           @id @default(autoincrement())
+  name         String
+  type         AttributeType @default(TEXT)
+  categoryId   Int?
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  options      Json?
+  unit         String?
+  isRequired   Boolean       @default(false)
+  isFilterable Boolean       @default(true)
+  isVariant    Boolean       @default(false)
+  isActive     Boolean       @default(true)
+  order        Int           @default(0)
+
+  productAttributes ProductAttribute[]
+  knownProductAttrs KnownProductAttribute[]
+
+  @@map("attribute_definitions")
+}
+
+model Product {
+  id             Int              @id @default(autoincrement())
+  sellerId       Int
+  seller         User             @relation(fields: [sellerId], references: [id])
+  categoryId     Int
+  category       Category         @relation(fields: [categoryId], references: [id])
+  name           String
+  slug           String           @unique
+  description    String?
+  brand          String?
+  condition      ProductCondition @default(NEW)
+  conditionScore Int?
+  deliveryTypes  DeliveryType[]
+  acceptsTrade   Boolean          @default(false)
+  price          Decimal          @db.Decimal(12, 2)
+  originalPrice  Decimal?         @db.Decimal(12, 2)
+  stock          Int              @default(0)
+  sku            String           @unique
+  masterSku      String?
+  taxRateId      Int?
+  taxRate        TaxRate?         @relation(fields: [taxRateId], references: [id])
+  warrantyInfo   String?
+  isActive       Boolean          @default(true)
+  isApproved     Boolean          @default(false)
+  isFeatured     Boolean          @default(false)
+  viewCount      Int              @default(0)
+  saleCount      Int              @default(0)
+  rating         Float            @default(0)
+  reactivationCount Int           @default(0)
+  expiresAt      DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([masterSku])
+
+  images             ProductImage[]
+  attributes         ProductAttribute[]
+  variants           ProductVariant[]
+  tags               ProductTag[]
+  cartItems          CartItem[]
+  orderItems         OrderItem[]
+  reviews            Review[]
+  wishlistItems      WishlistItem[]
+  buildComponents    BuildComponent[]
+  promotionProducts  PromotionProduct[]
+  couponProducts     CouponProduct[]
+  giftTriggerPromotions GiftPromotion[] @relation("GiftTriggerProduct")
+  giftItems             GiftPromotionItem[]
+  conversations      Conversation[]
+  views              ProductView[]
+  auction            Auction?
+  audits             ProductAudit[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@index([isApproved])
+  @@index([name])
+  @@map("products")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int     @default(0)
+  isPrimary Boolean @default(false)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model ProductAttribute {
+  id                    Int                 @id @default(autoincrement())
+  productId             Int
+  product               Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributeDefinitionId Int
+  attributeDefinition   AttributeDefinition @relation(fields: [attributeDefinitionId], references: [id])
+  valueText             String?
+  valueNumber           Float?
+  valueBoolean          Boolean?
+
+  @@unique([productId, attributeDefinitionId])
+  @@map("product_attributes")
+}
+
+model ProductVariant {
+  id             Int    @id @default(autoincrement())
+  productId      Int
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku            String @unique
+  priceModifier  Decimal @default(0) @db.Decimal(12, 2)
+  stock          Int    @default(0)
+  attributesJson Json?
+  cartItems      CartItem[]
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+  group String?
+  products ProductTag[]
+
+  @@map("tags")
+}
+
+model ProductTag {
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tagId     Int
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@map("product_tags")
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @unique
+  user      User?    @relation(fields: [userId], references: [id])
+  sessionId String?  @unique
+  items     CartItem[]
+  createdAt DateTime @default(now())
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int            @id @default(autoincrement())
+  cartId    Int
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product        @relation(fields: [productId], references: [id])
+  variantId Int?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity  Int            @default(1)
+
+  @@unique([cartId, productId, variantId])
+  @@map("cart_items")
+}
+
+model Address {
+  id         Int     @id @default(autoincrement())
+  userId     Int
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  street     String
+  number     String
+  floor      String?
+  city       String
+  state      String
+  postalCode String
+  isDefault  Boolean @default(false)
+  orders     Order[]
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Order {
+  id                Int           @id @default(autoincrement())
+  buyerId           Int
+  buyer             User          @relation("OrdersBought", fields: [buyerId], references: [id])
+  sellerId          Int
+  seller            User          @relation("OrdersSold", fields: [sellerId], references: [id])
+  status            OrderStatus   @default(PENDING)
+  subtotal          Decimal       @db.Decimal(12, 2)
+  shippingCost      Decimal?      @db.Decimal(12, 2)
+  total             Decimal       @db.Decimal(12, 2)
+  discountAmount    Decimal?      @db.Decimal(12, 2)
+  couponId          Int?
+  coupon            Coupon?       @relation(fields: [couponId], references: [id])
+  commission        Decimal?      @db.Decimal(12, 2)
+  sellerNet         Decimal?      @db.Decimal(12, 2)
+  paymentMethod     String?
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentQrUrl      String?
+  paymentProofUrl   String?
+  shippingAddressId Int?
+  shippingAddress   Address?      @relation(fields: [shippingAddressId], references: [id])
+  fulfillmentType   String        @default("SHIPPING") // SHIPPING | PICKUP
+  pickupAddress     String?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deliveredAt       DateTime?
+
+  items  OrderItem[]
+  returns ReturnRequest[]
+  affiliateReferrals AffiliateReferral[]
+  auctionWon     Auction?    @relation("AuctionOrder")
+  reviews        Review[]    @relation("OrderReviews")
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("orders")
+}
+
+model Coupon {
+  id           Int       @id @default(autoincrement())
+  code         String    @unique
+  description  String?
+  type         String    @default("PERCENTAGE") // PERCENTAGE | FIXED | GIFT
+  value        Decimal   @db.Decimal(12, 2)
+  sellerId     Int?
+  seller       User?     @relation("CouponSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  minSpend     Decimal?  @db.Decimal(12, 2)
+  maxUses      Int?      @default(1)
+  usesCount    Int       @default(0)
+  spentAmount  Decimal?  @db.Decimal(12, 2)
+  maxSpend     Decimal?  @db.Decimal(12, 2)
+  perUserLimit Int?
+  isSingleUse  Boolean   @default(false)
+  startDate    DateTime?
+  endDate      DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  orders       Order[]
+  products     CouponProduct[]
+  usages       CouponUsage[]
+
+  @@index([sellerId])
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id        Int      @id @default(autoincrement())
+  couponId  Int
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   Int
+  amount    Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+
+  @@unique([couponId, userId])
+  @@map("coupon_usages")
+}
+
+model CouponProduct {
+  couponId  Int
+  coupon    Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, productId])
+  @@map("coupon_products")
+}
+
+model PayoutAccount {
+  id          Int      @id @default(autoincrement())
+  sellerId    Int      @unique
+  seller      User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  method      String   @default("BNB") // BNB | BANK | QR
+  accountHolder String?
+  accountNumber String?
+  bankName    String?
+  phoneQr     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("payout_accounts")
+}
+
+model Payout {
+  id          Int       @id @default(autoincrement())
+  sellerId    Int
+  seller      User      @relation(fields: [sellerId], references: [id])
+  amount      Decimal   @db.Decimal(12, 2)
+  status      String    @default("PENDING") // PENDING | APPROVED | PAID | REJECTED
+  method      String    @default("BNB")
+  reference   String?
+  note        String?
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([sellerId])
+  @@map("payouts")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Decimal @db.Decimal(12, 2)
+  isGift    Boolean @default(false)
+  giftLabel String?
+  promotionId    Int?
+  promotionTitle String?
+  returns   ReturnRequest[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model ReturnRequest {
+  id             Int       @id @default(autoincrement())
+  orderItemId    Int
+  orderItem      OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderId        Int
+  order          Order     @relation(fields: [orderId], references: [id])
+  buyerId        Int
+  buyer          User      @relation("ReturnBuyer", fields: [buyerId], references: [id])
+  sellerId       Int
+  seller         User      @relation("ReturnSeller", fields: [sellerId], references: [id])
+  reason         String
+  details        String?
+  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED | COMPLETED | CANCELLED
+  refundAmount   Decimal?  @db.Decimal(12, 2)
+  adminNote      String?
+  responseNote   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("return_requests")
+}
+
+model Build {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  totalPrice Decimal  @db.Decimal(12, 2)
+  createdAt  DateTime @default(now())
+  components BuildComponent[]
+
+  @@index([userId])
+  @@map("builds")
+}
+
+model BuildComponent {
+  id        Int      @id @default(autoincrement())
+  buildId   Int
+  build     Build    @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  slotType  SlotType
+
+  @@index([buildId])
+  @@map("build_components")
+}
+
+model WishlistItem {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}
+
+model Promotion {
+  id            Int          @id @default(autoincrement())
+  title         String
+  description   String?
+  sellerId      Int?
+  seller        User?        @relation("SellerPromotions", fields: [sellerId], references: [id], onDelete: Cascade)
+  discountType  DiscountType @default(PERCENTAGE)
+  discountValue Decimal      @db.Decimal(12, 2)
+  minQuantity   Int?
+  minSpend      Decimal?     @db.Decimal(12, 2)
+  maxSpend      Decimal?     @db.Decimal(12, 2)
+  spentAmount   Decimal?     @db.Decimal(12, 2)
+  usesCount     Int          @default(0)
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean      @default(true)
+  products      PromotionProduct[]
+
+  @@index([sellerId])
+  @@map("promotions")
+}
+
+model PromotionProduct {
+  promotionId Int
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  productId   Int
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([promotionId, productId])
+  @@map("promotion_products")
+}
+
+model Banner {
+  id             Int      @id @default(autoincrement())
+  title          String?
+  imageDesktop   String
+  imageTablet    String?
+  imageMobile    String?
+  link           String?
+  newWindow      Boolean  @default(false)
+  backgroundColor String?
+  order          Int      @default(0)
+  isActive       Boolean  @default(true)
+  startDate      DateTime
+  endDate        DateTime
+
+  @@map("banners")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sellerId  Int?
+  seller    User?    @relation("SellerReviews", fields: [sellerId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation("ProductReviews", fields: [userId], references: [id])
+  orderId   Int?
+  order     Order?   @relation("OrderReviews", fields: [orderId], references: [id], onDelete: SetNull)
+  rating    Int
+  comment   String?
+  tags      Json?
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([sellerId])
+  @@index([orderId])
+  @@map("reviews")
+}
+
+/// Votos por etiqueta de reseña sobre un vendedor (positiva/negativa).
+/// Un usuario puede votar una sola vez por (vendedor, etiqueta).
+model ReviewTagVote {
+  id        Int      @id @default(autoincrement())
+  sellerId  Int
+  seller    User     @relation("SellerTagVotes", fields: [sellerId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation("UserTagVotes", fields: [userId], references: [id], onDelete: Cascade)
+  tag       String // nombre exacto de la etiqueta (ej: "Recomendar", "No recomendar")
+  createdAt DateTime @default(now())
+
+  @@unique([sellerId, userId, tag])
+  @@index([sellerId, tag])
+  @@map("review_tag_votes")
+}
+
+model Faq {
+  id       Int    @id @default(autoincrement())
+  question String
+  answer   String
+  order    Int    @default(0)
+
+  @@map("faqs")
+}
+
+model Warranty {
+  id      Int    @id @default(autoincrement())
+  title   String
+  content String
+  order   Int    @default(0)
+
+  @@map("warranties")
+}
+
+model Reach {
+  id      Int    @id @default(autoincrement())
+  title   String
+  content String
+  order   Int    @default(0)
+
+  @@map("reaches")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model SearchHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  sessionId String?
+  term      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("search_history")
+}
+
+model ProductView {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  sessionId String?
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([productId])
+  @@index([createdAt])
+  @@map("product_views")
+}
+
+model PrivilegedBuyer {
+  id        Int       @id @default(autoincrement())
+  sellerId  Int
+  seller    User      @relation("PrivilegedSellers", fields: [sellerId], references: [id], onDelete: Cascade)
+  buyerId   Int
+  buyer     User      @relation("PrivilegedBuyers", fields: [buyerId], references: [id], onDelete: Cascade)
+  status    String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt DateTime  @default(now())
+  approvedAt DateTime?
+
+  @@unique([sellerId, buyerId])
+  @@map("privileged_buyers")
+}
+
+model Conversation {
+  id           Int      @id @default(autoincrement())
+  buyerId      Int
+  buyer        User     @relation("ConversationBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId     Int
+  seller       User     @relation("ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  productId    Int?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderId      Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  messages     Message[]
+
+  @@unique([buyerId, sellerId, productId])
+  @@index([sellerId])
+  @@index([updatedAt])
+  @@map("conversations")
+}
+
+enum NotificationType {
+  NEW_ORDER
+  ORDER_STATUS
+  PAYMENT_VERIFIED
+  PAYMENT_PROOF
+  NEW_CHAT
+  NEW_MESSAGE
+  OUTBID
+  AUCTION_WON
+  AUCTION_SOLD
+  AUCTION_ENDED
+  PRODUCT_APPROVED
+  PRODUCT_REJECTED
+  SELLER_APPROVED
+  SELLER_REJECTED
+  NEW_REVIEW
+  PROMOTION
+  RETURN_REQUEST
+  RETURN_STATUS
+  SYSTEM
+  FORUM_ANSWER
+  FORUM_UPVOTE
+  FORUM_BEST
+  FORUM_RANK_UP
+  FORUM_REPORT
+  FORUM_COIN_EARN
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  message     String
+  /** Tipo de recurso al que apunta: order, chat, auction, product, seller, promotion */
+  refType     String?
+  refId       Int?
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       Int
+  sender         User         @relation("MessageSender", fields: [senderId], references: [id])
+  content        String
+  contentType    String       @default("text")
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Auction {
+  id            Int       @id @default(autoincrement())
+  sellerId      Int
+  seller        User      @relation("AuctionSeller", fields: [sellerId], references: [id])
+  productId     Int?      @unique
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  title         String
+  description   String?
+  categoryId    Int?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  imageUrl      String?
+  startingPrice Decimal   @db.Decimal(12, 2)
+  currentPrice  Decimal   @db.Decimal(12, 2)
+  reservePrice  Decimal?  @db.Decimal(12, 2)
+  buyNowPrice   Decimal?  @db.Decimal(12, 2)
+  minIncrement  Decimal   @default(1) @db.Decimal(12, 2)
+  maxIncrement  Decimal   @default(10) @db.Decimal(12, 2)
+  incrementType String    @default("fixed")
+  extensionMinutes Int    @default(0)
+  startDate     DateTime  @default(now())
+  endDate       DateTime
+  winnerId      Int?
+  winner        User?     @relation("AuctionWinner", fields: [winnerId], references: [id])
+  orderId       Int?      @unique
+  order         Order?    @relation("AuctionOrder", fields: [orderId], references: [id])
+  isSold        Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  isPaid        Boolean   @default(false)
+  paymentDeadline DateTime?
+  createdAt     DateTime  @default(now())
+  bids          AuctionBid[]
+  proxyBids     AuctionProxyBid[]
+  watchlist     AuctionWatchlist[]
+
+  @@index([sellerId])
+  @@index([endDate])
+  @@index([categoryId])
+  @@map("auctions")
+}
+
+model AuctionProxyBid {
+  id        Int      @id @default(autoincrement())
+  auctionId Int
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation("ProxyBidder", fields: [userId], references: [id])
+  maxBid    Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, userId])
+  @@map("auction_proxy_bids")
+}
+
+model AuctionWatchlist {
+  id        Int      @id @default(autoincrement())
+  auctionId Int
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation("AuctionWatcher", fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([auctionId, userId])
+  @@map("auction_watchlist")
+}
+
+model AuctionBid {
+  id        Int      @id @default(autoincrement())
+  auctionId Int
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  bidderId  Int
+  bidder    User     @relation("Bidder", fields: [bidderId], references: [id])
+  bidAmount Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+
+  @@index([auctionId])
+  @@index([bidderId])
+  @@map("auction_bids")
+}
+
+model ProductAudit {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  actorId    Int
+  actor      User     @relation(fields: [actorId], references: [id])
+  action     String   // CREATED | UPDATED | MODERATED | ACTIVATED | DEACTIVATED | DELETED | REACTIVATED | AUCTIONED
+  changes    Json?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([productId])
+  @@index([actorId])
+  @@map("product_audits")
+}
+
+model TaxRate {
+  id            Int      @id @default(autoincrement())
+  name          String
+  country       String   // ISO 2 letras, ej "BO"
+  state         String?  // Opcional: departamento/provincia específico
+  ratePercent   Decimal  @db.Decimal(5, 2)
+  appliesTo     String   @default("ALL") // ALL | CATEGORY | PRODUCT
+  categoryId    Int?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  products      Product[]
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([country])
+  @@index([categoryId])
+  @@map("tax_rates")
+}
+
+model Affiliate {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  user          User     @relation(fields: [userId], references: [id])
+  referralCode  String   @unique
+  commissionPct Decimal  @db.Decimal(5, 2) @default(2.0)
+  balance       Decimal  @db.Decimal(12, 2) @default(0)
+  referrals     AffiliateReferral[]
+  createdAt     DateTime @default(now())
+}
+
+model AffiliateReferral {
+  id           Int      @id @default(autoincrement())
+  affiliateId  Int
+  affiliate    Affiliate @relation(fields: [affiliateId], references: [id])
+  referredId   Int      @unique
+  referred     User     @relation("AffiliateReferred", fields: [referredId], references: [id])
+  orderId      Int?
+  order        Order?   @relation(fields: [orderId], references: [id])
+  commission   Decimal? @db.Decimal(12, 2)
+  status       String   @default("REGISTERED") // REGISTERED | ORDER_PAID
+  createdAt    DateTime @default(now())
+
+  @@index([affiliateId])
+  @@map("affiliate_referrals")
+}
+
+model GiftPromotion {
+  id             Int                @id @default(autoincrement())
+  sellerId       Int
+  seller         User               @relation("GiftPromotions", fields: [sellerId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  triggerType    String             @default("UNITS") // UNITS | AMOUNT | PRODUCT
+  triggerProductId Int?
+  triggerProduct   Product?         @relation("GiftTriggerProduct", fields: [triggerProductId], references: [id], onDelete: SetNull)
+  triggerQuantity Int?
+  triggerAmount  Decimal?           @db.Decimal(12, 2)
+  allowChoice    Boolean            @default(false)
+  isActive       Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  items          GiftPromotionItem[]
+
+  @@index([sellerId])
+  @@map("gift_promotions")
+}
+
+model GiftPromotionItem {
+  id               Int        @id @default(autoincrement())
+  giftPromotionId  Int
+  giftPromotion    GiftPromotion @relation(fields: [giftPromotionId], references: [id], onDelete: Cascade)
+  productId        Int
+  product          Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([giftPromotionId, productId])
+  @@map("gift_promotion_items")
+}
+
+model CoinTransaction {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int // positivo = gana/compra, negativo = gasta (canje)
+  type      String // PURCHASE | EARN_PURCHASE | EARN_FORUM | SPEND
+  refType   String? // ORDER | FORUM_QUESTION | FORUM_ANSWER | REWARD
+  refId     Int?
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("coin_transactions")
+}
+
+// ─────────────────────────────────────────────────────────
+// MÓDULO FORO (sección 8.6 — LaCASE Forum)
+// ─────────────────────────────────────────────────────────
+
+model ForumProfile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Alias anónimo estilo Reddit
+  forumUsername    String   @unique
+  avatarUrl        String?  // puede diferir del avatar de la multitienda
+
+  // Geolocalización de foro (independiente de User.locationCity)
+  city             String   @default("Bolivia")
+  cityVerified     Boolean  @default(false)  // true si se verificó con coords reales
+  latitude         Float?   // última latitud reportada (GPS o ciudad seleccionada)
+  longitude        Float?   // última longitud reportada
+  radioKm          Int      @default(25)     // radio configurable por el usuario
+  department       String?  // departamento deducido de la ciudad (moderación por departamento)
+  lastGeoUpdate    DateTime? // última actualización de geolocalización
+  cityId           Int?     // FK a ForumCity (ciudad del catálogo)
+  cityRef          ForumCity? @relation(fields: [cityId], references: [id], onDelete: SetNull)
+
+  // Karma y rangos
+  karma            Int      @default(0)       // karma acumulado histórico (nunca baja)
+  karmaSpent       Int      @default(0)       // karma canjeado (no afecta etiqueta)
+  tag              String   @default("Novato") // Novato|Colaborador|Activo|Experto|Maestro|Leyenda
+  reputationScore  Int      @default(0)       // suma de votos de reputación de otros usuarios
+
+  // Gamificación
+  streakDays       Int      @default(0)
+  lastActiveDate   DateTime?
+  signatureText    String?  // firma en el perfil (estilo foro clásico)
+  signatureImage   String?  // URL imagen firma
+
+  // Redes sociales del perfil del foro
+  twitterUrl       String?
+  linkedinUrl      String?
+  whatsappPhone    String?
+  websiteUrl       String?
+
+  // Estado
+  isBanned         Boolean  @default(false)
+  bannedUntil      DateTime?
+  bannedReason     String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relaciones
+  posts            ForumPost[]
+  replies          ForumReply[]
+  votes            ForumVote[]
+  reputationGiven  ForumReputationComment[] @relation("ReputationGiver")
+  reputationGot    ForumReputationComment[] @relation("ReputationReceiver")
+  karmaTransactions KarmaTransaction[]
+  reportsGiven     ForumReport[]            @relation("ReportAuthor")
+
+  @@map("forum_profiles")
+  @@index([city])
+  @@index([karma(sort: Desc)])
+  @@index([department])
+}
+
+model ForumCategory {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique  // ej: "salud", "precio-producto"
+  name        String
+  description String?
+  icon        String   @default("💬")  // emoji
+  color       String   @default("#FF6B35") // hex
+  parentId    Int?     // FK a sí mismo (máx. 2 niveles)
+  parent      ForumCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    ForumCategory[] @relation("CategoryTree")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts       ForumPost[]
+  cityCategories ForumCityCategory[]
+
+  @@map("forum_categories")
+  @@index([parentId])
+  @@index([isActive, sortOrder])
+}
+
+// ===== Geolocalización del foro (09-spec-geolocalizacion-foro.md) =====
+
+model ForumCity {
+  id          Int      @id @default(autoincrement())
+  name        String              // ej. "La Paz"
+  department  String              // ej. "La Paz" (departamento)
+  latitude    Float
+  longitude   Float
+  radiusKm    Int      @default(30) // tamaño estimado (mayor ciudad del departamento)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  categories  ForumCityCategory[]
+  profiles    ForumProfile[]
+  @@map("forum_cities")
+  @@unique([name, department])
+  @@index([department])
+}
+
+model ForumCityCategory {
+  id         Int @id @default(autoincrement())
+  cityId     Int
+  city       ForumCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@map("forum_city_categories")
+  @@unique([cityId, categoryId])
+}
+
+model ForumRule {
+  id          Int      @id @default(autoincrement())
+  title       String
+  body        String   @db.Text
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("forum_rules")
+}
+
+model ForumPost {
+  id           Int      @id @default(autoincrement())
+  authorId     Int?     // null si el autor fue eliminado
+  author       ForumProfile? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  categoryId   Int
+  category     ForumCategory @relation(fields: [categoryId], references: [id])
+
+  title        String   @db.VarChar(200)
+  body         String   @db.Text
+  images       String[] // array de URLs (Postgres native array)
+  tags         String[] // array de tags/etiquetas
+
+  city         String   // ciudad del post (copiada de ForumProfile.city al crear)
+  type         ForumPostType @default(GENERAL)
+  status       ForumPostStatus @default(OPEN)
+
+  // Métricas (desnormalizadas para performance de feed)
+  score        Float    @default(0)      // score ponderado para ranking
+  upvotes      Int      @default(0)
+  downvotes    Int      @default(0)
+  replyCount   Int      @default(0)
+  viewCount    Int      @default(0)
+
+  // Moderación
+  isHidden     Boolean  @default(false)  // auto-oculto por reportes
+  isPinned     Boolean  @default(false)  // fijado por moderador
+  deletedAt    DateTime?                 // eliminación lógica
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  replies      ForumReply[]
+  votes        ForumVote[]    @relation("PostVotes")
+  reports      ForumReport[]  @relation("PostReports")
+
+  @@map("forum_posts")
+  @@index([categoryId, city, createdAt(sort: Desc)])
+  @@index([city, score(sort: Desc), createdAt(sort: Desc)])
+  @@index([status, replyCount])
+  @@index([authorId])
+  @@index([deletedAt])
+  // Índice para búsqueda de texto (GIN en producción — aquí ILIKE suficiente para v1)
+  @@index([city, createdAt(sort: Desc)])
+}
+
+enum ForumPostType {
+  GENERAL
+  PRECIO       // activa bot de precios
+  EXISTENCIA   // activa bot de existencia
+  EMPLEO
+  ALQUILER
+  ANTICROTICO
+  DIRECCION
+}
+
+enum ForumPostStatus {
+  OPEN
+  RESOLVED     // tiene respuesta aceptada
+  CLOSED       // cerrado por moderador
+}
+
+model ForumReply {
+  id          Int      @id @default(autoincrement())
+  postId      Int
+  post        ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId    Int?      // null = bot o autor eliminado
+  author      ForumProfile? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  body        String   @db.Text
+  images      String[] // máx 2 imágenes
+
+  // Flags especiales
+  isBotReply  Boolean  @default(false)  // respuesta automática multitienda
+  isAccepted  Boolean  @default(false)  // respuesta que resuelve la duda (marcada por autor del post)
+  isHidden    Boolean  @default(false)
+  deletedAt   DateTime?
+
+  // Métricas
+  upvotes     Int      @default(0)
+  downvotes   Int      @default(0)
+  score       Float    @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  votes       ForumVote[]   @relation("ReplyVotes")
+  reports     ForumReport[] @relation("ReplyReports")
+
+  @@map("forum_replies")
+  @@index([postId, createdAt(sort: Asc)])
+  @@index([postId, isAccepted])
+  @@index([authorId])
+}
+
+model ForumVote {
+  id          Int      @id @default(autoincrement())
+  profileId   Int      // quién vota (ForumProfile)
+  profile     ForumProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  targetType  ForumVoteTarget  // POST | REPLY
+  postId      Int?
+  post        ForumPost?  @relation("PostVotes",  fields: [postId],  references: [id], onDelete: Cascade)
+  replyId     Int?
+  reply       ForumReply? @relation("ReplyVotes", fields: [replyId], references: [id], onDelete: Cascade)
+
+  value       Int      // +1 upvote | -1 downvote
+
+  createdAt   DateTime @default(now())
+
+  @@unique([profileId, targetType, postId])    // 1 voto por usuario por post
+  @@unique([profileId, targetType, replyId])   // 1 voto por usuario por reply
+  @@map("forum_votes")
+  @@index([postId])
+  @@index([replyId])
+  @@index([profileId, createdAt(sort: Desc)])  // para límite diario y anti-brigada
+}
+
+enum ForumVoteTarget {
+  POST
+  REPLY
+}
+
+model ForumReputationComment {
+  id         Int      @id @default(autoincrement())
+  fromId     Int      // quien deja la reputación
+  from       ForumProfile @relation("ReputationGiver",   fields: [fromId],   references: [id], onDelete: Cascade)
+  toId       Int      // a quién se la deja
+  to         ForumProfile @relation("ReputationReceiver", fields: [toId],     references: [id], onDelete: Cascade)
+
+  value      Int      // +1 confiable | -1 no confiable
+  comment    String?  @db.VarChar(300)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([fromId, toId])  // solo 1 comentario de reputación por par de usuarios
+  @@map("forum_reputation_comments")
+  @@index([toId])
+  @@index([fromId])
+}
+
+model ForumReport {
+  id           Int      @id @default(autoincrement())
+  reporterId   Int      // ForumProfile del que reporta
+  reporter     ForumProfile @relation("ReportAuthor", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  targetType   ForumReportTarget  // POST | REPLY | PROFILE
+  postId       Int?
+  post         ForumPost?   @relation("PostReports",  fields: [postId],  references: [id], onDelete: Cascade)
+  replyId      Int?
+  reply        ForumReply?  @relation("ReplyReports", fields: [replyId], references: [id], onDelete: Cascade)
+  profileId    Int?         // si se reporta un perfil directamente
+
+  reason       ForumReportReason
+  detail       String?  @db.VarChar(500)
+  status       ForumReportStatus @default(PENDING)
+  resolvedBy   Int?     // userId del moderador/admin que resolvió
+  resolvedAt   DateTime?
+  resolution   String?  // nota del moderador
+
+  createdAt    DateTime @default(now())
+
+  @@map("forum_reports")
+  @@index([status, createdAt(sort: Desc)])
+  @@index([postId])
+  @@index([replyId])
+  @@index([reporterId])
+}
+
+enum ForumReportTarget {
+  POST
+  REPLY
+  PROFILE
+}
+
+enum ForumReportReason {
+  SPAM
+  CONTENIDO_INAPROPIADO
+  DESINFORMACION
+  CONTENIDO_FALSO
+  CONTENIDO_IA
+  ESTAFA
+  DATOS_PERSONALES
+  PUBLICIDAD_ENCUBIERTA
+  ES_UN_BOT
+  ACOSO
+  OTRO
+}
+
+enum ForumReportStatus {
+  PENDING
+  RESOLVED   // moderador aprobó → contenido eliminado
+  REJECTED   // moderador rechazó → contenido restaurado
+}
+
+model DailyActionCounter {
+  id        Int      @id @default(autoincrement())
+  userId    Int      // User.id (no ForumProfile.id, para consistencia)
+  action    ForumDailyAction
+  date      DateTime @db.Date   // solo la fecha (UTC-4 / Bolivia)
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, action, date])
+  @@map("daily_action_counters")
+  @@index([userId, date])
+}
+
+enum ForumDailyAction {
+  POST        // límite: 1/día
+  REPLY       // límite: 5/día
+  VOTE        // límite: 10/día (suma posts + replies + reputación)
+}
+
+model KarmaTransaction {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  profile   ForumProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  amount    Int      // positivo = ganado, negativo = gastado/penalizado
+  type      KarmaTransactionType
+  refType   String?  // POST | REPLY | REDEEM | STREAK | CHALLENGE | RANK_BONUS
+  refId     Int?     // id del post/reply que lo originó
+  note      String?  // nota manual del admin o descripción automática
+
+  createdAt DateTime @default(now())
+
+  @@map("karma_transactions")
+  @@index([profileId, createdAt(sort: Desc)])
+  @@index([type])
+}
+
+enum KarmaTransactionType {
+  EARN_UPVOTE       // recibí upvote en post o reply (+1)
+  EARN_BEST_ANSWER  // mi respuesta fue aceptada (+10)
+  EARN_TOP_POST     // post más votado del día (+5)
+  EARN_STREAK       // bonus por racha de días consecutivos
+  EARN_CHALLENGE    // desafío diario completado (+2)
+  EARN_FIRST_POST   // primer post del día (+1)
+  EARN_ADMIN        // ajuste manual del admin
+  DEDUCT_DOWNVOTE   // recibí downvote (-1, piso 0)
+  DEDUCT_REPORT     // post/reply penalizado por moderador (-5)
+  REDEEM            // karma canjeado por monedas (-N, karma histórico intacto)
+}
+
+// ===== RBAC (core de administración dinámico, 01-spec-core-rbac.md) =====
+
+model RbacRole {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique          // 'ADMIN','SELLER','SUPPORT','ANALYST',...
+  name        String                    // 'Administrador global','Soporte',...
+  description String?
+  isSystem    Boolean  @default(false)  // true = los 4 de fábrica (no se borran)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  permissions RolePermission[]
+  menus       RoleMenu[]
+  users       UserRole[]
+  @@map("roles")
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique          // 'products.create','users.manage','forum.moderate',...
+  name        String                    // 'Crear productos',...
+  module      String   @default("core") // 'core','forum','seller','admin'
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  roles       RolePermission[]
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         RbacRole    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Menu {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique          // 'admin.dashboard','seller.products','admin.users',...
+  label     String                    // 'Dashboard','Productos',...
+  path      String                    // '/admin','/seller/productos',...
+  icon      String?                   // nombre de icono MUI / emoji móvil
+  parentId  Int?                      // menús anidados
+  parent    Menu?    @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Menu[]   @relation("MenuTree")
+  module    String   @default("core")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  roles     RoleMenu[]
+  @@map("menus")
+}
+
+model RoleMenu {
+  roleId Int
+  menuId Int
+  role   RbacRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu   Menu    @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  @@id([roleId, menuId])
+  @@map("role_menus")
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   RbacRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@id([userId, roleId])
+  @@index([roleId])
+  @@map("user_roles")
+}
