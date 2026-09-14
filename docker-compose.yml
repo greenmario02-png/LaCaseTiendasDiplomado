@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pctienda-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pctienda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clave-de-ejemplo}
+      POSTGRES_DB: ${POSTGRES_DB:-pctienda}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pctienda}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: pctienda-api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pctienda}:${POSTGRES_PASSWORD:-clave-de-ejemplo}@postgres:5432/${POSTGRES_DB:-pctienda}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-in-production}
+      PORT: 3000
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma db push && npx tsx prisma/seed.ts && npx tsx watch src/server.ts"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: pctienda-web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
