@@ -26,6 +26,8 @@ import EmptyState from '../components/ui/EmptyState';
 import CountdownTimer from '../components/ui/CountdownTimer';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../components/redesign/Buttons';
 import { ProductCard } from '../components/redesign/ProductCard';
+import { useLocationStore } from '../stores/locationStore';
+import { NearMeButton } from '../components/redesign/NearMeButton';
 
 interface Banner {
   id: number;
@@ -88,6 +90,7 @@ export default function HomePage() {
   const salesRef = useRef<Sale[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const geo = useLocationStore((st) => st.coords);
 
   useEffect(() => {
     Promise.all([
@@ -96,7 +99,7 @@ export default function HomePage() {
       api.get('/products/featured').catch(() => ({ data: { data: [] } })),
       api.get('/promotions').catch(() => ({ data: { data: [] } })),
       api.get('/tracking/me/recommended').catch(() => ({ data: { data: { recommendations: [], reason: '' } } })),
-      api.get('/tracking/feed').catch(() => ({ data: { data: { nearYou: [], categoryCarousels: [], forYou: [], trending: [], userCity: '' } } })),
+      api.get('/tracking/feed', { params: geo ? { lat: geo.lat, lng: geo.lng } : undefined }).catch(() => ({ data: { data: { nearYou: [], categoryCarousels: [], forYou: [], trending: [], userCity: '' } } })),
       api.get('/orders/recent-sales').catch(() => ({ data: { data: [] } })),
     ]).then(([b, c, f, p, r, feed, s]) => {
       setBanners(b.data.data);
@@ -140,7 +143,7 @@ export default function HomePage() {
     return () => {
       socket?.off('order:created', onOrder);
     };
-  }, []);
+  }, [geo]);
 
   if (loading) {
     return (
@@ -238,7 +241,7 @@ export default function HomePage() {
                 <Typography variant="h5" fontWeight={700}>
                   {userCity ? `Productos cerca de ti (${userCity})` : 'Productos cerca de ti'}
                 </Typography>
-                <Chip label="📍" size="small" color="primary" />
+                <NearMeButton />
               </Box>
               <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
                 Ver todo →

@@ -9,7 +9,8 @@ import type { ForumCity } from '../../services/forum.api';
 import { getErrorMessage } from '../../services/api';
 import { useForumStore } from '../../stores/forumStore';
 import { MapPin } from 'lucide-react';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
+import { useLocationStore } from '../../stores/locationStore';
 
 interface Props {
   compact?: boolean;
@@ -19,6 +20,7 @@ interface Props {
 /** Configuración de zona del foro: selector de ciudad (agrupado por departamento) + radio + GPS.
  *  Componente compartido entre ForumProfilePage y el selector del navbar del foro (09-spec G5). */
 export function GeoConfig({ compact = false, onSaved }: Props) {
+  const forumPalette = useForumPalette();
   const { geo, cities, updateGeo } = useForumStore();
   const [allCities, setAllCities] = useState<ForumCity[]>([]);
   const [cityId, setCityId] = useState<number | null>(geo?.cityId ?? null);
@@ -64,6 +66,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
           const { latitude, longitude } = pos.coords;
           const r = await resolveGeo(latitude, longitude);
           setCityId(r.cityId);
+          useLocationStore.getState().set({ lat: latitude, lng: longitude }, r.city);
           setError('');
         } catch (e) {
           setError(getErrorMessage(e));
@@ -148,6 +151,7 @@ function StackGeo({ cityId, grouped, onChange }: {
   grouped: Record<string, ForumCity[]>;
   onChange: (id: number | null) => void;
 }) {
+  const forumPalette = useForumPalette();
   const options = Object.entries(grouped).flatMap(([department, cities]) =>
     cities.map((c) => ({ ...c, _department: department })),
   );
