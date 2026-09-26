@@ -5,6 +5,7 @@ import { AuthRequest } from '../middlewares/auth';
 import { prisma } from '../config/database';
 import { ok, created } from '../utils/response';
 import { ApiError } from '../utils/errors';
+import { cityCoordsMap, nearestCity, nearestFirst, parseCoords, withCityFallback } from '../services/geo.service';
 
 function getIdentity(req: AuthRequest): { userId?: number; sessionId?: string } {
   if (req.user) return { userId: req.user.id };
@@ -227,8 +228,30 @@ export async function personalizedFeed(req: AuthRequest, res: Response, next: Ne
       userCity = user?.locationCity?.trim()?.toLowerCase() || user?.locationState?.trim()?.toLowerCase() || null;
     }
 
+    // Cercanía real por GPS: vendedores con coordenadas dentro del radio, del más cercano al más lejano.
+    const origin = parseCoords(req.query);
+    let geoNear: any[] = [];
+    if (origin) {
+      const cand = await prisma.product.findMany({
+        where: { isActive: true, isApproved: true },
+        orderBy: { createdAt: 'desc' },
+        take: 300,
+        include: { ...FEED_PRODUCT_INCLUDE, seller: { select: { ...FEED_PRODUCT_INCLUDE.seller.select, latitude: true, longitude: true } } },
+      });
+      const mapa = await cityCoordsMap();
+      geoNear = nearestFirst(
+        cand.map((p) => withCityFallback({ ...p, latitude: p.seller.latitude, longitude: p.seller.longitude }, p.seller.locationCity, mapa)),
+        origin,
+        origin.radiusKm,
+      ).slice(0, 10);
+      if (!userCity) {
+        const found = await nearestCity(origin.lat, origin.lng);
+        userCity = found?.city.name.toLowerCase() ?? null;
+      }
+    }
+
     // 1) Productos cerca de ti (misma ciudad, isActive, recientes) — fallback: destacados
-    const nearYou = await prisma.product.findMany({
+    const nearYou = geoNear.length > 0 ? geoNear : await prisma.product.findMany({
       where: {
         isActive: true,
         isApproved: true,
