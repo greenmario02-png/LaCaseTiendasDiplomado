@@ -35,7 +35,7 @@ export const staggerContainer: Variants = {
 
 export const staggerItem: Variants = fadeUp;
 
-/** Hover/tap estándar para tarjetas clicleables (productos, posts, entradas del Cono). */
+/** Hover/tap estándar para tarjetas clicleables (productos, posts, entradas de memes). */
 export const cardHover = {
   whileHover: { y: -4, scale: 1.01, transition: { duration: 0.18, ease: EASE } },
   whileTap: { scale: 0.98 },
