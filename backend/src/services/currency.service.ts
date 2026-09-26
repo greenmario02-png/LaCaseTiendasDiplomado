@@ -235,7 +235,7 @@ export interface LiveRates {
 const RATES_TTL_MS = 5 * 60 * 1000; // 5 minutos
 let ratesCache: { data: LiveRates; at: number } | null = null;
 
-async function fetchJson(url: string, timeoutMs = 6000): Promise<unknown> {
+async function fetchJson(url: string, timeoutMs = 2500): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -267,11 +267,29 @@ async function fetchUsdtUsd(): Promise<number> {
  * - EUR/JPY: Banco Central Europeo vía frankfurter.app (desde USD).
  * - USDT: Binance (USDT ≈ USD), sobre la tasa USD guardada.
  */
+let ratesInFlight: Promise<LiveRates> | null = null;
+
+// Stale-while-revalidate: si hay caché (aunque vencida) responde al instante y refresca en
+// segundo plano; las llamadas simultáneas comparten una sola consulta a las APIs externas.
 export async function getLiveRates(): Promise<LiveRates> {
-  if (ratesCache && Date.now() - ratesCache.at < RATES_TTL_MS) {
+  if (ratesCache) {
+    if (Date.now() - ratesCache.at >= RATES_TTL_MS && !ratesInFlight) {
+      ratesInFlight = computeLiveRates().finally(() => {
+        ratesInFlight = null;
+      });
+      ratesInFlight.catch(() => undefined);
+    }
     return ratesCache.data;
   }
+  if (!ratesInFlight) {
+    ratesInFlight = computeLiveRates().finally(() => {
+      ratesInFlight = null;
+    });
+  }
+  return ratesInFlight;
+}
 
+async function computeLiveRates(): Promise<LiveRates> {
   const [storedRates, usdtUsd] = await Promise.all([getRates(), fetchUsdtUsd()]);
   const usd = storedRates.USD ?? DEFAULT_RATES.USD ?? 6.96;
 
