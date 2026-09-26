@@ -55,6 +55,19 @@ export function createApp() {
   app.use(express.urlencoded({ extended: true }));
   app.use(generalLimiter);
 
+  // API versionada: /api/v1/* es un alias de /api/* (ambos siguen funcionando)
+  app.use((req, _res, next) => {
+    if (req.url === '/api/v1' || req.url.startsWith('/api/v1/') || req.url.startsWith('/api/v1?')) {
+      req.url = '/api' + req.url.slice('/api/v1'.length);
+    }
+    next();
+  });
+
+  // Ruta de salud pública
+  app.get(['/api/salud', '/api/v1/salud'], (_req, res) => {
+    res.status(200).json({ estado: 'ok' });
+  });
+
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
