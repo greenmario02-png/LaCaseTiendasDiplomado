@@ -154,3 +154,11 @@ export function resolveImageUrl(url: string | undefined | null): string | undefi
   }
   return url;
 }
+
+/** Pide un enlace temporal al CV de una postulación y lo abre en el navegador/visor. */
+export async function openApplicationCv(applicationId: number): Promise<void> {
+  const { Linking } = require('react-native');
+  const { data } = await api.post(`/jobs/applications/${applicationId}/cv-link`);
+  const origin = String(api.defaults.baseURL ?? '').replace(/\/api\/?$/, '');
+  await Linking.openURL(`${origin}${data.data.path}`);
+}
