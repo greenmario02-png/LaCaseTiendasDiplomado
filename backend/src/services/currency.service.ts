@@ -1,5 +1,6 @@
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
+import { env } from '../config/env';
 
 /**
  * Moneda base del sistema: Bs (Boliviano). Todos los precios se guardan en Bs.
@@ -111,9 +112,78 @@ async function fetchBcbUsdRate(): Promise<number | null> {
   }
 }
 
+const SOURCE_KEY = 'currency.source';
+const P2P_URL = 'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search';
+
+async function saveSetting(key: string, value: string) {
+  await prisma.setting.upsert({ where: { key }, create: { key, value }, update: { value } });
+}
+
+export function median(values: number[]): number {
+  const v = [...values].sort((a, b) => a - b);
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
+
+/** Descarta outliers (>15% respecto de la mediana) y devuelve la mediana del resto. */
+export function robustMedian(values: number[]): number {
+  const m0 = median(values);
+  const kept = values.filter((x) => Math.abs(x - m0) / m0 <= 0.15);
+  return median(kept.length ? kept : values);
+}
+
+async function fetchP2pPrices(tradeType: 'BUY' | 'SELL'): Promise<number[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2500);
+  try {
+    const res = await fetch(P2P_URL, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0 (compatible; LaCaseBot/1.0)' },
+      body: JSON.stringify({
+        fiat: 'BOB', page: 1, rows: 10, tradeType, asset: 'USDT', countries: [],
+        proMerchantAds: false, publisherType: null, payTypes: [], classifies: ['mass', 'profession'],
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = (await res.json()) as {
+      data?: Array<{ adv?: { price?: string; tradableQuantity?: string; maxSingleTransAmount?: string } }>;
+    };
+    const prices: number[] = [];
+    for (const row of json.data ?? []) {
+      const adv = row.adv;
+      const price = Number(adv?.price);
+      if (!Number.isFinite(price) || price <= 0) continue;
+      // Ignora anuncios con liquidez insignificante
+      if (adv?.tradableQuantity !== undefined && Number(adv.tradableQuantity) < 10) continue;
+      if (adv?.maxSingleTransAmount !== undefined && Number(adv.maxSingleTransAmount) < 100) continue;
+      prices.push(price);
+    }
+    return prices;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
- * Obtiene la tasa USD/BOB. Fuente PRIMARIA: Banco Central de Bolivia (bcb.gob.bo).
- * Si el BCB no responde, cae a APIs públicas de tasas; si todo falla, conserva la manual.
+ * Cotización USDT/BOB (≈ USD/BOB) desde Binance P2P: promedio de la mediana de compra y la
+ * mediana de venta. Requiere ≥3 anuncios válidos por lado; si no, devuelve null.
+ */
+export async function fetchBinanceUsdRate(): Promise<number | null> {
+  try {
+    const [buy, sell] = await Promise.all([fetchP2pPrices('BUY'), fetchP2pPrices('SELL')]);
+    if (buy.length < 3 || sell.length < 3) return null;
+    const rate = (robustMedian(buy) + robustMedian(sell)) / 2;
+    return Number.isFinite(rate) && rate > 0 ? Math.round(rate * 10000) / 10000 : null;
+  } catch (err) {
+    logger.warn('[Currency] Binance P2P falló:', (err as Error).message);
+    return null;
+  }
+}
+
+/**
+ * Obtiene la tasa USD/BOB. Fuente PRIMARIA: Binance P2P. Respaldo: BCB y APIs públicas.
+ * Las demás monedas se derivan por tasas cruzadas (er-api) ancladas a esa tasa.
  */
 export async function refreshRates(): Promise<Record<string, number>> {
   const sources = [
@@ -121,8 +191,15 @@ export async function refreshRates(): Promise<Record<string, number>> {
     'https://api.exchangerate-api.com/v4/latest/USD',
   ];
 
-  let usdToBob: number | null = await fetchBcbUsdRate();
-  let lastError: string | null = usdToBob === null ? 'BCB no disponible' : null;
+  let usdToBob: number | null = await fetchBinanceUsdRate();
+  let source = 'Binance P2P';
+  let lastError: string | null = usdToBob === null ? 'Binance no disponible' : null;
+
+  if (usdToBob === null) {
+    usdToBob = await fetchBcbUsdRate();
+    source = 'Banco Central de Bolivia (BCB)';
+    if (usdToBob === null) lastError = 'Binance y BCB no disponibles';
+  }
 
   for (const url of sources) {
     if (usdToBob !== null) break;
@@ -135,6 +212,7 @@ export async function refreshRates(): Promise<Record<string, number>> {
       const data = (await res.json()) as { rates?: Record<string, number> };
       if (data.rates?.BOB) {
         usdToBob = Number(data.rates.BOB);
+        source = 'API pública (er-api.com)';
         break;
       }
       throw new Error('La API no devolvió tasa BOB');
@@ -169,24 +247,50 @@ export async function refreshRates(): Promise<Record<string, number>> {
   }
 
   const now = new Date().toISOString();
-  // Persistir TODAS las tasas en Bs en settings (para que el selector de moneda convierta)
-  const stored: Record<string, number> = { USD: usdToBob };
-  await prisma.setting.upsert({ where: { key: getKey('USD') }, create: { key: getKey('USD'), value: String(usdToBob) }, update: { value: String(usdToBob) } });
+  await saveSetting(getKey('USD'), String(usdToBob));
+  await saveSetting(getKey('USDT'), String(usdToBob));
   for (const code of targetCodes) {
     const perUsd = usdRates[code];
     // tasa Bs por unidad = (Bs por USD) / (unidades por USD)
     const bs = perUsd && perUsd > 0 ? usdToBob / perUsd : DEFAULT_RATES[code] ?? usdToBob;
-    stored[code] = bs;
-    await prisma.setting.upsert({
-      where: { key: getKey(code) },
-      create: { key: getKey(code), value: String(bs) },
-      update: { value: String(bs) },
-    });
+    await saveSetting(getKey(code), String(bs));
   }
-  await prisma.setting.upsert({ where: { key: 'currency.ratesUpdatedAt' }, create: { key: 'currency.ratesUpdatedAt', value: now }, update: { value: now } });
+  await saveSetting('currency.ratesUpdatedAt', now);
+  await saveSetting(SOURCE_KEY, source);
   const rates = await getRates();
   rates.USD = usdToBob;
   return rates;
+}
+
+/** Intervalo aleatorio (ms) entre min y max minutos. */
+export function nextRefreshDelayMs(minMin: number, maxMin: number, rand: () => number = Math.random): number {
+  const lo = Math.min(minMin, maxMin);
+  const hi = Math.max(minMin, maxMin);
+  return Math.round((lo + rand() * (hi - lo)) * 60_000);
+}
+
+let refreshTimer: NodeJS.Timeout | null = null;
+
+/**
+ * Refresco automático encadenado con setTimeout a intervalo aleatorio (pensado para hosting
+ * gratuito que se duerme tras ~15 min de inactividad). No se inicia en NODE_ENV=test.
+ */
+export function startCurrencyRefreshScheduler(): void {
+  if (env.NODE_ENV === 'test' || refreshTimer) return;
+  const schedule = () => {
+    const delay = nextRefreshDelayMs(env.CURRENCY_REFRESH_MIN_MINUTES, env.CURRENCY_REFRESH_MAX_MINUTES);
+    refreshTimer = setTimeout(async () => {
+      try {
+        await refreshRates();
+      } catch (e) {
+        logger.warn(`[Currency] refresco automático: ${(e as Error).message}`);
+      }
+      schedule();
+    }, delay);
+    refreshTimer.unref();
+  };
+  refreshRates().catch((e) => logger.warn(`[Currency] refresco inicial: ${(e as Error).message}`));
+  schedule();
 }
 
 export async function setManualRate(usdToBob: number): Promise<Record<string, number>> {
@@ -194,12 +298,18 @@ export async function setManualRate(usdToBob: number): Promise<Record<string, nu
   const now = new Date().toISOString();
   await prisma.setting.upsert({ where: { key: getKey('USD') }, create: { key: getKey('USD'), value: String(usdToBob) }, update: { value: String(usdToBob) } });
   await prisma.setting.upsert({ where: { key: 'currency.ratesUpdatedAt' }, create: { key: 'currency.ratesUpdatedAt', value: now }, update: { value: now } });
+  await saveSetting(SOURCE_KEY, 'Manual');
   return getRates();
 }
 
 export async function setDefaultCurrency(code: string): Promise<void> {
   if (!CURRENCY_META[code]) throw new Error('Moneda no soportada');
   await prisma.setting.upsert({ where: { key: 'currency.default' }, create: { key: 'currency.default', value: code }, update: { value: code } });
+}
+
+export async function getRatesSource(): Promise<string | null> {
+  const settings = await getSettings();
+  return settings[SOURCE_KEY] ?? null;
 }
 
 export async function getRatesUpdatedAt(): Promise<string | null> {
@@ -290,7 +400,15 @@ export async function getLiveRates(): Promise<LiveRates> {
 }
 
 async function computeLiveRates(): Promise<LiveRates> {
-  const [storedRates, usdtUsd] = await Promise.all([getRates(), fetchUsdtUsd()]);
+  // Refresco perezoso (stale-while-revalidate): si la tasa guardada está vencida y no es manual, se renueva
+  if (env.NODE_ENV !== 'test') {
+    const [updatedAt, src] = await Promise.all([getRatesUpdatedAt(), getRatesSource()]);
+    const age = updatedAt ? Date.now() - new Date(updatedAt).getTime() : Infinity;
+    if (src !== 'Manual' && age >= RATES_TTL_MS) {
+      await refreshRates().catch((e) => logger.warn(`[Currency] refresco perezoso: ${(e as Error).message}`));
+    }
+  }
+  const [storedRates, usdtUsd, storedSource, settingsMap] = await Promise.all([getRates(), fetchUsdtUsd(), getRatesSource(), getSettings()]);
   const usd = storedRates.USD ?? DEFAULT_RATES.USD ?? 6.96;
 
   // Cotizaciones contra USD desde API pública (er-api.com, cubre EUR/JPY/ARS/CLP/BRL/UYU/PEN).
@@ -329,14 +447,14 @@ async function computeLiveRates(): Promise<LiveRates> {
     clp: clp ?? DEFAULT_RATES.CLP ?? usd / 950,
     uyu: uyu ?? DEFAULT_RATES.UYU ?? usd / 41,
     brl: brl ?? DEFAULT_RATES.BRL ?? usd / 5.5,
-    usdt: usd * usdtUsd,
+    usdt: Number(settingsMap[getKey('USDT')]) > 0 ? Number(settingsMap[getKey('USDT')]) : usd * usdtUsd,
   };
 
   const result: LiveRates = {
     base: 'BOB',
     rates,
     source: {
-      usd: 'Banco Central de Bolivia (BCB)',
+      usd: storedSource ?? 'Banco Central de Bolivia (BCB)',
       eur: 'API pública (er-api.com)',
       jpy: 'API pública (er-api.com)',
       ars: 'API pública (er-api.com)',
@@ -344,7 +462,7 @@ async function computeLiveRates(): Promise<LiveRates> {
       clp: 'API pública (er-api.com)',
       uyu: 'API pública (er-api.com)',
       brl: 'API pública (er-api.com)',
-      usdt: 'Binance',
+      usdt: storedSource === 'Binance P2P' ? 'Binance P2P' : 'Binance',
     },
     updatedAt: new Date().toISOString(),
   };

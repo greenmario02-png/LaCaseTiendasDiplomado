@@ -10,6 +10,8 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  CURRENCY_REFRESH_MIN_MINUTES: z.coerce.number().positive().default(8),
+  CURRENCY_REFRESH_MAX_MINUTES: z.coerce.number().positive().default(14),
 });
 
 const parsed = envSchema.safeParse(process.env);
