@@ -20,6 +20,7 @@ import coinsRoutes from './routes/coins.routes';
 import forumRoutes from './routes/forum.routes';
 import forumExtensionsRoutes from './routes/forum-extensions.routes';
 import conoRoutes from './routes/cono.routes';
+import botAccountRoutes from './routes/bot-account.routes';
 import chatRoutes from './routes/chat.routes';
 import trackingRoutes from './routes/tracking.routes';
 import auctionRoutes from './routes/auction.routes';
@@ -130,6 +131,7 @@ export function createApp() {
   app.use('/api/forum', forumRoutes);
   app.use('/api/forum', forumExtensionsRoutes);
   app.use('/api/cono', conoRoutes);
+  app.use('/api', botAccountRoutes);
   app.use('/api', contentRoutes);
 
   serveUploads(app);
