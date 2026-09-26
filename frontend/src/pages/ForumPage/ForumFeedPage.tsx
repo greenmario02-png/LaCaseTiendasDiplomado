@@ -20,7 +20,7 @@ const MODES = [
 
 export function ForumFeedPage() {
   const forumPalette = useForumPalette();
-  const { posts, loading, activeMode, activeCategory, geo, fetchPosts, loadMorePosts, setMode, setCategory, votePost } =
+  const { posts, loading, error, activeMode, activeCategory, geo, fetchPosts, loadMorePosts, setMode, setCategory, votePost } =
     useForumStore();
   const [openNew, setOpenNew] = useState(false);
   const [cityCategories, setCityCategories] = useState<{ category: { id: number; name: string; slug: string } }[]>([]);
@@ -109,6 +109,8 @@ export function ForumFeedPage() {
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <LoadingState />
         </Box>
+      ) : error ? (
+        <EmptyState message={error} />
       ) : posts.length === 0 ? (
         <EmptyState message="No hay preguntas aún. ¡Sé el primero en preguntar!" />
       ) : (

@@ -5,6 +5,9 @@ import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ScienceIcon from '@mui/icons-material/Science';
+import SchoolIcon from '@mui/icons-material/School';
+import { useNavigate } from 'react-router-dom';
 import { CategoryIcon } from '../../theme/forumIcons';
 import { useForumPalette } from '../../theme/forumTheme';
 import { useForumStore } from '../../stores/forumStore';
@@ -19,6 +22,7 @@ const MODES = [
 
 export default function ForumSidebarLeft() {
   const forumPalette = useForumPalette();
+  const navigate = useNavigate();
   const { activeMode, activeCategory, activeCity, setMode, setCategory, setCity } = useForumStore();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [cities, setCities] = useState<{ city: string; count: number }[]>([]);
@@ -43,6 +47,14 @@ export default function ForumSidebarLeft() {
               <ListItemText primary={m.label} sx={{ color: forumPalette.textPrimary }} />
             </ListItemButton>
           ))}
+          <ListItemButton onClick={() => navigate('/foro/verificacion')}>
+            <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}><ScienceIcon fontSize="small" /></ListItemIcon>
+            <ListItemText primary="Comunidades profesionales" sx={{ color: forumPalette.textPrimary }} />
+          </ListItemButton>
+          <ListItemButton onClick={() => navigate('/foro/universidades')}>
+            <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}><SchoolIcon fontSize="small" /></ListItemIcon>
+            <ListItemText primary="Universidades" sx={{ color: forumPalette.textPrimary }} />
+          </ListItemButton>
         </List>
       </Box>
 

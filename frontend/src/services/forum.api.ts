@@ -216,3 +216,73 @@ export interface GifResult { id: string; url: string; previewUrl: string; title:
 
 export const searchGifs = (q: string, limit = 12) =>
   api.get('/forum/gifs/search', { params: { q, limit } }).then((r) => r.data.data as GifResult[]);
+
+// ── Subforos profesionales (verificación por cuestionario) ──────────
+
+export interface ProfessionalField {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+}
+
+export interface ProfessionalQuestion {
+  id: number;
+  question: string;
+  options: string[];
+}
+
+export const listProfessionalFields = () =>
+  api.get('/forum/professional/fields').then((r) => r.data.data as ProfessionalField[]);
+
+export const getFieldQuestions = (slug: string) =>
+  api.get(`/forum/professional/fields/${slug}/questions`).then(
+    (r) => r.data.data as { field: ProfessionalField; questions: ProfessionalQuestion[] },
+  );
+
+export const submitVerification = (slug: string, answers: { questionId: number; selectedOptionIndex: number }[]) =>
+  api.post(`/forum/professional/fields/${slug}/verify`, { answers }).then(
+    (r) => r.data.data as { status: 'PASSED' | 'FAILED'; score: number; totalQuestions: number },
+  );
+
+export const getMyVerifications = () =>
+  api.get('/forum/professional/me').then(
+    (r) => r.data.data as { fieldId: number; status: string; field: ProfessionalField }[],
+  );
+
+// ── Universidades (subforos geolocalizados) ──────────────────────────
+
+export interface University {
+  id: number;
+  name: string;
+  city: { id: number; name: string; department: string };
+  categories: { slug: string }[];
+}
+
+export const listUniversities = (department?: string) =>
+  api.get('/forum/universities', { params: department ? { department } : {} }).then((r) => r.data.data as University[]);
+
+// ── Comentarios genéricos (con credibilidad) ─────────────────────────
+
+export interface GenericComment {
+  id: number;
+  targetType: string;
+  targetId: number;
+  body: string;
+  agreeCount: number;
+  fakeCount: number;
+  aiCount: number;
+  createdAt: string;
+  author: { id: number; forumUsername: string; avatarUrl?: string | null; tag: string };
+}
+
+export const listComments = (targetType: string, targetId: number, page = 1, limit = 20) =>
+  api.get('/forum/comments', { params: { targetType, targetId, page, limit } }).then((r) => r.data as { data: GenericComment[]; meta: { total: number } });
+
+export const createComment = (targetType: string, targetId: number, body: string) =>
+  api.post('/forum/comments', { targetType, targetId, body }).then((r) => r.data.data as GenericComment);
+
+export const deleteComment = (id: number) => api.delete(`/forum/comments/${id}`).then((r) => r.data.data);
+
+export const voteComment = (id: number, type: 'AGREE' | 'FAKE' | 'AI_GENERATED') =>
+  api.post(`/forum/comments/${id}/vote`, { type }).then((r) => r.data.data as { agreeCount: number; fakeCount: number; aiCount: number });
