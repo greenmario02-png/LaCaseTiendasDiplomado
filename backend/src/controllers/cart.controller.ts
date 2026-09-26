@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express';
 
 import { AuthRequest } from '../middlewares/auth';
 import * as cartService from '../services/cart.service';
+import { ApiError } from '../utils/errors';
 import { ok, created } from '../utils/response';
 
 export async function getCart(req: AuthRequest, res: Response, next: NextFunction) {
@@ -53,7 +54,7 @@ export async function clear(req: AuthRequest, res: Response, next: NextFunction)
 export async function merge(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const sessionId = req.body.sessionId;
-    if (!sessionId) return next(new Error('sessionId obligatorio'));
+    if (!sessionId || typeof sessionId !== 'string') throw ApiError.badRequest('sessionId obligatorio');
     await cartService.mergeGuestCart(req.user!.id, sessionId);
     const cart = await cartService.getCart(req);
     return ok(res, cart);

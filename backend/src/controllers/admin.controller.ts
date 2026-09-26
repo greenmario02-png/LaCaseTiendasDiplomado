@@ -318,6 +318,8 @@ export async function listUsers(req: AuthRequest, res: Response, next: NextFunct
 export async function updateUser(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const userId = Number(req.params.id);
+    if (!Number.isInteger(userId) || userId <= 0) throw ApiError.badRequest('ID de usuario inválido');
+    // req.body ya validado por adminUpdateUserSchema (rol dentro del enum, booleanos tipados)
     const { role, isActive, isApproved, isVerified, locationVerified } = req.body;
 
     const prevUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, isApproved: true, isActive: true, storeName: true, locationVerified: true } });
@@ -800,7 +802,7 @@ export async function listBanners(_req: AuthRequest, res: Response, next: NextFu
 export async function updateBanner(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const bannerId = Number(req.params.id);
-    const banner = await prisma.banner.update({ where: { id: bannerId }, data: req.body });
+    const banner = await prisma.banner.update({ where: { id: bannerId }, data: req.body }); // validado por updateBannerSchema
     return ok(res, banner);
   } catch (error) {
     if ((error as any).code === 'P2025') return next(ApiError.notFound('Banner no encontrado'));

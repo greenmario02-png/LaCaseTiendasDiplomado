@@ -49,6 +49,7 @@ export async function createProduct(req: AuthRequest, res: Response, next: NextF
     if (!user.isApproved) throw ApiError.forbidden('Tu tienda debe ser aprobada por un administrador');
     if (user.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No podés publicar productos por el momento');
 
+    // req.body ya viene filtrado por createProductSchema (lista blanca de campos)
     const { attributes, tags, images, ...data } = req.body;
 
     const slug = `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`;
@@ -112,7 +113,9 @@ export async function updateProduct(req: AuthRequest, res: Response, next: NextF
     const seller = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, storePaused: true } });
     if (seller?.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No podés modificar productos por el momento');
 
+    // req.body ya viene filtrado por updateProductSchema (lista blanca de campos)
     const { attributes, tags, images, ...data } = req.body;
+    if (!data.sku) delete data.sku; // un SKU vacío no reemplaza al existente
 
     // Empleados: NO pueden editar precios (solo dueño/admin de tienda o admin global)
     const isEmployee = req.user!.role === Role.SELLER && (req.user!.storeRole === 'EMPLOYEE');
@@ -134,7 +137,7 @@ export async function updateProduct(req: AuthRequest, res: Response, next: NextF
     const updated = await prisma.$transaction(async (tx) => {
       const p = await tx.product.update({
         where: { id: productId },
-        data: { ...data, slug: data.slug || product.slug },
+        data,
         include: PRODUCT_INCLUDE,
       });
 
