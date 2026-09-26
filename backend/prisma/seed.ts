@@ -779,12 +779,14 @@ const RBAC_MENUS: Array<{ code: string; label: string; path: string; module: str
   { code: 'public.auctions', label: 'Subastas', path: '/subastas', module: 'public', sortOrder: 2 },
   { code: 'public.forum', label: 'Foro', path: '/foro', module: 'public', sortOrder: 3 },
   { code: 'public.promotions', label: 'Promociones', path: '/promociones', module: 'public', sortOrder: 4 },
+  { code: 'public.jobs', label: 'Empleos', path: '/empleos', module: 'public', sortOrder: 5 },
   // Panel vendedor
   { code: 'seller.dashboard', label: 'Dashboard', path: '/seller', module: 'seller', sortOrder: 0 },
   { code: 'seller.products', label: 'Productos', path: '/seller/productos', module: 'seller', sortOrder: 1 },
   { code: 'seller.labels', label: 'Etiquetas', path: '/seller/etiquetas', module: 'seller', sortOrder: 2 },
   { code: 'seller.calendar', label: 'Calendario', path: '/seller/calendario', module: 'seller', sortOrder: 3 },
   { code: 'seller.auctions', label: 'Subastas', path: '/seller/subastas', module: 'seller', sortOrder: 4 },
+  { code: 'seller.jobs', label: 'Empleos', path: '/seller/empleos', module: 'seller', sortOrder: 4 },
   { code: 'seller.privileged', label: 'Compradores VIP', path: '/seller/privilegiados', module: 'seller', sortOrder: 5 },
   { code: 'seller.promotions', label: 'Promociones', path: '/seller/promociones', module: 'seller', sortOrder: 6 },
   { code: 'seller.coupons', label: 'Cupones', path: '/seller/cupones', module: 'seller', sortOrder: 7 },
@@ -815,6 +817,7 @@ const RBAC_MENUS: Array<{ code: string; label: string; path: string; module: str
   { code: 'admin.forum', label: 'Foro (moderación)', path: '/admin/foro', module: 'admin', sortOrder: 17 },
   { code: 'admin.calendar', label: 'Calendario', path: '/admin/calendario', module: 'admin', sortOrder: 18 },
   { code: 'admin.rbac', label: 'Roles y permisos', path: '/admin/rbac', module: 'admin', sortOrder: 19 },
+  { code: 'admin.jobs', label: 'Empleos', path: '/admin/empleos', module: 'admin', sortOrder: 20 },
 ];
 
 async function seedRbac() {
@@ -919,6 +922,26 @@ async function seedRbac() {
   }
 }
 
+const JOB_CATEGORIES = [
+  { name: 'Ventas y atención al cliente', slug: 'ventas-atencion-cliente', icon: '🛍️' },
+  { name: 'Logística y reparto', slug: 'logistica-reparto', icon: '🚚' },
+  { name: 'Administración y oficina', slug: 'administracion-oficina', icon: '🗂️' },
+  { name: 'Cocina y gastronomía', slug: 'cocina-gastronomia', icon: '🍳' },
+  { name: 'Construcción y oficios', slug: 'construccion-oficios', icon: '🔧' },
+  { name: 'Tecnología y soporte', slug: 'tecnologia-soporte', icon: '💻' },
+  { name: 'Limpieza y mantenimiento', slug: 'limpieza-mantenimiento', icon: '🧹' },
+  { name: 'Marketing y diseño', slug: 'marketing-diseno', icon: '🎨' },
+  { name: 'Educación y capacitación', slug: 'educacion-capacitacion', icon: '📚' },
+  { name: 'Seguridad', slug: 'seguridad', icon: '🛡️' },
+  { name: 'Otros', slug: 'otros-empleos', icon: '💼' },
+];
+
+async function seedJobCategories() {
+  for (const [i, c] of JOB_CATEGORIES.entries()) {
+    await prisma.jobCategory.upsert({ where: { slug: c.slug }, update: { name: c.name, icon: c.icon, sortOrder: i }, create: { ...c, sortOrder: i } });
+  }
+}
+
 async function main() {
   console.log('Limpiando base...');
   await prisma.orderItem.deleteMany();
@@ -960,6 +983,8 @@ async function main() {
   await prisma.payout.deleteMany();
   await prisma.payoutAccount.deleteMany();
   await prisma.privilegedBuyer.deleteMany();
+  await prisma.jobPosting.deleteMany();
+  await prisma.jobCategory.deleteMany();
   await prisma.user.deleteMany();
   await prisma.faq.deleteMany();
   await prisma.warranty.deleteMany();
@@ -1454,6 +1479,7 @@ async function main() {
   for (const r of reaches) await prisma.reach.create({ data: r });
 
   await seedRbac();
+  await seedJobCategories();
 
   // ===== Geolocalización del foro (09-spec G1.2): ciudades de Bolivia por departamento =====
   const FORUM_CITIES = [

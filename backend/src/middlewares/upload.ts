@@ -6,6 +6,7 @@ import express from 'express';
 import multer from 'multer';
 
 import { requireAdmin } from '../middlewares/roles';
+import { ApiError } from '../utils/errors';
 
 const UPLOAD_DIR = path.resolve(__dirname, '..', '..', 'uploads');
 const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
@@ -90,3 +91,26 @@ export function serveUploads(app: import('express').Express) {
     next();
   }, express.static(UPLOAD_DIR, { maxAge: '7d' }));
 }
+
+// ── CV de postulaciones: carpeta PRIVADA (fuera de /uploads, que es público). Solo se descarga
+// con un enlace firmado de corta duración emitido a la persona autorizada. ──
+export const CV_DIR = path.resolve(__dirname, '..', '..', 'private-uploads', 'cv');
+export const CV_ALLOWED_EXT = ['.pdf', '.doc', '.docx'];
+export const CV_MAX_SIZE = 5 * 1024 * 1024;
+fs.mkdirSync(CV_DIR, { recursive: true });
+
+export const cvUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, CV_DIR),
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+    },
+  }),
+  limits: { fileSize: CV_MAX_SIZE, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!CV_ALLOWED_EXT.includes(ext)) return cb(ApiError.badRequest('El CV debe ser un archivo PDF, DOC o DOCX'));
+    cb(null, true);
+  },
+});
