@@ -24,6 +24,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ChatIcon from '@mui/icons-material/Chat';
 import GavelIcon from '@mui/icons-material/Gavel';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import ForumIcon from '@mui/icons-material/Forum';
 import { styled, alpha } from '@mui/material/styles';
 import { useAuthStore } from '../../stores/authStore';
@@ -172,6 +173,12 @@ export default function Navbar() {
           <Tooltip title="Foro LaCASE">
             <IconButton color="inherit" onClick={() => navigate('/foro')}>
               <ForumIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Memes y torneo">
+            <IconButton color="inherit" onClick={() => navigate('/cono')} aria-label="Memes y torneo">
+              <SentimentVeryDissatisfiedIcon />
             </IconButton>
           </Tooltip>
 

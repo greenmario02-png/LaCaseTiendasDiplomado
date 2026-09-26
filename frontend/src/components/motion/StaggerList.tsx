@@ -8,8 +8,8 @@ interface ContainerProps {
 }
 
 /**
- * Grillas/listas que entran en cascada (productos, posts del foro, entradas del Cono de
- * la Vergüenza). Envolvé el contenedor con `StaggerContainer` y cada tarjeta con
+ * Grillas/listas que entran en cascada (productos, posts del foro, entradas de memes).
+ * Envolvé el contenedor con `StaggerContainer` y cada tarjeta con
  * `StaggerItem` — no hace falta orquestar el delay a mano, lo maneja Framer Motion.
  */
 export function StaggerContainer({ children, className }: ContainerProps) {

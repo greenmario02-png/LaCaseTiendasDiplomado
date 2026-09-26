@@ -32,6 +32,11 @@ const ForumFeedPage = lazy(() => import('./pages/ForumPage/ForumFeedPage').then(
 const ForumPostPage = lazy(() => import('./pages/ForumPage/ForumPostPage').then((m) => ({ default: m.ForumPostPage })));
 const ForumCategoriesPage = lazy(() => import('./pages/ForumPage/ForumCategoriesPage').then((m) => ({ default: m.ForumCategoriesPage })));
 const ForumProfilePage = lazy(() => import('./pages/ForumPage/ForumProfilePage').then((m) => ({ default: m.ForumProfilePage })));
+const ProfessionalVerificationPage = lazy(() => import('./pages/ForumPage/ProfessionalVerificationPage'));
+const UniversitiesPage = lazy(() => import('./pages/ForumPage/UniversitiesPage').then((m) => ({ default: m.UniversitiesPage })));
+const ConoHomePage = lazy(() => import('./pages/ConoPage/ConoHomePage'));
+const ConoThemeDetailPage = lazy(() => import('./pages/ConoPage/ConoThemeDetailPage'));
+const ConoEntryDetailPage = lazy(() => import('./pages/ConoPage/ConoEntryDetailPage'));
 
 const AccountPage = lazy(() => import('./pages/account/AccountPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
@@ -170,7 +175,20 @@ export default function App() {
             <Route path="categorias" element={<ForumCategoriesPage />} />
             <Route path="post/:id" element={<ForumPostPage />} />
             <Route path="u/:username" element={<ForumProfilePage />} />
+            <Route
+              path="verificacion"
+              element={
+                <Protected>
+                  <ProfessionalVerificationPage />
+                </Protected>
+              }
+            />
+            <Route path="universidades" element={<UniversitiesPage />} />
           </Route>
+
+          <Route path="/cono" element={<ConoHomePage />} />
+          <Route path="/cono/entrada/:id" element={<ConoEntryDetailPage />} />
+          <Route path="/cono/:slug" element={<ConoThemeDetailPage />} />
 
           <Route path="/empleos" element={<JobsPage />} />
 
