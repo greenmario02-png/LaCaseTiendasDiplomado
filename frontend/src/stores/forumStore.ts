@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as api from '../services/forum.api';
 import type { ForumProfile, ForumPost, ForumCity, ForumGeoSession } from '../services/forum.api';
+import { getErrorMessage } from '../services/api';
 
 interface ForumStore {
   profile: ForumProfile | null;
@@ -8,6 +9,8 @@ interface ForumStore {
   page: number;
   totalPages: number;
   loading: boolean;
+  /** Mensaje de error del último fetchPosts (ej. subforo de universidad restringido). */
+  error: string | null;
   activeMode: string;
   activeCity: string;
   activeCategory: string;
@@ -37,6 +40,7 @@ export const useForumStore = create<ForumStore>((set, get) => ({
   activeMode: 'RECIENTE',
   activeCity: '',
   activeCategory: '',
+  error: null,
   geo: null,
   cities: [],
   geoLoaded: false,
@@ -57,8 +61,8 @@ export const useForumStore = create<ForumStore>((set, get) => ({
     const newCity = city ?? s.activeCity;
     const newCat = category ?? s.activeCategory;
 
-    if (reset) set({ posts: [], page: 1, loading: true });
-    else set({ loading: true });
+    if (reset) set({ posts: [], page: 1, loading: true, error: null });
+    else set({ loading: true, error: null });
 
     try {
       const res = await api.listPosts({
@@ -78,8 +82,8 @@ export const useForumStore = create<ForumStore>((set, get) => ({
         activeCategory: newCat,
         loading: false,
       }));
-    } catch {
-      set({ loading: false });
+    } catch (e) {
+      set({ loading: false, posts: [], error: getErrorMessage(e) });
     }
   },
 
