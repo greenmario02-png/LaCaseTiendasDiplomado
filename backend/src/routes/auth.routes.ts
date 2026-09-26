@@ -12,9 +12,9 @@ const router = Router();
 router.post('/register', registerLimiter, validate(registerSchema), asyncHandler(authController.register));
 router.post('/sellers/register', registerLimiter, validate(sellerRegisterSchema), asyncHandler(authController.registerSeller));
 router.post('/login', authLimiter, validate(loginSchema), asyncHandler(authController.login));
-router.post('/refresh', validate(refreshSchema), asyncHandler(authController.refresh));
-router.post('/logout', asyncHandler(authController.logout));
+router.post('/refresh', authLimiter, validate(refreshSchema), asyncHandler(authController.refresh));
+router.post('/logout', authLimiter, asyncHandler(authController.logout));
 router.get('/me', authenticate, asyncHandler(authController.me));
-router.post('/verify-password', authenticate, asyncHandler(authController.verifyPassword));
+router.post('/verify-password', authLimiter, authenticate, asyncHandler(authController.verifyPassword));
 
 export default router;
