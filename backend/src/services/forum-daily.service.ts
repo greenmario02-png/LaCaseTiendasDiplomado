@@ -24,6 +24,19 @@ export async function processForumTopPost(): Promise<number | null> {
 
   if (!topPost?.authorId) return null;
 
+  // Idempotencia real (no solo "buscar si ya existe" en JS, que sigue siendo racy bajo
+  // concurrencia real): el constraint único de ForumTopPostAward.postId hace que solo una
+  // ejecución concurrente gane el `create`; las demás reciben P2002 y no otorgan nada.
+  try {
+    await prisma.forumTopPostAward.create({ data: { postId: topPost.id } });
+  } catch (e) {
+    if ((e as { code?: string }).code === 'P2002') {
+      logger.info(`[forum-top-post] post ${topPost.id} ya fue premiado — se ignora esta ejecución`);
+      return topPost.id;
+    }
+    throw e;
+  }
+
   await karmaService.earn(
     topPost.authorId,
     5,

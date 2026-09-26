@@ -32,5 +32,13 @@ export default async function globalSetup() {
     stdio: 'pipe',
   });
 
+  console.log('[globalSetup] Aplicando seed de subforos profesionales y universidades...');
+
+  execSync('npx tsx prisma/seed-professional.ts', {
+    cwd: path.resolve(__dirname, '..'),
+    env: { ...process.env },
+    stdio: 'pipe',
+  });
+
   console.log('[globalSetup] Listo.\n');
 }

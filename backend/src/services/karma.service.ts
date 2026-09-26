@@ -26,33 +26,51 @@ export const karmaService = {
   ): Promise<void> {
     if (amount === 0) return;
 
-    const profile = await prisma.forumProfile.findUniqueOrThrow({ where: { id: profileId } });
+    const result = await prisma.$transaction(async (tx) => {
+      // Update atómico con piso en 0: el CTE `locked` toma el row lock (FOR UPDATE) y
+      // el UPDATE calcula karma nuevo a partir de ESE valor bloqueado, no de un valor
+      // leído antes de la transacción — dos penalizaciones concurrentes ya no pueden
+      // ambas "ver" el mismo karma viejo y hacer que el total termine por debajo de 0.
+      const rows = await tx.$queryRaw<{ oldKarma: number; newKarma: number; oldTag: string; userId: number }[]>`
+        WITH locked AS (
+          SELECT karma, tag, "userId" FROM forum_profiles WHERE id = ${profileId} FOR UPDATE
+        )
+        UPDATE forum_profiles
+        SET karma = GREATEST((SELECT karma FROM locked) + ${amount}, 0)
+        WHERE id = ${profileId}
+        RETURNING
+          (SELECT karma FROM locked) AS "oldKarma",
+          karma AS "newKarma",
+          (SELECT tag FROM locked) AS "oldTag",
+          (SELECT "userId" FROM locked) AS "userId"
+      `;
+      const row = rows[0];
+      if (!row) throw ApiError.notFound('Perfil de foro no encontrado.');
 
-    // Karma nunca baja de 0
-    const effectiveAmount = amount < 0 ? Math.max(-profile.karma, amount) : amount;
-    if (effectiveAmount === 0) return;
+      const effectiveAmount = row.newKarma - row.oldKarma;
+      if (effectiveAmount === 0) return { ...row, effectiveAmount, newTag: row.oldTag };
 
-    const newKarma = profile.karma + effectiveAmount;
-    const newTag = this.getTag(newKarma);
-
-    await prisma.$transaction([
-      prisma.karmaTransaction.create({
+      const newTag = this.getTag(row.newKarma);
+      if (newTag !== row.oldTag) {
+        await tx.forumProfile.update({ where: { id: profileId }, data: { tag: newTag } });
+      }
+      await tx.karmaTransaction.create({
         data: { profileId, amount: effectiveAmount, type: type as never, refType, refId, note },
-      }),
-      prisma.forumProfile.update({
-        where: { id: profileId },
-        data: { karma: { increment: effectiveAmount }, tag: newTag },
-      }),
-    ]);
+      });
+
+      return { ...row, effectiveAmount, newTag };
+    });
+
+    if (result.effectiveAmount === 0) return;
 
     // Notificar si subió de rango
-    if (newTag !== profile.tag && effectiveAmount > 0) {
+    if (result.newTag !== result.oldTag && result.effectiveAmount > 0) {
       try {
         await createNotification({
-          userId: profile.userId,
+          userId: result.userId,
           type: 'FORUM_RANK_UP' as never,
-          title: `¡Nuevo rango: ${newTag}! 🏅`,
-          message: `Tu karma llegó a ${newKarma}. ¡Ahora eres ${newTag} en LaCASE!`,
+          title: `¡Nuevo rango: ${result.newTag}! 🏅`,
+          message: `Tu karma llegó a ${result.newKarma}. ¡Ahora eres ${result.newTag} en LaCASE!`,
           refType: 'FORUM_PROFILE',
           refId: profileId,
         });

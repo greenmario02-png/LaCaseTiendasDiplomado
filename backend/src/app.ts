@@ -18,6 +18,7 @@ import buildRoutes from './routes/build.routes';
 import currencyRoutes from './routes/currency.routes';
 import coinsRoutes from './routes/coins.routes';
 import forumRoutes from './routes/forum.routes';
+import forumExtensionsRoutes from './routes/forum-extensions.routes';
 import chatRoutes from './routes/chat.routes';
 import trackingRoutes from './routes/tracking.routes';
 import auctionRoutes from './routes/auction.routes';
@@ -126,6 +127,7 @@ export function createApp() {
   app.use('/api', currencyRoutes);
   app.use('/api/coins', coinsRoutes);
   app.use('/api/forum', forumRoutes);
+  app.use('/api/forum', forumExtensionsRoutes);
   app.use('/api', contentRoutes);
 
   serveUploads(app);

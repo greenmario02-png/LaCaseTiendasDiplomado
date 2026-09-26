@@ -56,8 +56,9 @@ export async function adminListCategories(_req: Request, res: Response) {
   return ok(res, categories);
 }
 
-export async function getCategoryBySlug(req: Request, res: Response) {
-  const category = await FS.getCategoryBySlug(String(req.params.slug));
+export async function getCategoryBySlug(req: AuthRequest, res: Response) {
+  const viewerProfile = req.user ? await FS.ensureForumProfile(req.user.id).catch(() => null) : null;
+  const category = await FS.getCategoryBySlug(String(req.params.slug), viewerProfile?.id);
   if (!category) throw ApiError.notFound('Categoría no encontrada.');
   return ok(res, category);
 }
@@ -283,23 +284,31 @@ export async function getTopUsers(_req: Request, res: Response) {
 export async function listReports(req: AuthRequest, res: Response) {
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
+  const isAdmin = req.user!.role === 'ADMIN';
+  // Moderador no-ADMIN: restringir a su propio departamento (null si no tiene uno asignado: no ve nada).
+  let department: string | null | undefined;
+  if (!isAdmin) {
+    const modProfile = await prisma.forumProfile.findUnique({ where: { userId: req.user!.id }, select: { department: true } });
+    department = modProfile?.department ?? null;
+  }
   const { reports, total } = await FS.listReports({
     page,
     limit,
     status: req.query.status as string | undefined,
     targetType: req.query.targetType as string | undefined,
     reason: req.query.reason as string | undefined,
+    department,
   });
   return paginated(res, reports, total, page, limit);
 }
 
 export async function resolveReport(req: AuthRequest, res: Response) {
-  const report = await FS.resolveReport(Number(req.params.id), req.user!.id, req.body.resolution);
+  const report = await FS.resolveReport(Number(req.params.id), req.user!.id, req.user!.role === 'ADMIN', req.body.resolution);
   return ok(res, report);
 }
 
 export async function rejectReport(req: AuthRequest, res: Response) {
-  const report = await FS.rejectReport(Number(req.params.id), req.user!.id, req.body.resolution);
+  const report = await FS.rejectReport(Number(req.params.id), req.user!.id, req.user!.role === 'ADMIN', req.body.resolution);
   return ok(res, report);
 }
 
