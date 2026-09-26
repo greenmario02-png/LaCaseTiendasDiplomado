@@ -3,8 +3,6 @@ import { Gift } from 'lucide-react';
 import {
   Box,
   Typography,
-  Paper,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -32,6 +30,10 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { LoadingState } from '../../components/redesign/States';
+import { useUnifiedTokens } from '../../theme';
 
 interface CouponProduct {
   productId: number;
@@ -66,6 +68,7 @@ const emptyForm = {
 
 export default function SellerCoupons() {
   const money = useMoney();
+  const t = useUnifiedTokens();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [myProducts, setMyProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -160,29 +163,26 @@ export default function SellerCoupons() {
 
   const typeLabel = (t: string) => (t === 'PERCENTAGE' ? 'Porcentaje' : t === 'FIXED' ? 'Monto fijo' : 'Regalo');
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 6 }} />;
+  if (loading) return <LoadingState />;
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box display="flex" alignItems="center" gap={1}>
-          <LocalOfferIcon color="primary" />
-          <Typography variant="h5" fontWeight={700}>
-            Cupones de mi tienda
-          </Typography>
-        </Box>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={openNew}>
-          Crear cupón
-        </Button>
-      </Box>
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Creá cupones de descuento para tus productos o cupones de regalo. Elegí los productos de tu tienda a los que aplica el cupón.
-      </Typography>
+      <PageHeader
+        title="Cupones de mi tienda"
+        subtitle="Creá cupones de descuento para tus productos o cupones de regalo. Elegí los productos de tu tienda a los que aplica el cupón."
+        icon={<LocalOfferIcon />}
+        actions={
+          <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
+            Crear cupón
+          </PrimaryButton>
+        }
+      />
 
-      <TableContainer component={Paper}>
+      <SurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+      <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ bgcolor: 'action.hover' }}>
+            <TableRow sx={{ bgcolor: t.surface, '& th': { color: t.onSurfaceVariant, fontWeight: 700 } }}>
               <TableCell>Código</TableCell>
               <TableCell>Tipo</TableCell>
               <TableCell>Valor</TableCell>
@@ -234,6 +234,7 @@ export default function SellerCoupons() {
           </TableBody>
         </Table>
       </TableContainer>
+      </SurfaceCard>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editing ? 'Editar cupón' : 'Crear cupón'}</DialogTitle>
@@ -292,10 +293,10 @@ export default function SellerCoupons() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={save} disabled={saving || !form.code || !form.value}>
-            {saving ? <CircularProgress size={18} /> : 'Guardar'}
-          </Button>
+          <GhostButton type="button" onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <PrimaryButton type="button" onClick={save} disabled={saving || !form.code || !form.value}>
+            {saving ? <CircularProgress size={18} color="inherit" /> : 'Guardar'}
+          </PrimaryButton>
         </DialogActions>
       </Dialog>
     </Box>

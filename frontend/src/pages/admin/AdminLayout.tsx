@@ -9,11 +9,9 @@ import {
   ListItemIcon,
   ListItemText,
   Drawer,
-  Typography,
   useMediaQuery,
   useTheme,
   Divider,
-  Button,
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -39,6 +37,9 @@ import HistoryIcon from '@mui/icons-material/History';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ForumIcon from '@mui/icons-material/Forum';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader } from '../../components/redesign/PageHeader';
+import { SecondaryButton } from '../../components/redesign/Buttons';
 import { useRbacStore, type RbacMenu } from '../../stores/rbacStore';
 
 const MENU = [
@@ -83,6 +84,7 @@ function rbacAdminMenus(rbacMenus: RbacMenu[]) {
 
 export default function AdminLayout() {
   const theme = useTheme();
+  const t = useUnifiedTokens();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
   const rbacMenus = useRbacStore((s) => s.menus);
@@ -99,7 +101,7 @@ export default function AdminLayout() {
           sx={{
             width: 260,
             flexShrink: 0,
-            '& .MuiDrawer-paper': { width: 260, boxSizing: 'border-box', pt: 8 },
+            '& .MuiDrawer-paper': { width: 260, boxSizing: 'border-box', pt: 8, bgcolor: t.surfaceContainerLowest, borderColor: `${t.outline}33` },
           }}
         >
           <List>
@@ -109,15 +111,28 @@ export default function AdminLayout() {
                   component={Link}
                   to={item.to}
                   selected={item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)}
+                  sx={{
+                    borderRadius: '12px',
+                    mx: 1,
+                    color: t.onSurfaceVariant,
+                    '& .MuiListItemIcon-root': { color: 'inherit', minWidth: 40 },
+                    '&.Mui-selected, &.Mui-selected:hover': { bgcolor: `${t.primary}1F`, color: t.primary, fontWeight: 700 },
+                  }}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />
                 </ListItemButton>
               </ListItem>
             ))}
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{ my: 1, borderColor: `${t.outline}33` }} />
             <ListItem disablePadding>
-              <ListItemButton component={Link} to="/" color="inherit">
+              <ListItemButton component={Link} to="/" color="inherit" sx={{
+                    borderRadius: '12px',
+                    mx: 1,
+                    color: t.onSurfaceVariant,
+                    '& .MuiListItemIcon-root': { color: 'inherit', minWidth: 40 },
+                    '&.Mui-selected, &.Mui-selected:hover': { bgcolor: `${t.primary}1F`, color: t.primary, fontWeight: 700 },
+                  }}>
                 <ListItemIcon>
                   <StoreIcon />
                 </ListItemIcon>
@@ -130,14 +145,15 @@ export default function AdminLayout() {
 
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, md: 3 } }}>
         <Container maxWidth="lg">
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-            <Typography variant="h5" fontWeight={700}>
-              Panel de administración
-            </Typography>
-            <Button component={Link} to="/" variant="outlined" startIcon={<StoreIcon />} size="small">
-              Volver a la tienda
-            </Button>
-          </Box>
+          <PageHeader
+            title="Panel de administración"
+            icon={<DashboardIcon />}
+            actions={
+              <SecondaryButton type="button" to="/" size="small" startIcon={<StoreIcon />}>
+                Volver a la tienda
+              </SecondaryButton>
+            }
+          />
           <Outlet />
         </Container>
       </Box>

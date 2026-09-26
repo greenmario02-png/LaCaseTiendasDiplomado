@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 import { PriceDisplay } from './PriceDisplay';
 
 export interface CardProduct {
@@ -23,7 +23,7 @@ interface ProductCardProps {
 
 /** Tarjeta de producto del rediseño Unified: imagen, precio Bs, tienda, stock, agregar al carrito. */
 export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const out = product.stock <= 0;
   const body = (
     <>

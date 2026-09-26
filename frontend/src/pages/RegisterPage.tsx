@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Paper, Typography, TextField, Button, Box, Alert, CircularProgress } from '@mui/material';
+import { TextField, Box, Alert, CircularProgress } from '@mui/material';
+import AuthCard from '../components/redesign/AuthCard';
+import { PrimaryButton } from '../components/redesign/Buttons';
 import { useAuthStore } from '../stores/authStore';
 import { getErrorMessage } from '../services/api';
 import toast from 'react-hot-toast';
@@ -32,18 +34,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" fontWeight={700} mb={3} textAlign="center">
-          Crear cuenta
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
-          <TextField label="Nombre" required value={form.firstName} onChange={handleChange('firstName')} />
+    <AuthCard
+      title="Crear cuenta"
+      subtitle="Es gratis y toma menos de un minuto"
+      footer={
+        <>
+          ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link> · ¿Querés vender? <Link to="/registro-vendedor">Abrí tu tienda</Link>
+        </>
+      }
+    >
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
+        <TextField label="Nombre" required value={form.firstName} onChange={handleChange('firstName')} />
           <TextField label="Apellido" required value={form.lastName} onChange={handleChange('lastName')} />
           <TextField label="Email" type="email" required value={form.email} onChange={handleChange('email')} />
           <TextField label="Teléfono" value={form.phone} onChange={handleChange('phone')} />
@@ -54,16 +60,10 @@ export default function RegisterPage() {
             onChange={handleChange('referralCode')}
             helperText="¿Te invitó un amigo? Escribí su código y quien te invitó gana 50 monedas del proyecto."
           />
-          <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}>
-            {loading ? <CircularProgress size={22} color="inherit" /> : 'Registrarme'}
-          </Button>
-        </Box>
-        <Box mt={2} textAlign="center">
-          <Typography variant="body2" color="text.secondary">
-            ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link> · ¿Querés vender? <Link to="/registro-vendedor">Abrí tu tienda</Link>
-          </Typography>
-        </Box>
-      </Paper>
-    </Container>
+        <PrimaryButton type="submit" size="large" fullWidth disabled={loading}>
+          {loading ? <CircularProgress size={22} color="inherit" /> : 'Registrarme'}
+        </PrimaryButton>
+      </Box>
+    </AuthCard>
   );
 }

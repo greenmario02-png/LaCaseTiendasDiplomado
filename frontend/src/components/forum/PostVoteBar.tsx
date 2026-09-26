@@ -1,6 +1,6 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 
 interface Props {
   score: number;
@@ -15,6 +15,7 @@ interface Props {
  * Iconos de la librería Lucide (reemplazan las flechas/emojis de antes).
  */
 export default function PostVoteBar({ score, userVote, onVote, size = 'small' }: Props) {
+  const forumPalette = useForumPalette();
   const fs = size === 'small' ? 18 : 22;
   return (
     <Box

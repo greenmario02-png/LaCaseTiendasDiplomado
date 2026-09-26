@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack, Chip } from '@mui/material';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 export type FilterOption = { key: string; label: string };
 
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export function FilterBar({ options, active, onChange }: Props) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   return (
     <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
       {options.map((opt) => {

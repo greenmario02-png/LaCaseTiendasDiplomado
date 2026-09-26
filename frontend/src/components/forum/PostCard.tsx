@@ -3,7 +3,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ShareIcon from '@mui/icons-material/Share';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { MapPin } from 'lucide-react';
-import { forumPalette, formatTimeAgo } from '../../theme/forumTheme';
+import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 import { CategoryIcon } from '../../theme/forumIcons';
 import { useForumStore } from '../../stores/forumStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export default function PostCard({ post }: Props) {
+  const forumPalette = useForumPalette();
   const { user } = useAuthStore();
   const { votePost } = useForumStore();
   const navigate = useNavigate();

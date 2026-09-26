@@ -6,7 +6,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { CategoryIcon } from '../../theme/forumIcons';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 import { useForumStore } from '../../stores/forumStore';
 import { listCategories, getCitiesStats } from '../../services/forum.api';
 import type { ForumCategory } from '../../services/forum.api';
@@ -18,6 +18,7 @@ const MODES = [
 ];
 
 export default function ForumSidebarLeft() {
+  const forumPalette = useForumPalette();
   const { activeMode, activeCategory, activeCity, setMode, setCategory, setCity } = useForumStore();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [cities, setCities] = useState<{ city: string; count: number }[]>([]);

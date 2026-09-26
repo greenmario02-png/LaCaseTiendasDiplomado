@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 interface CountdownTimerProps {
   target: number;
@@ -20,7 +20,7 @@ function parts(ms: number) {
 
 /** Cuenta regresiva en vivo (dd:hh:mm:ss). Llama onEnd al llegar a 0. */
 export function CountdownTimer({ target, onEnd }: CountdownTimerProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const [now, setNow] = useState(() => Date.now());
   const ended = useRef(false);
 

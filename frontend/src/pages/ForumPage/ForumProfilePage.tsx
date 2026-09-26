@@ -20,15 +20,16 @@ import { KarmaCard } from '../../components/forum/KarmaCard';
 import { RedeemKarmaDialog } from '../../components/forum/RedeemKarmaDialog';
 import { GeoConfig } from '../../components/forum/GeoConfig';
 import { MapPin, ThumbsUp, LocateFixed } from 'lucide-react';
-import { forumPalette, getTag, formatTimeAgo } from '../../theme/forumTheme';
-import { getUnifiedTokens } from '../../theme';
+import { useForumPalette, getTag, formatTimeAgo } from '../../theme/forumTheme';
+import { useUnifiedTokens } from '../../theme';
 
 export function ForumProfilePage() {
   const { username } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { profile, fetchProfile } = useForumStore();
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
+  const forumPalette = useForumPalette();
 
   const [data, setData] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);

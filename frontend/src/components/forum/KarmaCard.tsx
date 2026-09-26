@@ -1,6 +1,6 @@
 import { Box, Typography, LinearProgress, Button } from '@mui/material';
 import RedeemIcon from '@mui/icons-material/Redeem';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 
 interface Props {
   karma: number;
@@ -12,6 +12,7 @@ interface Props {
 const MAX_KARMA = 3000; // Leyenda
 
 export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
+  const forumPalette = useForumPalette();
   const available = karma - karmaSpent;
   const pct = Math.min(100, (karma / MAX_KARMA) * 100);
 

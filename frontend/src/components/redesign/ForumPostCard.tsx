@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, Chip, Typography, Box, Button, Stack } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { getUnifiedTokens } from '../../theme';
+import { useThemeStore } from '../../stores/themeStore';
 
 export type ForumPostCardData = {
   id: number;
@@ -24,7 +25,8 @@ type Props = {
 
 export function ForumPostCard({ post, onOpen, onPositive }: Props) {
   const [voted, setVoted] = useState(false);
-  const tokens = getUnifiedTokens(false);
+  const darkMode = useThemeStore((s) => s.darkMode);
+  const tokens = getUnifiedTokens(darkMode);
   const isResolved = post.status === 'RESOLVED';
   return (
     <Card
@@ -59,7 +61,7 @@ export function ForumPostCard({ post, onOpen, onPositive }: Props) {
             size="small"
             sx={{
               bgcolor: isResolved ? `${tokens.tertiaryContainer}1A` : `${tokens.secondaryContainer}26`,
-              color: isResolved ? tokens.tertiaryContainer : '#B45309',
+              color: isResolved ? tokens.tertiaryContainer : tokens.secondary,
               fontWeight: 600,
             }}
           />

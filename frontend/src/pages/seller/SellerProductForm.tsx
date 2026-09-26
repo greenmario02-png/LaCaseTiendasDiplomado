@@ -4,7 +4,6 @@ import { useAuthStore } from '../../stores/authStore';
 import {
   Box,
   Typography,
-  Paper,
   TextField,
   Button,
   Grid,
@@ -37,10 +36,14 @@ import toast from 'react-hot-toast';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import ProductCard from '../../components/ui/ProductCard';
+import { SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { useUnifiedTokens } from '../../theme';
 
 const WIZARD_STEPS = ['Información', 'Fotos', 'Atributos', 'Vista previa'];
 
 export default function SellerProductForm() {
+  const tk = useUnifiedTokens();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -574,10 +577,10 @@ export default function SellerProductForm() {
   };
 
   return (
-    <Dialog open fullWidth maxWidth="lg" onClose={close} scroll="body" PaperProps={{ sx: { borderRadius: 2 } }}>
+    <Dialog open fullWidth maxWidth="lg" onClose={close} scroll="body" PaperProps={{ sx: { borderRadius: '16px', bgcolor: tk.surface, backgroundImage: 'none' } }}>
       <DialogTitle sx={{ pb: 1 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" fontWeight={700}>
+          <Typography variant="h6" fontWeight={800} color={tk.onSurface}>
             {isEdit ? 'Editar producto' : 'Nuevo producto'}
           </Typography>
           <IconButton onClick={close} title="Cerrar" aria-label="Cerrar">
@@ -729,7 +732,7 @@ export default function SellerProductForm() {
 
             {/* ===== PUBLICAR COMO SUBASTA ===== */}
             <Grid item xs={12}>
-              <Paper variant="outlined" sx={{ p: 2 }}>
+              <SurfaceCard sx={{ p: 2 }}>
                 <FormControlLabel
                   control={
                     <Switch checked={form.asAuction} onChange={(e) => setForm({ ...form, asAuction: e.target.checked })} color="primary" />
@@ -830,7 +833,7 @@ export default function SellerProductForm() {
                     </Grid>
                   </Grid>
                 )}
-              </Paper>
+              </SurfaceCard>
             </Grid>
           </Grid>
         )}
@@ -943,7 +946,7 @@ export default function SellerProductForm() {
                 <ProductCard product={previewProduct} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
+                <SurfaceCard sx={{ p: 2 }}>
                   <Typography variant="subtitle2" fontWeight={700} mb={1}>
                     Resumen del producto
                   </Typography>
@@ -976,7 +979,7 @@ export default function SellerProductForm() {
                   <Typography variant="body2" sx={{ mt: 1 }}>
                     <strong>Garantía:</strong> {form.warrantyInfo || '—'}
                   </Typography>
-                </Paper>
+                </SurfaceCard>
               </Grid>
             </Grid>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
@@ -1159,7 +1162,7 @@ export default function SellerProductForm() {
 
             {/* ===== PUBLICAR COMO SUBASTA ===== */}
             <Grid item xs={12}>
-              <Paper variant="outlined" sx={{ p: 2 }}>
+              <SurfaceCard sx={{ p: 2 }}>
                 <FormControlLabel
                   control={
                     <Switch checked={form.asAuction} onChange={(e) => setForm({ ...form, asAuction: e.target.checked })} color="primary" />
@@ -1260,7 +1263,7 @@ export default function SellerProductForm() {
                     </Grid>
                   </Grid>
                 )}
-              </Paper>
+              </SurfaceCard>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -1400,31 +1403,31 @@ export default function SellerProductForm() {
       <DialogActions sx={{ px: 3, py: 2, justifyContent: 'space-between' }}>
         {isEdit ? (
           <Box display="flex" gap={1} alignItems="center">
-            <Button variant="outlined" onClick={close}>
+            <GhostButton type="button" onClick={close}>
               Cancelar
-            </Button>
-            <Button variant="contained" color="primary" onClick={submit} disabled={loading}>
-              {loading ? <CircularProgress size={20} /> : 'Guardar cambios'}
-            </Button>
+            </GhostButton>
+            <PrimaryButton type="button" onClick={submit} disabled={loading}>
+              {loading ? <CircularProgress size={20} color="inherit" /> : 'Guardar cambios'}
+            </PrimaryButton>
           </Box>
         ) : (
           <>
             <Box display="flex" gap={1} alignItems="center">
-              <Button variant="outlined" onClick={close}>
+              <GhostButton type="button" onClick={close}>
                 Cancelar
-              </Button>
-              <Button variant="outlined" onClick={handleBack} disabled={activeStep === 0}>
+              </GhostButton>
+              <GhostButton type="button" onClick={handleBack} disabled={activeStep === 0}>
                 Anterior
-              </Button>
+              </GhostButton>
             </Box>
             {activeStep < WIZARD_STEPS.length - 1 ? (
-              <Button variant="contained" color="primary" onClick={handleNext}>
+              <PrimaryButton type="button" onClick={handleNext}>
                 Siguiente
-              </Button>
+              </PrimaryButton>
             ) : (
-              <Button variant="contained" color="primary" onClick={submit} disabled={loading}>
-                {loading ? <CircularProgress size={20} /> : 'Publicar producto'}
-              </Button>
+              <PrimaryButton type="button" onClick={submit} disabled={loading}>
+                {loading ? <CircularProgress size={20} color="inherit" /> : 'Publicar producto'}
+              </PrimaryButton>
             )}
           </>
         )}

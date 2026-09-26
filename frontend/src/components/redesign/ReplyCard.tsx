@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, Chip, Typography, Box, Button, Stack } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 export type ReplyCardData = {
   id: number;
@@ -24,7 +24,7 @@ type Props = {
 
 export function ReplyCard({ reply, canAccept, onAccept, onPositive }: Props) {
   const [voted, setVoted] = useState(false);
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const positives = reply.positives ?? 0;
 
   return (

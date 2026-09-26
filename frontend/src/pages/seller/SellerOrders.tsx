@@ -1,8 +1,7 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -19,12 +18,17 @@ import { Truck } from 'lucide-react';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { EmptyState } from '../../components/redesign/States';
+import { useUnifiedTokens } from '../../theme';
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 const PAYMENT_STATUSES = ['PENDING', 'PROOF_SUBMITTED', 'VERIFIED', 'REJECTED'];
 
 export default function SellerOrders() {
   const money = useMoney();
+  const t = useUnifiedTokens();
   const [orders, setOrders] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<any>(null);
@@ -66,24 +70,26 @@ export default function SellerOrders() {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight={700}>
-          Pedidos recibidos
-        </Typography>
-        <Select size="small" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} displayEmpty>
-          <MenuItem value="">Todos los estados</MenuItem>
-          {STATUSES.map((s) => (
-            <MenuItem key={s} value={s}>
-              {s}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
+      <PageHeader
+        title="Pedidos recibidos"
+        icon={<ReceiptLongIcon />}
+        actions={
+          <Select size="small" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} displayEmpty>
+            <MenuItem value="">Todos los estados</MenuItem>
+            {STATUSES.map((s) => (
+              <MenuItem key={s} value={s}>
+                {s}
+              </MenuItem>
+            ))}
+          </Select>
+        }
+      />
 
-      <TableContainer component={Paper}>
+      <SurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+      <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ bgcolor: t.surface, '& th': { color: t.onSurfaceVariant, fontWeight: 700 } }}>
               <TableCell>#</TableCell>
               <TableCell>Comprador</TableCell>
               <TableCell align="right">Total</TableCell>
@@ -159,6 +165,8 @@ export default function SellerOrders() {
           </TableBody>
         </Table>
       </TableContainer>
+      {orders.length === 0 && <EmptyState message="Todavía no recibiste pedidos" />}
+      </SurfaceCard>
 
       {meta?.totalPages > 1 && (
         <Box display="flex" justifyContent="center" mt={3}>
