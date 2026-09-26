@@ -1,50 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
-import {
-  Store,
-  Package,
-  ClipboardCheck,
-  ShoppingBag,
-  Users,
-  DollarSign,
-  CalendarRange,
-  TrendingUp,
-  MessageSquareWarning,
-  PackageOpen,
-  Flame,
-} from 'lucide-react-native';
-import { VisionScreen, GlassCard, GradientIconBox, VisionBackground } from '../components/vision';
-import { vision } from '../theme/vision';
+import { Store, PackageOpen, Flame } from 'lucide-react-native';
+import { useAppTheme } from '../theme/ThemeContext';
+import { StatCard } from '../components/redesign/StatCard';
+import { NeoButton } from '../components/redesign/NeoButton';
+import { LoadingState } from '../components/redesign/States';
 
 const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
-const KPI_ICONS = [Package, ClipboardCheck, ShoppingBag, Users, DollarSign, CalendarRange, TrendingUp, MessageSquareWarning];
-
-const GRADIENTS: readonly (readonly [string, string])[] = [
-  vision.gradPrimary,
-  vision.gradCyan,
-  vision.gradGreen,
-  vision.gradOrange,
-  vision.gradPink,
-  vision.gradViolet,
-];
-
-function KpiCard({ label, value, color, index }: { label: string; value: string; color?: string; index: number }) {
-  const Icon = KPI_ICONS[index % KPI_ICONS.length];
-  return (
-    <GlassCard style={styles.kpiCard}>
-      <GradientIconBox gradient={GRADIENTS[index % GRADIENTS.length]} size={40} radius={12}>
-        <Icon size={20} color="#fff" />
-      </GradientIconBox>
-      <Text style={styles.kpiLabel}>{label}</Text>
-      <Text style={[styles.kpiValue, color ? { color } : null]}>{value}</Text>
-    </GlassCard>
-  );
-}
-
 export default function SellerDashboardScreen({ navigation }: any) {
+  const { colors, raised } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -64,8 +32,7 @@ export default function SellerDashboardScreen({ navigation }: any) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <VisionBackground />
-        <ActivityIndicator size="large" color={vision.text} />
+        <LoadingState />
       </View>
     );
   }
@@ -74,23 +41,23 @@ export default function SellerDashboardScreen({ navigation }: any) {
   const recentOrders: any[] = d.recentOrders ?? [];
   const topProducts: any[] = d.topProducts ?? [];
 
-  const kpis: { label: string; value: string; color?: string }[] = [
+  const kpis: { label: string; value: string }[] = [
     { label: 'Productos', value: String(d.totalProducts ?? d.productCount ?? 0) },
-    { label: 'Pendientes mod.', value: String(d.pendingProducts ?? 0), color: d.pendingProducts ? '#ffc837' : vision.text },
+    { label: 'Pendientes mod.', value: String(d.pendingProducts ?? 0) },
     { label: 'Pedidos', value: String(d.totalSales ?? d.orderCount ?? 0) },
     { label: 'Clientes atendidos', value: String(d.customersServed ?? 0) },
-    { label: 'Ventas', value: money(d.totalRevenue ?? d.sales ?? 0), color: '#6ad2ff' },
+    { label: 'Ventas', value: money(d.totalRevenue ?? d.sales ?? 0) },
     { label: 'Ventas de la semana', value: money(d.revenueWeek ?? 0) },
     { label: 'Ventas del mes', value: money(d.revenueMonth ?? 0) },
-    { label: 'Mensajes sin leer', value: String(d.unreadMessages ?? 0), color: d.unreadMessages ? '#ffc837' : vision.text },
+    { label: 'Mensajes sin leer', value: String(d.unreadMessages ?? 0) },
   ];
 
   return (
-    <VisionScreen>
+    <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
       <View style={styles.titleRow}>
-        <GradientIconBox gradient={vision.gradViolet} size={44} radius={14}>
-          <Store size={24} color="#fff" />
-        </GradientIconBox>
+        <View style={[styles.iconBox, { backgroundColor: colors.surface }, raised]}>
+          <Store size={22} color={colors.primary} />
+        </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>{user?.storeName || 'Panel de vendedor'}</Text>
           <Text style={styles.subtitle}>Rendimiento de tu tienda</Text>
@@ -98,24 +65,26 @@ export default function SellerDashboardScreen({ navigation }: any) {
       </View>
 
       <View style={styles.grid}>
-        {kpis.map((k, i) => (
-          <KpiCard key={k.label} label={k.label} value={k.value} color={k.color} index={i} />
+        {kpis.map((k) => (
+          <View key={k.label} style={styles.kpiCell}>
+            <StatCard title={k.label} value={k.value} />
+          </View>
         ))}
       </View>
 
       <View style={styles.btnRow}>
-        <TouchableOpacity style={[styles.btn, { backgroundColor: '#4318ff' }]} onPress={() => navigation.navigate('Seller', { id: user?.id })}>
-          <Text style={styles.btnText}>Ver mi tienda</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.btn, styles.btnOutline]} onPress={() => navigation.navigate('EditStore')}>
-          <Text style={styles.btnOutlineText}>Editar tienda</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <NeoButton title="Ver mi tienda" onPress={() => navigation.navigate('Seller', { id: user?.id })} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <NeoButton title="Editar tienda" variant="ghost" onPress={() => navigation.navigate('EditStore')} />
+        </View>
       </View>
 
       {recentOrders.length > 0 && (
-        <GlassCard style={styles.sectionCard}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
-            <PackageOpen size={16} color={vision.textSecondary} />
+            <PackageOpen size={16} color={colors.textSecondary} />
             <Text style={styles.sectionTitle}>Últimos pedidos</Text>
           </View>
           {recentOrders.slice(0, 5).map((o: any) => (
@@ -131,13 +100,13 @@ export default function SellerDashboardScreen({ navigation }: any) {
               <Text style={styles.rowValue}>{money(o.total)}</Text>
             </View>
           ))}
-        </GlassCard>
+        </View>
       )}
 
       {topProducts.length > 0 && (
-        <GlassCard style={styles.sectionCard}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
-            <Flame size={16} color="#ffc837" />
+            <Flame size={16} color={colors.warning} />
             <Text style={styles.sectionTitle}>Top productos</Text>
           </View>
           {topProducts.slice(0, 5).map((p: any) => (
@@ -153,44 +122,36 @@ export default function SellerDashboardScreen({ navigation }: any) {
               <Text style={styles.rowValue}>{money(p.price)}</Text>
             </View>
           ))}
-        </GlassCard>
+        </View>
       )}
-    </VisionScreen>
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 22, fontWeight: '900', color: vision.text },
-  subtitle: { fontSize: 12, color: vision.textMuted, marginTop: 2 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  kpiCard: { width: '47%', padding: 14 },
-  kpiLabel: { fontSize: 12, color: vision.textSecondary, marginTop: 10 },
-  kpiValue: { fontSize: 20, fontWeight: '800', color: vision.text, marginTop: 2 },
-  btnRow: { flexDirection: 'row', gap: 10, marginTop: 20 },
-  btn: { flex: 1, borderRadius: 14, paddingVertical: 13, alignItems: 'center' },
-  btnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  btnOutline: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: '#4318ff',
-  },
-  btnOutlineText: { color: '#6ad2ff', fontSize: 15, fontWeight: '700' },
-  sectionCard: { marginTop: 18 },
-  sectionTitleRow: { flexDirection: 'row', gap: 6, alignItems: 'center', marginBottom: 10 },
-  sectionTitle: { fontSize: 15, fontWeight: '800', color: vision.text },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 12,
-    marginBottom: 8,
-  },
-  rowTitle: { fontSize: 14, fontWeight: '700', color: vision.textSecondary },
-  rowSub: { fontSize: 12, color: vision.textMuted, marginTop: 2 },
-  rowValue: { fontSize: 14, fontWeight: '800', color: '#6ad2ff' },
-});
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
+    flex: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 16, paddingBottom: 32 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+    iconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    title: { fontSize: 22, fontWeight: '900', color: colors.text },
+    subtitle: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    kpiCell: { flexBasis: '47%', flexGrow: 1 },
+    btnRow: { flexDirection: 'row', gap: 10, marginTop: 20 },
+    sectionCard: { marginTop: 18, borderRadius: 16, padding: 14 },
+    sectionTitleRow: { flexDirection: 'row', gap: 6, alignItems: 'center', marginBottom: 10 },
+    sectionTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 8,
+    },
+    rowTitle: { fontSize: 14, fontWeight: '700', color: colors.text },
+    rowSub: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+    rowValue: { fontSize: 14, fontWeight: '800', color: colors.price },
+  });

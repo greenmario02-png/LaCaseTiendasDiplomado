@@ -1,17 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
   ShieldCheck,
-  Package,
   Store,
-  Users,
   ShoppingCart,
-  DollarSign,
-  TrendingUp,
-  Clock,
   ClipboardList,
-  UserCheck,
   TriangleAlert,
   Zap,
   ChevronRight,
@@ -22,8 +16,9 @@ import {
   Bell,
 } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
-import { VisionScreen, GlassCard, GradientIconBox, VisionBackground } from '../components/vision';
-import { vision } from '../theme/vision';
+import { useAppTheme } from '../theme/ThemeContext';
+import { StatCard } from '../components/redesign/StatCard';
+import { LoadingState } from '../components/redesign/States';
 
 const ADMIN_MENU = [
   { label: 'Vendedores', icon: Store, route: 'AdminSellers', desc: 'Aprobar, pausar y suspender tiendas' },
@@ -37,40 +32,9 @@ const ADMIN_MENU = [
 
 const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
-const KPI_ICONS = [
-  Package,
-  Store,
-  Users,
-  ShoppingCart,
-  DollarSign,
-  TrendingUp,
-  Clock,
-  ClipboardList,
-  UserCheck,
-];
-
-function KpiCard({ label, value, color, index }: { label: string; value: string; color?: string; index: number }) {
-  const Icon = KPI_ICONS[index % KPI_ICONS.length];
-  const gradients: readonly (readonly [string, string])[] = [
-    vision.gradPrimary,
-    vision.gradCyan,
-    vision.gradGreen,
-    vision.gradOrange,
-    vision.gradPink,
-    vision.gradViolet,
-  ];
-  return (
-    <GlassCard style={styles.kpiCard}>
-      <GradientIconBox gradient={gradients[index % gradients.length]} size={40} radius={12}>
-        <Icon size={20} color="#fff" />
-      </GradientIconBox>
-      <Text style={styles.kpiLabel}>{label}</Text>
-      <Text style={[styles.kpiValue, color ? { color } : null]}>{value}</Text>
-    </GlassCard>
-  );
-}
-
 export default function AdminDashboardScreen() {
+  const { colors, raised } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [kpis, setKpis] = useState<any>(null);
   const [salesToday, setSalesToday] = useState<any>(null);
   const [copies, setCopies] = useState<any[]>([]);
@@ -98,86 +62,91 @@ export default function AdminDashboardScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <VisionBackground />
-        <ActivityIndicator size="large" color={vision.text} />
+        <LoadingState />
       </View>
     );
   }
 
   const k = kpis || {};
-  const cards: { label: string; value: string; color?: string }[] = [
+  const cards: { label: string; value: string }[] = [
     { label: 'Productos', value: String(k.totalProducts ?? 0) },
     { label: 'Vendedores', value: String(k.totalSellers ?? 0) },
     { label: 'Clientes', value: String(k.totalUsers ?? 0) },
     { label: 'Órdenes', value: String(k.totalOrders ?? 0) },
-    { label: 'Ventas', value: money(k.totalRevenue ?? 0), color: '#6ad2ff' },
+    { label: 'Ventas', value: money(k.totalRevenue ?? 0) },
     { label: 'Mes', value: money(k.monthRevenue ?? 0) },
-    { label: 'Pedidos pendientes', value: String(k.pendingOrders ?? 0), color: k.pendingOrders ? '#ffc837' : vision.text },
-    { label: 'Productos pend.', value: String(k.pendingProducts ?? 0), color: k.pendingProducts ? '#ffc837' : vision.text },
-    { label: 'Vendedores pend.', value: String(k.pendingSellers ?? 0), color: k.pendingSellers ? '#ffc837' : vision.text },
+    { label: 'Pedidos pendientes', value: String(k.pendingOrders ?? 0) },
+    { label: 'Productos pend.', value: String(k.pendingProducts ?? 0) },
+    { label: 'Vendedores pend.', value: String(k.pendingSellers ?? 0) },
   ];
 
   const todayProducts: any[] = salesToday?.products ?? [];
   const todayPromos: any[] = salesToday?.promotions ?? [];
 
   return (
-    <VisionScreen>
+    <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
       <View style={styles.titleRow}>
-        <GradientIconBox gradient={vision.gradPrimary} size={44} radius={14}>
-          <ShieldCheck size={24} color="#fff" />
-        </GradientIconBox>
+        <View style={[styles.iconBox, { backgroundColor: colors.surface }, raised]}>
+          <ShieldCheck size={22} color={colors.primary} />
+        </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>Panel de administración</Text>
           <Text style={styles.subtitle}>Visión general de la multitienda</Text>
         </View>
       </View>
 
-      <GlassCard style={styles.menuCard}>
-        <Text style={styles.menuTitle}>Menú de administración</Text>
+      <Text style={styles.menuTitle}>Menú de administración</Text>
+      <View style={styles.menuList}>
         {ADMIN_MENU.map((m) => {
           const Icon = m.icon;
           return (
-            <Pressable key={m.route} style={styles.menuItem} onPress={() => navigation.navigate(m.route)}>
+            <Pressable
+              key={m.route}
+              style={[styles.menuItem, { backgroundColor: colors.surface }, raised]}
+              onPress={() => navigation.navigate(m.route)}
+            >
               <View style={styles.menuIconWrap}>
-                <Icon size={18} color={vision.text} />
+                <Icon size={18} color={colors.primary} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.menuLabel}>{m.label}</Text>
                 <Text style={styles.menuDesc}>{m.desc}</Text>
               </View>
-              <ChevronRight size={18} color={vision.textMuted} />
+              <ChevronRight size={18} color={colors.textSecondary} />
             </Pressable>
           );
         })}
-      </GlassCard>
+      </View>
 
       <View style={styles.grid}>
-        {cards.map((c, i) => (
-          <KpiCard key={c.label} label={c.label} value={c.value} color={c.color} index={i} />
+        {cards.map((c) => (
+          <View key={c.label} style={styles.kpiCell}>
+            <StatCard title={c.label} value={c.value} />
+          </View>
         ))}
       </View>
 
       {copies.length > 0 && (
-        <GlassCard style={[styles.sectionCard, { borderColor: 'rgba(255,200,55,0.4)' }]}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.warning }, raised]}>
           <View style={styles.sectionTitleRow}>
-            <TriangleAlert size={16} color="#ffc837" />
-            <Text style={[styles.sectionTitle, { color: '#ffc837' }]}>Copias masivas detectadas</Text>
+            <TriangleAlert size={16} color={colors.warning} />
+            <Text style={[styles.sectionTitle, { color: colors.warning }]}>Copias masivas detectadas</Text>
           </View>
           {copies.slice(0, 5).map((c: any, i: number) => (
             <View key={i} style={styles.row}>
               <Text style={styles.rowTitle} numberOfLines={1}>
                 {c.actor?.storeName || `${c.actor?.firstName} ${c.actor?.lastName}`} ({c.actor?.email})
               </Text>
-              <Text style={[styles.rowValue, { color: '#ffc837' }]}>{c.count} copia(s)</Text>
+              <Text style={[styles.rowValue, { color: colors.warning }]}>{c.count} copia(s)</Text>
             </View>
           ))}
-        </GlassCard>
+        </View>
       )}
 
       {todayProducts.length > 0 && (
-        <GlassCard style={styles.sectionCard}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
-            <ShoppingCart size={16} color={vision.textSecondary} />
+            <ShoppingCart size={16} color={colors.textSecondary} />
             <Text style={styles.sectionTitle}>Vendidos hoy</Text>
           </View>
           {todayProducts.slice(0, 6).map((p: any) => (
@@ -188,13 +157,13 @@ export default function AdminDashboardScreen() {
               <Text style={styles.rowValue}>{p.quantity} vendido(s)</Text>
             </View>
           ))}
-        </GlassCard>
+        </View>
       )}
 
       {todayPromos.length > 0 && (
-        <GlassCard style={styles.sectionCard}>
+        <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
-            <Zap size={16} color="#ffc837" />
+            <Zap size={16} color={colors.warning} />
             <Text style={styles.sectionTitle}>Promociones activas</Text>
           </View>
           {todayPromos.slice(0, 5).map((promo: any) => (
@@ -202,63 +171,53 @@ export default function AdminDashboardScreen() {
               <Text style={styles.rowTitle} numberOfLines={1}>
                 {promo.title}
               </Text>
-              <Text style={[styles.rowValue, { color: '#ff5858' }]}>
+              <Text style={[styles.rowValue, { color: colors.error }]}>
                 {promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}%` : money(promo.discountValue)} OFF
               </Text>
             </View>
           ))}
-        </GlassCard>
+        </View>
       )}
-    </VisionScreen>
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 22, fontWeight: '900', color: vision.text },
-  subtitle: { fontSize: 12, color: vision.textMuted, marginTop: 2 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 },
-  menuCard: { marginBottom: 18 },
-  menuTitle: { fontSize: 13, fontWeight: '800', color: vision.textSecondary, marginBottom: 10 },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 12,
-    marginBottom: 8,
-  },
-  menuIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  menuLabel: { fontSize: 14, fontWeight: '800', color: vision.text },
-  menuDesc: { fontSize: 11, color: vision.textMuted, marginTop: 1 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  kpiCard: { width: '47%', padding: 14 },
-  kpiLabel: { fontSize: 12, color: vision.textSecondary, marginTop: 10 },
-  kpiValue: { fontSize: 20, fontWeight: '800', color: vision.text, marginTop: 2 },
-  sectionCard: { marginTop: 18 },
-  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  sectionTitle: { fontSize: 15, fontWeight: '800', color: vision.text },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 12,
-    marginBottom: 8,
-  },
-  rowTitle: { fontSize: 13, fontWeight: '700', color: vision.textSecondary, flex: 1, marginRight: 8 },
-  rowValue: { fontSize: 13, fontWeight: '800', color: '#6ad2ff' },
-});
+const makeStyles = (colors: any) =>
+  StyleSheet.create({
+    flex: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 16, paddingBottom: 32 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+    iconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    title: { fontSize: 22, fontWeight: '900', color: colors.text },
+    subtitle: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 18 },
+    menuTitle: { fontSize: 13, fontWeight: '800', color: colors.textSecondary, marginBottom: 10 },
+    menuList: { gap: 10, marginBottom: 18 },
+    menuItem: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, padding: 12 },
+    menuIconWrap: {
+      width: 34,
+      height: 34,
+      borderRadius: 10,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    menuLabel: { fontSize: 14, fontWeight: '800', color: colors.text },
+    menuDesc: { fontSize: 11, color: colors.textSecondary, marginTop: 1 },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    kpiCell: { flexBasis: '47%', flexGrow: 1 },
+    sectionCard: { marginTop: 18, borderRadius: 16, padding: 14 },
+    sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+    sectionTitle: { fontSize: 15, fontWeight: '800', color: colors.text },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.background,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 8,
+    },
+    rowTitle: { fontSize: 13, fontWeight: '700', color: colors.text, flex: 1, marginRight: 8 },
+    rowValue: { fontSize: 13, fontWeight: '800', color: colors.price },
+  });

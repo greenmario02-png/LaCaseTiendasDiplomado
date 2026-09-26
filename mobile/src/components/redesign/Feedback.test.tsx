@@ -28,9 +28,9 @@ describe('ConfirmDialog', () => {
         onClose={onClose}
       />,
     );
-    fireEvent.press(getByText('Eliminar'));
+    await fireEvent.press(getByText('Eliminar'));
     expect(onConfirm).toHaveBeenCalledTimes(1);
-    fireEvent.press(getByText('Cancelar'));
+    await fireEvent.press(getByText('Cancelar'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

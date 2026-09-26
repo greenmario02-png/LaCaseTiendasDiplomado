@@ -1,11 +1,10 @@
-import React, { useMemo,  useCallback, useEffect  } from 'react';
+import React, { useMemo,  useCallback  } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   RefreshControl,
 } from 'react-native';
 import {
@@ -25,32 +24,33 @@ import {
 } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNotificationsStore, AppNotification } from '../stores/notificationsStore';
-import { VisionBackground, GlassCard, GradientIconBox } from '../components/vision';
-import { vision } from '../theme/vision';
+import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 
-const TYPE_META: Record<string, { icon: React.ReactNode; gradient: readonly [string, string] }> = {
-  NEW_MESSAGE: { icon: <MessageCircle size={18} color="#fff" />, gradient: vision.gradCyan },
-  NEW_ORDER: { icon: <ShoppingCart size={18} color="#fff" />, gradient: vision.gradGreen },
-  ORDER_STATUS: { icon: <PackageCheck size={18} color="#fff" />, gradient: vision.gradPrimary },
-  PAYMENT_PROOF: { icon: <BadgeCheck size={18} color="#fff" />, gradient: vision.gradOrange },
-  PAYMENT_VERIFIED: { icon: <BadgeCheck size={18} color="#fff" />, gradient: vision.gradGreen },
-  AUCTION_ENDED: { icon: <Gavel size={18} color="#fff" />, gradient: vision.gradViolet },
-  AUCTION_WON: { icon: <Gavel size={18} color="#fff" />, gradient: vision.gradPrimary },
-  AUCTION_SOLD: { icon: <Gavel size={18} color="#fff" />, gradient: vision.gradGreen },
-  OUTBID: { icon: <Gavel size={18} color="#fff" />, gradient: vision.gradOrange },
-  FORUM_ANSWER: { icon: <MessageSquareText size={18} color="#fff" />, gradient: vision.gradViolet },
-  FORUM_BEST: { icon: <Flame size={18} color="#fff" />, gradient: vision.gradOrange },
-  FORUM_RANK_UP: { icon: <Flame size={18} color="#fff" />, gradient: vision.gradPink },
-  FORUM_REPORT: { icon: <ShieldAlert size={18} color="#fff" />, gradient: vision.gradPink },
-  RETURN_REQUEST: { icon: <RotateCcw size={18} color="#fff" />, gradient: vision.gradOrange },
-  RETURN_STATUS: { icon: <RotateCcw size={18} color="#fff" />, gradient: vision.gradCyan },
-  SELLER_APPROVED: { icon: <Store size={18} color="#fff" />, gradient: vision.gradGreen },
-  SYSTEM: { icon: <Bell size={18} color="#fff" />, gradient: vision.gradViolet },
+type Tone = 'primary' | 'success' | 'warning' | 'error' | 'info';
+
+const TYPE_META: Record<string, { Icon: React.ComponentType<any>; tone: Tone }> = {
+  NEW_MESSAGE: { Icon: MessageCircle, tone: 'info' },
+  NEW_ORDER: { Icon: ShoppingCart, tone: 'success' },
+  ORDER_STATUS: { Icon: PackageCheck, tone: 'primary' },
+  PAYMENT_PROOF: { Icon: BadgeCheck, tone: 'warning' },
+  PAYMENT_VERIFIED: { Icon: BadgeCheck, tone: 'success' },
+  AUCTION_ENDED: { Icon: Gavel, tone: 'info' },
+  AUCTION_WON: { Icon: Gavel, tone: 'primary' },
+  AUCTION_SOLD: { Icon: Gavel, tone: 'success' },
+  OUTBID: { Icon: Gavel, tone: 'warning' },
+  FORUM_ANSWER: { Icon: MessageSquareText, tone: 'info' },
+  FORUM_BEST: { Icon: Flame, tone: 'warning' },
+  FORUM_RANK_UP: { Icon: Flame, tone: 'error' },
+  FORUM_REPORT: { Icon: ShieldAlert, tone: 'error' },
+  RETURN_REQUEST: { Icon: RotateCcw, tone: 'warning' },
+  RETURN_STATUS: { Icon: RotateCcw, tone: 'info' },
+  SELLER_APPROVED: { Icon: Store, tone: 'success' },
+  SYSTEM: { Icon: Bell, tone: 'info' },
 };
 
-function iconFor(type: string): { icon: React.ReactNode; gradient: readonly [string, string] } {
-  return TYPE_META[type] ?? { icon: <Bell size={18} color="#fff" />, gradient: vision.gradPrimary };
+function metaFor(type: string) {
+  return TYPE_META[type] ?? { Icon: Bell, tone: 'primary' as Tone };
 }
 
 function timeAgo(iso: string): string {
@@ -65,20 +65,21 @@ function timeAgo(iso: string): string {
 }
 
 function NotificationRow({ item, onPress }: { item: AppNotification; onPress: () => void }) {
-  const { colors } = useAppTheme();
+  const { colors, raised, pressed } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
-  const meta = iconFor(item.type);
+  const { Icon, tone } = metaFor(item.type);
+  const tint = colors[tone];
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-      <GlassCard style={[styles.row, !item.isRead && styles.rowUnread]}>
+      <View style={[styles.row, item.isRead ? { ...pressed } : { ...raised }]}>
         <View style={styles.rowLeft}>
-          <GradientIconBox gradient={meta.gradient} size={38} radius={11}>
-            {meta.icon}
-          </GradientIconBox>
+          <View style={[styles.iconBox, raised]}>
+            <Icon size={18} color={tint} />
+          </View>
           {!item.isRead && <View style={styles.dot} />}
         </View>
         <View style={styles.rowBody}>
-          <Text style={styles.rowTitle} numberOfLines={1}>
+          <Text style={[styles.rowTitle, item.isRead && styles.rowTitleRead]} numberOfLines={1}>
             {item.title}
           </Text>
           {!!item.message && (
@@ -88,8 +89,8 @@ function NotificationRow({ item, onPress }: { item: AppNotification; onPress: ()
           )}
           <Text style={styles.rowTime}>{timeAgo(item.createdAt)}</Text>
         </View>
-        <ArrowRight size={16} color={vision.textMuted} />
-      </GlassCard>
+        <ArrowRight size={16} color={colors.textSecondary} />
+      </View>
     </TouchableOpacity>
   );
 }
@@ -126,11 +127,8 @@ export default function NotificationsScreen({ navigation }: any) {
 
   return (
     <View style={styles.flex}>
-      <VisionBackground />
       <View style={styles.header}>
-        <GradientIconBox gradient={vision.gradPrimary} size={40} radius={12}>
-          <Bell size={20} color="#fff" />
-        </GradientIconBox>
+        <Bell size={22} color={colors.primary} />
         <View style={styles.headerText}>
           <Text style={styles.title}>Notificaciones</Text>
           <Text style={styles.subtitle}>
@@ -139,7 +137,7 @@ export default function NotificationsScreen({ navigation }: any) {
         </View>
         {unread > 0 && (
           <TouchableOpacity style={styles.readAllBtn} onPress={markAllRead}>
-            <CheckCheck size={16} color={vision.textSecondary} />
+            <CheckCheck size={16} color={colors.primary} />
             <Text style={styles.readAllText}>Leer todas</Text>
           </TouchableOpacity>
         )}
@@ -147,7 +145,7 @@ export default function NotificationsScreen({ navigation }: any) {
 
       {loading && items.length === 0 ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#fff" />
+          <LoadingState />
         </View>
       ) : (
         <FlatList
@@ -155,14 +153,8 @@ export default function NotificationsScreen({ navigation }: any) {
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Bell size={40} color={vision.textMuted} />
-              <Text style={styles.emptyTitle}>Sin notificaciones</Text>
-              <Text style={styles.emptyText}>Cuando recibas mensajes, pedidos o respuestas del foro, aparecerán acá.</Text>
-            </View>
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />}
+          ListEmptyComponent={<EmptyState message="Sin notificaciones. Cuando recibas mensajes, pedidos o respuestas del foro, aparecerán acá." />}
           renderItem={({ item }) => <NotificationRow item={item} onPress={() => openItem(item)} />}
         />
       )}
@@ -172,49 +164,53 @@ export default function NotificationsScreen({ navigation }: any) {
 
 const makeStyles = (colors: any) =>
   StyleSheet.create({
-  flex: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  headerText: { flex: 1 },
-  title: { fontSize: 22, fontWeight: '900', color: vision.text },
-  subtitle: { fontSize: 13, color: vision.textSecondary, marginTop: 2 },
-  readAllBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 20, borderWidth: 1, borderColor: vision.textMuted },
-  readAllText: { fontSize: 12, fontWeight: '700', color: vision.textSecondary },
-  list: { padding: 16, paddingBottom: 48, gap: 10 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 18,
-  },
-  rowUnread: {
-    borderColor: vision.gradPrimary[1],
-    borderWidth: 1,
-  },
-  rowLeft: { flexDirection: 'row', alignItems: 'center' },
-  dot: {
-    position: 'absolute',
-    right: -2,
-    top: -2,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.error,
-    borderWidth: 1.5,
-    borderColor: '#1d2150',
-  },
-  rowBody: { flex: 1 },
-  rowTitle: { fontSize: 14, fontWeight: '800', color: vision.text },
-  rowMessage: { fontSize: 12.5, color: vision.textSecondary, marginTop: 2, lineHeight: 17 },
-  rowTime: { fontSize: 11, color: vision.textMuted, marginTop: 3 },
-  empty: { alignItems: 'center', paddingTop: 80, gap: 8 },
-  emptyTitle: { fontSize: 17, fontWeight: '800', color: vision.text },
-  emptyText: { fontSize: 13, color: vision.textSecondary, textAlign: 'center', paddingHorizontal: 30, lineHeight: 19 },
-});
+    flex: { flex: 1, backgroundColor: colors.background },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 8,
+    },
+    headerText: { flex: 1 },
+    title: { fontSize: 22, fontWeight: '900', color: colors.text },
+    subtitle: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
+    readAllBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 20 },
+    readAllText: { fontSize: 12, fontWeight: '700', color: colors.primary },
+    list: { padding: 16, paddingBottom: 48, gap: 14 },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      borderRadius: 18,
+      padding: 14,
+      backgroundColor: colors.surface,
+    },
+    rowLeft: { flexDirection: 'row', alignItems: 'center' },
+    iconBox: {
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+    },
+    dot: {
+      position: 'absolute',
+      right: -3,
+      top: -3,
+      width: 11,
+      height: 11,
+      borderRadius: 6,
+      backgroundColor: colors.error,
+      borderWidth: 2,
+      borderColor: colors.surface,
+    },
+    rowBody: { flex: 1 },
+    rowTitle: { fontSize: 14, fontWeight: '800', color: colors.text },
+    rowTitleRead: { fontWeight: '600', color: colors.textSecondary },
+    rowMessage: { fontSize: 12.5, color: colors.textSecondary, marginTop: 2, lineHeight: 17 },
+    rowTime: { fontSize: 11, color: colors.textSecondary, marginTop: 3 },
+  });
