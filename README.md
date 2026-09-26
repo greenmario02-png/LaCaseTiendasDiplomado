@@ -58,6 +58,30 @@ promociones, reportes económicos, moneda, roles y permisos (RBAC dinámico).
 Preguntas y respuestas por ciudad/departamento y categoría, karma y rangos, geolocalización con
 subforos, moderación por departamento (ver modelo de roles arriba).
 
+### Empleos
+Las tiendas verificadas publican ofertas de empleo con categoría y período de pago
+(diario, semanal o mensual); un ADMIN las modera antes de publicarlas. Los clientes se postulan
+(con CV opcional PDF/DOC/DOCX de hasta 5 MB) y el vendedor gestiona el estado de cada
+postulación (recibida, vista, preseleccionada, rechazada, contratada, retirada). Los CV se
+guardan en almacenamiento privado y se descargan con enlaces firmados de 5 minutos. El admin
+tiene una vista de todas las postulaciones. Detalle en [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md).
+
+### Geolocalización y monedas
+Servicio de geolocalización unificado para tienda y foro: tiendas cercanas ordenadas de la más
+cercana a la más lejana (fórmula haversine) y subforos por departamento. Cotizaciones de moneda
+en vivo con caché.
+
+### Rediseño y rendimiento
+Sistema de diseño **Unified** (web) y **Silk** (móvil), con modo claro y oscuro. Optimizaciones
+de carga: deduplicación de GET, stale-while-revalidate y división del bundle en chunks.
+
+## Documentación
+
+- [`docs/requisitos-funcionales.md`](docs/requisitos-funcionales.md)
+- [`docs/requisitos-no-funcionales.md`](docs/requisitos-no-funcionales.md)
+- [`docs/modelo-roles.md`](docs/modelo-roles.md)
+- [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md)
+
 ## Arquitectura
 
 ```
@@ -157,6 +181,9 @@ npm test              # Vitest
 npm test              # Jest
 ```
 
+Ejecutar los tests requiere la base de datos PostgreSQL local levantada y las migraciones
+aplicadas (`npx prisma db push`) antes de `npm test` en el backend.
+
 ## Endpoints principales
 
 - Health: `GET /api/health`
@@ -164,6 +191,7 @@ npm test              # Jest
 - Subastas: `GET /api/auctions` / `POST /api/auctions/:id/bid`
 - Chat: `GET /api/chat` / `POST /api/chat/:id/messages`
 - Notificaciones: `GET /api/notifications`
+- Empleos: `GET /api/jobs` / `POST /api/jobs/:id/apply` (ver `docs/endpoints-empleos.md`)
 - Foro: `GET /api/forum/*`
 - Roles y permisos: `GET/PUT /api/rbac/*`
 - Docs OpenAPI: `http://localhost:3000/api-docs`
