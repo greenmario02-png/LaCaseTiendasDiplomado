@@ -3,7 +3,7 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useLocationStore } from '../../stores/locationStore';
 import { useUnifiedTokens } from '../../theme';
 
-/** Botón/chip para activar "cerca de ti" con la ubicación del navegador (compartida con foro, tienda y eventos). */
+/** Botón/chip para activar "cerca de ti" con la ubicación del navegador (compartida con foro y tienda). */
 export function NearMeButton() {
   const t = useUnifiedTokens();
   const { coords, city, status, request, clear } = useLocationStore();
