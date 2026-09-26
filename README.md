@@ -1,9 +1,9 @@
 # Base LaCase Multitiendas
 
-Marketplace multi-vendedor para Bolivia con catálogo unificado, comparación de precios entre
-tiendas, subastas estilo eBay, chat en tiempo real, comisiones de plataforma, panel de
-administración y un foro comunitario con moderación por subforo — backend, frontend web y app
-móvil en un solo repositorio.
+Marketplace multi-vendedor para Bolivia. **Alcance de la monografía: tiendas, catálogo y pedido con pago
+por QR manual.** Backend, frontend web y app móvil en un solo repositorio. Otros módulos (subastas, foro,
+chat, empleos, geolocalización, etc.) existen en el código pero están **fuera de alcance**
+(ver [`docs/fuera-de-alcance.md`](docs/fuera-de-alcance.md)).
 
 ## Stack
 
@@ -18,69 +18,40 @@ móvil en un solo repositorio.
 
 ## Modelo de roles
 
-Tres roles de plataforma:
+Dos roles funcionales y un administrador que solo existe por seed (limitación declarada):
 
 | Rol | Descripción |
 |---|---|
-| **ADMIN** | Administrador global — gestiona vendedores, categorías, moderación, reportes y roles/permisos. |
-| **SELLER** (vendedor) | Publica y administra su tienda y productos; puede tener un equipo (OWNER/ADMIN/EMPLOYEE) con permisos diferenciados. |
-| **CUSTOMER** (cliente) | Compra, participa en subastas, chatea con vendedores y usa el foro. |
+| **CUSTOMER** (Comprador) | Rol por defecto de toda cuenta nueva (menor privilegio): busca en el catálogo, arma el carrito, crea pedidos y envía el comprobante de pago QR. |
+| **SELLER** (Vendedor) | Registra su tienda (queda pendiente de aprobación), publica productos y verifica los pagos de sus pedidos. |
+| **ADMIN** (Administrador) | **Solo desde el seed**; aprueba tiendas, modera productos, gestiona categorías y usuarios. |
 
-La **moderación del foro no es un cuarto rol de plataforma**: es una asignación (rol RBAC
-`MODERADOR_FORO`) sobre cualquier usuario CUSTOMER o SELLER, acotada al departamento donde tiene
-su perfil de foro. Un ADMIN asigna esa moderación desde el panel de «Roles y permisos».
+La moderación del foro (fuera de alcance) es una asignación RBAC, no un cuarto rol. Detalle en
+[`docs/modelo-roles.md`](docs/modelo-roles.md).
 
-## Funcionalidades principales
+## Alcance real
 
-### Catálogo y tienda
-- Catálogo multi-vendedor con atributos dinámicos (EAV) — sirve para cualquier rubro (ropa,
-  hardware, celulares, electrodomésticos, etc.)
-- Búsqueda global, filtros avanzados y paginación por cursor
-- Carrito agrupado por tienda, checkout con envío calculado y pago por QR
-- Reseñas post-compra, verificación de tiendas, compradores privilegiados
+| Prioridad | Contenido |
+|---|---|
+| Must (8 RF) | Registro/login, solicitud de tienda, aprobación y moderación, publicación de productos, catálogo, carrito y pedido con QR, comprobante de pago, verificación del pago por el vendedor |
+| Should (4 RF) | Historial de pedidos, confirmación de recepción, categorías, gestión de usuarios |
+| Could (2 RF) | Notificaciones de pedido, cotización Bs/USD (Binance P2P) |
+| Won't | Subastas, foro, chat, empleos, geolocalización, eventos, afiliados, cupones, devoluciones y pagos, equipo de tienda y RBAC dinámico |
 
-### Subastas (estilo eBay)
-Proxy bidding, precio de reserva, Buy It Now, anti-sniping, watchlist, cierre automático con
-orden de pago y relistado.
-
-### Chat y notificaciones
-Chat comprador↔vendedor en tiempo real (Socket.IO) y notificaciones con navegación al recurso.
-
-### Panel de vendedor
-Dashboard con gráficos, CRUD de productos, carga masiva, equipo de tienda, cupones,
-promociones, pagos con comisión configurable.
-
-### Panel de administración
-Dashboard, moderación de productos, gestión de vendedores/usuarios, categorías, banners,
-promociones, reportes económicos, moneda, roles y permisos (RBAC dinámico).
-
-### Foro comunitario
-Preguntas y respuestas por ciudad/departamento y categoría, karma y rangos, geolocalización con
-subforos, moderación por departamento (ver modelo de roles arriba).
-
-### Empleos
-Las tiendas verificadas publican ofertas de empleo con categoría y período de pago
-(diario, semanal o mensual); un ADMIN las modera antes de publicarlas. Los clientes se postulan
-(con CV opcional PDF/DOC/DOCX de hasta 5 MB) y el vendedor gestiona el estado de cada
-postulación (recibida, vista, preseleccionada, rechazada, contratada, retirada). Los CV se
-guardan en almacenamiento privado y se descargan con enlaces firmados de 5 minutos. El admin
-tiene una vista de todas las postulaciones. Detalle en [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md).
-
-### Geolocalización y monedas
-Servicio de geolocalización unificado para tienda y foro: tiendas cercanas ordenadas de la más
-cercana a la más lejana (fórmula haversine) y subforos por departamento. Cotizaciones de moneda
-en vivo con caché.
-
-### Rediseño y rendimiento
-Sistema de diseño **Unified** (web) y **Silk** (móvil), con modo claro y oscuro. Optimizaciones
-de carga: deduplicación de GET, stale-while-revalidate y división del bundle en chunks.
+14 requisitos funcionales (Must 57,1 %) y 5 requisitos no funcionales con métrica.
 
 ## Documentación
 
-- [`docs/requisitos-funcionales.md`](docs/requisitos-funcionales.md)
-- [`docs/requisitos-no-funcionales.md`](docs/requisitos-no-funcionales.md)
+- [`docs/requisitos-funcionales.md`](docs/requisitos-funcionales.md) — 14 RF, criterios Dado/Cuando/Entonces, MoSCoW
+- [`docs/requisitos-no-funcionales.md`](docs/requisitos-no-funcionales.md) — 5 RNF con métrica
+- [`docs/fuera-de-alcance.md`](docs/fuera-de-alcance.md) — Won't have
+- [`docs/casos-de-uso.md`](docs/casos-de-uso.md)
 - [`docs/modelo-roles.md`](docs/modelo-roles.md)
-- [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md)
+- [`docs/modelo-datos.md`](docs/modelo-datos.md) — entidades y diccionario de datos
+- [`docs/arquitectura.md`](docs/arquitectura.md) — monolito modular, flechas, despliegue, riesgos
+- [`docs/contrato-api.md`](docs/contrato-api.md) — rutas Must, errores, dominios
+- [`docs/seguridad-y-pruebas.md`](docs/seguridad-y-pruebas.md) — controles, casos de prueba y brechas
+- [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md) — módulo Empleos (fuera de alcance)
 
 ## Arquitectura
 
@@ -153,16 +124,17 @@ PC ahí si probás desde un teléfono físico en la misma red.
 docker compose up -d
 ```
 
-## Credenciales de prueba
+## Cuentas de prueba (datos ficticios del seed)
 
 | Rol | Email | Password |
 |---|---|---|
+| Administrador | admin@lacase.bo | (definida en el entorno) |
 | Vendedor | vendedor@lacase.bo | (definida en el entorno) |
-| Cliente | comprador@lacase.bo | (definida en el entorno) |
-| Cliente + moderador de foro (La Paz) | comprador@lacase.bo | password123 |
+| Comprador | comprador@lacase.bo | (definida en el entorno) |
 
-Además de estas cuentas fijas, el seed genera vendedores y compradores adicionales con datos
-aleatorios (contraseña `password123`) para poblar el catálogo, las subastas y los chats.
+Son solo para desarrollo y demostración; cambiar la contraseña del administrador antes de cualquier
+despliegue público. Los secretos reales (`DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`) van en
+variables de entorno y nunca en el repositorio.
 
 ## Comandos de calidad
 
@@ -181,17 +153,25 @@ npm test              # Vitest
 npm test              # Jest
 ```
 
-Ejecutar los tests requiere la base de datos PostgreSQL local levantada y las migraciones
-aplicadas (`npx prisma db push`) antes de `npm test` en el backend.
+### Cómo correr las pruebas
 
-## Endpoints principales
+```bash
+cd backend
+npm test                # Jest + Supertest; recrea la base de test con `prisma db push --force-reset` y el seed
+npm run test:coverage   # cobertura de líneas
+```
 
-- Health: `GET /api/health`
-- Productos: `GET /api/products` (filtros + cursor pagination)
-- Subastas: `GET /api/auctions` / `POST /api/auctions/:id/bid`
-- Chat: `GET /api/chat` / `POST /api/chat/:id/messages`
-- Notificaciones: `GET /api/notifications`
-- Empleos: `GET /api/jobs` / `POST /api/jobs/:id/apply` (ver `docs/endpoints-empleos.md`)
-- Foro: `GET /api/forum/*`
-- Roles y permisos: `GET/PUT /api/rbac/*`
+Requiere PostgreSQL local levantado (usuario y base de test configurables por `DATABASE_URL`, ver
+`backend/tests/globalSetup.ts`). La tabla de casos está en
+[`docs/seguridad-y-pruebas.md`](docs/seguridad-y-pruebas.md).
+
+## Endpoints principales (alcance Must)
+
+- Salud: `GET /api/health`
+- Autenticación: `POST /api/auth/register`, `/api/auth/sellers/register`, `/api/auth/login`
+- Catálogo: `GET /api/products`, `GET /api/products/:id`
+- Carrito y pedidos: `/api/cart`, `POST /api/orders`, `POST /api/orders/:id/payment-proof`,
+  `PUT /api/orders/seller/:id/payment-status`
+- Vendedor y administrador: `/api/seller/products`, `/api/admin/products/:id/moderate`
+- Contrato completo: [`docs/contrato-api.md`](docs/contrato-api.md)
 - Docs OpenAPI: `http://localhost:3000/api-docs`
