@@ -32,6 +32,7 @@ import auditRoutes from './routes/audit.routes';
 import storeTeamRoutes from './routes/storeTeam.routes';
 import rbacRoutes from './routes/rbac.routes';
 import jobRoutes from './routes/job.routes';
+import { assertPublicHttpUrl, fetchPublicImage } from './utils/safeFetch';
 import { serveUploads } from './middlewares/upload';
 import { setupSwagger } from './config/swagger';
 
@@ -78,31 +79,28 @@ export function createApp() {
   // Proxy de imágenes: resuelve URLs externas (con redirects) y las sirve localmente
   // para que la app móvil (React Native) no dependa de CDNs con 302.
   app.get('/api/img/:encoded', async (req, res) => {
-    // El proxy sirve imágenes cross-origin (web, Expo web, APK): estos headers se
-    // setean ANTES de cualquier respuesta (éxito O error) para anular el
-    // Cross-Origin-Resource-Policy: same-origin que agrega helmet y permitir el
-    // acceso desde cualquier origen (las <img> no requieren credenciales). Sin
-    // esto, los 502 con JSON del proxy se bloqueaban con NotSameOrigin.
+    // CORP cross-origin: permite que las <img> de la web/móvil (otro origen) muestren la imagen.
+    // No se envía Access-Control-Allow-Origin: las <img> no lo necesitan y así ningún sitio
+    // puede leer el contenido con fetch/XHR.
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.set('Access-Control-Allow-Origin', '*');
     try {
-      const url = decodeURIComponent(req.params.encoded);
-      if (!/^https?:\/\//.test(url)) return res.status(400).json({ error: 'URL inválida' });
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      const upstream = await fetch(url, { redirect: 'follow', signal: controller.signal });
-      clearTimeout(timer);
-      if (!upstream.ok) return res.status(502).json({ error: 'No se pudo cargar la imagen' });
-      const ct = upstream.headers.get('content-type') || 'image/jpeg';
-      res.set('Content-Type', ct);
-      // no-cache: revalida con el server cada vez (los headers CORS/CORP que
-      // agregamos deben estar SIEMPRE frescos; un max-age largo guardaría las
-      // respuestas viejas con CORP: same-origin en caché del navegador).
+      let url: string;
+      try {
+        url = decodeURIComponent(req.params.encoded);
+      } catch {
+        return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'URL inválida' } });
+      }
+      try {
+        await assertPublicHttpUrl(url);
+      } catch {
+        return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'URL no permitida' } });
+      }
+      const { buffer, contentType } = await fetchPublicImage(url);
+      res.set('Content-Type', contentType);
       res.set('Cache-Control', 'no-cache');
-      const buffer = Buffer.from(await upstream.arrayBuffer());
       res.send(buffer);
     } catch {
-      res.status(502).json({ error: 'Error cargando la imagen' });
+      res.status(502).json({ error: { code: 'BAD_GATEWAY', message: 'No se pudo cargar la imagen' } });
     }
   });
 

@@ -9,7 +9,7 @@ import { requireAdmin } from '../middlewares/roles';
 import { ApiError } from '../utils/errors';
 
 const UPLOAD_DIR = path.resolve(__dirname, '..', '..', 'uploads');
-const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'];
+const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.gif']; // SVG excluido: puede contener scripts (XSS)
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -31,7 +31,7 @@ const upload = multer({
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (!ALLOWED.includes(ext)) {
-      return cb(new Error(`Formato no permitido. Usá: ${ALLOWED.join(', ')}`));
+      return cb(ApiError.badRequest(`Formato no permitido. Usá: ${ALLOWED.join(', ')}`));
     }
     cb(null, true);
   },
@@ -61,7 +61,7 @@ export const forumUpload = multer({
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (!FORUM_ALLOWED_EXT.includes(ext) || !FORUM_ALLOWED_MIME.includes(file.mimetype)) {
-      return cb(new Error(`Formato no permitido. Usá: ${FORUM_ALLOWED_MIME.join(', ')} (máx 8 MB)`));
+      return cb(ApiError.badRequest(`Formato no permitido. Usá: ${FORUM_ALLOWED_MIME.join(', ')} (máx 8 MB)`));
     }
     cb(null, true);
   },
@@ -89,7 +89,13 @@ export function serveUploads(app: import('express').Express) {
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
     res.set('Access-Control-Allow-Origin', '*');
     next();
-  }, express.static(UPLOAD_DIR, { maxAge: '7d' }));
+  }, express.static(UPLOAD_DIR, {
+    maxAge: '7d',
+    setHeaders: (res, filePath) => {
+      // SVG antiguos ya subidos: se sirven sin permitir la ejecución de scripts
+      if (filePath.toLowerCase().endsWith('.svg')) res.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+    },
+  }));
 }
 
 // ── CV de postulaciones: carpeta PRIVADA (fuera de /uploads, que es público). Solo se descarga
