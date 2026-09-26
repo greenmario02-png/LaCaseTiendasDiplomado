@@ -34,6 +34,7 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import GroupIcon from '@mui/icons-material/Group';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader } from '../../components/redesign/PageHeader';
 import { useAuthStore } from '../../stores/authStore';
@@ -45,6 +46,7 @@ const MENU = [
   { to: '/seller/etiquetas', label: 'Etiquetas', icon: <QrCode2Icon /> },
   { to: '/seller/calendario', label: 'Calendario', icon: <CalendarMonthIcon /> },
   { to: '/seller/subastas', label: 'Subastas', icon: <GavelIcon /> },
+  { to: '/seller/empleos', label: 'Empleos', icon: <WorkOutlineIcon />, adminOnly: true },
   { to: '/seller/privilegiados', label: 'Compradores VIP', icon: <WorkspacePremiumIcon />, adminOnly: true },
         { to: '/seller/promociones', label: 'Promociones', icon: <LocalOfferOutlinedIcon />, adminOnly: true },
         { to: '/seller/cupones', label: 'Cupones', icon: <LocalOfferIcon />, adminOnly: true },
@@ -65,6 +67,7 @@ const SELLER_ADMIN_ONLY_PATHS = [
   '/seller/regalos',
   '/seller/pagos',
   '/seller/equipo',
+  '/seller/empleos',
   '/seller/configuracion',
 ];
 

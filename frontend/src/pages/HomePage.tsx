@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import GavelIcon from '@mui/icons-material/Gavel';
+import { JobCard, type Job } from '../components/redesign/JobCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -89,8 +90,16 @@ export default function HomePage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const salesRef = useRef<Sale[]>([]);
 
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const geo = useLocationStore((st) => st.coords);
+
+  useEffect(() => {
+    api
+      .get('/jobs', { params: { limit: 6 } })
+      .then((r) => setJobs(r.data.data ?? []))
+      .catch(() => setJobs([]));
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -231,6 +240,26 @@ export default function HomePage() {
           </Grid>
         </Container>
       </Box>
+
+      {jobs.length > 0 && (
+        <Container maxWidth="lg" sx={{ pt: 3 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h5" fontWeight={700}>
+              Empleos
+            </Typography>
+            <Typography component={Link} to="/empleos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
+              Ver todos los empleos
+            </Typography>
+          </Box>
+          <Grid container spacing={2}>
+            {jobs.slice(0, 6).map((job) => (
+              <Grid item xs={12} sm={6} md={4} key={job.id}>
+                <JobCard job={job} onClick={() => navigate('/empleos')} />
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      )}
 
       <Container maxWidth="lg" sx={{ py: 3 }}>
         {/* PRODUCTOS CERCA DE TI */}

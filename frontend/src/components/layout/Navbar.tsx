@@ -13,6 +13,8 @@ import {
   Tooltip,
   Divider,
 } from '@mui/material';
+import WorkIcon from '@mui/icons-material/Work';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -161,6 +163,12 @@ export default function Navbar() {
             </IconButton>
           </Tooltip>
 
+          <Tooltip title="Empleos">
+            <IconButton color="inherit" onClick={() => navigate('/empleos')} aria-label="Empleos">
+              <WorkIcon />
+            </IconButton>
+          </Tooltip>
+
           <Tooltip title="Foro LaCASE">
             <IconButton color="inherit" onClick={() => navigate('/foro')}>
               <ForumIcon />
@@ -211,6 +219,9 @@ export default function Navbar() {
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta'); }}>
                   <AccountCircleIcon sx={{ mr: 1 }} /> Mi cuenta
+                </MenuItem>
+                <MenuItem onClick={() => { handleClose(); navigate('/cuenta/postulaciones'); }}>
+                  <AssignmentIndIcon sx={{ mr: 1 }} /> Mis postulaciones
                 </MenuItem>
                 {(user.role === 'SELLER' || user.role === 'ADMIN') && (
                   <MenuItem onClick={() => { handleClose(); navigate('/seller'); }}>

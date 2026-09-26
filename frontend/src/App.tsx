@@ -83,6 +83,11 @@ const AdminCalendar = lazy(() => import('./pages/admin/AdminCalendar'));
 const AdminRbac = lazy(() => import('./pages/admin/AdminRbac'));
 const AdminForumPage = lazy(() => import('./pages/admin/AdminForumPage'));
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
+const JobsPage = lazy(() => import('./pages/JobsPage'));
+const MyApplicationsPage = lazy(() => import('./pages/account/MyApplicationsPage'));
+const SellerJobs = lazy(() => import('./pages/seller/SellerJobs'));
+const AdminJobs = lazy(() => import('./pages/admin/AdminJobs'));
+const AdminJobApplications = lazy(() => import('./pages/admin/AdminJobApplications'));
 const EventsPage = lazy(() => import('./pages/events/EventsPage'));
 const EventDetailPage = lazy(() => import('./pages/events/EventDetailPage'));
 const OrganizerLayout = lazy(() => import('./pages/organizer/OrganizerLayout'));
@@ -176,6 +181,7 @@ export default function App() {
             <Route path="u/:username" element={<ForumProfilePage />} />
           </Route>
 
+          <Route path="/empleos" element={<JobsPage />} />
           <Route path="/eventos" element={<EventsPage />} />
           <Route path="/eventos/:slug" element={<EventDetailPage />} />
           <Route
@@ -240,6 +246,14 @@ export default function App() {
             element={
               <Protected>
                 <AddressesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cuenta/postulaciones"
+            element={
+              <Protected>
+                <MyApplicationsPage />
               </Protected>
             }
           />
@@ -315,6 +329,7 @@ export default function App() {
           <Route path="promociones" element={<RequireStoreAdmin><SellerPromotions /></RequireStoreAdmin>} />
           <Route path="pagos" element={<RequireStoreAdmin><SellerPayouts /></RequireStoreAdmin>} />
           <Route path="equipo" element={<RequireStoreAdmin><SellerTeam /></RequireStoreAdmin>} />
+          <Route path="empleos" element={<RequireStoreAdmin><SellerJobs /></RequireStoreAdmin>} />
           <Route path="etiquetas" element={<SellerLabels />} />
           <Route path="calendario" element={<SellerCalendar />} />
           <Route path="devoluciones" element={<SellerReturns />} />
@@ -348,6 +363,8 @@ export default function App() {
           <Route path="calendario" element={<AdminCalendar />} />
           <Route path="foro" element={<AdminForumPage />} />
           <Route path="configuracion" element={<AdminSettingsPage />} />
+          <Route path="empleos" element={<AdminJobs />} />
+          <Route path="postulaciones" element={<AdminJobApplications />} />
           <Route path="rbac" element={<AdminRbac />} />
         </Route>
 
