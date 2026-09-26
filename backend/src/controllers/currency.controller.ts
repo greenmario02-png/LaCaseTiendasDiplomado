@@ -7,14 +7,16 @@ import { ApiError } from '../utils/errors';
 
 export async function getCurrencies(_req: Request, res: Response, next: NextFunction) {
   try {
-    const [currencies, ratesUpdatedAt] = await Promise.all([
+    const [currencies, ratesUpdatedAt, ratesSource] = await Promise.all([
       currencyService.getCurrencies(),
       currencyService.getRatesUpdatedAt(),
+      currencyService.getRatesSource(),
     ]);
     return ok(res, {
       base: currencyService.BASE_CURRENCY,
       currencies,
       ratesUpdatedAt,
+      ratesSource,
     });
   } catch (error) {
     next(error);
@@ -24,7 +26,7 @@ export async function getCurrencies(_req: Request, res: Response, next: NextFunc
 export async function refreshRates(_req: Request, res: Response, next: NextFunction) {
   try {
     const rates = await currencyService.refreshRates();
-    return ok(res, { rates, message: 'Tasa actualizada desde la API oficial' });
+    return ok(res, { rates, message: 'Tasa actualizada desde Binance P2P' });
   } catch (error) {
     next(ApiError.badRequest((error as Error).message));
   }

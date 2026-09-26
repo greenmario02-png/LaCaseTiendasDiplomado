@@ -7,6 +7,8 @@ import { logger } from './utils/logger';
 import { expireProducts } from './services/expiration.service';
 import { processAuctionClosures } from './services/auction-closure.service';
 import { processForumTopPost } from './services/forum-daily.service';
+import { closeDailyMatches } from './services/cono.service';
+import { startCurrencyRefreshScheduler } from './services/currency.service';
 import cron from 'node-cron';
 
 async function main() {
@@ -39,6 +41,14 @@ async function main() {
   cron.schedule('55 3 * * *', async () => {
     await processForumTopPost().catch((e) => logger.warn(`[forum-top-post] error: ${(e as Error).message}`));
   });
+
+  // Memes y torneo: cierra la votación diaria de los enfrentamientos (00:05 hora boliviana = 04:05 UTC)
+  cron.schedule('5 4 * * *', async () => {
+    await closeDailyMatches().catch((e) => logger.warn(`[cono-matches] error: ${(e as Error).message}`));
+  });
+
+  // Cotización USD/BOB desde Binance P2P, con refresco a intervalo aleatorio
+  startCurrencyRefreshScheduler();
 
   httpServer.listen(env.PORT, () => {
     logger.info(`API + WebSocket escuchando en http://localhost:${env.PORT}/api`);
