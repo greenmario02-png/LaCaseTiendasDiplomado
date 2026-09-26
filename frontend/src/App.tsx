@@ -88,15 +88,6 @@ const MyApplicationsPage = lazy(() => import('./pages/account/MyApplicationsPage
 const SellerJobs = lazy(() => import('./pages/seller/SellerJobs'));
 const AdminJobs = lazy(() => import('./pages/admin/AdminJobs'));
 const AdminJobApplications = lazy(() => import('./pages/admin/AdminJobApplications'));
-const EventsPage = lazy(() => import('./pages/events/EventsPage'));
-const EventDetailPage = lazy(() => import('./pages/events/EventDetailPage'));
-const OrganizerLayout = lazy(() => import('./pages/organizer/OrganizerLayout'));
-const EventsListPage = lazy(() => import('./pages/organizer/EventsListPage'));
-const EventWizardPage = lazy(() => import('./pages/organizer/EventWizardPage'));
-const OrgPedidosPage = lazy(() => import('./pages/organizer/OrgPedidosPage'));
-const OrgEquipoPage = lazy(() => import('./pages/organizer/OrgEquipoPage'));
-const OrgEstadisticasPage = lazy(() => import('./pages/organizer/OrgEstadisticasPage'));
-const OrgConfiguracionPage = lazy(() => import('./pages/organizer/OrgConfiguracionPage'));
 function PageLoader() {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -182,23 +173,6 @@ export default function App() {
           </Route>
 
           <Route path="/empleos" element={<JobsPage />} />
-          <Route path="/eventos" element={<EventsPage />} />
-          <Route path="/eventos/:slug" element={<EventDetailPage />} />
-          <Route
-            path="/organizador"
-            element={
-              <Protected>
-                <OrganizerLayout />
-              </Protected>
-            }
-          >
-            <Route index element={<EventsListPage />} />
-            <Route path="eventos/nuevo" element={<EventWizardPage />} />
-            <Route path="pedidos" element={<OrgPedidosPage />} />
-            <Route path="equipo" element={<OrgEquipoPage />} />
-            <Route path="estadisticas" element={<OrgEstadisticasPage />} />
-            <Route path="configuracion" element={<OrgConfiguracionPage />} />
-          </Route>
 
           <Route
             path="/checkout"

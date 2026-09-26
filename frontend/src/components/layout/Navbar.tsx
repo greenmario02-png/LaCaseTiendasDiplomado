@@ -175,12 +175,6 @@ export default function Navbar() {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Eventos 🎟️">
-            <IconButton color="inherit" onClick={() => navigate('/eventos')}>
-              <span style={{ fontSize: 20 }}>🎟️</span>
-            </IconButton>
-          </Tooltip>
-
           <Tooltip title="Carrito">
             <IconButton color="inherit" onClick={() => navigate('/carrito')}>
               <Badge badgeContent={itemCount} color="secondary">
