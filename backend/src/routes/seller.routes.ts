@@ -9,6 +9,8 @@ import * as knownProductController from '../controllers/knownProduct.controller'
 import * as calendarController from '../controllers/calendar.controller';
 import * as jobController from '../controllers/job.controller';
 import { validate } from '../middlewares/validate';
+import { updateSellerProfileSchema } from '../schemas/seller.schemas';
+import { createProductSchema, updateProductSchema } from '../schemas/product.schemas';
 import { applicationStatusSchema, createJobSchema, updateJobSchema } from '../schemas/job.schemas';
 import { authenticate } from '../middlewares/auth';
 import { requireSeller, requireStoreAdmin } from '../middlewares/roles';
@@ -36,12 +38,12 @@ router.post('/jobs/:id/close', requireStoreAdmin, asyncHandler(jobController.clo
 router.get('/jobs/:id/applications', requireStoreAdmin, asyncHandler(jobController.jobApplications));
 router.put('/jobs/applications/:id/status', requireStoreAdmin, validate(applicationStatusSchema), asyncHandler(jobController.updateApplicationStatus));
 router.get('/products', asyncHandler(sellerController.listSellerProducts));
-router.post('/products', asyncHandler(sellerController.createProduct));
+router.post('/products', validate(createProductSchema), asyncHandler(sellerController.createProduct));
 router.post('/products/copy', asyncHandler(sellerController.copyProduct));
-router.put('/products/:id', asyncHandler(sellerController.updateProduct));
+router.put('/products/:id', validate(updateProductSchema), asyncHandler(sellerController.updateProduct));
 router.delete('/products/:id', asyncHandler(sellerController.deleteProduct));
 router.post('/products/:id/reactivate', asyncHandler(sellerController.reactivateProduct));
-router.put('/profile', requireStoreAdmin, asyncHandler(sellerController.updateSellerProfile));
+router.put('/profile', requireStoreAdmin, validate(updateSellerProfileSchema), asyncHandler(sellerController.updateSellerProfile));
 
 // Compradores privilegiados (lado vendedor)
 router.get('/privileged/requests', asyncHandler(sellerController.listPrivilegedRequests));

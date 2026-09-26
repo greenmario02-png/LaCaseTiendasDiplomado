@@ -9,6 +9,8 @@ import * as calendarController from '../controllers/calendar.controller';
 import * as rbacController from '../controllers/rbac.controller';
 import * as jobController from '../controllers/job.controller';
 import { validate } from '../middlewares/validate';
+import { adminCreateUserSchema, adminUpdateUserSchema, updateBannerSchema, updatePromotionSchema } from '../schemas/admin.schemas';
+import { updateOrderStatusSchema } from '../schemas/order.schemas';
 import { moderateJobSchema, jobCategorySchema } from '../schemas/job.schemas';
 import { authenticate } from '../middlewares/auth';
 import { requireAdmin } from '../middlewares/roles';
@@ -37,8 +39,8 @@ router.get('/copies/alerts', asyncHandler(adminController.copyAlerts));
 router.get('/sellers/:id', asyncHandler(adminController.sellerDetail));
 router.put('/sellers/:id/pause', asyncHandler(adminController.pauseSeller));
 router.get('/users', asyncHandler(adminController.listUsers));
-router.post('/users', asyncHandler(adminController.createUser));
-router.put('/users/:id', asyncHandler(adminController.updateUser));
+router.post('/users', validate(adminCreateUserSchema), asyncHandler(adminController.createUser));
+router.put('/users/:id', validate(adminUpdateUserSchema), asyncHandler(adminController.updateUser));
 router.get('/users/:id', asyncHandler(adminController.userDetail));
 
 router.get('/sellers/pending', asyncHandler(adminController.pendingSellers));
@@ -46,7 +48,7 @@ router.get('/products/pending', asyncHandler(adminController.pendingProducts));
 router.put('/products/:id/moderate', asyncHandler(adminController.moderateProduct));
 
 router.get('/orders', asyncHandler(adminController.listOrders));
-router.put('/orders/:id/status', asyncHandler(adminController.updateOrderStatus));
+router.put('/orders/:id/status', validate(updateOrderStatusSchema), asyncHandler(adminController.updateOrderStatus));
 
 router.get('/categories', asyncHandler(adminController.listCategories));
 router.post('/categories', asyncHandler(adminController.createCategory));
@@ -74,12 +76,12 @@ router.delete('/job-categories/:id', asyncHandler(jobController.adminDeleteCateg
 
 router.get('/banners', asyncHandler(adminController.listBanners));
 router.post('/banners', asyncHandler(adminController.createBanner));
-router.put('/banners/:id', asyncHandler(adminController.updateBanner));
+router.put('/banners/:id', validate(updateBannerSchema), asyncHandler(adminController.updateBanner));
 router.delete('/banners/:id', asyncHandler(adminController.deleteBanner));
 
 router.get('/promotions', asyncHandler(adminController.listPromotions));
 router.post('/promotions', asyncHandler(adminController.createPromotion));
-router.put('/promotions/:id', asyncHandler(adminController.updatePromotion));
+router.put('/promotions/:id', validate(updatePromotionSchema), asyncHandler(adminController.updatePromotion));
 router.delete('/promotions/:id', asyncHandler(adminController.deletePromotion));
 
 router.get('/tags', asyncHandler(adminController.listTags));
