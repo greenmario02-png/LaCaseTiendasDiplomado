@@ -37,6 +37,8 @@ import HistoryIcon from '@mui/icons-material/History';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ForumIcon from '@mui/icons-material/Forum';
 import SettingsIcon from '@mui/icons-material/Settings';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader } from '../../components/redesign/PageHeader';
 import { SecondaryButton } from '../../components/redesign/Buttons';
@@ -47,6 +49,8 @@ const MENU = [
   { to: '/admin/productos', label: 'Moderación productos', icon: <InventoryIcon /> },
   { to: '/admin/verificacion', label: 'Verificación de tiendas', icon: <VerifiedUserIcon /> },
   { to: '/admin/vendedores', label: 'Vendedores', icon: <StorefrontIcon /> },
+  { to: '/admin/empleos', label: 'Empleos', icon: <WorkOutlineIcon /> },
+  { to: '/admin/postulaciones', label: 'Postulaciones', icon: <AssignmentIndOutlinedIcon /> },
   { to: '/admin/usuarios', label: 'Usuarios', icon: <PeopleIcon /> },
   { to: '/admin/categorias', label: 'Categorías y atributos', icon: <CategoryIcon /> },
   { to: '/admin/banners', label: 'Banners', icon: <ImageIcon /> },
