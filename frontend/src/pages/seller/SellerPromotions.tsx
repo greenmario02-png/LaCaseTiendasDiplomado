@@ -1,11 +1,9 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Tabs,
   Tab,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,6 +29,10 @@ import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { EmptyState } from '../../components/redesign/States';
+import { useUnifiedTokens } from '../../theme';
 
 interface ProductOption {
   id: number;
@@ -55,6 +57,7 @@ const EMPTY_PROMO = {
 
 export default function SellerPromotions() {
   const money = useMoney();
+  const tk = useUnifiedTokens();
   const [tab, setTab] = useState(0);
   const [promotions, setPromotions] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -192,19 +195,16 @@ export default function SellerPromotions() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            Promociones
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Descuentos en productos, cupones y promos de regalo de tu tienda
-          </Typography>
-        </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-          Nueva promoción
-        </Button>
-      </Stack>
+      <PageHeader
+        title="Promociones"
+        subtitle="Descuentos en productos, cupones y promos de regalo de tu tienda"
+        icon={<LocalOfferIcon />}
+        actions={
+          <PrimaryButton type="button" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+            Nueva promoción
+          </PrimaryButton>
+        }
+      />
 
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
         <Tab label={`Activas (${active.length})`} />
@@ -212,20 +212,22 @@ export default function SellerPromotions() {
       </Tabs>
 
       {tab === 0 && active.length === 0 && (
-        <Paper sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
-          No tenés promociones activas. Tocá "Nueva promoción" para crear una.
-        </Paper>
+        <SurfaceCard>
+          <EmptyState message='No tenés promociones activas. Tocá "Nueva promoción" para crear una.' />
+        </SurfaceCard>
       )}
       {tab === 1 && finished.length === 0 && (
-        <Paper sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>No tenés promociones finalizadas.</Paper>
+        <SurfaceCard>
+          <EmptyState message="No tenés promociones finalizadas." />
+        </SurfaceCard>
       )}
 
       {(tab === 0 ? active : finished).map((p) => (
-        <Paper key={p.id} sx={{ p: 2, mb: 2 }}>
+        <SurfaceCard key={p.id} sx={{ p: 2, mb: 2 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
             <Box>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" fontWeight={700} color={tk.onSurface}>
                   {p.title}
                 </Typography>
                 <Chip
@@ -263,7 +265,7 @@ export default function SellerPromotions() {
               </IconButton>
             )}
           </Stack>
-        </Paper>
+        </SurfaceCard>
       ))}
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
@@ -530,13 +532,13 @@ export default function SellerPromotions() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
-          <Button
-            variant="contained"
+          <GhostButton type="button" onClick={() => setDialogOpen(false)}>Cancelar</GhostButton>
+          <PrimaryButton
+            type="button"
             onClick={() => (promoType === 'PRODUCT' ? savePromo() : promoType === 'COUPON' ? saveCoupon() : saveGift())}
           >
             Crear
-          </Button>
+          </PrimaryButton>
         </DialogActions>
       </Dialog>
     </Box>

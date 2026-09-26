@@ -50,8 +50,8 @@ import {
   type ForumModerator,
   type ForumCategory,
 } from '../../services/forum.api';
-import { forumPalette } from '../../theme/forumTheme';
-import { getUnifiedTokens } from '../../theme';
+import { useForumPalette } from '../../theme/forumTheme';
+import { useUnifiedTokens } from '../../theme';
 import { StatCard } from '../../components/redesign/StatCard';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import toast from 'react-hot-toast';
@@ -105,7 +105,8 @@ const REASON_LABEL: Record<string, string> = {
 
 export default function AdminForumPage() {
   const [tab, setTab] = useState(0);
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
+  const forumPalette = useForumPalette();
 
   // Moderación
   const [stats, setStats] = useState<ForumStats | null>(null);

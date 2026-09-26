@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 export type StatCardProps = {
   title: string;
@@ -12,7 +12,7 @@ export type StatCardProps = {
 };
 
 export function StatCard({ title, value, icon, trend }: StatCardProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   return (
     <Card
       sx={{

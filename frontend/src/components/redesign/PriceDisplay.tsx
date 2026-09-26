@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 import { useCurrencyStore, convertPrice, getRate } from '../../stores/currencyStore';
 
 interface PriceDisplayProps {
@@ -24,7 +24,7 @@ export function fmtBs(n: number): string {
  * SIEMPRE está en Bs (moneda base del sistema).
  */
 export function PriceDisplay({ price, salePrice, priceUsd, currency }: PriceDisplayProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const currencies = useCurrencyStore((s) => s.currencies);
   const selected = useCurrencyStore((s) => s.selected);
 

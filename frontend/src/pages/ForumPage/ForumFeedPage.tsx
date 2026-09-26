@@ -9,7 +9,7 @@ import { ForumPostCard } from '../../components/redesign/ForumPostCard';
 import { FilterBar } from '../../components/redesign/FilterBar';
 import { PrimaryButton, SecondaryButton } from '../../components/redesign/Buttons';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 
 const MODES = [
   { key: 'RECIENTE', label: 'Reciente' },
@@ -19,6 +19,7 @@ const MODES = [
 ];
 
 export function ForumFeedPage() {
+  const forumPalette = useForumPalette();
   const { posts, loading, activeMode, activeCategory, geo, fetchPosts, loadMorePosts, setMode, setCategory, votePost } =
     useForumStore();
   const [openNew, setOpenNew] = useState(false);

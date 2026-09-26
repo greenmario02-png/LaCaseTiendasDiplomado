@@ -19,11 +19,12 @@ import { PrimaryButton } from '../../components/redesign/Buttons';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 import { MapPin, MessageSquare } from 'lucide-react';
 import { CategoryIcon } from '../../theme/forumIcons';
-import { forumPalette, formatTimeAgo } from '../../theme/forumTheme';
+import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 
 type PostDetail = any;
 
 export function ForumPostPage() {
+  const forumPalette = useForumPalette();
   const { id } = useParams();
   const postId = Number(id);
   const navigate = useNavigate();

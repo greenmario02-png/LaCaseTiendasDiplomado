@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { Link } from 'react-router-dom';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 export type CurrencyRates = {
   usd?: number;
@@ -18,7 +18,7 @@ type Props = {
 const fmt = (n?: number) => (typeof n === 'number' ? n.toFixed(2).replace('.', ',') : '—');
 
 export function CurrencyRatesBar({ rates }: Props) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const items: { key: string; label: string; value: number | undefined }[] = [
     { key: 'usd', label: 'USD', value: rates.usd },
     { key: 'eur', label: 'EUR', value: rates.eur },

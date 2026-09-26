@@ -1,6 +1,6 @@
 import { Card, Box, Typography, Chip, Button, Stack, Avatar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { forumPalette, formatTimeAgo } from '../../theme/forumTheme';
+import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 import { useAuthStore } from '../../stores/authStore';
 import type { ForumReply } from '../../services/forum.api';
 import PostVoteBar from './PostVoteBar';
@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props) {
+  const forumPalette = useForumPalette();
   const { user } = useAuthStore();
 
   return (

@@ -6,7 +6,7 @@ import { useForumStore } from '../../stores/forumStore';
 import { MapPin } from 'lucide-react';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 import { FilterBar } from '../../components/redesign/FilterBar';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 export function ForumCategoriesPage() {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export function ForumCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
 
   useEffect(() => {
     Promise.all([listCategories(), getCitiesStats()])

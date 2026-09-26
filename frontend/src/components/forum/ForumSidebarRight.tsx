@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, List, ListItem, Chip, Divider, Avatar } from '@mui/material';
 import { PencilLine, Trophy, Medal, Star, TrendingUp, MessageCircle, Coins } from 'lucide-react';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 import { useAuthStore } from '../../stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import { getTrending, getTopUsers } from '../../services/forum.api';
@@ -9,6 +9,7 @@ import { getTrending, getTopUsers } from '../../services/forum.api';
 export default function ForumSidebarRight() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const forumPalette = useForumPalette();
   const [trending, setTrending] = useState<{ tag: string; count: number }[]>([]);
   const [topUsers, setTopUsers] = useState<{ id: number; forumUsername: string; karma: number; tag: string; reputationScore: number }[]>([]);
 

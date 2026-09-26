@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -14,11 +13,13 @@ import {
   MenuItem,
   Stack,
   Chip,
-  CircularProgress,
-  Alert,
   Link,
 } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
 import { api } from '../../services/api';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { LoadingState, ErrorState } from '../../components/redesign/States';
 
 type AuditAction =
   | 'CREATED'
@@ -79,6 +80,7 @@ function formatDate(iso: string) {
 }
 
 export default function AdminLogs() {
+  const t = useUnifiedTokens();
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -110,6 +112,7 @@ export default function AdminLogs() {
 
   return (
     <Box>
+      <PageHeader title="Logs de acciones" subtitle="Auditoría de cambios sobre productos" icon={<HistoryIcon />} />
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={3}>
         <TextField
           size="small"
@@ -141,16 +144,12 @@ export default function AdminLogs() {
         </TextField>
       </Stack>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+      {error && <ErrorState message={error} onRetry={load} />}
 
-      <Paper>
+      <SurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
         <TableContainer>
           <Table size="small">
-            <TableHead>
+            <TableHead sx={{ bgcolor: t.surface }}>
               <TableRow>
                 <TableCell>Fecha</TableCell>
                 <TableCell>Acción</TableCell>
@@ -163,12 +162,12 @@ export default function AdminLogs() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                    <CircularProgress size={28} />
+                    <LoadingState />
                   </TableCell>
                 </TableRow>
               ) : rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 4, color: t.onSurfaceVariant }}>
                     <Typography variant="body2">
                       No hay logs de auditoría todavía. Se registran cuando se crean, editan o moderan productos.
                     </Typography>
@@ -176,7 +175,7 @@ export default function AdminLogs() {
                 </TableRow>
               ) : (
                 rows.map((r) => (
-                  <TableRow key={r.id} hover>
+                  <TableRow key={r.id} hover sx={{ '& td': { borderColor: `${t.outline}33` } }}>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatDate(r.createdAt)}</TableCell>
                     <TableCell>
                       <Chip label={r.action} size="small" color={ACTION_COLORS[r.action] ?? 'default'} />
@@ -238,7 +237,7 @@ export default function AdminLogs() {
           labelRowsPerPage="Filas por página"
           rowsPerPageOptions={[10, 20, 50]}
         />
-      </Paper>
+      </SurfaceCard>
     </Box>
   );
 }

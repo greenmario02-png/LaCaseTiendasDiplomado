@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Container, Typography, Grid, Paper, Chip, Box } from '@mui/material';
+import { Container, Typography, Grid, Chip, Box } from '@mui/material';
 import { api } from '../services/api';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useMoney } from '../hooks/useMoney';
+import { useUnifiedTokens } from '../theme';
+import { PageHeader, SurfaceCard } from '../components/redesign/PageHeader';
+import { EmptyState } from '../components/redesign/States';
+import { StaggerContainer, StaggerItem } from '../components/motion/StaggerList';
 import ProductCard from '../components/ui/ProductCard';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
 
 export default function PromotionsPage() {
   const money = useMoney();
+  const t = useUnifiedTokens();
   const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,27 +28,31 @@ export default function PromotionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Typography variant="h5" fontWeight={700} mb={3}>
-        Promociones activas
-      </Typography>
-      {promotions.length === 0 && <Typography color="text.secondary">No hay promociones activas en este momento.</Typography>}
+      <PageHeader title="Promociones activas" subtitle="Aprovechá los mejores descuentos" icon={<LocalOfferIcon />} />
+      {promotions.length === 0 && (
+        <SurfaceCard>
+          <EmptyState message="No hay promociones activas en este momento." />
+        </SurfaceCard>
+      )}
 
+      <StaggerContainer>
       {promotions.map((promo) => (
-        <Paper key={promo.id} sx={{ p: 3, mb: 3 }}>
+        <StaggerItem key={promo.id}>
+        <SurfaceCard sx={{ mb: 3 }}>
           <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap">
             <Chip
               label={promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}% OFF` : `${money(promo.discountValue)} OFF`}
               color="primary"
             />
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6" fontWeight={700} color={t.onSurface}>
               {promo.title}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color={t.onSurfaceVariant}>
               Hasta el {new Date(promo.endDate).toLocaleDateString('es-BO')}
             </Typography>
           </Box>
           {promo.description && (
-            <Typography variant="body2" color="text.secondary" mb={2}>
+            <Typography variant="body2" color={t.onSurfaceVariant} mb={2}>
               {promo.description}
             </Typography>
           )}
@@ -53,8 +63,10 @@ export default function PromotionsPage() {
               </Grid>
             ))}
           </Grid>
-        </Paper>
+        </SurfaceCard>
+        </StaggerItem>
       ))}
+      </StaggerContainer>
     </Container>
   );
 }

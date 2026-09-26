@@ -1,35 +1,53 @@
 // Sistema de diseño del foro LaCASE — rediseñado con los tokens del "LaCase Unified System"
-// (Material 3 claro; índigo #4F46E5, ámbar #FEA619, esmeralda #006E4B).
-// Se mantienen las MISMAS claves para que todos los componentes del foro hereden el estilo nuevo.
-import { getUnifiedTokens } from './unifiedTokens';
+// (Material 3; índigo #4F46E5, ámbar #FEA619, esmeralda #006E4B — claro u oscuro según el modo
+// de la app). Se mantienen las MISMAS claves para que todos los componentes del foro hereden el
+// estilo nuevo.
+import { getUnifiedTokens, type UnifiedTokens } from './unifiedTokens';
+import { useThemeStore } from '../stores/themeStore';
 
-const t = getUnifiedTokens(false);
+function buildForumPalette(t: UnifiedTokens) {
+  return {
+    accent: t.primary,
+    accentHover: t.primaryContainer,
+    accentMuted: `${t.primary}1A`,
+    bgBase: t.background,
+    bgCard: t.surfaceContainerLowest,
+    bgInput: t.surfaceContainerLowest,
+    bgHover: t.primary + '0D',
+    border: t.outline + '40',
+    textPrimary: t.onSurface,
+    textSecondary: t.onSurfaceVariant,
+    textMuted: t.outline,
+    karmaGold: t.karmaBadges.Leyenda.text,
+    karmaUp: t.tertiaryContainer,
+    karmaDown: t.error,
+    amarillo: t.secondaryContainer,
+    rojo: t.error,
+    verde: t.tertiaryContainer,
+    // Rangos de karma (tintes del Unified System)
+    rankNuevo: t.karmaBadges.Novato.text,
+    rankActivo: t.karmaBadges.Activo.text,
+    rankExperto: t.karmaBadges.Experto.text,
+    rankMaestro: t.karmaBadges.Maestro.text,
+    rankLeyenda: t.karmaBadges.Leyenda.text,
+  };
+}
 
-export const forumPalette = {
-  accent: t.primary,
-  accentHover: t.primaryContainer,
-  accentMuted: `${t.primary}1A`,
-  bgBase: t.background,
-  bgCard: t.surfaceContainerLowest,
-  bgInput: '#FFFFFF',
-  bgHover: t.primary + '0D',
-  border: t.outline + '40',
-  textPrimary: t.onSurface,
-  textSecondary: t.onSurfaceVariant,
-  textMuted: t.outline,
-  karmaGold: t.karmaBadges.Leyenda.text,
-  karmaUp: t.tertiaryContainer,
-  karmaDown: t.error,
-  amarillo: t.secondaryContainer,
-  rojo: t.error,
-  verde: t.tertiaryContainer,
-  // Rangos de karma (tintes del Unified System)
-  rankNuevo: t.karmaBadges.Novato.text,
-  rankActivo: t.karmaBadges.Activo.text,
-  rankExperto: t.karmaBadges.Experto.text,
-  rankMaestro: t.karmaBadges.Maestro.text,
-  rankLeyenda: t.karmaBadges.Leyenda.text,
-};
+/**
+ * Paleta del foro reactiva al modo oscuro real de la app. Antes era una constante calculada UNA
+ * SOLA VEZ en modo claro (`getUnifiedTokens(false)`) — con la app en modo oscuro, el texto y los
+ * fondos del foro quedaban con tonos claros ilegibles/desentonados. Los componentes del foro que
+ * ya importaban `forumPalette` como objeto plano siguen funcionando: import `useForumPalette` y
+ * asigná `const forumPalette = useForumPalette();` al principio del componente (shadowing), sin
+ * tocar el resto de las referencias `forumPalette.x`.
+ */
+export function useForumPalette() {
+  const darkMode = useThemeStore((s) => s.darkMode);
+  return buildForumPalette(getUnifiedTokens(darkMode));
+}
+
+/** @deprecated Usa `useForumPalette()` dentro de un componente — esta constante es solo modo claro. */
+export const forumPalette = buildForumPalette(getUnifiedTokens(false));
 
 export function getTag(karma: number): string {
   const thresholds = [

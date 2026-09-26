@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Sparkles, TrendingDown, TrendingUp, Timer, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   Container,
@@ -10,7 +9,6 @@ import {
   CardContent,
   Box,
   Chip,
-  Paper,
   Pagination,
   TextField,
   InputAdornment,
@@ -21,7 +19,6 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
-  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import GavelIcon from '@mui/icons-material/Gavel';
@@ -30,6 +27,10 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { api } from '../services/api';
 import { useMoney } from '../hooks/useMoney';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
+import { useUnifiedTokens } from '../theme';
+import { PageHeader, SurfaceCard } from '../components/redesign/PageHeader';
+import { EmptyState } from '../components/redesign/States';
+import { FadeIn } from '../components/motion/FadeIn';
 
 interface Auction {
   id: number;
@@ -67,6 +68,7 @@ const SORTS = [
 
 export default function AuctionsPage() {
   const money = useMoney();
+  const t = useUnifiedTokens();
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -104,15 +106,10 @@ export default function AuctionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box display="flex" alignItems="center" gap={1} mb={3}>
-        <GavelIcon color="primary" />
-        <Typography variant="h5" fontWeight={700}>
-          Subastas
-        </Typography>
-      </Box>
+      <PageHeader title="Subastas" subtitle="Pujá por productos únicos y llevate las mejores ofertas" icon={<GavelIcon />} />
 
       {/* Buscador y filtros */}
-      <Paper sx={{ p: 2, mb: 3 }}>
+      <SurfaceCard sx={{ p: 2, mb: 3 }}>
         <Stack spacing={2}>
           <TextField
             fullWidth
@@ -150,12 +147,12 @@ export default function AuctionsPage() {
             />
           </Stack>
         </Stack>
-      </Paper>
+      </SurfaceCard>
 
       {topDeal && (
         <Box display="flex" alignItems="center" gap={1} mb={2}>
-          <WhatshotIcon color="error" />
-          <Typography variant="body2" color="text.secondary">
+          <WhatshotIcon sx={{ color: t.error }} />
+          <Typography variant="body2" color={t.onSurfaceVariant}>
             Ordenadas según tu interés y las mejores ofertas (precios más bajos y activas primero).
           </Typography>
         </Box>
@@ -164,11 +161,9 @@ export default function AuctionsPage() {
       {loading ? (
         <ProductGridSkeleton count={8} />
       ) : auctions.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary">
-            No se encontraron subastas{search ? ` para "${search}"` : ''}. Probá con otros términos o quitá los filtros.
-          </Typography>
-        </Paper>
+        <SurfaceCard>
+          <EmptyState message={`No se encontraron subastas${search ? ` para "${search}"` : ''}. Probá con otros términos o quitá los filtros.`} />
+        </SurfaceCard>
       ) : (
         <>
           <Grid container spacing={2}>
@@ -178,7 +173,20 @@ export default function AuctionsPage() {
               const hasBuyNow = a.buyNowPrice && Number(a.buyNowPrice) > 0;
               return (
                 <Grid item xs={6} sm={4} md={3} key={a.id}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <FadeIn>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      borderRadius: '16px',
+                      bgcolor: t.surfaceContainerLowest,
+                      border: `1px solid ${t.outline}33`,
+                      boxShadow: t.cardShadow,
+                    }}
+                  >
                     {isHot && (
                       <Chip
                         icon={<WhatshotIcon />}
@@ -202,7 +210,7 @@ export default function AuctionsPage() {
                         {a.imageUrl ? (
                           <img src={a.imageUrl} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f5f5' }}>
+                          <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: t.surface }}>
                             <GavelIcon color="disabled" sx={{ fontSize: 48 }} />
                           </Box>
                         )}
@@ -213,40 +221,41 @@ export default function AuctionsPage() {
                             left: 0,
                             right: 0,
                             height: 4,
-                            bgcolor: '#e0e0e0',
+                            bgcolor: `${t.outline}33`,
                           }}
                         >
                           <Box
                             sx={{
                               width: `${urgency * 100}%`,
                               height: '100%',
-                              bgcolor: isHot ? 'error.main' : 'warning.main',
+                              bgcolor: isHot ? t.error : t.secondaryContainer,
                               transition: 'width 1s',
                             }}
                           />
                         </Box>
                       </Box>
                       <CardContent>
-                        <Typography variant="body2" fontWeight={600} noWrap>
+                        <Typography variant="body2" fontWeight={600} color={t.onSurface} noWrap>
                           {a.title}
                         </Typography>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                          <Typography fontWeight={800} className="price-color">
+                          <Typography fontWeight={800} color={t.primary}>
                             {money(Number(a.currentPrice))}
                           </Typography>
                           <Chip label={`${a.bidsCount} pujas`} size="small" variant="outlined" />
                         </Box>
                         <Box display="flex" justifyContent="space-between" mt={1}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" color={t.onSurfaceVariant}>
                             {a.seller?.storeName}
                           </Typography>
-                          <Typography variant="caption" color={isHot ? 'error.main' : 'text.secondary'} fontWeight={600}>
+                          <Typography variant="caption" color={isHot ? t.error : t.onSurfaceVariant} fontWeight={600}>
                             ⏱ {formatTimeLeft(a.timeLeftMs)}
                           </Typography>
                         </Box>
                       </CardContent>
                     </CardActionArea>
                   </Card>
+                  </FadeIn>
                 </Grid>
               );
             })}

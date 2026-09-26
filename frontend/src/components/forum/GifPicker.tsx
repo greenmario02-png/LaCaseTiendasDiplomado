@@ -3,7 +3,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
   Box, CircularProgress, Typography,
 } from '@mui/material';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 import { searchGifs, type GifResult } from '../../services/forum.api';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function GifPicker({ open, onClose, onPick }: Props) {
+  const forumPalette = useForumPalette();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GifResult[]>([]);
   const [loading, setLoading] = useState(false);

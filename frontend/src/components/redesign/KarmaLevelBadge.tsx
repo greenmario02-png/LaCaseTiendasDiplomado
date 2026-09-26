@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import { getUnifiedTokens, type KarmaLevel } from '../../theme';
+import { useUnifiedTokens, type KarmaLevel } from '../../theme';
 
 interface KarmaLevelBadgeProps {
   level?: string;
@@ -7,7 +7,7 @@ interface KarmaLevelBadgeProps {
 
 /** Insignia pill del nivel de karma del foro (sin números, anti-Reddit). */
 export function KarmaLevelBadge({ level = 'Novato' }: KarmaLevelBadgeProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   const badge = tokens.karmaBadges[level as KarmaLevel] ?? tokens.karmaBadges.Novato;
   return (
     <Chip

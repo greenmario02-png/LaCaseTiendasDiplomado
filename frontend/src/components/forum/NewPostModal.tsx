@@ -4,7 +4,7 @@ import {
   MenuItem, Stack, Chip, Alert, InputLabel, FormControl, Select, Box,
 } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 import { useForumStore } from '../../stores/forumStore';
 import { useAuthStore } from '../../stores/authStore';
 import { listCategories, createPost, uploadPostImages } from '../../services/forum.api';
@@ -21,6 +21,7 @@ interface Props {
 }
 
 export default function NewPostModal({ open, onClose }: Props) {
+  const forumPalette = useForumPalette();
   const { user } = useAuthStore();
   const fetchPosts = useForumStore((s) => s.fetchPosts);
   const [categories, setCategories] = useState<ForumCategory[]>([]);

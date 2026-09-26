@@ -4,19 +4,22 @@ import { useParams, Link } from 'react-router-dom';
 import {
   Container,
   Typography,
-  Paper,
   Box,
   Chip,
-  Button,
   Divider,
   Breadcrumbs,
   Alert,
-  CircularProgress,
 } from '@mui/material';
 import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton } from '../../components/redesign/Buttons';
+import { LoadingState } from '../../components/redesign/States';
+import { FadeIn } from '../../components/motion/FadeIn';
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: 'Pendiente',
@@ -30,6 +33,7 @@ const STATUS_LABEL: Record<string, string> = {
 export default function OrderDetailPage() {
   const { id } = useParams();
   const money = useMoney();
+  const t = useUnifiedTokens();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [proofUrl, setProofUrl] = useState('');
@@ -63,12 +67,14 @@ export default function OrderDetailPage() {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 8 }} />;
+  if (loading) return <LoadingState />;
 
   if (!order) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <Typography variant="h5">Orden no encontrada</Typography>
+        <Typography variant="h5" fontWeight={700} color={t.onSurface}>
+          Orden no encontrada
+        </Typography>
       </Container>
     );
   }
@@ -76,44 +82,44 @@ export default function OrderDetailPage() {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
-        <Typography component={Link} to="/cuenta/pedidos" sx={{ textDecoration: 'none', color: 'inherit' }}>
+        <Typography component={Link} to="/cuenta/pedidos" sx={{ textDecoration: 'none', color: t.onSurfaceVariant }}>
           Mis pedidos
         </Typography>
-        <Typography color="text.primary">#{order.id}</Typography>
+        <Typography color={t.onSurface}>#{order.id}</Typography>
       </Breadcrumbs>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
-          <Typography variant="h5" fontWeight={700}>
-            Orden #{order.id}
-          </Typography>
+      <PageHeader
+        title={`Orden #${order.id}`}
+        subtitle={`${new Date(order.createdAt).toLocaleString('es-AR')} · Tienda: ${order.seller.storeName}`}
+        icon={<ReceiptLongIcon />}
+        actions={
+          <>
           <Chip label={STATUS_LABEL[order.status] || order.status} color={order.status === 'DELIVERED' ? 'success' : 'info'} />
           {order.fulfillmentType === 'PICKUP' ? (
             <Chip label="🏬 Retiro en tienda" color="secondary" variant="outlined" />
           ) : (
             <Chip icon={<Truck size={13} strokeWidth={2.2} />} label="Envío a domicilio" color="default" variant="outlined" />
           )}
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          {new Date(order.createdAt).toLocaleString('es-AR')} · Tienda: {order.seller.storeName}
-        </Typography>
-      </Paper>
+          </>
+        }
+      />
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" fontWeight={700} mb={2}>
+      <FadeIn>
+      <SurfaceCard sx={{ mb: 3 }}>
+        <Typography variant="h6" fontWeight={700} mb={2} color={t.onSurface}>
           Productos
         </Typography>
         {order.items?.map((item: any) => (
-          <Box key={item.id} display="flex" justifyContent="space-between" py={1} borderBottom={1} borderColor="divider">
+          <Box key={item.id} display="flex" justifyContent="space-between" py={1} borderBottom={1} borderColor={`${t.outline}33`}>
             <Box display="flex" gap={1}>
               {item.product.images?.[0] && (
                 <img src={item.product.images[0].url} alt="" style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} />
               )}
               <Box>
-                <Typography variant="body2" fontWeight={600}>
+                <Typography variant="body2" fontWeight={600} color={t.onSurface}>
                   {item.product.name}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color={t.onSurfaceVariant}>
                   ×{item.quantity} a {money(item.unitPrice)}
                 </Typography>
                 {item.isGift && (
@@ -121,32 +127,32 @@ export default function OrderDetailPage() {
                 )}
               </Box>
             </Box>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" fontWeight={600} color={t.onSurface}>
               {money(Number(item.unitPrice) * item.quantity)}
             </Typography>
           </Box>
         ))}
         <Box mt={2}>
           <Box display="flex" justifyContent="space-between" fontSize="body2">
-            <Typography color="text.secondary">Subtotal</Typography>
-            <Typography>{money(order.subtotal)}</Typography>
+            <Typography color={t.onSurfaceVariant}>Subtotal</Typography>
+            <Typography color={t.onSurface}>{money(order.subtotal)}</Typography>
           </Box>
           <Box display="flex" justifyContent="space-between" fontSize="body2">
-            <Typography color="text.secondary">Envío</Typography>
-            <Typography>{money(order.shippingCost)}</Typography>
+            <Typography color={t.onSurfaceVariant}>Envío</Typography>
+            <Typography color={t.onSurface}>{money(order.shippingCost)}</Typography>
           </Box>
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1, borderColor: `${t.outline}33` }} />
           <Box display="flex" justifyContent="space-between">
-            <Typography fontWeight={700}>Total</Typography>
-            <Typography fontWeight={700} className="price-color">
+            <Typography fontWeight={700} color={t.onSurface}>Total</Typography>
+            <Typography fontWeight={700} color={t.primary}>
               {money(order.total)}
             </Typography>
           </Box>
         </Box>
-      </Paper>
+      </SurfaceCard>
 
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight={700} mb={2}>
+      <SurfaceCard>
+        <Typography variant="h6" fontWeight={700} mb={2} color={t.onSurface}>
           Pago por QR
         </Typography>
         {order.paymentStatus === 'VERIFIED' ? (
@@ -159,7 +165,7 @@ export default function OrderDetailPage() {
                 {order.seller?.paymentQrUrl ? (
                   <img src={order.seller.paymentQrUrl} alt="QR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 ) : (
-                  <Typography color="text.disabled">QR no disponible</Typography>
+                  <Typography color={t.onSurfaceVariant}>QR no disponible</Typography>
                 )}
               </Box>
             </Box>
@@ -168,53 +174,61 @@ export default function OrderDetailPage() {
                 value={proofUrl}
                 onChange={(e) => setProofUrl(e.target.value)}
                 placeholder="URL del comprobante de transferencia"
-                style={{ flex: 1, padding: 10, borderRadius: 8, border: '1px solid #ccc' }}
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  borderRadius: 8,
+                  border: `1px solid ${t.outline}`,
+                  background: t.surfaceContainerLowest,
+                  color: t.onSurface,
+                }}
               />
-              <Button variant="contained" onClick={uploadProof} disabled={!proofUrl.trim()}>
+              <PrimaryButton type="button" onClick={uploadProof} disabled={!proofUrl.trim()}>
                 Subir comprobante
-              </Button>
+              </PrimaryButton>
             </Box>
           </>
         )}
-      </Paper>
+      </SurfaceCard>
 
       {order.paymentStatus === 'VERIFIED' && ['SHIPPED', 'DELIVERED', 'PENDING', 'PROOF_SUBMITTED'].includes(order.status) && (
-        <Paper sx={{ p: 3, mt: 3, bgcolor: 'success.light' }}>
-          <Typography variant="h6" fontWeight={700} mb={1}>
+        <SurfaceCard sx={{ mt: 3, bgcolor: 'success.light' }}>
+          <Typography variant="h6" fontWeight={700} mb={1} color="text.primary">
             ¿Recibiste tu pedido?
           </Typography>
-          <Typography variant="body2" color="text.secondary" mb={2}>
+          <Typography variant="body2" color="text.primary" mb={2}>
             Confirmar la entrega protege tu compra y libera el pago al vendedor. Es la garantía de confianza de la plataforma.
           </Typography>
-          <Button variant="contained" color="success" size="large" onClick={confirmDelivery}>
+          <PrimaryButton type="button" color="success" size="large" onClick={confirmDelivery}>
             Sí, confirmo que recibí el pedido ✓
-          </Button>
-        </Paper>
+          </PrimaryButton>
+        </SurfaceCard>
       )}
 
       {order.shippingAddress && (
-        <Paper sx={{ p: 3, mt: 3 }}>
-          <Typography variant="h6" fontWeight={700} mb={1}>
+        <SurfaceCard sx={{ mt: 3 }}>
+          <Typography variant="h6" fontWeight={700} mb={1} color={t.onSurface}>
             Envío a
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" color={t.onSurfaceVariant}>
             {order.shippingAddress.street} {order.shippingAddress.number}
             {order.shippingAddress.floor ? ', ' + order.shippingAddress.floor : ''} — {order.shippingAddress.city},{' '}
             {order.shippingAddress.state} (CP {order.shippingAddress.postalCode})
           </Typography>
-        </Paper>
+        </SurfaceCard>
       )}
 
       {order.fulfillmentType === 'PICKUP' && (
-        <Paper sx={{ p: 3, mt: 3, bgcolor: 'secondary.light' }}>
-          <Typography variant="h6" fontWeight={700} mb={1}>
+        <SurfaceCard sx={{ mt: 3, bgcolor: 'secondary.light' }}>
+          <Typography variant="h6" fontWeight={700} mb={1} color="text.primary">
             🏬 Retiro en tienda
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" color="text.primary">
             {order.pickupAddress || 'Retirá el pedido en la tienda del vendedor.'}
           </Typography>
-        </Paper>
+        </SurfaceCard>
       )}
+      </FadeIn>
     </Container>
   );
 }

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
-  Paper,
   Box,
   TextField,
   Button,
@@ -18,13 +17,21 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import StarIcon from '@mui/icons-material/Star';
 import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton } from '../../components/redesign/Buttons';
+import { EmptyState } from '../../components/redesign/States';
+import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
 
 const EMPTY_FORM = { street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: false };
 
 export default function AddressesPage() {
+  const t = useUnifiedTokens();
   const [addresses, setAddresses] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -82,34 +89,38 @@ export default function AddressesPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={700}>
-          Mis direcciones
-        </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openNew}>
-          Nueva dirección
-        </Button>
-      </Box>
+      <PageHeader
+        title="Mis direcciones"
+        subtitle="Administrá tus direcciones de envío"
+        icon={<LocationOnIcon />}
+        actions={
+          <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
+            Nueva dirección
+          </PrimaryButton>
+        }
+      />
 
       {addresses.length === 0 && (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary">No tenés direcciones guardadas.</Typography>
-        </Paper>
+        <SurfaceCard>
+          <EmptyState message="No tenés direcciones guardadas." />
+        </SurfaceCard>
       )}
 
+      <StaggerContainer>
       {addresses.map((a) => (
-        <Paper key={a.id} sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <StaggerItem key={a.id}>
+        <SurfaceCard sx={{ p: 2, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box flex={1}>
-            <Typography fontWeight={600}>
+            <Typography fontWeight={600} color={t.onSurface}>
               {a.street} {a.number}
               {a.floor ? ', ' + a.floor : ''}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color={t.onSurfaceVariant}>
               {a.city}, {a.state} — CP {a.postalCode}
             </Typography>
             {a.isDefault && (
-              <Typography variant="caption" color="primary" fontWeight={600}>
-                ★ Dirección por defecto
+              <Typography variant="caption" color={t.primary} fontWeight={600} display="inline-flex" alignItems="center" gap={0.5}>
+                <StarIcon sx={{ fontSize: 14 }} /> Dirección por defecto
               </Typography>
             )}
           </Box>
@@ -119,8 +130,10 @@ export default function AddressesPage() {
           <IconButton color="error" onClick={() => remove(a.id)}>
             <DeleteIcon />
           </IconButton>
-        </Paper>
+        </SurfaceCard>
+        </StaggerItem>
       ))}
+      </StaggerContainer>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editingId ? 'Editar dirección' : 'Nueva dirección'}</DialogTitle>

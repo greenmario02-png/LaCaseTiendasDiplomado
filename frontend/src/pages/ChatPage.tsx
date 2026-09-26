@@ -1,18 +1,14 @@
 ﻿import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Package } from 'lucide-react';
 import {
   Container,
   Typography,
-  Paper,
   Box,
   TextField,
   IconButton,
   Avatar,
-  Button,
   CircularProgress,
   Badge,
-  Divider,
   Tab,
   Tabs,
   Menu,
@@ -34,6 +30,10 @@ import { productUrl } from '../utils/format';
 import { useAuthStore } from '../stores/authStore';
 import { getErrorMessage } from '../services/api';
 import toast from 'react-hot-toast';
+import { useUnifiedTokens } from '../theme';
+import { PageHeader, SurfaceCard } from '../components/redesign/PageHeader';
+import { PrimaryButton } from '../components/redesign/Buttons';
+import { LoadingState } from '../components/redesign/States';
 
 interface Message {
   id: number;
@@ -64,6 +64,7 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const theme = useTheme();
+  const t = useUnifiedTokens();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -259,15 +260,16 @@ const typingRef = useRef(false);
   };
 
   const renderList = () => (
-    <Paper
+    <SurfaceCard
       sx={{
+        p: 0,
         height: isMobile ? 'calc(100vh - 260px)' : 'calc(100vh - 220px)',
         overflow: 'auto',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth" sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth" sx={{ borderBottom: `1px solid ${t.outline}33` }}>
         <Tab
           label={
             <Badge badgeContent={unreadByTab('compras')} color="error">
@@ -292,10 +294,10 @@ const typingRef = useRef(false);
 
       {list.length === 0 ? (
         <Box p={3} textAlign="center">
-          <Typography color="text.secondary" variant="body2">
+          <Typography color={t.onSurface} variant="body2">
             {tab === 'compras' ? 'No tenés compras/consultas aún.' : 'No tenés ventas en curso.'}
           </Typography>
-          <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+          <Typography variant="caption" color={t.onSurfaceVariant} display="block" mt={1}>
             {tab === 'compras'
               ? 'Iniciá una desde la ficha de un producto o de una tienda.'
               : 'Cuando un comprador te escriba o compre, aparecerá acá.'}
@@ -311,30 +313,29 @@ const typingRef = useRef(false);
               sx={{
                 p: 2,
                 cursor: 'pointer',
-                borderBottom: 1,
-                borderColor: 'divider',
-                bgcolor: activeId === c.id ? 'action.selected' : 'transparent',
-                '&:hover': { bgcolor: 'action.hover' },
+                borderBottom: `1px solid ${t.outline}33`,
+                bgcolor: activeId === c.id ? `${t.primary}1A` : 'transparent',
+                '&:hover': { bgcolor: `${t.primary}0D` },
               }}
             >
               <Box display="flex" alignItems="center" gap={1}>
                 <Badge badgeContent={unread} color="error" invisible={unread === 0} overlap="circular">
-                  <Avatar sx={{ width: 38, height: 38, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
+                  <Avatar sx={{ width: 38, height: 38, bgcolor: t.primary, color: t.onPrimary, fontSize: '0.9rem' }}>
                     {otherAvatarLabel(c)}
                   </Avatar>
                 </Badge>
                 <Box flex={1} minWidth={0}>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="body2" fontWeight={600} noWrap>
+                    <Typography variant="body2" fontWeight={600} color={t.onSurface} noWrap>
                       {otherName(c)}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1, flexShrink: 0 }}>
+                    <Typography variant="caption" color={t.onSurfaceVariant} sx={{ ml: 1, flexShrink: 0 }}>
                       {new Date(c.updatedAt).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' })}
                     </Typography>
                   </Box>
                   <Typography
                     variant="caption"
-                    color={unread > 0 ? 'text.primary' : 'text.secondary'}
+                    color={unread > 0 ? t.onSurface : t.onSurfaceVariant}
                     fontWeight={unread > 0 ? 600 : 400}
                     noWrap
                     display="block"
@@ -344,7 +345,7 @@ const typingRef = useRef(false);
                 </Box>
               </Box>
               {c.product && (
-                <Typography variant="caption" color="primary" noWrap display="block" mt={0.5} sx={{ pl: 6 }}>
+                <Typography variant="caption" color={t.primary} noWrap display="block" mt={0.5} sx={{ pl: 6 }}>
                   {c.product.name}
                 </Typography>
               )}
@@ -352,14 +353,14 @@ const typingRef = useRef(false);
           );
         })
       )}
-    </Paper>
+    </SurfaceCard>
   );
 
   const renderChat = () => (
-    <Paper sx={{ height: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 220px)', display: 'flex', flexDirection: 'column' }}>
+    <SurfaceCard sx={{ p: 0, overflow: 'hidden', height: isMobile ? 'calc(100vh - 200px)' : 'calc(100vh - 220px)', display: 'flex', flexDirection: 'column' }}>
       {active ? (
         <>
-          <Box p={1.5} borderBottom={1} borderColor="divider">
+          <Box p={1.5} sx={{ borderBottom: `1px solid ${t.outline}33` }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               {isMobile && (
                 <IconButton onClick={goBack} size="small">
@@ -367,16 +368,16 @@ const typingRef = useRef(false);
                 </IconButton>
               )}
               <IconButton size="small" onClick={(e) => setAvatarAnchor(e.currentTarget)} sx={{ p: 0 }}>
-                <Avatar sx={{ bgcolor: 'primary.main' }}>{headerTitle()?.[0]?.toUpperCase() ?? 'V'}</Avatar>
+                <Avatar sx={{ bgcolor: t.primary, color: t.onPrimary }}>{headerTitle()?.[0]?.toUpperCase() ?? 'V'}</Avatar>
               </IconButton>
               <Box flex={1} minWidth={0}>
-                <Typography variant="subtitle1" fontWeight={700} noWrap>
+                <Typography variant="subtitle1" fontWeight={700} color={t.onSurface} noWrap>
                   {headerTitle()}
                 </Typography>
                 {active.product && (
                   <Typography
                     variant="caption"
-                    color="text.secondary"
+                    color={t.onSurfaceVariant}
                     component={Link}
                     to={productUrl(active.product)}
                     noWrap
@@ -390,15 +391,15 @@ const typingRef = useRef(false);
             </Stack>
           </Box>
 
-          <Box flex={1} overflow="auto" p={2} sx={{ bgcolor: 'background.default' }}>
+          <Box flex={1} overflow="auto" p={2} sx={{ bgcolor: t.background }}>
             {messages.length === 0 && (
-              <Typography color="text.secondary" textAlign="center" mt={4}>
+              <Typography color={t.onSurfaceVariant} textAlign="center" mt={4}>
                 Sin mensajes todavía. Escribí para consultar por el producto.
               </Typography>
             )}
             {messages.length === 0 && otherIsSeller && icebreakers.length > 0 && (
               <Box mt={2} mb={1}>
-                <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                <Typography variant="caption" color={t.onSurfaceVariant} display="block" mb={0.5}>
                   💬 Sugerencias para empezar la conversación:
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -416,10 +417,11 @@ const typingRef = useRef(false);
                     sx={{
                       maxWidth: isMobile ? '85%' : '75%',
                       p: 1.5,
-                      borderRadius: 2,
-                      bgcolor: mine ? 'primary.main' : 'background.paper',
-                      color: mine ? 'white' : 'inherit',
-                      boxShadow: 1,
+                      borderRadius: mine ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      bgcolor: mine ? t.primary : t.surfaceContainerLowest,
+                      color: mine ? t.onPrimary : t.onSurface,
+                      border: mine ? 'none' : `1px solid ${t.outline}33`,
+                      boxShadow: t.cardShadow,
                     }}
                   >
                     <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
@@ -428,7 +430,7 @@ const typingRef = useRef(false);
                     <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', textAlign: 'right', mt: 0.5 }}>
                       {new Date(m.createdAt).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}
                       {mine && (
-                        <Box component="span" ml={0.5} color={m.readAt ? '#4caf50' : 'inherit'}>
+                        <Box component="span" ml={0.5} color={m.readAt ? t.tertiaryContainer : 'inherit'}>
                           {m.readAt ? '✓✓' : '✓'}
                         </Box>
                       )}
@@ -439,16 +441,16 @@ const typingRef = useRef(false);
             })}
             <div ref={bottomRef} />
             {otherTyping && (
-              <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 0.5 }}>
+              <Typography variant="caption" color={t.onSurfaceVariant} sx={{ px: 1, pb: 0.5 }}>
                 Escribiendo...
               </Typography>
             )}
           </Box>
 
-          <Box p={1.5} borderTop={1} borderColor="divider">
+          <Box p={1.5} sx={{ borderTop: `1px solid ${t.outline}33` }}>
             {suggestions?.inactive && (
               <Box mb={1}>
-                <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                <Typography variant="caption" color={t.onSurfaceVariant} display="block" mb={0.5}>
                   ⏰ Sin respuesta todavía — sugerencias ({suggestions.region ?? ''}):
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
@@ -486,7 +488,7 @@ const typingRef = useRef(false);
                 }
               }}
             />
-            <IconButton color="primary" onClick={send} disabled={sending || !text.trim()}>
+            <IconButton onClick={send} sx={{ color: t.primary }} disabled={sending || !text.trim()}>
               {sending ? <CircularProgress size={20} /> : <SendIcon />}
             </IconButton>
             </Box>
@@ -494,49 +496,45 @@ const typingRef = useRef(false);
         </>
       ) : (
         <Box p={4} textAlign="center">
-          <ChatIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-          <Typography color="text.secondary">Seleccioná una conversación de la lista para ver los mensajes.</Typography>
+          <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
+          <Typography color={t.onSurfaceVariant}>Seleccioná una conversación de la lista para ver los mensajes.</Typography>
         </Box>
       )}
-    </Paper>
+    </SurfaceCard>
   );
 
   if (!user) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <ChatIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-        <Typography variant="h5" mb={2}>
+        <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
+        <Typography variant="h5" mb={2} color={t.onSurface}>
           Iniciá sesión para ver tus conversaciones
         </Typography>
-        <Button component={Link} to="/login" variant="contained" color="primary">
+        <PrimaryButton type="button" to="/login">
           Iniciar sesión
-        </Button>
+        </PrimaryButton>
       </Container>
     );
   }
 
   if (loading && conversations.length === 0) {
     return (
-      <Box display="flex" justifyContent="center" py={8}>
-        <CircularProgress />
-      </Box>
+      <LoadingState />
     );
   }
 
   return (
     <>
       <Container maxWidth="lg" sx={{ py: 3 }}>
-        <Box display="flex" alignItems="center" gap={1} mb={2}>
-          <Badge badgeContent={unreadByTab('compras') + unreadByTab('ventas')} color="error">
-            <ChatIcon color="primary" />
-          </Badge>
-          <Typography variant="h5" fontWeight={700}>
-            Mensajes
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Compras y ventas separadas
-          </Typography>
-        </Box>
+        <PageHeader
+          title="Mensajes"
+          subtitle="Compras y ventas separadas"
+          icon={
+            <Badge badgeContent={unreadByTab('compras') + unreadByTab('ventas')} color="error">
+              <ChatIcon />
+            </Badge>
+          }
+        />
 
         {isMobile ? (
           activeId && active ? renderChat() : renderList()

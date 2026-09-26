@@ -1,10 +1,8 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
-  Paper,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -42,9 +40,15 @@ import { useMoney } from '../../hooks/useMoney';
 import { useAuthStore } from '../../stores/authStore';
 import BarcodeReader from '../../components/seller/BarcodeReader';
 import toast from 'react-hot-toast';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { EmptyState } from '../../components/redesign/States';
+import { useUnifiedTokens } from '../../theme';
 
 export default function SellerProducts() {
   const money = useMoney();
+  const tk = useUnifiedTokens();
   const navigate = useNavigate();
   const isEmployee = useAuthStore((s) => s.user?.storeRole) === 'EMPLOYEE';
   const [products, setProducts] = useState<any[]>([]);
@@ -131,35 +135,37 @@ export default function SellerProducts() {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight={700}>
-          Mis productos ({meta?.total ?? 0})
-        </Typography>
-        <Box display="flex" gap={1}>
-          <Button variant="outlined" startIcon={<QrCodeScannerIcon />} onClick={() => setReaderOpen(true)}>
-            Escanear
-          </Button>
-          <Button variant="outlined" startIcon={<ContentCopyIcon />} onClick={() => setCopyOpen(true)}>
-            Copiar producto
-          </Button>
-          <Button component={Link} to="/seller/etiquetas" variant="outlined" startIcon={<PrintIcon />}>
-            Etiquetas
-          </Button>
-          <Button component={Link} to="/seller/productos/varios" variant="outlined" startIcon={<LibraryAddIcon />}>
-            Agregar varios
-          </Button>
-          <Button component={Link} to="/seller/productos/nuevo" variant="contained" startIcon={<AddIcon />}>
-            Nuevo producto
-          </Button>
-        </Box>
-      </Box>
+      <PageHeader
+        title={`Mis productos (${meta?.total ?? 0})`}
+        icon={<Inventory2Icon />}
+        actions={
+          <>
+            <GhostButton type="button" startIcon={<QrCodeScannerIcon />} onClick={() => setReaderOpen(true)}>
+              Escanear
+            </GhostButton>
+            <GhostButton type="button" startIcon={<ContentCopyIcon />} onClick={() => setCopyOpen(true)}>
+              Copiar producto
+            </GhostButton>
+            <GhostButton to="/seller/etiquetas" startIcon={<PrintIcon />}>
+              Etiquetas
+            </GhostButton>
+            <GhostButton to="/seller/productos/varios" startIcon={<LibraryAddIcon />}>
+              Agregar varios
+            </GhostButton>
+            <PrimaryButton to="/seller/productos/nuevo" startIcon={<AddIcon />}>
+              Nuevo producto
+            </PrimaryButton>
+          </>
+        }
+      />
 
-      <TableContainer component={Paper}>
+      <SurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+      <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ bgcolor: tk.surface, '& th': { color: tk.onSurfaceVariant, fontWeight: 700 } }}>
               <TableCell>Producto</TableCell>
-              <TableCell>CategorÃ­a</TableCell>
+              <TableCell>Categoría</TableCell>
               <TableCell align="right">Precio</TableCell>
               <TableCell align="center">Stock</TableCell>
               <TableCell align="center">Estado</TableCell>
@@ -213,6 +219,8 @@ export default function SellerProducts() {
           </TableBody>
         </Table>
       </TableContainer>
+      {products.length === 0 && <EmptyState message="Todavía no cargaste productos" />}
+      </SurfaceCard>
 
       {meta?.totalPages > 1 && (
         <Box display="flex" justifyContent="center" mt={3}>
@@ -273,7 +281,7 @@ export default function SellerProducts() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setHistoryOpen(false)}>Cerrar</Button>
+          <GhostButton type="button" onClick={() => setHistoryOpen(false)}>Cerrar</GhostButton>
         </DialogActions>
       </Dialog>
 
@@ -310,15 +318,15 @@ export default function SellerProducts() {
               <List dense disablePadding>
                 {copyResults.map((p: any) => (
                   <ListItem key={p.id} divider disablePadding secondaryAction={
-                    <Button
+                    <PrimaryButton
+                      type="button"
                       size="small"
-                      variant="contained"
                       startIcon={copyingId === p.id ? <CircularProgress size={14} /> : <ContentCopyIcon />}
                       disabled={copyingId !== null}
                       onClick={() => doCopy(p.id)}
                     >
                       Copiar
-                    </Button>
+                    </PrimaryButton>
                   }>
                     <ListItemButton component={Link} to={`/producto/${p.id}`} target="_blank" sx={{ borderRadius: 1 }}>
                       <ListItemAvatar>
@@ -343,7 +351,7 @@ export default function SellerProducts() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCopyOpen(false)}>Cancelar</Button>
+          <GhostButton type="button" onClick={() => setCopyOpen(false)}>Cancelar</GhostButton>
         </DialogActions>
       </Dialog>
     </Box>

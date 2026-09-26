@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Coins } from 'lucide-react';
-import { Box, Typography, Card, CardContent, Chip, Button, Alert, Grid, CircularProgress, Stack, TextField, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Typography, Chip, Grid, Stack, TextField, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 import { api, getErrorMessage } from '../../services/api';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
+import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { EmptyState, LoadingState, ErrorState } from '../../components/redesign/States';
+import { FadeIn } from '../../components/motion/FadeIn';
 
 const STATUS: Record<string, { label: string; color: any }> = {
   PENDING: { label: 'Pendiente', color: 'warning' },
@@ -12,6 +17,7 @@ const STATUS: Record<string, { label: string; color: any }> = {
 };
 
 export default function AdminReturnsPage() {
+  const t = useUnifiedTokens();
   const [returns, setReturns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -61,30 +67,25 @@ export default function AdminReturnsPage() {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ mt: 6, mx: 'auto', display: 'block' }} />;
+  if (loading) return <LoadingState />;
 
   return (
     <Box p={3} maxWidth={1000} mx="auto">
-      <Typography variant="h5" fontWeight={800} gutterBottom>
-        Devoluciones (administración)
-      </Typography>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
+      <PageHeader title="Devoluciones (administración)" icon={<AssignmentReturnIcon />} />
+      {error && <ErrorState message={error} onRetry={() => setError('')} />}
 
       {returns.length === 0 ? (
-        <Alert severity="info">No hay solicitudes de devolución.</Alert>
+        <EmptyState message="No hay solicitudes de devolución." />
       ) : (
+        <FadeIn>
         <Stack spacing={2}>
           {returns.map((r) => (
-            <Card key={r.id} variant="outlined">
-              <CardContent>
+            <SurfaceCard key={r.id} sx={{ p: 2.5 }}>
+              <Box>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} md={8}>
                     <Typography fontWeight={700}>{r.orderItem?.product?.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color={t.onSurfaceVariant}>
                       Comprador: {r.buyer?.firstName} {r.buyer?.lastName} · Tienda: {r.seller?.storeName}
                     </Typography>
                     <Typography variant="body2" mt={0.5}>
@@ -101,7 +102,7 @@ export default function AdminReturnsPage() {
                       </Typography>
                     )}
                     {r.adminNote && (
-                      <Typography variant="body2" color="text.secondary" mt={0.5}>
+                      <Typography variant="body2" color={t.onSurfaceVariant} mt={0.5}>
                         Nota admin: {r.adminNote}
                       </Typography>
                     )}
@@ -109,16 +110,17 @@ export default function AdminReturnsPage() {
                   <Grid item xs={12} md={4} sx={{ textAlign: { md: 'right' } }}>
                     <Chip label={STATUS[r.status]?.label ?? r.status} color={STATUS[r.status]?.color ?? 'default'} size="small" />
                     <Box mt={1}>
-                      <Button size="small" variant="contained" onClick={() => openDialog(r)}>
+                      <PrimaryButton type="button" size="small" onClick={() => openDialog(r)}>
                         Resolver
-                      </Button>
+                      </PrimaryButton>
                     </Box>
                   </Grid>
                 </Grid>
-              </CardContent>
-            </Card>
+              </Box>
+            </SurfaceCard>
           ))}
         </Stack>
+        </FadeIn>
       )}
 
       <Dialog open={Boolean(dialog)} onClose={() => setDialog(null)} maxWidth="sm" fullWidth>
@@ -156,10 +158,10 @@ export default function AdminReturnsPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialog(null)}>Cancelar</Button>
-          <Button variant="contained" onClick={save} disabled={saving}>
+          <GhostButton type="button" onClick={() => setDialog(null)}>Cancelar</GhostButton>
+          <PrimaryButton type="button" onClick={save} disabled={saving}>
             {saving ? 'Guardando...' : 'Guardar'}
-          </Button>
+          </PrimaryButton>
         </DialogActions>
       </Dialog>
     </Box>

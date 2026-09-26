@@ -34,6 +34,8 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import GroupIcon from '@mui/icons-material/Group';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { useUnifiedTokens } from '../../theme';
+import { PageHeader } from '../../components/redesign/PageHeader';
 import { useAuthStore } from '../../stores/authStore';
 import { useRbacStore, type RbacMenu } from '../../stores/rbacStore';
 
@@ -100,6 +102,7 @@ function isReauthValid(userId: number): boolean {
 
 export default function SellerLayout() {
   const theme = useTheme();
+  const t = useUnifiedTokens();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
@@ -142,13 +145,24 @@ export default function SellerLayout() {
           sx={{
             width: 240,
             flexShrink: 0,
-            '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', pt: 8 },
+            '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', pt: 8, bgcolor: t.surfaceContainerLowest, borderColor: `${t.outline}33` },
           }}
         >
           <List>
             {menu.map((item) => (
               <ListItem key={item.to} disablePadding>
-                <ListItemButton component={Link} to={item.to} selected={item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)}>
+                <ListItemButton
+                  component={Link}
+                  to={item.to}
+                  selected={item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)}
+                  sx={{
+                    borderRadius: '12px',
+                    mx: 1,
+                    color: t.onSurfaceVariant,
+                    '& .MuiListItemIcon-root': { color: 'inherit', minWidth: 40 },
+                    '&.Mui-selected, &.Mui-selected:hover': { bgcolor: `${t.primary}1F`, color: t.primary, fontWeight: 700 },
+                  }}
+                >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.label} />
                 </ListItemButton>
@@ -160,12 +174,7 @@ export default function SellerLayout() {
 
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, md: 3 } }}>
         <Container maxWidth="lg">
-          <Box display="flex" alignItems="center" gap={1} mb={3}>
-            <StorefrontIcon color="primary" />
-            <Typography variant="h5" fontWeight={700}>
-              {isEmployee ? 'Panel del empleado' : 'Panel del vendedor'}
-            </Typography>
-          </Box>
+          <PageHeader title={isEmployee ? 'Panel del empleado' : 'Panel del vendedor'} icon={<StorefrontIcon />} />
           <Outlet />
         </Container>
       </Box>
@@ -178,9 +187,9 @@ export default function SellerLayout() {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: { xs: '90%', sm: 420 },
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            borderRadius: 2,
+            bgcolor: t.surfaceContainerLowest,
+            boxShadow: t.cardShadow,
+            borderRadius: '16px',
             p: 4,
             outline: 'none',
           }}

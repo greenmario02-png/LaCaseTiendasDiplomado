@@ -1,8 +1,9 @@
 import { Chip } from '@mui/material';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-import { forumPalette } from '../../theme/forumTheme';
+import { useForumPalette } from '../../theme/forumTheme';
 
 export function BotReplyBadge() {
+  const forumPalette = useForumPalette();
   return (
     <Chip
       icon={<SmartToyIcon fontSize="small" />}

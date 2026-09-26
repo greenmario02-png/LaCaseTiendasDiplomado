@@ -1,6 +1,6 @@
 import { Chip } from '@mui/material';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 
 interface CoinChipProps {
   coins: number;
@@ -9,7 +9,7 @@ interface CoinChipProps {
 
 /** Chip ámbar con las monedas del proyecto. */
 export function CoinChip({ coins, label }: CoinChipProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
   return (
     <Chip
       icon={<MonetizationOnIcon />}

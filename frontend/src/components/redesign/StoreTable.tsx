@@ -3,7 +3,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Typography, Box,
 } from '@mui/material';
-import { getUnifiedTokens } from '../../theme';
+import { useUnifiedTokens } from '../../theme';
 import { EmptyState } from './States';
 
 export type StoreColumn = { key: string; label: string };
@@ -17,7 +17,7 @@ type StoreTableProps = {
 };
 
 export function StoreTable({ columns, rows, onRowClick, emptyMessage = 'No hay registros todavía.' }: StoreTableProps) {
-  const tokens = getUnifiedTokens(false);
+  const tokens = useUnifiedTokens();
 
   if (rows.length === 0) {
     return <EmptyState message={emptyMessage} />;
