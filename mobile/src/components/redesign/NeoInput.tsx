@@ -12,6 +12,12 @@ export interface NeoInputProps {
   testID?: string;
   style?: StyleProp<ViewStyle>;
   multiline?: boolean;
+  autoCapitalize?: TextInputProps['autoCapitalize'];
+  autoComplete?: TextInputProps['autoComplete'];
+  autoCorrect?: boolean;
+  textContentType?: TextInputProps['textContentType'];
+  returnKeyType?: TextInputProps['returnKeyType'];
+  onSubmitEditing?: TextInputProps['onSubmitEditing'];
 }
 
 export function NeoInput({
@@ -24,6 +30,12 @@ export function NeoInput({
   testID,
   style,
   multiline,
+  autoCapitalize,
+  autoComplete,
+  autoCorrect,
+  textContentType,
+  returnKeyType,
+  onSubmitEditing,
 }: NeoInputProps) {
   const { colors: c, pressed } = useAppTheme();
 
@@ -39,6 +51,12 @@ export function NeoInput({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         multiline={multiline}
+        autoCapitalize={autoCapitalize}
+        autoComplete={autoComplete}
+        autoCorrect={autoCorrect}
+        textContentType={textContentType}
+        returnKeyType={returnKeyType}
+        onSubmitEditing={onSubmitEditing}
         style={[styles.input, { backgroundColor: c.surface, color: c.text, ...pressed }]}
       />
     </View>
