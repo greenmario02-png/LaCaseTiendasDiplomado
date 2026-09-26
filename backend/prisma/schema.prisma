@@ -67,6 +67,10 @@ enum DeliveryType {
 }
 
 model User {
+  jobApplications      JobApplication[] @relation("JobApplications")
+  jobPostingsStore     JobPosting[] @relation("JobPostingsStore")
+  jobPostingsCreated   JobPosting[] @relation("JobPostingsCreated")
+  jobPostingsReviewed  JobPosting[] @relation("JobPostingsReviewed")
   id                 Int       @id @default(autoincrement())
   email              String    @unique
   passwordHash       String
@@ -791,6 +795,11 @@ model Conversation {
 }
 
 enum NotificationType {
+  JOB_APPLICATION_RECEIVED
+  JOB_APPLICATION_UPDATED
+  JOB_SUBMITTED
+  JOB_APPROVED
+  JOB_REJECTED
   NEW_ORDER
   ORDER_STATUS
   PAYMENT_VERIFIED
@@ -1482,4 +1491,103 @@ model UserRole {
   @@id([userId, roleId])
   @@index([roleId])
   @@map("user_roles")
+}
+
+// ═══ Empleos: ofertas de trabajo publicadas por tiendas verificadas, moderadas por el admin ═══
+
+enum JobPayPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum JobStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
+model JobCategory {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  slug      String       @unique
+  icon      String?
+  sortOrder Int          @default(0)
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  postings  JobPosting[]
+
+  @@map("job_categories")
+}
+
+model JobPosting {
+  applications    JobApplication[]
+  id              Int          @id @default(autoincrement())
+  storeId         Int
+  store           User         @relation("JobPostingsStore", fields: [storeId], references: [id])
+  createdById     Int
+  createdBy       User         @relation("JobPostingsCreated", fields: [createdById], references: [id])
+  categoryId      Int
+  category        JobCategory  @relation(fields: [categoryId], references: [id])
+  title           String
+  description     String       @db.Text
+  requirements    String?      @db.Text
+  city            String
+  locationState   String?
+  latitude        Float?
+  longitude       Float?
+  payPeriod       JobPayPeriod
+  salaryMin       Decimal?     @db.Decimal(12, 2)
+  salaryMax       Decimal?     @db.Decimal(12, 2)
+  vacancies       Int          @default(1)
+  schedule        String?
+  contactPhone    String?
+  status          JobStatus    @default(PENDING)
+  rejectionReason String?
+  reviewedById    Int?
+  reviewedBy      User?        @relation("JobPostingsReviewed", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  publishedAt     DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([status, expiresAt])
+  @@index([storeId])
+  @@index([categoryId])
+  @@map("job_postings")
+}
+
+enum JobApplicationStatus {
+  RECEIVED
+  VIEWED
+  SHORTLISTED
+  REJECTED
+  HIRED
+  WITHDRAWN
+}
+
+model JobApplication {
+  id             Int                  @id @default(autoincrement())
+  jobId          Int
+  job            JobPosting           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId    Int
+  applicant      User                 @relation("JobApplications", fields: [applicantId], references: [id], onDelete: Cascade)
+  message        String               @db.Text
+  contactPhone   String
+  expectedSalary Decimal?             @db.Decimal(12, 2)
+  resumeUrl      String?
+  cvFile         String?
+  cvName         String?
+  status         JobApplicationStatus @default(RECEIVED)
+  storeNote      String?
+  reviewedAt     DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([jobId, applicantId])
+  @@index([applicantId])
+  @@index([jobId, status])
+  @@map("job_applications")
 }

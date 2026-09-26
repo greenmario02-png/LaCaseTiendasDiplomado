@@ -7,6 +7,9 @@ import * as payoutController from '../controllers/payout.controller';
 import * as knownProductController from '../controllers/knownProduct.controller';
 import * as calendarController from '../controllers/calendar.controller';
 import * as rbacController from '../controllers/rbac.controller';
+import * as jobController from '../controllers/job.controller';
+import { validate } from '../middlewares/validate';
+import { moderateJobSchema, jobCategorySchema } from '../schemas/job.schemas';
 import { authenticate } from '../middlewares/auth';
 import { requireAdmin } from '../middlewares/roles';
 import { requirePermission } from '../middlewares/rbac';
@@ -59,6 +62,15 @@ router.get('/known-products', asyncHandler(knownProductController.adminListKnown
 router.post('/known-products', asyncHandler(knownProductController.adminCreateKnownProduct));
 router.put('/known-products/:id', asyncHandler(knownProductController.adminUpdateKnownProduct));
 router.delete('/known-products/:id', asyncHandler(knownProductController.adminDeleteKnownProduct));
+
+// Empleos: moderación y categorías de trabajo
+router.get('/jobs', asyncHandler(jobController.adminList));
+router.put('/jobs/:id/moderate', validate(moderateJobSchema), asyncHandler(jobController.adminModerate));
+router.get('/job-applications', asyncHandler(jobController.adminApplications));
+router.get('/job-categories', asyncHandler(jobController.adminCategories));
+router.post('/job-categories', validate(jobCategorySchema), asyncHandler(jobController.adminCreateCategory));
+router.put('/job-categories/:id', validate(jobCategorySchema), asyncHandler(jobController.adminUpdateCategory));
+router.delete('/job-categories/:id', asyncHandler(jobController.adminDeleteCategory));
 
 router.get('/banners', asyncHandler(adminController.listBanners));
 router.post('/banners', asyncHandler(adminController.createBanner));

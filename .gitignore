@@ -28,3 +28,5 @@ mobile/android/key.properties
 mobile/android/app/*.keystore
 mobile/android/app/*.jks
 mobile/ios/build/
+
+backend/private-uploads/

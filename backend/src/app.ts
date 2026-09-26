@@ -28,6 +28,7 @@ import affiliateRoutes from './routes/affiliate.routes';
 import auditRoutes from './routes/audit.routes';
 import storeTeamRoutes from './routes/storeTeam.routes';
 import rbacRoutes from './routes/rbac.routes';
+import jobRoutes from './routes/job.routes';
 import { serveUploads } from './middlewares/upload';
 import { setupSwagger } from './config/swagger';
 
@@ -100,6 +101,7 @@ export function createApp() {
   app.use('/api/builds', buildRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/tracking', trackingRoutes);
+  app.use('/api/jobs', jobRoutes);
   app.use('/api/auctions', auctionRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/returns', returnRoutes);

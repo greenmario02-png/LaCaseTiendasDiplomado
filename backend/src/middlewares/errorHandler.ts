@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
+import multer from 'multer';
 
 import { ApiError } from '../utils/errors';
 import { env } from '../config/env';
@@ -8,6 +9,11 @@ import { logger } from '../utils/logger';
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({ error: { code: err.code, message: err.message, details: err.details } });
+  }
+
+  if (err instanceof multer.MulterError) {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'El archivo supera el tamaño máximo permitido (5 MB)' : 'No se pudo procesar el archivo subido';
+    return res.status(400).json({ error: { code: 'BAD_REQUEST', message } });
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {

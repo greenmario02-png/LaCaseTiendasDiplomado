@@ -7,6 +7,9 @@ import * as giftController from '../controllers/gift.controller';
 import * as sellerPromotionController from '../controllers/sellerPromotion.controller';
 import * as knownProductController from '../controllers/knownProduct.controller';
 import * as calendarController from '../controllers/calendar.controller';
+import * as jobController from '../controllers/job.controller';
+import { validate } from '../middlewares/validate';
+import { applicationStatusSchema, createJobSchema, updateJobSchema } from '../schemas/job.schemas';
 import { authenticate } from '../middlewares/auth';
 import { requireSeller, requireStoreAdmin } from '../middlewares/roles';
 import { uploadSingleAuthenticated } from '../middlewares/upload';
@@ -25,6 +28,13 @@ router.post('/known-products', requireStoreAdmin, asyncHandler(knownProductContr
 router.put('/known-products/:id', requireStoreAdmin, asyncHandler(knownProductController.sellerUpdateKnownProduct));
 router.delete('/known-products/:id', requireStoreAdmin, asyncHandler(knownProductController.sellerDeleteKnownProduct));
 router.post('/attributes', requireStoreAdmin, asyncHandler(knownProductController.sellerCreateAttributes));
+// Empleos: solo OWNER/ADMIN de tiendas verificadas (se valida en el servicio); pasan por moderación del admin
+router.get('/jobs', requireStoreAdmin, asyncHandler(jobController.listMine));
+router.post('/jobs', requireStoreAdmin, validate(createJobSchema), asyncHandler(jobController.create));
+router.put('/jobs/:id', requireStoreAdmin, validate(updateJobSchema), asyncHandler(jobController.update));
+router.post('/jobs/:id/close', requireStoreAdmin, asyncHandler(jobController.close));
+router.get('/jobs/:id/applications', requireStoreAdmin, asyncHandler(jobController.jobApplications));
+router.put('/jobs/applications/:id/status', requireStoreAdmin, validate(applicationStatusSchema), asyncHandler(jobController.updateApplicationStatus));
 router.get('/products', asyncHandler(sellerController.listSellerProducts));
 router.post('/products', asyncHandler(sellerController.createProduct));
 router.post('/products/copy', asyncHandler(sellerController.copyProduct));
