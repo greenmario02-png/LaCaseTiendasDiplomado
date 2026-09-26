@@ -7,6 +7,7 @@ import { ok, created, paginated } from '../utils/response';
 import * as FS from '../services/forum.service';
 import { karmaService } from '../services/karma.service';
 import * as giphyService from '../services/giphy.service';
+import { haversineKm, nearestCity } from '../services/geo.service';
 
 // ─── Perfil ───────────────────────────────────────────────────────
 
@@ -326,34 +327,6 @@ export async function getAdminStats(_req: Request, res: Response) {
 }
 
 // ─── Geolocalización del foro (09-spec G2) ────────────────────────
-
-/** Distancia haversine en km entre dos coordenadas. */
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
-
-/** Ciudad más cercana a las coords dadas (dentro de su radio, o la más cercana). */
-async function nearestCity(lat: number, lng: number) {
-  const cities = await prisma.forumCity.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-  });
-  let best: { city: (typeof cities)[number]; dist: number } | null = null;
-  for (const c of cities) {
-    const dist = haversineKm(lat, lng, c.latitude, c.longitude);
-    if (!best || dist < best.dist) best = { city: c, dist };
-  }
-  if (!best) return null;
-  const within = best.dist <= best.city.radiusKm;
-  return { city: best.city, distanceKm: Math.round(best.dist * 100) / 100, within };
-}
 
 /** GET /forum/geo/session — carga única por sesión del cliente. */
 export async function getGeoSession(req: AuthRequest, res: Response) {
