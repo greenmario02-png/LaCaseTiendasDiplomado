@@ -7,7 +7,7 @@ import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useRbacStore } from '../stores/rbacStore';
 import { CoinChip } from '../components/redesign/CoinChip';
-import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MapPin, MessageSquareWarning } from 'lucide-react-native';
+import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MapPin, MessageSquareWarning, Briefcase } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
 
@@ -127,11 +127,14 @@ export default function ProfileScreen({ navigation }: any) {
         <MenuItem icon={<Heart size={17} color={colors.error} />} label="Mis favoritos" onPress={() => navigation.navigate('Wishlist')} />
         <MenuItem icon={<Package size={17} color={colors.primary} />} label="Mis direcciones" onPress={() => navigation.navigate('Addresses')} />
         <MenuItem icon={<Pencil size={17} color={colors.textSecondary} />} label="Editar perfil" onPress={() => navigation.navigate('EditProfile')} />
+        <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label="Empleos" onPress={() => navigation.navigate('Jobs')} />
+        <MenuItem icon={<ClipboardList size={17} color={colors.primary} />} label="Mis postulaciones" onPress={() => navigation.navigate('MyApplications')} />
         <MenuItem icon={<Gift size={17} color={colors.warning} />} label="Invitá amigos y ganá 50 monedas" onPress={() => setInviteOpen(true)} />
         {(user?.role === 'SELLER' || hasPermission('seller.products.manage')) && (
           <>
             <MenuItem icon={<Store size={17} color={colors.primary} />} label="Mi tienda" onPress={() => navigation.navigate('SellerDashboard')} />
             <MenuItem icon={<Package size={17} color={colors.primary} />} label="Mis productos" onPress={() => navigation.navigate('SellerProducts')} />
+            <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label="Mis empleos" onPress={() => navigation.navigate('SellerJobs')} />
             <MenuItem icon={<Upload size={17} color={colors.primary} />} label="Carga masiva de productos" onPress={() => navigation.navigate('SellerBulkProducts')} />
             <MenuItem icon={<Users size={17} color={colors.primary} />} label="Equipo de tienda" onPress={() => navigation.navigate('SellerTeam')} />
             <MenuItem icon={<Ticket size={17} color={colors.primary} />} label="Mis cupones" onPress={() => navigation.navigate('SellerCoupons')} />
@@ -145,6 +148,8 @@ export default function ProfileScreen({ navigation }: any) {
             <MenuItem icon={<ShieldCheck size={17} color={colors.primary} />} label="Panel admin" onPress={() => navigation.navigate('AdminDashboard')} />
             <MenuItem icon={<Store size={17} color={colors.primary} />} label="Vendedores" onPress={() => navigation.navigate('AdminSellers')} />
             <MenuItem icon={<MapPin size={17} color={colors.primary} />} label="Verificación de tiendas" onPress={() => navigation.navigate('AdminVerification')} />
+            <MenuItem icon={<Briefcase size={17} color={colors.warning} />} label="Moderar empleos" onPress={() => navigation.navigate('AdminJobs')} />
+            <MenuItem icon={<Users size={17} color={colors.warning} />} label="Postulaciones" onPress={() => navigation.navigate('AdminJobApplications')} />
             <MenuItem icon={<MessageSquareWarning size={17} color={colors.warning} />} label="Moderación del foro" onPress={() => navigation.navigate('ForumModeration')} />
           </>
         )}

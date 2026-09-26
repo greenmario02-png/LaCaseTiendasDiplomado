@@ -1,6 +1,7 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, TextInput } from 'react-native';
-import { Store, ArrowLeftRight, Calculator, Zap, Bell } from 'lucide-react-native';
+import { Store, ArrowLeftRight, Calculator, Zap, Bell, Briefcase } from 'lucide-react-native';
+import { JobCard, type Job } from '../components/redesign/JobCard';
 import { api, resolveImageUrl } from '../services/api';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { CountdownTimer } from '../components/redesign/CountdownTimer';
@@ -27,6 +28,7 @@ export default function HomeScreen({ navigation }: any) {
   const [featured, setFeatured] = useState<any[]>([]);
   const [promotions, setPromotions] = useState<any[]>([]);
   const [rates, setRates] = useState<any>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [calcOpen, setCalcOpen] = useState(false);
   const [calcAmount, setCalcAmount] = useState('100');
@@ -50,6 +52,13 @@ export default function HomeScreen({ navigation }: any) {
       } catch {}
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
+    api
+      .get('/jobs', { params: { limit: 6 } })
+      .then(({ data }) => setJobs(data.data ?? []))
+      .catch(() => {});
   }, []);
 
   const rateOf = (code: string): number => {
@@ -185,6 +194,25 @@ export default function HomeScreen({ navigation }: any) {
             </View>
           )}
 
+          {jobs.length > 0 && (
+            <View>
+              <View style={styles.promoHeader}>
+                <View style={styles.promoTitleRow}>
+                  <Briefcase size={16} color={colors.primary} />
+                  <Text style={styles.sectionTitleNoMargin}>Empleos</Text>
+                </View>
+                <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
+                  <Text style={styles.seeAll}>Ver todos</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 14, gap: 12 }}>
+                {jobs.map((job) => (
+                  <JobCard key={job.id} job={job} compact onPress={() => navigation.navigate('Jobs')} />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           <Text style={styles.sectionTitle}>Destacados</Text>
         </View>
       }
@@ -299,6 +327,7 @@ const makeStyles = (colors: any) =>
   promoHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 20, marginBottom: 10 },
   promoTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitleNoMargin: { fontSize: 18, fontWeight: '800', color: colors.text },
+  seeAll: { fontSize: 13, fontWeight: '700', color: colors.primary },
   promoSubtitle: { fontSize: 12, color: colors.textSecondary },
   promoCard: {
     width: 220,

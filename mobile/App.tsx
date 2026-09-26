@@ -51,6 +51,12 @@ import ForumProfileScreen from './src/screens/forum/ForumProfileScreen';
 import ForumKarmaScreen from './src/screens/forum/ForumKarmaScreen';
 import NewPostScreen from './src/screens/forum/NewPostScreen';
 import ForumGeoConfigScreen from './src/screens/forum/ForumGeoConfigScreen';
+import JobsScreen from './src/screens/JobsScreen';
+import MyApplicationsScreen from './src/screens/MyApplicationsScreen';
+import SellerJobsScreen from './src/screens/SellerJobsScreen';
+import AdminJobsScreen from './src/screens/AdminJobsScreen';
+import AdminJobApplicationsScreen from './src/screens/AdminJobApplicationsScreen';
+import AdminJobCategoriesScreen from './src/screens/AdminJobCategoriesScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -148,6 +154,12 @@ function AppNavigator() {
             <Stack.Screen name="SellerPayouts" component={SellerPayoutsScreen} options={{ headerShown: true, title: 'Mis pagos' }} />
             <Stack.Screen name="AdminVerification" component={AdminVerificationScreen} options={{ headerShown: true, title: 'Verificación de tiendas' }} />
             <Stack.Screen name="ForumModeration" component={ForumModerationScreen} options={{ headerShown: true, title: 'Moderación del foro' }} />
+            <Stack.Screen name="Jobs" component={JobsScreen} options={{ headerShown: true, title: 'Empleos' }} />
+            <Stack.Screen name="SellerJobs" component={SellerJobsScreen} options={{ headerShown: true, title: 'Mis empleos' }} />
+            <Stack.Screen name="MyApplications" component={MyApplicationsScreen} options={{ headerShown: true, title: 'Mis postulaciones' }} />
+            <Stack.Screen name="AdminJobs" component={AdminJobsScreen} options={{ headerShown: true, title: 'Moderar empleos' }} />
+            <Stack.Screen name="AdminJobApplications" component={AdminJobApplicationsScreen} options={{ headerShown: true, title: 'Postulaciones' }} />
+            <Stack.Screen name="AdminJobCategories" component={AdminJobCategoriesScreen} options={{ headerShown: true, title: 'Categorías de trabajo' }} />
           </>
         )}
       </Stack.Navigator>
