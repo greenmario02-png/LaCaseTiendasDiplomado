@@ -8,6 +8,19 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Comparte una sola petición entre GETs idénticos simultáneos (StrictMode, varios componentes
+// pidiendo lo mismo al montar). Se libera al terminar, así que no cachea nada.
+const inFlightGets = new Map<string, Promise<unknown>>();
+const rawGet = api.get.bind(api);
+api.get = ((url: string, config?: Parameters<typeof rawGet>[1]) => {
+  const key = `${localStorage.getItem('accessToken') ?? ''}|${url}|${JSON.stringify(config?.params ?? {})}`;
+  const pending = inFlightGets.get(key);
+  if (pending) return pending;
+  const request = rawGet(url, config).finally(() => inFlightGets.delete(key));
+  inFlightGets.set(key, request);
+  return request;
+}) as typeof api.get;
+
 function ensureSessionId(): string {
   let sessionId = localStorage.getItem('sessionId');
   if (!sessionId) {
