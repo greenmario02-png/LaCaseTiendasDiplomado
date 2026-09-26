@@ -51,6 +51,7 @@ La moderación del foro (fuera de alcance) es una asignación RBAC, no un cuarto
 - [`docs/arquitectura.md`](docs/arquitectura.md) — monolito modular, flechas, despliegue, riesgos
 - [`docs/contrato-api.md`](docs/contrato-api.md) — rutas Must, errores, dominios
 - [`docs/seguridad-y-pruebas.md`](docs/seguridad-y-pruebas.md) — controles, casos de prueba y brechas
+- [`docs/despliegue.md`](docs/despliegue.md) — plan de despliegue en producción (pendiente, E4)
 - [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md) — módulo Empleos (fuera de alcance)
 
 ## Arquitectura
@@ -167,7 +168,7 @@ Requiere PostgreSQL local levantado (usuario y base de test configurables por `D
 
 ## Endpoints principales (alcance Must)
 
-- Salud: `GET /api/health`
+- Salud: `GET /api/v1/salud` → `{"estado":"ok"}` (toda la API también responde bajo `/api/v1`; `/api/health` sigue vigente)
 - Autenticación: `POST /api/auth/register`, `/api/auth/sellers/register`, `/api/auth/login`
 - Catálogo: `GET /api/products`, `GET /api/products/:id`
 - Carrito y pedidos: `/api/cart`, `POST /api/orders`, `POST /api/orders/:id/payment-proof`,
