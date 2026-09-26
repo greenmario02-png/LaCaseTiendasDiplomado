@@ -121,6 +121,15 @@ whatsappPhone      String?
   coinTransactions   CoinTransaction[]
   forumProfile       ForumProfile?
   userRoles          UserRole[]
+  strikes            UserStrike[]        @relation("UserStrikeSubject")
+  strikesIssued      UserStrike[]        @relation("StrikeIssuer")
+  contentEvidence    ContentEvidence[]
+  takedownsResolved  TakedownRequest[]   @relation("TakedownResolver")
+  blacklistEntriesAdded BlacklistEntry[] @relation("BlacklistAdder")
+  botAccount         BotAccount?
+  botAccountsOperated BotAccount[]       @relation("BotOperator")
+  botConversations   BotConversation[]
+  debateZoneAlias    DebateZoneAlias?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -1105,6 +1114,13 @@ model ForumProfile {
   reputationGot    ForumReputationComment[] @relation("ReputationReceiver")
   karmaTransactions KarmaTransaction[]
   reportsGiven     ForumReport[]            @relation("ReportAuthor")
+  professionalVerifications ProfessionalVerification[]
+  genericComments  GenericComment[]
+  genericCommentVotes GenericCommentVote[]
+  conoThemesCreated ConoTheme[] @relation("ConoThemeCreator")
+  conoEntriesSubmitted ConoEntry[] @relation("ConoEntrySubmitter")
+  conoVotes        ConoVote[]  @relation("ConoVoter")
+  conoMatchVotes   ConoMatchVote[] @relation("ConoMatchVoter")
 
   @@map("forum_profiles")
   @@index([city])
@@ -1119,7 +1135,8 @@ model ForumCategory {
   description String?
   icon        String   @default("💬")  // emoji
   color       String   @default("#FF6B35") // hex
-  parentId    Int?     // FK a sí mismo (máx. 2 niveles)
+  parentId    Int?     // FK a sí mismo (máx. 2 niveles) — subforos profesionales usan esto:
+                        // categoría padre = área (ej. "Informática"), hijas = Ciencia/Debates/Noticias/Preguntas
   parent      ForumCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
   children    ForumCategory[] @relation("CategoryTree")
   isActive    Boolean  @default(true)
@@ -1127,13 +1144,158 @@ model ForumCategory {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Subforo profesional: para publicar acá (o en cualquier hija) hace falta una
+  // ProfessionalVerification aprobada en este campo. null = subforo abierto normal.
+  requiresFieldId Int?
+  requiresField   ProfessionalField? @relation(fields: [requiresFieldId], references: [id], onDelete: SetNull)
+
+  // Subforo de universidad: visibilidad geolocalizada (ver University + assertUniversityAccess).
+  universityId Int?
+  university   University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+
+  /// Zona de Debate: en esta categoría se muestra el alias
+  /// de `DebateZoneAlias` en vez del `forumUsername` real. Publicar/ver acá NO requiere nada
+  /// especial (a diferencia de requiresFieldId/universityId) — cualquiera puede participar.
+  isDebateZone Boolean @default(false)
+
   posts       ForumPost[]
   cityCategories ForumCityCategory[]
 
   @@map("forum_categories")
   @@index([parentId])
   @@index([isActive, sortOrder])
+  @@index([requiresFieldId])
+  @@index([universityId])
 }
+
+// ===== Subforos profesionales (verificación por cuestionario) =====
+
+/// Área profesional/de estudio (Informática, Psicología, Arquitectura, Química, etc.).
+/// Un ForumCategory con `requiresFieldId` apuntando acá solo admite publicar a perfiles
+/// con una ProfessionalVerification aprobada para ese field.
+model ProfessionalField {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique  // ej: "informatica", "psicologia"
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  questions      ProfessionalFieldQuestion[]
+  verifications  ProfessionalVerification[]
+  categories     ForumCategory[]
+
+  @@map("professional_fields")
+}
+
+/// Pregunta de opción múltiple para filtrar gente que dice ser de un área sin serlo
+/// (ej. en informática, marcar "HTML" como lenguaje de programación revela que no lo es).
+/// `correctOptionIndex` referencia `options` (array de strings, en el orden mostrado).
+model ProfessionalFieldQuestion {
+  id                 Int      @id @default(autoincrement())
+  fieldId            Int
+  field              ProfessionalField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  question           String   @db.VarChar(300)
+  options            String[] // ej. ["HTML", "Python", "Ruby", "PHP"]
+  correctOptionIndex Int
+  isActive           Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  @@map("professional_field_questions")
+  @@index([fieldId, isActive, sortOrder])
+}
+
+enum ProfessionalVerificationStatus {
+  PASSED
+  FAILED
+}
+
+/// Resultado de un intento de verificación por cuestionario. Se guardan las respuestas
+/// dadas (no solo el resultado) para poder auditar/detectar patrones de bot; un perfil
+/// puede reintentar (ver `assertCanAttemptVerification` — límite de intentos/tiempo).
+model ProfessionalVerification {
+  id           Int      @id @default(autoincrement())
+  profileId    Int
+  profile      ForumProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  fieldId      Int
+  field        ProfessionalField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  status       ProfessionalVerificationStatus
+  score        Int      // cantidad de respuestas correctas
+  totalQuestions Int
+  answers      Json     // [{questionId, selectedOptionIndex}] — auditoría/anti-bot
+  createdAt    DateTime @default(now())
+
+  @@map("professional_verifications")
+  @@index([profileId, fieldId, status])
+}
+
+// ===== Subforos por universidad (geolocalizados) =====
+
+/// Universidad pública por departamento. `cityId` ancla el subforo a una ciudad del
+/// catálogo (ForumCity) para la regla de visibilidad geolocalizada.
+model University {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cityId    Int
+  city      ForumCity @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  categories ForumCategory[]
+
+  @@map("universities")
+  @@index([cityId])
+}
+
+// ===== Motor genérico de comentarios con credibilidad =====
+// Reusable por memes y torneo / QuemadosBolivia / Bolivia en Comunidad (fases
+// posteriores) — `targetType`/`targetId` identifican el contenido comentado,
+// igual patrón que ContentEvidence/TakedownRequest.
+
+enum CommentVoteType {
+  AGREE          // "de acuerdo"
+  FAKE           // "está mamando" (falso)
+  AI_GENERATED   // "creado con IA"
+}
+
+model GenericComment {
+  id          Int      @id @default(autoincrement())
+  targetType  String   // 'CONO_ENTRY' | 'FUNA' | 'COMUNIDAD_POST' | ...
+  targetId    Int
+  authorId    Int
+  author      ForumProfile @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body        String   @db.VarChar(500)
+
+  agreeCount  Int      @default(0)
+  fakeCount   Int      @default(0)
+  aiCount     Int      @default(0)
+
+  isHidden    Boolean  @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  votes       GenericCommentVote[]
+
+  @@map("generic_comments")
+  @@index([targetType, targetId, createdAt(sort: Desc)])
+  @@index([authorId])
+}
+
+/// Un solo voto por usuario por comentario (puede cambiar de tipo, no acumular varios).
+model GenericCommentVote {
+  id         Int      @id @default(autoincrement())
+  commentId  Int
+  comment    GenericComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  profileId  Int
+  profile    ForumProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type       CommentVoteType
+  createdAt  DateTime @default(now())
+
+  @@map("generic_comment_votes")
+  @@unique([commentId, profileId])
+}
+
 
 // ===== Geolocalización del foro (09-spec-geolocalizacion-foro.md) =====
 
@@ -1149,6 +1311,7 @@ model ForumCity {
   createdAt   DateTime @default(now())
   categories  ForumCityCategory[]
   profiles    ForumProfile[]
+  universities University[]
   @@map("forum_cities")
   @@unique([name, department])
   @@index([department])
@@ -1203,6 +1366,12 @@ model ForumPost {
   isPinned     Boolean  @default(false)  // fijado por moderador
   deletedAt    DateTime?                 // eliminación lógica
 
+  /// Detector de sesgo/incitación de Zona de Debate:
+  /// heurístico 0-1). Null = no evaluado. Solo SUGIERE, nunca mueve solo —
+  /// `debateSuggestedAt` no-null es lo que dispara el aviso al autor/moderador.
+  debateFlagScore   Float?
+  debateSuggestedAt DateTime?
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -1256,6 +1425,12 @@ model ForumReply {
   upvotes     Int      @default(0)
   downvotes   Int      @default(0)
   score       Float    @default(0)
+
+  /// Mismo detector que ForumPost (Zona de Debate) — corre sobre respuestas también,
+  /// porque un hilo puede derivar en pelea de política en las respuestas sin que el post
+  /// original lo sea. 
+  debateFlagScore   Float?
+  debateSuggestedAt DateTime?
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -1367,6 +1542,18 @@ enum ForumReportStatus {
   PENDING
   RESOLVED   // moderador aprobó → contenido eliminado
   REJECTED   // moderador rechazó → contenido restaurado
+}
+
+/// Marca idempotente de "post más votado del día ya premiado" — un `postId` solo puede
+/// existir una vez acá aunque el job de `forum-daily.service.ts` corra dos veces (reintento,
+/// réplica del proceso, etc.). El constraint único en `postId` es lo que hace la idempotencia
+/// segura bajo concurrencia real, a diferencia de un simple "buscar si ya existe" en JS.
+model ForumTopPostAward {
+  id        Int      @id @default(autoincrement())
+  postId    Int      @unique
+  awardedAt DateTime @default(now())
+
+  @@map("forum_top_post_awards")
 }
 
 model DailyActionCounter {
@@ -1491,6 +1678,389 @@ model UserRole {
   @@id([userId, roleId])
   @@index([roleId])
   @@map("user_roles")
+}
+
+// ============================================================================
+// Moderación reforzada: memes y torneo / QuemadosBolivia / Bolivia en
+// Comunidad.
+//
+// Estos modelos son GENÉRICOS a propósito: las tablas de contenido de cada
+// sección (funas, entradas del torneo, publicaciones de Comunidad) todavía no
+// existen — son trabajo posterior. `targetType` +
+// `targetId` identifican el contenido al que se refiere cada fila sin
+// necesidad de una FK a una tabla que aún no existe; cuando esas tablas se
+// creen, targetType deberá usar sus nombres (ej. 'FUNA', 'CONO_ENTRY',
+// 'COMUNIDAD_POST', 'TAKEDOWN_REQUEST').
+// ============================================================================
+
+enum EvidencePurpose {
+  SUPPORT   // evidencia que respalda la publicación original (obligatoria para publicar)
+  TAKEDOWN  // evidencia adjunta a una solicitud de baja
+}
+
+enum EvidenceFileType {
+  PHOTO
+  SCREENSHOT
+  DOCUMENT
+  OTHER
+}
+
+/// Archivo adjunto obligatorio para publicaciones de las secciones reforzadas.
+/// Ver Reglamento §2.1-§2.2 y §5 (metadatos de captura, campo `capturedInApp`).
+model ContentEvidence {
+  id             Int              @id @default(autoincrement())
+  targetType     String           // 'FUNA' | 'CONO_ENTRY' | 'COMUNIDAD_POST' | 'TAKEDOWN_REQUEST'
+  targetId       Int
+  purpose        EvidencePurpose
+  uploadedByUserId Int?           // null si lo sube alguien sin cuenta a través de un TakedownRequest
+  uploadedBy     User?            @relation(fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+  fileUrl        String
+  fileType       EvidenceFileType
+  description    String?          @db.VarChar(500)
+  /// true si se capturó desde la cámara dentro de la app (no galería/descarga) — señal de
+  /// riesgo adicional para el moderador, no prueba absoluta. Null = desconocido (subida web).
+  capturedInApp  Boolean?
+  capturedAt     DateTime?        // timestamp del dispositivo al momento de la captura, si se conoce
+  createdAt      DateTime         @default(now())
+
+  @@map("content_evidence")
+  @@index([targetType, targetId])
+  @@index([uploadedByUserId])
+}
+
+enum TakedownStatus {
+  PENDING_VERIFICATION // esperando que el solicitante confirme su correo
+  PENDING_REVIEW        // correo verificado, en cola de revisión de moderación
+  APPROVED               // se aprobó la baja — el contenido se oculta
+  REJECTED                // se rechazó — el contenido se mantiene
+}
+
+/// Solicitud de baja de una publicación. Quien solicita puede NO tener cuenta en la
+/// plataforma (por eso los datos de contacto van en la propia solicitud, no se
+/// asumen de un User), pero sí debe verificar su correo antes de que la solicitud
+/// pase a revisión. Ver Reglamento §3.
+model TakedownRequest {
+  id                   Int             @id @default(autoincrement())
+  targetType           String          // 'FUNA' | 'CONO_ENTRY' | 'COMUNIDAD_POST'
+  targetId             Int
+
+  requesterName        String
+  requesterPhone       String
+  requesterEmail       String
+  emailVerified        Boolean         @default(false)
+  emailVerifyCode      String?         // hash del código, no el código en texto plano
+  emailVerifyExpiresAt DateTime?
+  emailVerifyAttempts  Int             @default(0)
+
+  reason               String          @db.Text
+  status               TakedownStatus  @default(PENDING_VERIFICATION)
+
+  resolvedByUserId     Int?
+  resolvedBy           User?           @relation("TakedownResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  resolvedAt           DateTime?
+  resolution           String?         @db.Text
+
+  createdAt            DateTime        @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@map("takedown_requests")
+  @@index([targetType, targetId])
+  @@index([status, createdAt(sort: Desc)])
+}
+
+enum StrikeSeverity {
+  WARNING   // sin restricción de cuenta, solo queda registrada
+  MINOR     // pierde el privilegio de publicar en estas secciones 30 días
+  MAJOR     // baneo de estas secciones + entrada en lista negra
+  BAN       // baneo total de la cuenta
+}
+
+/// Falta registrada contra un usuario en el contexto de estas secciones reforzadas.
+/// Ver Reglamento §4 (tabla de sanciones). El historial completo (no solo el conteo)
+/// se mantiene siempre, incluso tras vencer una suspensión — es lo que sostiene la
+/// "acumulación" de faltas graves.
+model UserStrike {
+  id          Int             @id @default(autoincrement())
+  userId      Int
+  user        User            @relation("UserStrikeSubject", fields: [userId], references: [id], onDelete: Cascade)
+
+  severity    StrikeSeverity
+  reason      String          @db.Text
+  relatedType String?         // 'FUNA' | 'CONO_ENTRY' | 'COMUNIDAD_POST' | 'TAKEDOWN_REQUEST'
+  relatedId   Int?
+
+  issuedByUserId Int?         // null = automático (ej. umbral de reportes), si no, moderador/admin
+  issuedBy    User?           @relation("StrikeIssuer", fields: [issuedByUserId], references: [id], onDelete: SetNull)
+
+  /// Fecha en que vence una suspensión MINOR/MAJOR; null para WARNING/BAN (no vencen).
+  suspendedUntil DateTime?
+
+  createdAt   DateTime        @default(now())
+
+  @@map("user_strikes")
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([severity])
+}
+
+enum BlacklistEntryType {
+  USER
+  EMAIL
+  PHONE
+  PRODUCT
+  DEVICE_FINGERPRINT
+}
+
+/// Lista negra independiente del `userId`: banear una cuenta no alcanza si el mismo
+/// teléfono/correo puede simplemente crear otra — por eso EMAIL/PHONE/PRODUCT son
+/// entradas propias, no solo un flag en User. Ver Reglamento §4/§8.
+model BlacklistEntry {
+  id            Int                @id @default(autoincrement())
+  type          BlacklistEntryType
+  value         String             // el email, teléfono, productId (como string) o userId (como string)
+  reason        String             @db.Text
+  addedByUserId Int
+  addedBy       User               @relation("BlacklistAdder", fields: [addedByUserId], references: [id], onDelete: Restrict)
+  isActive      Boolean            @default(true)
+  expiresAt     DateTime?          // null = permanente
+  createdAt     DateTime           @default(now())
+
+  @@map("blacklist_entries")
+  @@unique([type, value])
+  @@index([type, isActive])
+}
+
+// ============================================================================
+// memes y torneo (foro). Dos modalidades:
+// - MEME: ranking libre estilo cuantarazon.com (subís, la comunidad vota positivo/nica).
+// - TOURNAMENT: cuadro de eliminatorias tipo VS, votación diaria (peor banco, peor
+//   político, etc.), creado por un usuario con verificación profesional aprobada.
+// Reusa ContentEvidence (targetType='CONO_ENTRY', evidencia obligatoria por entrada) y
+// GenericComment (targetType='CONO_ENTRY', info/discusión sobre cada entrada) — ver
+// reglamento del foro.
+// ============================================================================
+
+enum ConoThemeType {
+  MEME
+  TOURNAMENT
+}
+
+model ConoTheme {
+  id            Int           @id @default(autoincrement())
+  slug          String        @unique
+  title         String
+  description   String?       @db.Text
+  type          ConoThemeType
+
+  createdById   Int
+  createdBy     ForumProfile  @relation("ConoThemeCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+
+  entries       ConoEntry[]
+  matches       ConoMatch[]
+
+  @@map("cono_themes")
+  @@index([type, isActive])
+}
+
+model ConoEntry {
+  id              Int       @id @default(autoincrement())
+  themeId         Int
+  theme           ConoTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  submittedById   Int
+  submittedBy     ForumProfile @relation("ConoEntrySubmitter", fields: [submittedById], references: [id], onDelete: Cascade)
+
+  label           String    @db.VarChar(120)
+  imageUrl        String
+
+  positiveCount   Int       @default(0)
+  negativeCount   Int       @default(0) // "nica"
+
+  isHidden        Boolean   @default(false) // moderación (evidencia insuficiente/denunciada)
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  votes           ConoVote[]
+  matchesAsA      ConoMatch[] @relation("MatchEntryA")
+  matchesAsB      ConoMatch[] @relation("MatchEntryB")
+  wonMatches      ConoMatch[] @relation("MatchWinner")
+
+  @@map("cono_entries")
+  @@index([themeId, deletedAt, isHidden])
+  @@index([submittedById])
+}
+
+enum ConoVoteValue {
+  POSITIVE
+  NEGATIVE
+}
+
+/// Voto directo sobre una entrada (modalidad MEME — ranking estilo cuantarazon).
+model ConoVote {
+  id        Int           @id @default(autoincrement())
+  entryId   Int
+  entry     ConoEntry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  profileId Int
+  profile   ForumProfile  @relation("ConoVoter", fields: [profileId], references: [id], onDelete: Cascade)
+  value     ConoVoteValue
+  createdAt DateTime      @default(now())
+
+  @@map("cono_votes")
+  @@unique([entryId, profileId])
+  @@index([entryId, createdAt])
+}
+
+enum ConoMatchStatus {
+  PENDING   // esperando el día de votación
+  ACTIVE    // votación abierta hoy
+  RESOLVED  // ya tiene ganador
+}
+
+/// Enfrentamiento 1 vs 1 (modalidad TOURNAMENT) — votación diaria, arriba la foto+nombre
+/// de cada competidor, abajo sus comentarios (GenericComment) con info que "ilumina" el voto.
+model ConoMatch {
+  id          Int             @id @default(autoincrement())
+  themeId     Int
+  theme       ConoTheme       @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  round       Int             @default(1)
+
+  entryAId    Int
+  entryA      ConoEntry       @relation("MatchEntryA", fields: [entryAId], references: [id])
+  entryBId    Int
+  entryB      ConoEntry       @relation("MatchEntryB", fields: [entryBId], references: [id])
+
+  votesA      Int             @default(0)
+  votesB      Int             @default(0)
+  status      ConoMatchStatus @default(PENDING)
+
+  winnerId    Int?
+  winner      ConoEntry?      @relation("MatchWinner", fields: [winnerId], references: [id])
+
+  votingDate  DateTime        @db.Date // día boliviano en que se vota este match
+  createdAt   DateTime        @default(now())
+
+  matchVotes  ConoMatchVote[]
+
+  @@map("cono_matches")
+  @@index([themeId, round])
+  @@index([status, votingDate])
+}
+
+model ConoMatchVote {
+  id        Int       @id @default(autoincrement())
+  matchId   Int
+  match     ConoMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  profileId Int
+  profile   ForumProfile @relation("ConoMatchVoter", fields: [profileId], references: [id], onDelete: Cascade)
+  choice    String    // 'A' | 'B'
+  createdAt DateTime  @default(now())
+
+  @@map("cono_match_votes")
+  @@unique([matchId, profileId])
+}
+
+// ============================================================================
+// Zona de Debate. Subforo marcado con
+// ForumCategory.isDebateZone=true — publicar/responder ahí muestra un alias
+// (DebateZoneAlias, estable por usuario) en vez del forumUsername real. La
+// plataforma sigue sabiendo la autoría real (moderación normal aplica).
+// ============================================================================
+
+/// Alias estable por usuario dentro de Zona de Debate:
+/// decisión: estable, no rotativo por publicación). Se genera la primera vez que el usuario
+/// publica o responde en la categoría con isDebateZone=true.
+model DebateZoneAlias {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alias     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("debate_zone_aliases")
+}
+
+// ============================================================================
+// Chat para Bots. Cuentas de bot DECLARADAS
+// (Lectura B — nunca se hacen pasar por humanas), que conversan con usuarios
+// reales para "comprenderlos mejor" y (fase posterior) debaten en Zona de
+// Debate. Solo bots operados por el equipo de LaCase en esta primera fase.
+// ============================================================================
+
+enum BotAccountStatus {
+  ACTIVE
+  SUSPENDED // no puede iniciar conversaciones/debates nuevos
+  BANNED    // cuenta + dispositivo + teléfono en BlacklistEntry (ver UserStrike relatedType='BOT_ACCOUNT')
+}
+
+/// Declara que un User existente es un bot — reusa la infraestructura de cuentas (auth, etc.)
+/// en vez de duplicarla. Un bot NO es un Role (ver enum Role: ADMIN/SELLER/CUSTOMER,
+/// sin BOT) — es un tipo de cuenta ortogonal, mismo patrón que ForumProfile.
+model BotAccount {
+  id               Int               @id @default(autoincrement())
+  userId           Int               @unique
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName      String            // nombre público del bot, ej. "Bot Economía Liberal"
+  declaredStance   String            @db.Text // postura/propósito declarado, visible al usuario
+  status           BotAccountStatus  @default(ACTIVE)
+
+  operatedByUserId Int               // usuario del equipo LaCase responsable
+  operatedBy       User              @relation("BotOperator", fields: [operatedByUserId], references: [id], onDelete: Restrict)
+
+  timeBudgetMsDefault Int            @default(600000) // 10 min por defecto, presupuesto total por debate (§3)
+  charLimitPerTurn    Int            @default(700)    // tope de caracteres por turno
+
+  createdAt        DateTime          @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  conversations     BotConversation[]
+
+  @@map("bot_accounts")
+  @@index([status])
+}
+
+enum BotMessageSender {
+  BOT
+  USER
+}
+
+/// Chat bot↔usuario. Se guarda un resumen (no la transcripción cruda indefinidamente) —
+/// Ver reglamento del foro: personalización, contexto de moderación solo con
+/// reporte activo, o analítica agregada. `rawExpiresAt` marca cuándo un job de purga borra los
+/// BotConversationMessage crudos (propuesta: 30 días), dejando solo el `summary`.
+model BotConversation {
+  id               Int       @id @default(autoincrement())
+  botAccountId     Int
+  botAccount       BotAccount @relation(fields: [botAccountId], references: [id], onDelete: Cascade)
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  summary          String?   @db.Text
+  rawExpiresAt     DateTime
+
+  startedAt        DateTime  @default(now())
+  endedAt          DateTime?
+
+  messages         BotConversationMessage[]
+
+  @@map("bot_conversations")
+  @@index([botAccountId])
+  @@index([userId])
+  @@index([rawExpiresAt])
+}
+
+model BotConversationMessage {
+  id             Int              @id @default(autoincrement())
+  conversationId Int
+  conversation   BotConversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         BotMessageSender
+  body           String           @db.Text
+  createdAt      DateTime         @default(now())
+
+  @@map("bot_conversation_messages")
+  @@index([conversationId, createdAt])
 }
 
 // ═══ Empleos: ofertas de trabajo publicadas por tiendas verificadas, moderadas por el admin ═══
