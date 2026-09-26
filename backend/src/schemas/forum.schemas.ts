@@ -107,6 +107,9 @@ export const categorySchema = z.object({
     color:       z.string().regex(/^#[0-9A-Fa-f]{6}$/).default('#FF6B35'),
     parentId:    z.number().int().positive().optional(),
     sortOrder:   z.number().int().default(0),
+    // Subforo profesional / de universidad (ver forum-gates.service.ts) — opcionales.
+    requiresFieldId: z.number().int().positive().optional(),
+    universityId:    z.number().int().positive().optional(),
   }),
 });
 

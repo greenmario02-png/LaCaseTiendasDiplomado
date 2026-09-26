@@ -4,6 +4,8 @@ import { getIO } from '../config/socket';
 import { createNotification } from './notification.service';
 import { karmaService } from './karma.service';
 import { forumBotService } from './forum-bot.service';
+import { resolveCategoryGates, assertProfessionalVerified, assertCanAccessUniversity } from './forum-gates.service';
+import { flagIfPolemic, maskAuthorsForDebateZone } from './debate-zone.service';
 
 // ─── Helpers internos ──────────────────────────────────────────────
 
@@ -12,19 +14,27 @@ import { forumBotService } from './forum-bot.service';
  * Se llama en TODOS los endpoints autenticados del foro.
  */
 export async function ensureForumProfile(userId: number) {
-  let profile = await prisma.forumProfile.findUnique({ where: { userId } });
-  if (!profile) {
-    const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    const alias = await generateUniqueAlias();
-    profile = await prisma.forumProfile.create({
+  const profile = await prisma.forumProfile.findUnique({ where: { userId } });
+  if (profile) return profile;
+
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  const alias = await generateUniqueAlias();
+  try {
+    return await prisma.forumProfile.create({
       data: {
         userId,
         forumUsername: alias,
         city: user.locationCity || 'Bolivia',
       },
     });
+  } catch (e) {
+    if ((e as { code?: string }).code !== 'P2002') throw e;
+    // Carrera: dos requests concurrentes del mismo usuario (ej. dos pestañas, web+mobile a
+    // la vez) que nunca había entrado al foro — ambas ven "sin perfil" y ambas intentan
+    // crear uno; ForumProfile.userId es @unique, así que la segunda choca acá. La otra ya
+    // lo creó, así que solo hace falta traerlo.
+    return await prisma.forumProfile.findUniqueOrThrow({ where: { userId } });
   }
-  return profile;
 }
 
 export async function generateUniqueAlias(): Promise<string> {
@@ -266,23 +276,32 @@ export async function adminListCategories() {
   });
 }
 
-export async function getCategoryBySlug(slug: string) {
-  return prisma.forumCategory.findFirst({
+export async function getCategoryBySlug(slug: string, viewerProfileId?: number) {
+  const category = await prisma.forumCategory.findFirst({
     where: { slug, isActive: true },
-    include: { posts: { where: { deletedAt: null, isHidden: false }, orderBy: { createdAt: 'desc' }, take: 20 } },
+    include: {
+      posts: { where: { deletedAt: null, isHidden: false }, orderBy: { createdAt: 'desc' }, take: 20 },
+      parent: { select: { requiresFieldId: true, universityId: true } },
+    },
   });
+  if (!category) return null;
+
+  const effectiveUniversityId = category.universityId ?? category.parent?.universityId ?? null;
+  if (effectiveUniversityId) await assertCanAccessUniversity(viewerProfileId, effectiveUniversityId);
+
+  return category;
 }
 
 export async function createCategory(data: {
   slug: string; name: string; description?: string; icon?: string; color?: string;
-  parentId?: number; sortOrder?: number;
+  parentId?: number; sortOrder?: number; requiresFieldId?: number; universityId?: number;
 }) {
   return prisma.forumCategory.create({ data });
 }
 
 export async function updateCategory(id: number, data: Partial<{
   slug: string; name: string; description?: string; icon?: string; color?: string;
-  parentId?: number; sortOrder?: number; isActive?: boolean;
+  parentId?: number; sortOrder?: number; isActive?: boolean; requiresFieldId?: number | null; universityId?: number | null;
 }>) {
   return prisma.forumCategory.update({ where: { id }, data });
 }
@@ -311,7 +330,17 @@ export async function listPosts(params: ListPostsParams) {
 
   const where: Record<string, unknown> = { deletedAt: null, isHidden: false };
   if (city) where.city = { contains: city, mode: 'insensitive' };
-  if (category) where.category = { slug: category };
+  if (category) {
+    where.category = { slug: category };
+    // Si el subforo filtrado es de universidad, aplicar el gate de visibilidad geolocalizada
+    // antes de devolver ningún post (evita listar actividad de otra ciudad vía el feed).
+    const cat = await prisma.forumCategory.findFirst({
+      where: { slug: category },
+      select: { universityId: true, parent: { select: { universityId: true } } },
+    });
+    const effectiveUniversityId = cat?.universityId ?? cat?.parent?.universityId ?? null;
+    if (effectiveUniversityId) await assertCanAccessUniversity(viewerProfileId, effectiveUniversityId);
+  }
   if (type) where.type = type;
   if (q) where.OR = [
     { title: { contains: q, mode: 'insensitive' } },
@@ -341,9 +370,9 @@ export async function listPosts(params: ListPostsParams) {
       take: limit,
       orderBy: orderBy as never,
       include: {
-        category: { select: { id: true, slug: true, name: true, icon: true, color: true } },
+        category: { select: { id: true, slug: true, name: true, icon: true, color: true, isDebateZone: true } },
         author: {
-          select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true },
+          select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true, userId: true },
         },
         votes: viewerProfileId ? { where: { profileId: viewerProfileId } } : false,
       },
@@ -351,8 +380,15 @@ export async function listPosts(params: ListPostsParams) {
     prisma.forumPost.count({ where }),
   ]);
 
+  // Zona de Debate: solo resolvemos/creamos alias para autores de posts DE ESA categoría — un
+  // feed puede mezclar categorías (sin filtro), no hay que generar un alias para alguien que no
+  // publicó ahí solo por compartir página con quien sí.
+  const debateZoneAuthors = data.filter((p) => p.category.isDebateZone).map((p) => p.author);
+  const aliasMap = await maskAuthorsForDebateZone(debateZoneAuthors, debateZoneAuthors.length > 0);
+
   const posts = data.map((p) => {
     const votes = (p as unknown as { votes: Array<{ value: number }> }).votes;
+    const alias = p.author && p.category.isDebateZone ? aliasMap.get(p.author.userId) : undefined;
     return {
       id: p.id,
       title: p.title,
@@ -369,7 +405,7 @@ export async function listPosts(params: ListPostsParams) {
       viewCount: p.viewCount,
       createdAt: p.createdAt,
       category: p.category,
-      author: p.author,
+      author: p.author ? { ...p.author, userId: undefined, forumUsername: alias ?? p.author.forumUsername } : p.author,
       userVote: viewerProfileId && votes?.length ? votes[0].value : 0,
     };
   });
@@ -381,16 +417,21 @@ export async function getPost(postId: number, viewerProfileId?: number) {
   const post = await prisma.forumPost.findFirst({
     where: { id: postId, deletedAt: null },
     include: {
-      category: { select: { id: true, slug: true, name: true, icon: true, color: true } },
+      category: {
+        select: {
+          id: true, slug: true, name: true, icon: true, color: true,
+          universityId: true, parent: { select: { universityId: true } }, isDebateZone: true,
+        },
+      },
       author: {
-        select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true },
+        select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true, userId: true },
       },
       replies: {
         where: { deletedAt: null },
         orderBy: [{ isAccepted: 'desc' }, { createdAt: 'asc' }],
         include: {
           author: {
-            select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true },
+            select: { forumUsername: true, avatarUrl: true, tag: true, karma: true, city: true, userId: true },
           },
           votes: viewerProfileId ? { where: { profileId: viewerProfileId } } : false,
         },
@@ -399,11 +440,27 @@ export async function getPost(postId: number, viewerProfileId?: number) {
   });
   if (!post) throw ApiError.notFound('Pregunta no encontrada.');
 
+  const effectiveUniversityId = post.category.universityId ?? post.category.parent?.universityId ?? null;
+  if (effectiveUniversityId) await assertCanAccessUniversity(viewerProfileId, effectiveUniversityId);
+
   // Incrementar viewCount (no crítico)
   prisma.forumPost.update({
     where: { id: postId },
     data: { viewCount: { increment: 1 } },
   }).catch(() => undefined);
+
+  // Zona de Debate: post y respuestas comparten la categoría del post (las respuestas no tienen
+  // categoría propia), así que un solo lote de alias alcanza para todos los autores del hilo.
+  const debateZoneAuthors = post.category.isDebateZone
+    ? [post.author, ...post.replies.map((r) => r.author)]
+    : [];
+  const aliasMap = await maskAuthorsForDebateZone(debateZoneAuthors, debateZoneAuthors.length > 0);
+  const maskAuthor = <A extends { forumUsername: string; userId: number } | null>(author: A) =>
+    author && post.category.isDebateZone
+      ? { ...author, userId: undefined, forumUsername: aliasMap.get(author.userId) ?? author.forumUsername }
+      : author
+        ? { ...author, userId: undefined }
+        : author;
 
   const postVotes = (post as unknown as { votes?: Array<{ value: number }> }).votes;
   const data = {
@@ -422,7 +479,7 @@ export async function getPost(postId: number, viewerProfileId?: number) {
     viewCount: post.viewCount,
     createdAt: post.createdAt,
     category: post.category,
-    author: post.author,
+    author: maskAuthor(post.author),
     userVote: viewerProfileId && postVotes?.length ? postVotes[0].value : 0,
     replies: post.replies.map((r) => {
       const rVotes = (r as unknown as { votes?: Array<{ value: number }> }).votes;
@@ -437,7 +494,7 @@ export async function getPost(postId: number, viewerProfileId?: number) {
         downvotes: r.downvotes,
         score: r.score,
         createdAt: r.createdAt,
-        author: r.author,
+        author: maskAuthor(r.author),
         userVote: viewerProfileId && rVotes?.length ? rVotes[0].value : 0,
       };
     }),
@@ -456,6 +513,10 @@ export async function createPost(data: {
   type: string;
   images?: string[];
 }) {
+  const gates = await resolveCategoryGates(data.categoryId);
+  if (gates.requiresFieldId) await assertProfessionalVerified(data.authorId, gates.requiresFieldId);
+  if (gates.universityId) await assertCanAccessUniversity(data.authorId, gates.universityId);
+
   const post = await prisma.forumPost.create({
     data: {
       authorId: data.authorId,
@@ -481,6 +542,12 @@ export async function createPost(data: {
   setImmediate(() => {
     karmaService.earn(data.authorId, 1, 'EARN_FIRST_POST', 'POST', post.id)
       .catch((e) => console.error('[Karma] Error first post:', (e as Error).message));
+  });
+
+  // Detector de Zona de Debate — solo sugiere, nunca mueve el post (ver debate-zone.service.ts).
+  setImmediate(() => {
+    flagIfPolemic('post', post.id, `${data.title}\n${data.body}`)
+      .catch((e) => console.error('[DebateZone] Error flagging post:', (e as Error).message));
   });
 
   return post;
@@ -525,6 +592,10 @@ export async function createReply(userId: number, postId: number, body: string) 
   const post = await prisma.forumPost.findUniqueOrThrow({ where: { id: postId } });
   if (post.deletedAt) throw ApiError.notFound('Pregunta no encontrada.');
 
+  const gates = await resolveCategoryGates(post.categoryId);
+  if (gates.requiresFieldId) await assertProfessionalVerified(profile.id, gates.requiresFieldId);
+  if (gates.universityId) await assertCanAccessUniversity(profile.id, gates.universityId);
+
   await checkAndIncrementDailyCounter(userId, 'REPLY', 5);
 
   const reply = await prisma.$transaction([
@@ -564,6 +635,13 @@ export async function createReply(userId: number, postId: number, body: string) 
   } catch (e) {
     console.error('[Forum] Socket emit error:', (e as Error).message);
   }
+
+  // Detector de Zona de Debate — corre sobre respuestas también, un hilo puede derivar
+  // en pelea de política sin que el post original lo sea (ver debate-zone.service.ts).
+  setImmediate(() => {
+    flagIfPolemic('reply', reply[0].id, body)
+      .catch((e) => console.error('[DebateZone] Error flagging reply:', (e as Error).message));
+  });
 
   return reply[0];
 }
@@ -631,60 +709,77 @@ export async function voteTarget(params: {
     }
   }
 
-  // Upsert del voto
-  const existingVote = await prisma.forumVote.findFirst({
-    where: {
-      profileId,
-      ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }),
-    },
-  });
-
-  let netChange = 0;
-  if (existingVote) {
-    if (existingVote.value === value) {
-      // Toggle: cancelar voto
-      await prisma.forumVote.delete({ where: { id: existingVote.id } });
-      netChange = -value;
-    } else {
-      // Cambiar de dirección
-      await prisma.forumVote.update({ where: { id: existingVote.id }, data: { value } });
-      netChange = value * 2;
-    }
-  } else {
-    // Nuevo voto
-    await prisma.forumVote.create({
-      data: {
+  // Upsert del voto. En Postgres, si el INSERT viola el constraint único DENTRO de una
+  // transacción, TODA esa transacción queda abortada — cualquier consulta posterior en la
+  // misma transacción (ej. un findFirst de recuperación) también falla. Por eso la
+  // recuperación ante P2002 no puede vivir en la misma transacción que falló: hay que
+  // dejarla abortar y reintentar UNA vez en una transacción nueva, donde el voto
+  // concurrente ya está comiteado y visible.
+  // El recuento de upvotes/downvotes se hace DENTRO de esta misma transacción (no en una
+  // consulta separada después) — dos requests concurrentes que cada una recalculara y
+  // escribiera el contador por su cuenta, fuera de la transacción, podían pisarse el
+  // resultado entre sí según el orden real de ejecución de cada recuento independiente,
+  // dejando upvotes/downvotes en un valor inconsistente con los votos reales en BD.
+  const runVoteTx = () => prisma.$transaction(async (tx) => {
+    const existingVote = await tx.forumVote.findFirst({
+      where: {
         profileId,
-        targetType: (targetType.toUpperCase()) as never,
-        value,
         ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }),
       },
     });
-    netChange = value;
-  }
 
-  // Actualizar contadores desnormalizados recalculándolos desde los votos
-  // reales en BD (fix: los incrementos netos desincronizaban upvotes/downvotes
-  // en toggles y cambios de dirección).
-  const [upCount, downCount] = await Promise.all([
-    prisma.forumVote.count({
-      where: {
-        ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }),
-        value: 1,
-      },
-    }),
-    prisma.forumVote.count({
-      where: {
-        ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }),
-        value: -1,
-      },
-    }),
-  ]);
-  const counters = { upvotes: upCount, downvotes: downCount };
-  if (targetType === 'post') {
-    await prisma.forumPost.update({ where: { id: targetId }, data: counters });
-  } else {
-    await prisma.forumReply.update({ where: { id: targetId }, data: counters });
+    let netChange: number;
+    if (existingVote) {
+      if (existingVote.value === value) {
+        // Toggle: cancelar voto
+        await tx.forumVote.delete({ where: { id: existingVote.id } });
+        netChange = -value;
+      } else {
+        // Cambiar de dirección
+        await tx.forumVote.update({ where: { id: existingVote.id }, data: { value } });
+        netChange = value * 2;
+      }
+    } else {
+      // Nuevo voto
+      await tx.forumVote.create({
+        data: {
+          profileId,
+          targetType: (targetType.toUpperCase()) as never,
+          value,
+          ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }),
+        },
+      });
+      netChange = value;
+    }
+
+    const [upCount, downCount] = await Promise.all([
+      tx.forumVote.count({
+        where: { ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }), value: 1 },
+      }),
+      tx.forumVote.count({
+        where: { ...(targetType === 'post' ? { postId: targetId } : { replyId: targetId }), value: -1 },
+      }),
+    ]);
+    const counters = { upvotes: upCount, downvotes: downCount };
+    if (targetType === 'post') {
+      await tx.forumPost.update({ where: { id: targetId }, data: counters });
+    } else {
+      await tx.forumReply.update({ where: { id: targetId }, data: counters });
+    }
+
+    return { netChange, ...counters };
+  });
+
+  let netChange: number;
+  try {
+    ({ netChange } = await runVoteTx());
+  } catch (e) {
+    if ((e as { code?: string }).code !== 'P2002') throw e;
+    // Carrera: otra request del mismo usuario creó el voto entre el findFirst y el create
+    // de la transacción anterior (que se abortó completa). Reintentar en una transacción
+    // nueva — ahora el findFirst sí va a encontrar el voto concurrente ya comiteado, y el
+    // recuento de arriba corre otra vez sobre el estado real post-conflicto.
+    ({ netChange } = await runVoteTx());
   }
 
   const newScore = await recalculateScore(targetType, targetId);
@@ -698,7 +793,13 @@ export async function voteTarget(params: {
     });
   }
 
-  // Emitir por Socket.IO
+  const finalTarget = targetType === 'post'
+    ? await prisma.forumPost.findUniqueOrThrow({ where: { id: targetId } })
+    : await prisma.forumReply.findUniqueOrThrow({ where: { id: targetId } });
+
+  // Emitir por Socket.IO — mismo payload que la respuesta REST (antes solo mandaba
+  // newScore y el cliente conectado por socket quedaba con upvotes/downvotes desactualizados
+  // frente a quien recibía la respuesta REST directa).
   try {
     const io = getIO();
     if (io) {
@@ -707,15 +808,13 @@ export async function voteTarget(params: {
         targetType: targetType.toUpperCase(),
         targetId,
         newScore,
+        upvotes: finalTarget.upvotes,
+        downvotes: finalTarget.downvotes,
       });
     }
   } catch (e) {
     console.error('[Forum] Socket emit error:', (e as Error).message);
   }
-
-  const finalTarget = targetType === 'post'
-    ? await prisma.forumPost.findUniqueOrThrow({ where: { id: targetId } })
-    : await prisma.forumReply.findUniqueOrThrow({ where: { id: targetId } });
 
   return {
     newScore,
@@ -745,13 +844,25 @@ export async function acceptReply(params: {
     throw new ApiError(403, 'SELF_ACCEPT', 'No puedes marcar tu propia respuesta.');
   }
   if (reply.post.status === 'RESOLVED') {
+    // Chequeo rápido no-atómico: evita una transacción innecesaria en el caso común.
+    // La protección real contra la carrera (dos replies aceptadas a la vez) es el
+    // updateMany condicional de abajo, dentro de la transacción.
     throw new ApiError(409, 'ALREADY_RESOLVED', 'Esta pregunta ya tiene una respuesta aceptada.');
   }
 
-  await prisma.$transaction([
-    prisma.forumReply.update({ where: { id: replyId }, data: { isAccepted: true } }),
-    prisma.forumPost.update({ where: { id: reply.postId }, data: { status: 'RESOLVED' } }),
-  ]);
+  await prisma.$transaction(async (tx) => {
+    // Update condicional atómico: si otra respuesta ya resolvió el post entre el chequeo
+    // de arriba y acá, count === 0 y abortamos — evita que dos replies queden "aceptadas"
+    // a la vez con su karma/coins duplicados.
+    const updated = await tx.forumPost.updateMany({
+      where: { id: reply.postId, status: { not: 'RESOLVED' } },
+      data: { status: 'RESOLVED' },
+    });
+    if (updated.count === 0) {
+      throw new ApiError(409, 'ALREADY_RESOLVED', 'Esta pregunta ya tiene una respuesta aceptada.');
+    }
+    await tx.forumReply.update({ where: { id: replyId }, data: { isAccepted: true } });
+  });
 
   // Karma + coins al autor de la respuesta
   if (reply.authorId) {
@@ -933,18 +1044,105 @@ export async function reportTarget(params: {
 
 // ─── Moderación ────────────────────────────────────────────────────
 
+type ReportTargetRef = {
+  targetType: string;
+  postId: number | null;
+  replyId: number | null;
+  profileId: number | null;
+};
+
+/**
+ * Resuelve el departamento del CONTENIDO reportado (no el del reportero):
+ * para POST/REPLY, el departamento de la ciudad donde se publicó; para PROFILE,
+ * el departamento del perfil denunciado. Devuelve null si no se puede determinar
+ * (ej. ciudad no catalogada) — en ese caso el llamador debe denegar por defecto.
+ */
+async function resolveReportDepartment(report: ReportTargetRef): Promise<string | null> {
+  let city: string | null = null;
+  let profileId: number | null = null;
+
+  if (report.targetType === 'POST' && report.postId) {
+    const post = await prisma.forumPost.findUnique({ where: { id: report.postId }, select: { city: true, authorId: true } });
+    city = post?.city ?? null;
+    profileId = post?.authorId ?? null;
+  } else if (report.targetType === 'REPLY' && report.replyId) {
+    const reply = await prisma.forumReply.findUnique({
+      where: { id: report.replyId },
+      select: { authorId: true, post: { select: { city: true } } },
+    });
+    city = reply?.post.city ?? null;
+    profileId = reply?.authorId ?? null;
+  } else if (report.targetType === 'PROFILE' && report.profileId) {
+    profileId = report.profileId;
+  }
+
+  if (city) {
+    // ForumPost.city se guarda en minúsculas (ver createPost); comparar sin distinguir mayúsculas.
+    const cityRow = await prisma.forumCity.findFirst({
+      where: { name: { equals: city, mode: 'insensitive' } },
+      select: { department: true },
+    });
+    if (cityRow?.department) return cityRow.department;
+  }
+  if (profileId) {
+    const profile = await prisma.forumProfile.findUnique({ where: { id: profileId }, select: { department: true } });
+    if (profile?.department) return profile.department;
+  }
+  return null;
+}
+
+/**
+ * Un moderador solo puede actuar sobre reportes de contenido de SU PROPIO departamento
+ * (`ForumProfile.department`); ADMIN no tiene restricción. Fail-closed: si el departamento
+ * del moderador o del contenido no se puede determinar, se deniega.
+ */
+async function assertCanModerateReport(actingUserId: number, isAdmin: boolean, report: ReportTargetRef) {
+  if (isAdmin) return;
+
+  const [modProfile, targetDepartment] = await Promise.all([
+    prisma.forumProfile.findUnique({ where: { userId: actingUserId }, select: { department: true } }),
+    resolveReportDepartment(report),
+  ]);
+
+  if (!modProfile?.department || !targetDepartment || modProfile.department !== targetDepartment) {
+    throw new ApiError(403, 'DEPARTMENT_MISMATCH', 'Solo podés moderar reportes de tu propio departamento.');
+  }
+}
+
 export async function listReports(params: {
   page: number;
   limit: number;
   status?: string;
   targetType?: string;
   reason?: string;
+  /** Si se pasa (moderador no-ADMIN), restringe el listado al departamento del moderador. */
+  department?: string | null;
 }) {
-  const { page, limit, status, targetType, reason } = params;
+  const { page, limit, status, targetType, reason, department } = params;
   const where: Record<string, unknown> = {};
   if (status) where.status = status;
   if (targetType) where.targetType = targetType;
   if (reason) where.reason = reason;
+
+  // department === undefined → sin restricción (llamado por ADMIN).
+  // department === null → moderador sin departamento asignado: no ve nada (fail-closed).
+  if (department === null) {
+    return { reports: [], total: 0 };
+  }
+  if (department) {
+    const [cities, profiles] = await Promise.all([
+      prisma.forumCity.findMany({ where: { department }, select: { name: true } }),
+      prisma.forumProfile.findMany({ where: { department }, select: { id: true } }),
+    ]);
+    // ForumPost.city se guarda en minúsculas (ver createPost); el catálogo ForumCity.name no.
+    // Prisma no soporta `mode: 'insensitive'` dentro de `in`, así que comparamos ya en minúsculas.
+    const cityNamesLower = cities.map((c) => c.name.toLowerCase());
+    where.OR = [
+      { post: { city: { in: cityNamesLower } } },
+      { reply: { post: { city: { in: cityNamesLower } } } },
+      { targetType: 'PROFILE', profileId: { in: profiles.map((p) => p.id) } },
+    ];
+  }
 
   const [data, total] = await Promise.all([
     prisma.forumReport.findMany({
@@ -963,9 +1161,10 @@ export async function listReports(params: {
   return { reports: data, total };
 }
 
-export async function resolveReport(reportId: number, resolvedByUserId: number, resolution?: string) {
+export async function resolveReport(reportId: number, resolvedByUserId: number, isAdmin: boolean, resolution?: string) {
   const report = await prisma.forumReport.findUniqueOrThrow({ where: { id: reportId } });
   if (report.status !== 'PENDING') throw new ApiError(409, 'ALREADY_PROCESSED', 'Este reporte ya fue procesado.');
+  await assertCanModerateReport(resolvedByUserId, isAdmin, report);
 
   // Soft-delete del contenido denunciado
   if (report.targetType === 'POST' && report.postId) {
@@ -997,9 +1196,10 @@ export async function resolveReport(reportId: number, resolvedByUserId: number, 
   return { reportId, status: 'RESOLVED' };
 }
 
-export async function rejectReport(reportId: number, resolvedByUserId: number, resolution?: string) {
+export async function rejectReport(reportId: number, resolvedByUserId: number, isAdmin: boolean, resolution?: string) {
   const report = await prisma.forumReport.findUniqueOrThrow({ where: { id: reportId } });
   if (report.status !== 'PENDING') throw new ApiError(409, 'ALREADY_PROCESSED', 'Este reporte ya fue procesado.');
+  await assertCanModerateReport(resolvedByUserId, isAdmin, report);
 
   // Restaurar isHidden si fue auto-ocultado
   if (report.targetType === 'POST' && report.postId) {

@@ -124,7 +124,7 @@ router.get('/admin/categories', authenticate, requireRole('ADMIN'), asyncHandler
  *     responses:
  *       200: { description: Categoría }
  */
-router.get('/categories/:slug', asyncHandler(forumController.getCategoryBySlug));
+router.get('/categories/:slug', optionalAuth, asyncHandler(forumController.getCategoryBySlug));
 
 /**
  * @swagger
