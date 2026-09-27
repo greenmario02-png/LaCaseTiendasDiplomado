@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lacase-backend
+    name: lacase-diplomado-api
     runtime: node
     plan: free
     region: oregon
