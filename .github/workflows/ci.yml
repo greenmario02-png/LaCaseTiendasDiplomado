@@ -28,8 +28,8 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/base_lacase_test
-      JWT_SECRET: test-secret-2026-9f2c4a1b7e3d8c
-      JWT_REFRESH_SECRET: test-refresh-secret-2026-5d8e2f1a9c4b7e
+      JWT_SECRET: solo-para-pruebas-en-ci
+      JWT_REFRESH_SECRET: solo-para-pruebas-en-ci-refresh
       NODE_ENV: test
 
     steps:

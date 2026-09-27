@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 export default async function globalSetup() {
   dotenv.config({ path: path.resolve(__dirname, '..', '.env.test') });
 
-  process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/pctienda_test';
+  process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/lacase_test';
   process.env.NODE_ENV = 'test';
 
   console.log('\n[globalSetup] Inicializando BD de test...');

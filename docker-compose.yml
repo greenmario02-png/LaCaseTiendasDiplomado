@@ -6,7 +6,7 @@ services:
     container_name: pctienda-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-pctienda}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clave-de-ejemplo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD en el entorno o en un archivo .env}
       POSTGRES_DB: ${POSTGRES_DB:-pctienda}
     ports:
       - "5432:5432"
@@ -26,9 +26,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-pctienda}:${POSTGRES_PASSWORD:-clave-de-ejemplo}@postgres:5432/${POSTGRES_DB:-pctienda}
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-in-production}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pctienda}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD en el entorno o en un archivo .env}@postgres:5432/${POSTGRES_DB:-pctienda}
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en el entorno o en un archivo .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?defina JWT_REFRESH_SECRET en el entorno o en un archivo .env}
       PORT: 3000
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     volumes:
