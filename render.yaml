@@ -5,9 +5,9 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm install --include=dev && npx prisma generate && npm run build
     startCommand: npm run start
-    healthCheckPath: /api/health
+    healthCheckPath: /api/v1/salud
     envVars:
       - key: NODE_ENV
         value: production
@@ -23,6 +23,7 @@ services:
         value: 7d
       - key: CORS_ORIGIN
         sync: false
-
-# El sitio estático del frontend (lacase-frontend) se despliega en Render desde un
-# repositorio separado — no forma parte de esta entrega de código.
+      - key: CURRENCY_REFRESH_MIN_MINUTES
+        value: "8"
+      - key: CURRENCY_REFRESH_MAX_MINUTES
+        value: "14"
