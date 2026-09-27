@@ -108,7 +108,8 @@ export function resolveImageUrl(url?: string | null): string {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
   if (url.startsWith('/uploads/')) {
-    return `${import.meta.env.VITE_API_URL || ''}${url}`;
+    const apiUrl: string = import.meta.env.VITE_API_URL || '';
+    return `${apiUrl.replace(/\/api\/?$/, '')}${url}`;
   }
   return url;
 }
