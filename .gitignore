@@ -4,7 +4,8 @@ build/
 *.db
 *.db-journal
 logs-dev.txt
-backend/uploads/
+backend/uploads/*
+!backend/uploads/.gitkeep
 mobile/*.apk
 mobile/*.aab
 *.apk
@@ -27,3 +28,5 @@ mobile/android/app/*.jks
 mobile/ios/build/
 
 backend/private-uploads/
+private-uploads/
+*.aab

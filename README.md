@@ -2,8 +2,7 @@
 
 Marketplace multi-vendedor para Bolivia. **Alcance de la monografía: tiendas, catálogo y pedido con pago
 por QR manual.** Backend, frontend web y app móvil en un solo repositorio. Otros módulos (subastas, foro,
-chat, empleos, geolocalización, etc.) existen en el código pero están **fuera de alcance**
-(ver [`docs/fuera-de-alcance.md`](docs/fuera-de-alcance.md)).
+chat, empleos, geolocalización, etc.) existen en el código pero están **fuera de alcance**.
 
 ## Stack
 
@@ -26,8 +25,7 @@ Dos roles funcionales y un administrador que solo existe por seed (limitación d
 | **SELLER** (Vendedor) | Registra su tienda (queda pendiente de aprobación), publica productos y verifica los pagos de sus pedidos. |
 | **ADMIN** (Administrador) | **Solo desde el seed**; aprueba tiendas, modera productos, gestiona categorías y usuarios. |
 
-La moderación del foro (fuera de alcance) es una asignación RBAC, no un cuarto rol. Detalle en
-[`docs/modelo-roles.md`](docs/modelo-roles.md).
+La moderación del foro (fuera de alcance) es una asignación RBAC, no un cuarto rol.
 
 ## Alcance real
 
@@ -39,20 +37,6 @@ La moderación del foro (fuera de alcance) es una asignación RBAC, no un cuarto
 | Won't | Subastas, foro, chat, empleos, geolocalización, eventos, afiliados, cupones, devoluciones y pagos, equipo de tienda y RBAC dinámico |
 
 14 requisitos funcionales (Must 57,1 %) y 5 requisitos no funcionales con métrica.
-
-## Documentación
-
-- [`docs/requisitos-funcionales.md`](docs/requisitos-funcionales.md) — 14 RF, criterios Dado/Cuando/Entonces, MoSCoW
-- [`docs/requisitos-no-funcionales.md`](docs/requisitos-no-funcionales.md) — 5 RNF con métrica
-- [`docs/fuera-de-alcance.md`](docs/fuera-de-alcance.md) — Won't have
-- [`docs/casos-de-uso.md`](docs/casos-de-uso.md)
-- [`docs/modelo-roles.md`](docs/modelo-roles.md)
-- [`docs/modelo-datos.md`](docs/modelo-datos.md) — entidades y diccionario de datos
-- [`docs/arquitectura.md`](docs/arquitectura.md) — monolito modular, flechas, despliegue, riesgos
-- [`docs/contrato-api.md`](docs/contrato-api.md) — rutas Must, errores, dominios
-- [`docs/seguridad-y-pruebas.md`](docs/seguridad-y-pruebas.md) — controles, casos de prueba y brechas
-- [`docs/despliegue.md`](docs/despliegue.md) — plan de despliegue en producción (pendiente, E4)
-- [`docs/endpoints-empleos.md`](docs/endpoints-empleos.md) — módulo Empleos (fuera de alcance)
 
 ## Arquitectura
 
@@ -77,8 +61,13 @@ mobile/
   src/           # App Expo (React Native), espeja los flujos del frontend
 .github/workflows/  # CI (lint + typecheck + test)
 docker-compose.yml
-render.yaml
 ```
+
+## Requisitos previos
+
+- Node.js 20 o superior y npm
+- PostgreSQL 14 o superior en local
+- (Opcional) Docker, Expo Go o un emulador Android/iOS para la app móvil
 
 ## Instalación y ejecución local
 
@@ -92,32 +81,54 @@ createdb base_lacase
 
 ```bash
 cd backend
-cp .env.example .env    # editar credenciales si es necesario
+cp .env.example .env     # completar los valores (ver variables abajo)
 npm install
 npx prisma db push       # crear tablas
-npx tsx prisma/seed.ts   # poblar con datos de prueba
-npx tsx prisma/seed-forum.ts        # categorías y ciudades del foro
-npm run dev              # API + WebSocket en :3000
+npm run db:seed          # datos de prueba
+npx tsx prisma/seed-forum.ts   # categorías y ciudades del foro
+npm run dev              # API + WebSocket en http://localhost:3000
 ```
 
-### 3. Frontend
+Variables de `backend/.env` (por nombre):
+
+| Variable | Ejemplo / descripción |
+|---|---|
+| `DATABASE_URL` | `postgresql://USUARIO:CLAVE@localhost:5432/base_lacase` |
+| `JWT_SECRET` | secreto de al menos 32 caracteres |
+| `JWT_REFRESH_SECRET` | secreto de al menos 32 caracteres |
+| `JWT_EXPIRES_IN` / `JWT_REFRESH_EXPIRES_IN` | `15m` / `7d` |
+| `PORT` | `3000` |
+| `CORS_ORIGIN` | `http://localhost:5173` |
+| `NODE_ENV` | `development` |
+| `CURRENCY_REFRESH_MIN_MINUTES` / `CURRENCY_REFRESH_MAX_MINUTES` | `8` / `14` |
+
+Seed mínimo (sin datos de demostración): `ADMIN_EMAIL=... ADMIN_PASSWORD=... npm run db:seed:prod`
+crea el administrador y el árbol de categorías; si además se define `DEMO_PASSWORD`, crea dos
+cuentas ficticias (`vendedor.demo@lacase.bo`, `comprador.demo@lacase.bo`). Es idempotente.
+
+### 3. Frontend web
 
 ```bash
 cd frontend
+cp .env.example .env     # VITE_API_URL=http://localhost:3000/api
 npm install
-npm run dev              # Vite, proxya /api y /uploads a :3000
+npm run dev              # Vite en http://localhost:5173
 ```
+
+`VITE_API_URL` es la URL de la API; `VITE_SOCKET_URL` (opcional) es la URL de Socket.IO y por defecto
+se deriva del origen de `VITE_API_URL`.
 
 ### 4. App móvil
 
 ```bash
 cd mobile
+cp .env.example .env     # EXPO_PUBLIC_API_URL=http://localhost:3000/api
 npm install
-npm start                # Expo — escaneá el QR con Expo Go, o "a" para emulador Android
+npm start                # Expo: QR con Expo Go, o "a" para emulador Android
 ```
 
-En desarrollo, la app apunta al backend local (`mobile/src/config/env.ts`); ajustá la IP de tu
-PC ahí si probás desde un teléfono físico en la misma red.
+Sin `EXPO_PUBLIC_API_URL` la app usa `http://localhost:3000/api` (web/iOS) o `http://10.0.2.2:3000/api`
+(emulador Android). Desde un teléfono físico, usar la IP de tu PC en la red local.
 
 ### 5. (Opcional) Docker
 
@@ -133,9 +144,8 @@ docker compose up -d
 | Vendedor | vendedor@lacase.bo | (definida en el entorno) |
 | Comprador | comprador@lacase.bo | (definida en el entorno) |
 
-Son solo para desarrollo y demostración; cambiar la contraseña del administrador antes de cualquier
-despliegue público. Los secretos reales (`DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`) van en
-variables de entorno y nunca en el repositorio.
+Son cuentas ficticias, solo para desarrollo y demostración. Los secretos (`DATABASE_URL`, `JWT_SECRET`,
+`JWT_REFRESH_SECRET`) van en variables de entorno y nunca en el repositorio.
 
 ## Comandos de calidad
 
@@ -163,8 +173,7 @@ npm run test:coverage   # cobertura de líneas
 ```
 
 Requiere PostgreSQL local levantado (usuario y base de test configurables por `DATABASE_URL`, ver
-`backend/tests/globalSetup.ts`). La tabla de casos está en
-[`docs/seguridad-y-pruebas.md`](docs/seguridad-y-pruebas.md).
+`backend/tests/globalSetup.ts`).
 
 ## Endpoints principales (alcance Must)
 
@@ -174,5 +183,4 @@ Requiere PostgreSQL local levantado (usuario y base de test configurables por `D
 - Carrito y pedidos: `/api/cart`, `POST /api/orders`, `POST /api/orders/:id/payment-proof`,
   `PUT /api/orders/seller/:id/payment-status`
 - Vendedor y administrador: `/api/seller/products`, `/api/admin/products/:id/moderate`
-- Contrato completo: [`docs/contrato-api.md`](docs/contrato-api.md)
 - Docs OpenAPI: `http://localhost:3000/api-docs`
