@@ -1,6 +1,18 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+function resolveSocketUrl(): string {
+  if (import.meta.env.VITE_SOCKET_URL) return import.meta.env.VITE_SOCKET_URL;
+  if (import.meta.env.VITE_API_URL) {
+    try {
+      return new URL(import.meta.env.VITE_API_URL).origin;
+    } catch {
+      /* URL inválida: usar el valor por defecto */
+    }
+  }
+  return 'http://localhost:3000';
+}
+
+const SOCKET_URL = resolveSocketUrl();
 
 const socket: Socket = io(SOCKET_URL, {
   autoConnect: false,
