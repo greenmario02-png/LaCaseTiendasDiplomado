@@ -426,10 +426,12 @@ const TOURNAMENTS: { slug: string; title: string; description: string; entries: 
 async function seedRinconcitoBoliviano(profileIds: number[]) {
   const creatorId = profileIds[0];
 
+  const memeTitle = 'Rinconcito Boliviano — Memes';
+  const memeDescription = 'Memes y momentos bien bolivianos, votados por la comunidad.';
   const memeTheme = await prisma.conoTheme.upsert({
     where: { slug: 'rinconcito-boliviano-memes' },
-    update: {},
-    create: { slug: 'rinconcito-boliviano-memes', title: 'Rinconcito Boliviano — Memes', description: 'Memes y momentos bien bolivianos, votados por la comunidad.', type: 'MEME', createdById: creatorId },
+    update: { title: memeTitle, description: memeDescription },
+    create: { slug: 'rinconcito-boliviano-memes', title: memeTitle, description: memeDescription, type: 'MEME', createdById: creatorId },
   });
   const existingMemeEntries = await prisma.conoEntry.count({ where: { themeId: memeTheme.id } });
   if (existingMemeEntries === 0) {
@@ -463,7 +465,7 @@ async function seedRinconcitoBoliviano(profileIds: number[]) {
   for (const t of TOURNAMENTS) {
     const theme = await prisma.conoTheme.upsert({
       where: { slug: t.slug },
-      update: {},
+      update: { title: t.title, description: t.description },
       create: { slug: t.slug, title: t.title, description: t.description, type: 'TOURNAMENT', createdById: creatorId },
     });
     const existingEntries = await prisma.conoEntry.count({ where: { themeId: theme.id } });
