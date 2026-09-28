@@ -804,7 +804,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Buy It Now (opcional)"
+                        label="Comprar ahora (opcional)"
                         type="number"
                         value={form.auctionBuyNowPrice}
                         onChange={(e) => setForm({ ...form, auctionBuyNowPrice: e.target.value })}
@@ -1234,7 +1234,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Buy It Now (opcional)"
+                        label="Comprar ahora (opcional)"
                         type="number"
                         value={form.auctionBuyNowPrice}
                         onChange={(e) => setForm({ ...form, auctionBuyNowPrice: e.target.value })}

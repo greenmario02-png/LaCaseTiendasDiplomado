@@ -38,6 +38,11 @@ export async function uploadBuffer(buffer: Buffer, folder: string, originalName:
     const { error } = await supabase.storage.from(SUPABASE_STORAGE_BUCKET).upload(objectPath, buffer, {
       contentType,
       upsert: false,
+      // Cada subida tiene un nombre de archivo aleatorio y nunca se sobrescribe (upsert: false),
+      // así que el contenido de una URL nunca cambia: se puede cachear "para siempre" (1 año) sin
+      // riesgo de servir una versión vieja. Esto es lo que hace que la imagen no se re-descargue
+      // en cada visita, tanto en el navegador como en la app móvil.
+      cacheControl: '31536000',
     });
     if (error) throw new Error(`Error al subir la imagen a Supabase Storage: ${error.message}`);
     const { data } = supabase.storage.from(SUPABASE_STORAGE_BUCKET).getPublicUrl(objectPath);
