@@ -583,12 +583,19 @@ export const CATEGORY_KEYWORDS: Record<string, string> = {
 let flickrSeed = 100;
 
 /** Foto real (LoremFlickr) para una palabra clave dada, en vez de una imagen aleatoria sin relación. */
+/**
+ * Foto de relleno realista y estable (Picsum Photos, servido por Fastly). Antes se usaba
+ * LoremFlickr por palabra clave, pero a este volumen de imágenes bloquea las peticiones con una
+ * página de verificación anti-bot en vez de servir la foto ("imágenes rotas" en producción).
+ * Picsum no permite buscar por palabra clave, pero es estable y cada "seed" siempre devuelve la
+ * misma foto, así que es idempotente entre corridas del script.
+ */
 export function flickrImage(keyword: string, width = 800, height = width): string {
   flickrSeed += 1;
-  return `https://loremflickr.com/${width}/${height}/${keyword}?lock=${flickrSeed}`;
+  return `https://picsum.photos/seed/${encodeURIComponent(keyword)}-${flickrSeed}/${width}/${height}`;
 }
 
-/** Foto real (LoremFlickr) relacionada a la categoría del producto. */
+/** Foto de relleno realista y estable para la categoría del producto. */
 export function categoryImage(categoryName: string, width = 800, height = width): string {
   const keyword = CATEGORY_KEYWORDS[categoryName] ?? 'store';
   return flickrImage(keyword, width, height);
@@ -604,7 +611,7 @@ export const DESC_CLOSERS = [
   'Entrega en el punto de encuentro o envío a domicilio dentro de la ciudad.',
   'Consultanos por WhatsApp para coordinar la entrega.',
   'Aceptamos pago por QR o transferencia bancaria.',
-  'Stock limitado, hacé tu pedido antes de que se agote.',
+  'Stock limitado, haz tu pedido antes de que se agote.',
   'Ideal para uso diario o como regalo.',
 ];
 
