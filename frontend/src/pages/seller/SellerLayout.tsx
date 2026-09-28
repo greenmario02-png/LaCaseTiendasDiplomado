@@ -201,7 +201,7 @@ export default function SellerLayout() {
             Verificación de seguridad
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={3}>
-            Para ingresar al panel de la tienda, confirmá tu contraseña.
+            Para ingresar al panel de la tienda, confirma tu contraseña.
           </Typography>
           <TextField
             label="Contraseña"

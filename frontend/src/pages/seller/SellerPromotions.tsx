@@ -111,11 +111,11 @@ export default function SellerPromotions() {
 
   const savePromo = async () => {
     if (!form.title || !form.discountValue) {
-      toast.error('Completá título y descuento');
+      toast.error('Completa título y descuento');
       return;
     }
     if (selectedProducts.length === 0) {
-      toast.error('Elegí al menos un producto');
+      toast.error('Elige al menos un producto');
       return;
     }
     try {
@@ -138,7 +138,7 @@ export default function SellerPromotions() {
 
   const saveCoupon = async () => {
     if (!couponForm.code || !couponForm.value) {
-      toast.error('Completá código y valor');
+      toast.error('Completa código y valor');
       return;
     }
     try {
@@ -161,7 +161,7 @@ export default function SellerPromotions() {
 
   const saveGift = async () => {
     if (!giftForm.title || giftForm.giftProductIds.length === 0) {
-      toast.error('Completá título y productos de regalo');
+      toast.error('Completa título y productos de regalo');
       return;
     }
     try {
@@ -213,12 +213,12 @@ export default function SellerPromotions() {
 
       {tab === 0 && active.length === 0 && (
         <SurfaceCard>
-          <EmptyState message='No tenés promociones activas. Tocá "Nueva promoción" para crear una.' />
+          <EmptyState message='No tienes promociones activas. Toca "Nueva promoción" para crear una.' />
         </SurfaceCard>
       )}
       {tab === 1 && finished.length === 0 && (
         <SurfaceCard>
-          <EmptyState message="No tenés promociones finalizadas." />
+          <EmptyState message="No tienes promociones finalizadas." />
         </SurfaceCard>
       )}
 
@@ -291,7 +291,7 @@ export default function SellerPromotions() {
               </MenuItem>
               <MenuItem value="GIFT">
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <RedeemIcon fontSize="small" /> Promo de regalo (comprá y recibí)
+                  <RedeemIcon fontSize="small" /> Promo de regalo (compra y recibe)
                 </Stack>
               </MenuItem>
             </TextField>

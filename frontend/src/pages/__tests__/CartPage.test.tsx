@@ -41,6 +41,6 @@ describe('CartPage', () => {
         <CartPage />
       </MemoryRouter>,
     );
-    expect(await screen.findByRole('link', { name: /Iniciá sesión/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /Inicia sesión/ })).toBeInTheDocument();
   });
 });

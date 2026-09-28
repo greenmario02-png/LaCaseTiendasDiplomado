@@ -303,10 +303,10 @@ export default function ProductDetailPage() {
       {offers && offers.count > 1 && (
         <Paper sx={{ mt: 3, p: 2 }}>
           <Typography variant="h6" fontWeight={700} mb={1}>
-            Compará precios — {offers.count} tiendas venden este producto
+            Compara precios — {offers.count} tiendas venden este producto
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            El mejor precio es {money(offers.bestPrice)}. Elegí la tienda que más te convenga.
+            El mejor precio es {money(offers.bestPrice)}. Elige la tienda que más te convenga.
           </Typography>
           <Box>
             {offers.offers.map((o: any) => {
@@ -479,7 +479,7 @@ export default function ProductDetailPage() {
               size="small"
               multiline
               rows={2}
-              placeholder="Escribí tu reseña..."
+              placeholder="Escribe tu reseña..."
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               sx={{ mt: 1, mb: 1 }}
@@ -490,7 +490,7 @@ export default function ProductDetailPage() {
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            <Link to="/login">Iniciá sesión</Link> para dejar una reseña.
+            <Link to="/login">Inicia sesión</Link> para dejar una reseña.
           </Typography>
         )}
       </Paper>

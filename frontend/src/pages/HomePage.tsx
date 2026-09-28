@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import GavelIcon from '@mui/icons-material/Gavel';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { JobCard, type Job } from '../components/redesign/JobCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -85,6 +86,7 @@ export default function HomePage() {
   const [forYou, setForYou] = useState<any[]>([]);
   const [trending, setTrending] = useState<any[]>([]);
   const [userCity, setUserCity] = useState<string>('');
+  const [auctions, setAuctions] = useState<any[]>([]);
 
   // Letrero de compras en tiempo real
   const [sales, setSales] = useState<Sale[]>([]);
@@ -110,7 +112,8 @@ export default function HomePage() {
       api.get('/tracking/me/recommended').catch(() => ({ data: { data: { recommendations: [], reason: '' } } })),
       api.get('/tracking/feed', { params: geo ? { lat: geo.lat, lng: geo.lng } : undefined }).catch(() => ({ data: { data: { nearYou: [], categoryCarousels: [], forYou: [], trending: [], userCity: '' } } })),
       api.get('/orders/recent-sales').catch(() => ({ data: { data: [] } })),
-    ]).then(([b, c, f, p, r, feed, s]) => {
+      api.get('/auctions', { params: { limit: 6, sort: 'ending_soon' } }).catch(() => ({ data: { data: [] } })),
+    ]).then(([b, c, f, p, r, feed, s, auc]) => {
       setBanners(b.data.data);
       setCategories(c.data.data);
       setFeatured(f.data.data);
@@ -125,6 +128,7 @@ export default function HomePage() {
       const initialSales = s.data.data ?? [];
       setSales(initialSales);
       salesRef.current = initialSales;
+      setAuctions(auc.data.data ?? []);
       setLoading(false);
     });
 
@@ -193,8 +197,9 @@ export default function HomePage() {
           >
             {[...sales, ...sales].map((s, i) => (
               <Box key={`${s.id}-${i}`} display="flex" alignItems="center" gap={1} sx={{ minWidth: 'max-content' }}>
-                <Typography variant="body2" fontWeight={700} component="span">
-                  🔥 {s.productName}
+                <Typography variant="body2" fontWeight={700} component="span" display="inline-flex" alignItems="center" gap={0.5}>
+                  <LocalFireDepartmentIcon fontSize="small" />
+                  {s.productName}
                 </Typography>
                 <Typography variant="body2" component="span" sx={{ opacity: 0.9 }}>
                   en {s.storeName} · {s.city} · {money(s.amount)}
@@ -214,7 +219,7 @@ export default function HomePage() {
                 Todas las tiendas, un solo lugar
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                Compará precios entre cientos de vendedores, encontrá el mejor precio y calculá el envío según la
+                Compara precios entre cientos de vendedores, encuentra el mejor precio y calcula el envío según la
                 ubicación de cada tienda.
               </Typography>
               <Box display="flex" gap={1}>
@@ -225,7 +230,7 @@ export default function HomePage() {
                   Subastas
                 </SecondaryButton>
                 <GhostButton to="/registro-vendedor">
-                  Abrí tu tienda
+                  Abre tu tienda
                 </GhostButton>
               </Box>
             </Grid>
@@ -532,13 +537,69 @@ export default function HomePage() {
           </>
         )}
 
+        {/* SUBASTAS ACTIVAS */}
+        {auctions.length > 0 && (
+          <Box mb={4}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 2,
+                p: 2,
+                borderRadius: 2,
+                bgcolor: 'secondary.main',
+                color: 'secondary.contrastText',
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                <GavelIcon />
+                <Typography variant="h6" fontWeight={700}>
+                  Subastas activas — termina pronto
+                </Typography>
+              </Box>
+              <Typography component={Link} to="/subastas" variant="body2" sx={{ color: 'inherit', textDecoration: 'underline' }}>
+                Ver todas →
+              </Typography>
+            </Box>
+            <Grid container spacing={2}>
+              {auctions.slice(0, 6).map((a) => (
+                <Grid item xs={6} sm={4} md={2} key={a.id}>
+                  <Card
+                    component={Link}
+                    to={`/subasta/${a.id}`}
+                    sx={{ textDecoration: 'none', height: '100%', display: 'flex', flexDirection: 'column' }}
+                  >
+                    <CardActionArea sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                      <Box sx={{ aspectRatio: '1/1', bgcolor: 'action.hover' }}>
+                        {a.imageUrl && (
+                          <img src={a.imageUrl} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        )}
+                      </Box>
+                      <Box p={1.5}>
+                        <Typography variant="body2" fontWeight={600} noWrap>
+                          {a.title}
+                        </Typography>
+                        <Typography variant="body1" fontWeight={800} color="primary.main">
+                          {money(Number(a.currentPrice))}
+                        </Typography>
+                        <CountdownTimer targetDate={a.endDate} compact />
+                      </Box>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+
         {/* DESTACADOS — más vistos de la semana */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h5" fontWeight={700}>
               Destacados
             </Typography>
-            <Chip label="🔥 más vistos" size="small" color="warning" />
+            <Chip icon={<LocalFireDepartmentIcon />} label="Más vistos" size="small" color="warning" />
           </Box>
           <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
             Ver todos →

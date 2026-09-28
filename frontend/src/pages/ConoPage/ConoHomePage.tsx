@@ -3,7 +3,6 @@ import {
   Box, Typography, Card, CardContent, CardActionArea, Grid, Tabs, Tab, Button, Dialog,
   DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Chip, Alert,
 } from '@mui/material';
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
@@ -55,10 +54,10 @@ export default function ConoHomePage() {
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', p: 2 }}>
       <Typography variant="h5" fontWeight={800} sx={{ color: tokens.onSurface, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <SentimentVeryDissatisfiedIcon sx={{ fontSize: 26, color: tokens.primary }} /> Memes y torneo
+        <EmojiEventsIcon sx={{ fontSize: 26, color: tokens.primary }} /> Rinconcito Boliviano
       </Typography>
       <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 2 }}>
-        Rankings de la comunidad, con humor y con datos. Votá positivo o nica, o seguí un torneo de eliminatorias.
+        Rankings de la comunidad, con humor y con datos. Vota positivo o nica, o sigue un torneo de eliminatorias.
       </Typography>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -76,7 +75,7 @@ export default function ConoHomePage() {
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>
       ) : themes.length === 0 ? (
-        <Alert severity="info">Todavía no hay temas en esta categoría. ¡Creá el primero!</Alert>
+        <Alert severity="info">Todavía no hay temas en esta categoría. ¡Crea el primero!</Alert>
       ) : (
         <StaggerContainer>
           <Grid container spacing={2}>
@@ -112,7 +111,7 @@ export default function ConoHomePage() {
         <DialogTitle>Nuevo tema — {tab === 'MEME' ? 'Memes' : 'Torneo'}</DialogTitle>
         <DialogContent>
           <Alert severity="info" sx={{ mb: 2, fontSize: '0.8rem' }}>
-            Necesitás al menos una verificación profesional aprobada para crear un tema.
+            Necesitas al menos una verificación profesional aprobada para crear un tema.
             <Button size="small" onClick={() => navigate('/foro/verificacion')} sx={{ ml: 1 }}>Verificarme</Button>
           </Alert>
           <TextField

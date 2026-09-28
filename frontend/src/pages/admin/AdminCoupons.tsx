@@ -173,7 +173,7 @@ export default function AdminCoupons() {
             {coupons.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} align="center">
-                  No hay cupones. Creá uno para ofrecer descuentos.
+                  No hay cupones. Crea uno para ofrecer descuentos.
                 </TableCell>
               </TableRow>
             )}

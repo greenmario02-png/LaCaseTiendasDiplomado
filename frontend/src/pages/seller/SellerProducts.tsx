@@ -124,7 +124,7 @@ export default function SellerProducts() {
       const { data } = await api.post('/seller/products/copy', { productId: id });
       setCopyOpen(false);
       setCopyQuery('');
-      toast.success('Producto copiado. Completá imagen y precio para publicarlo.');
+      toast.success('Producto copiado. Completa imagen y precio para publicarlo.');
       navigate('/seller/productos/nuevo', { state: { copyData: data.data } });
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -291,7 +291,7 @@ export default function SellerProducts() {
         <DialogTitle>Copiar producto</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Buscá un producto en la multitienda para copiar sus datos (nombre, descripción, categoría y
+            Busca un producto en la multitienda para copiar sus datos (nombre, descripción, categoría y
             características). Después tendrás que poner tu propia imagen y precio.
           </Typography>
           <TextField
@@ -345,7 +345,7 @@ export default function SellerProducts() {
             )}
             {!copyLoading && copyQuery.trim().length < 2 && (
               <Typography variant="body2" color="text.secondary" align="center" py={3}>
-                Escribí al menos 2 caracteres para buscar.
+                Escribe al menos 2 caracteres para buscar.
               </Typography>
             )}
           </Box>

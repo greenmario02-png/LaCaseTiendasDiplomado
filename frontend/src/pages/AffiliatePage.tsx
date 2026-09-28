@@ -63,7 +63,7 @@ export default function AffiliatePage() {
                 </SecondaryButton>
               </Stack>
               <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                Compartilo con tus amigos. Cuando se registren y compren, ganás comisión.
+                Compártelo con tus amigos. Cuando se registren y compren, ganas comisión.
               </Typography>
             </CardContent>
           </Card>
@@ -101,7 +101,7 @@ export default function AffiliatePage() {
         Mis referidos
       </Typography>
       {referrals.length === 0 ? (
-        <Alert severity="info">Aún no tenés referidos. Compartí tu código para empezar a ganar.</Alert>
+        <Alert severity="info">Aún no tienes referidos. Comparte tu código para empezar a ganar.</Alert>
       ) : (
         <TableContainer component={Card} variant="outlined">
           <Table size="small">

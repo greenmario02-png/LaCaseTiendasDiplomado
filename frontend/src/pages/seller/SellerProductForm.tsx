@@ -335,7 +335,7 @@ export default function SellerProductForm() {
     setBulkError('');
     const raw = bulkNames.trim();
     if (!raw) {
-      setBulkError('Escribí al menos un nombre.');
+      setBulkError('Escribe al menos un nombre.');
       return;
     }
     setBulkLoading(true);
@@ -469,10 +469,10 @@ export default function SellerProductForm() {
 
   const validateStep = (step: number): string => {
     if (step === 0) {
-      if (!form.name.trim()) return 'Escribí el nombre del producto.';
-      if (!form.categoryId) return 'Elegí la categoría del producto.';
-      if (!form.asAuction && !form.price) return 'Indicá el precio del producto.';
-      if (form.asAuction && !form.auctionEndDate) return 'Para subasta, indicá la fecha de fin.';
+      if (!form.name.trim()) return 'Escribe el nombre del producto.';
+      if (!form.categoryId) return 'Elige la categoría del producto.';
+      if (!form.asAuction && !form.price) return 'Indica el precio del producto.';
+      if (form.asAuction && !form.auctionEndDate) return 'Para subasta, indica la fecha de fin.';
     }
     return '';
   };
@@ -499,7 +499,7 @@ export default function SellerProductForm() {
       // Publicar como SUBASTA
       if (form.asAuction) {
         if (!form.auctionEndDate) {
-          setError('Para subasta, indicá la fecha de fin');
+          setError('Para subasta, indica la fecha de fin');
           setLoading(false);
           return;
         }
@@ -651,8 +651,8 @@ export default function SellerProductForm() {
                       label="Producto conocido (atributos precargados)"
                       helperText={
                         newKnownName
-                          ? 'No existe todavía: podés crearlo y luego asignarle atributos con el botón +.'
-                          : 'Elegí un producto conocido de la categoría para precargar atributos, o escribí uno nuevo.'
+                          ? 'No existe todavía: puedes crearlo y luego asignarle atributos con el botón +.'
+                          : 'Elige un producto conocido de la categoría para precargar atributos, o escribe uno nuevo.'
                       }
                     />
                   )}
@@ -828,7 +828,7 @@ export default function SellerProductForm() {
                         value={form.auctionEndDate ? dayjs(form.auctionEndDate) : null}
                         onChange={(v) => setForm({ ...form, auctionEndDate: v ? v.toISOString() : '' })}
                         format="DD/MM/YYYY HH:mm"
-                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elegí la fecha y hora de cierre de la subasta.' } }}
+                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elige la fecha y hora de cierre de la subasta.' } }}
                       />
                     </Grid>
                   </Grid>
@@ -894,7 +894,7 @@ export default function SellerProductForm() {
                 <input type="file" accept="image/*" multiple hidden onChange={handleUpload} />
               </Button>
               <Typography variant="caption" color="text.secondary">
-                {images.length}/8 · Podés subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
+                {images.length}/8 · Puedes subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
               </Typography>
             </Box>
           </Box>
@@ -983,7 +983,7 @@ export default function SellerProductForm() {
               </Grid>
             </Grid>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-              Revisá que la información esté completa. Al publicar, el producto queda pendiente de moderación del administrador.
+              Revisa que la información esté completa. Al publicar, el producto queda pendiente de moderación del administrador.
             </Typography>
           </Box>
         )}
@@ -1034,8 +1034,8 @@ export default function SellerProductForm() {
                       label="Producto conocido (atributos precargados)"
                       helperText={
                         newKnownName
-                          ? 'No existe todavía: podés crearlo y luego asignarle atributos con el botón +.'
-                          : 'Elegí un producto conocido de la categoría para precargar atributos, o escribí uno nuevo.'
+                          ? 'No existe todavía: puedes crearlo y luego asignarle atributos con el botón +.'
+                          : 'Elige un producto conocido de la categoría para precargar atributos, o escribe uno nuevo.'
                       }
                     />
                   )}
@@ -1136,7 +1136,7 @@ export default function SellerProductForm() {
                     <input type="file" accept="image/*" multiple hidden onChange={handleUpload} />
                   </Button>
                   <Typography variant="caption" color="text.secondary">
-                    {images.length}/8 · Podés subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
+                    {images.length}/8 · Puedes subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
                   </Typography>
                 </Box>
               </Box>
@@ -1258,7 +1258,7 @@ export default function SellerProductForm() {
                         value={form.auctionEndDate ? dayjs(form.auctionEndDate) : null}
                         onChange={(v) => setForm({ ...form, auctionEndDate: v ? v.toISOString() : '' })}
                         format="DD/MM/YYYY HH:mm"
-                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elegí la fecha y hora de cierre de la subasta.' } }}
+                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elige la fecha y hora de cierre de la subasta.' } }}
                       />
                     </Grid>
                   </Grid>
@@ -1351,12 +1351,12 @@ export default function SellerProductForm() {
               )}
             />
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              Podés sumar atributos de otras categorías o que no están definidos para la actual. Se guardan como
+              Puedes sumar atributos de otras categorías o que no están definidos para la actual. Se guardan como
               especificación del producto.
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle2" gutterBottom>
-              ¿Falta un atributo? Creá varios separándolos con coma
+              ¿Falta un atributo? Crea varios separándolos con coma
             </Typography>
             <Box display="flex" gap={1} alignItems="flex-start">
               <TextField

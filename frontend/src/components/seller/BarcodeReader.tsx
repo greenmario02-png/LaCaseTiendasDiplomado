@@ -74,7 +74,7 @@ export default function BarcodeReader({ open, onClose }: Props) {
       <DialogTitle>Leer código de barras</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Escaneá el código de barras de un producto o escribí su SKU y presioná Enter.
+          Escanea el código de barras de un producto o escribe su SKU y presiona Enter.
         </Typography>
         <TextField
           inputRef={inputRef}

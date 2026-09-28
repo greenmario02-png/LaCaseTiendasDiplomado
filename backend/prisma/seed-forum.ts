@@ -65,7 +65,7 @@ async function seedSubforosPorCiudad() {
   );
 }
 
-async function main() {
+export async function seedForum() {
   const created = await prisma.forumCategory.createMany({
     data: CATEGORIAS.map((c, i) => ({ ...c, sortOrder: i })),
     skipDuplicates: true,
@@ -77,9 +77,11 @@ async function main() {
   await seedSubforosPorCiudad();
 }
 
-main()
-  .catch((e) => {
-    console.error('[seed-forum] Error:', e);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+if (require.main === module) {
+  seedForum()
+    .catch((e) => {
+      console.error('[seed-forum] Error:', e);
+      process.exit(1);
+    })
+    .finally(() => prisma.$disconnect());
+}

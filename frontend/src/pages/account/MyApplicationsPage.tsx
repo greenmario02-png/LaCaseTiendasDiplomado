@@ -73,7 +73,7 @@ export default function MyApplicationsPage() {
   }, [load]);
 
   const withdraw = async (a: Application) => {
-    if (!window.confirm(`¿Querés retirar tu postulación a "${a.job.title}"?`)) return;
+    if (!window.confirm(`¿Quieres retirar tu postulación a "${a.job.title}"?`)) return;
     setBusyId(a.id);
     try {
       await api.delete(`/jobs/${a.jobId}/apply`);
@@ -100,7 +100,7 @@ export default function MyApplicationsPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      <PageHeader title="Mis postulaciones" subtitle="Seguí el estado de tus postulaciones a empleos" icon={<AssignmentIndIcon />} />
+      <PageHeader title="Mis postulaciones" subtitle="Sigue el estado de tus postulaciones a empleos" icon={<AssignmentIndIcon />} />
 
       {loading ? (
         <LoadingState />

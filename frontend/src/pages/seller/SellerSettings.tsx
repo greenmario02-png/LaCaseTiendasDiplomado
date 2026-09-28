@@ -69,7 +69,7 @@ export default function SellerSettings() {
       const url = data.data?.url ?? data.data?.fileUrl ?? data.data?.path;
       if (url) {
         setForm((f) => ({ ...f, profileImage: url }));
-        toast.success('Foto de perfil lista — guardá los cambios');
+        toast.success('Foto de perfil lista — guarda los cambios');
       }
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -184,7 +184,7 @@ export default function SellerSettings() {
               fullWidth
               multiline
               rows={2}
-              placeholder="Contá la historia de tu tienda o lo que vendés..."
+              placeholder="Cuenta la historia de tu tienda o lo que vendes..."
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -267,7 +267,7 @@ export default function SellerSettings() {
               countryHint={COUNTRIES.find((c) => c.code === form.country)?.name}
             />
             <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
-              Buscá tu ciudad, hacé clic en el mapa o en un resultado para marcar el punto exacto. Esta ubicación se mostrará a tus clientes.
+              Busca tu ciudad, haz clic en el mapa o en un resultado para marcar el punto exacto. Esta ubicación se mostrará a tus clientes.
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -298,7 +298,7 @@ export default function SellerSettings() {
               </Grid>
             </Grid>
             <Typography variant="caption" color="text.secondary">
-              Son opcionales. Solo se muestran en tu perfil público si los completás.
+              Son opcionales. Solo se muestran en tu perfil público si los completas.
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -307,7 +307,7 @@ export default function SellerSettings() {
             </Alert>
             <TextField label="QR de pago (URL de imagen)" value={form.paymentQrUrl} onChange={(e) => setForm({ ...form, paymentQrUrl: e.target.value })} fullWidth placeholder="https://img.example.com/mi-qr.png" />
             <Typography variant="caption" color="text.secondary">
-              Subí una imagen con tu alias/QR de Mercado Pago o CBU. Se mostrará al comprador al finalizar la compra.
+              Sube una imagen con tu alias/QR de Mercado Pago o CBU. Se mostrará al comprador al finalizar la compra.
             </Typography>
             <TextField
               label="Envío gratis desde (Bs)"
@@ -353,13 +353,13 @@ export default function SellerSettings() {
         </Typography>
         {verif.isVerified ? (
           <Alert severity="success" sx={{ mb: 2 }}>
-            Tu tienda está verificada. Mostrás el logo junto a tu nombre, lo que genera más confianza en los compradores.
+            Tu tienda está verificada. Muestras el logo junto a tu nombre, lo que genera más confianza en los compradores.
           </Alert>
         ) : (
           <Alert severity={verif.isVerificationRequested ? 'info' : 'warning'} sx={{ mb: 2 }}>
             {verif.isVerificationRequested
               ? 'Tu solicitud de verificación está en revisión por el administrador. Como en Couchsurfing o Twitter, se verifica la existencia física de tu tienda (NIT y documentación) antes de otorgar el sello.'
-              : 'Obtiene el sello de vendedor verificado (como la cuenta azul de Twitter): presentá tu NIT y el administrador verificará físicamente tu tienda. Las tiendas verificadas generan más confianza y más ventas.'}
+              : 'Obtiene el sello de vendedor verificado (como la cuenta azul de Twitter): presenta tu NIT y el administrador verificará físicamente tu tienda. Las tiendas verificadas generan más confianza y más ventas.'}
           </Alert>
         )}
 

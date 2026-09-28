@@ -130,7 +130,7 @@ export default function LocationPicker({ value, onChange, countryHint = '' }: Pr
         </MapContainer>
       </Paper>
       <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-        {value ? `📍 ${value.label} (${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}) — toque el mapa para ajustar` : 'Hacé clic en el mapa para marcar la ubicación de tu tienda.'}
+        {value ? `📍 ${value.label} (${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}) — toque el mapa para ajustar` : 'Haz clic en el mapa para marcar la ubicación de tu tienda.'}
       </Typography>
     </Box>
   );

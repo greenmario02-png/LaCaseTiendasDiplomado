@@ -47,14 +47,14 @@ export default function OrdersPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <PageHeader title="Mis pedidos" subtitle="Seguí el estado de tus compras" icon={<ReceiptLongIcon />} />
+      <PageHeader title="Mis pedidos" subtitle="Sigue el estado de tus compras" icon={<ReceiptLongIcon />} />
 
       {loading ? (
         <Skeleton variant="rounded" height={300} />
       ) : orders.length === 0 ? (
         <SurfaceCard>
           <EmptyState
-            message="No tenés pedidos aún."
+            message="No tienes pedidos aún."
             action={
               <PrimaryButton to="/productos" type="button">
                 Comprar algo

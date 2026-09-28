@@ -77,7 +77,7 @@ export default function AccountPage() {
   const handleBuyCoins = async () => {
     const amount = Number(buyAmount);
     if (!Number.isInteger(amount) || amount <= 0) {
-      toast.error('Ingresá una cantidad válida de monedas.');
+      toast.error('Ingresa una cantidad válida de monedas.');
       return;
     }
     setBuying(true);
@@ -233,15 +233,15 @@ export default function AccountPage() {
               </List>
             ) : (
               <Typography color="text.secondary" variant="body2">
-                Todavía no tenés movimientos de monedas.
+                Todavía no tienes movimientos de monedas.
               </Typography>
             )}
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              Invitá amigos y ganá 50 monedas
+              Invita amigos y gana 50 monedas
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={1}>
-              Compartí tu código: cuando alguien se registre con él, ganás 50 monedas.
+              Comparte tu código: cuando alguien se registre con él, ganas 50 monedas.
               {invite?.referredCount ? ` Ya invitaste a ${invite.referredCount} persona(s).` : ''}
             </Typography>
             <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
@@ -306,7 +306,7 @@ export default function AccountPage() {
                   fullWidth
                   multiline
                   rows={3}
-                  placeholder="Contá un poco sobre vos o tu tienda..."
+                  placeholder="Cuenta un poco sobre ti o tu tienda..."
                 />
               </Grid>
             </Grid>
@@ -353,7 +353,7 @@ export default function AccountPage() {
         <DialogTitle>Comprar monedas del proyecto</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Comprás monedas a modo de tokens que podés usar en LaCase Multi Tiendas (productos, vales de regalo, vales de descuento).
+            Compras monedas a modo de tokens que puedes usar en LaCase Multi Tiendas (productos, vales de regalo, vales de descuento).
           </Typography>
           <TextField
             label="Cantidad de monedas"

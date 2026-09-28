@@ -30,7 +30,7 @@ interface BulkItem {
 }
 
 /**
- * Agregar varios productos: cargá muchas fotos de distintos productos y publicalos
+ * Agregar varios productos: carga muchas fotos de distintos productos y publícalos
  * de a uno reutilizando etiquetas/datos base (categoría, condición, precio, stock,
  * garantía, atributos o plantilla) para todos.
  */
@@ -135,16 +135,16 @@ export default function SellerBulkProducts() {
 
   const publishAll = async () => {
     if (!categoryId) {
-      toast.error('Elegí una categoría para los productos.');
+      toast.error('Elige una categoría para los productos.');
       return;
     }
     if (items.length === 0) {
-      toast.error('Subí al menos una foto de producto.');
+      toast.error('Sube al menos una foto de producto.');
       return;
     }
     const price = basePrice.trim();
     if (!price) {
-      toast.error('Indicá un precio (puede ser distinto por producto).');
+      toast.error('Indica un precio (puede ser distinto por producto).');
       return;
     }
     setSubmitting(true);
@@ -192,13 +192,13 @@ export default function SellerBulkProducts() {
         Agregar varios productos
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Cargá muchas fotos de distintos productos y publicá cada uno reutilizando los datos base
+        Carga muchas fotos de distintos productos y publica cada uno reutilizando los datos base
         (categoría, condición, precio, stock y atributos) para todos.
       </Typography>
 
       {isEmployee && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          Como empleado no podés editar el precio; usá el precio base que deje el administrador.
+          Como empleado no puedes editar el precio; usa el precio base que deje el administrador.
         </Alert>
       )}
 
@@ -218,7 +218,7 @@ export default function SellerBulkProducts() {
                 if (categories.length === 0) loadCategories();
               }}
             >
-              <MenuItem value="">Seleccioná una categoría</MenuItem>
+              <MenuItem value="">Selecciona una categoría</MenuItem>
               {categories.map((c: any) => (
                 <MenuItem key={c.id} value={String(c.id)}>
                   {c.name}
@@ -251,7 +251,7 @@ export default function SellerBulkProducts() {
                   if (tpl) applyTemplate(tpl);
                 }}
                 fullWidth
-                helperText="Elegí una plantilla para precargar los atributos comunes de todos los productos."
+                helperText="Elige una plantilla para precargar los atributos comunes de todos los productos."
               >
                 <MenuItem value="">Sin plantilla</MenuItem>
                 {templates.map((t: any) => (

@@ -59,7 +59,7 @@ export default function ImageCropDialog({ open, imageUrl, aspect, title = 'Recor
       setCrop({ x: 0, y: 0 });
       loadImageAsDataUrl(imageUrl)
         .then(setSrc)
-        .catch(() => setError('No se pudo cargar la imagen. Probá con otra.'));
+        .catch(() => setError('No se pudo cargar la imagen. Prueba con otra.'));
     }
   }, [open, imageUrl]);
 

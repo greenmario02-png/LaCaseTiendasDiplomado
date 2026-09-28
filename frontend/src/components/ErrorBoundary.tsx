@@ -43,7 +43,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               Algo salió mal
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
-              Ocurrió un error inesperado. Recargá la página para continuar.
+              Ocurrió un error inesperado. Recarga la página para continuar.
             </Typography>
             <Button variant="contained" color="primary" onClick={this.handleReload}>
               Recargar aplicación

@@ -95,7 +95,7 @@ export default function SellerLabels() {
           />
           <Divider sx={{ my: 1 }} />
           {products.length === 0 && (
-            <Alert severity="info">Todavía no tenés productos.</Alert>
+            <Alert severity="info">Todavía no tienes productos.</Alert>
           )}
           {products.map((p) => (
             <FormControlLabel
@@ -117,7 +117,7 @@ export default function SellerLabels() {
 
       {toPrint.length === 0 && (
         <Alert severity="info" sx={{ mt: 2 }} className="labels-toolbar">
-          Seleccioná al menos un producto para imprimir etiquetas.
+          Selecciona al menos un producto para imprimir etiquetas.
         </Alert>
       )}
 

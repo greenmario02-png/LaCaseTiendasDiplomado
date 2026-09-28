@@ -37,7 +37,7 @@ export default function WishlistPage() {
       <PageHeader title="Mis favoritos" subtitle={`${items.length} ${items.length === 1 ? 'producto' : 'productos'}`} icon={<FavoriteIcon />} />
 
       {items.length === 0 ? (
-        <EmptyState message="No tenés productos en favoritos" />
+        <EmptyState message="No tienes productos en favoritos" />
       ) : (
         <StaggerContainer>
         <Grid container spacing={2}>

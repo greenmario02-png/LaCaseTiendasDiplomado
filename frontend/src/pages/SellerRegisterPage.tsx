@@ -76,9 +76,9 @@ export default function SellerRegisterPage() {
     if (!form.storeName.trim() || form.storeName.trim().length < 2) newErrors.storeName = 'El nombre de la tienda es obligatorio';
     if (!form.storeDescription.trim() || form.storeDescription.trim().length < 10)
       newErrors.storeDescription = 'La descripción debe tener al menos 10 caracteres';
-    if (!form.storeCategory) newErrors.storeCategory = 'Seleccioná la categoría de productos que vendés';
-    if (!form.country) newErrors.country = 'Seleccioná el país';
-    if (!form.locationState) newErrors.locationState = `Seleccioná el ${country?.divisionLabel.toLowerCase() || 'departamento/provincia'}`;
+    if (!form.storeCategory) newErrors.storeCategory = 'Selecciona la categoría de productos que vendes';
+    if (!form.country) newErrors.country = 'Selecciona el país';
+    if (!form.locationState) newErrors.locationState = `Selecciona el ${country?.divisionLabel.toLowerCase() || 'departamento/provincia'}`;
     if (!form.locationCity.trim() || form.locationCity.trim().length < 2) newErrors.locationCity = 'La ciudad es obligatoria';
     if (!form.phone.trim() || form.phone.trim().length < 7) newErrors.phone = 'El celular de contacto es obligatorio';
     if (!form.firstName.trim() || form.firstName.trim().length < 2) newErrors.firstName = 'El nombre es obligatorio';
@@ -106,21 +106,21 @@ export default function SellerRegisterPage() {
     setErrors({});
 
     if (!validateLocal()) {
-      setServerError('Revisá los campos marcados en rojo');
+      setServerError('Revisa los campos marcados en rojo');
       return;
     }
 
     setLoading(true);
     try {
       await registerSeller(form);
-      toast.success('Solicitud enviada. Esperá la aprobación del administrador.');
+      toast.success('Solicitud enviada. Espera la aprobación del administrador.');
       navigate('/login');
     } catch (err) {
       const msg = getErrorMessage(err);
       if (msg.includes('Validación')) {
         const details = (err as any)?.response?.data?.error?.details;
         applyServerErrors(details);
-        setServerError('Revisá los campos marcados en rojo');
+        setServerError('Revisa los campos marcados en rojo');
       } else {
         setServerError(msg);
       }
@@ -138,14 +138,14 @@ export default function SellerRegisterPage() {
           <Paper sx={{ p: 3, bgcolor: 'primary.main', color: 'white', height: '100%' }}>
             <StorefrontIcon sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h5" fontWeight={700} mb={2}>
-              Abrí tu tienda en LaCase Multi Tiendas
+              Abre tu tienda en LaCase Multi Tiendas
             </Typography>
             <List>
               {[
-                'Publicá productos de cualquier rubro',
-                'Elegí tu país y departamento/provincia',
+                'Publica productos de cualquier rubro',
+                'Elige tu país y departamento/provincia',
                 'El envío se calcula según tu ubicación',
-                'Recibí pagos por QR',
+                'Recibe pagos por QR',
                 'Te contactamos por celular',
               ].map((item) => (
                 <ListItem key={item} disableGutters>
@@ -165,7 +165,7 @@ export default function SellerRegisterPage() {
               Registro de vendedor
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
-              Tu solicitud será revisada por un administrador. Podés publicar productos una vez aprobada.
+              Tu solicitud será revisada por un administrador. Puedes publicar productos una vez aprobada.
             </Typography>
 
             {serverError && (
@@ -197,7 +197,7 @@ export default function SellerRegisterPage() {
               />
               <TextField
                 select
-                label="Categoría de productos que vendés"
+                label="Categoría de productos que vendes"
                 required
                 value={form.storeCategory}
                 onChange={handleChange('storeCategory')}
@@ -243,7 +243,7 @@ export default function SellerRegisterPage() {
                         {...params}
                         label={`${country?.divisionLabel || 'Departamento/Provincia'} *`}
                         error={Boolean(errors.locationState)}
-                        helperText={errors.locationState || 'Podés escribir o seleccionar'}
+                        helperText={errors.locationState || 'Puedes escribir o seleccionar'}
                       />
                     )}
                   />
@@ -307,7 +307,7 @@ export default function SellerRegisterPage() {
 
             <Box mt={2} textAlign="center">
               <Typography variant="body2" color="text.secondary">
-                ¿Ya tenés tienda? <Link to="/login">Iniciá sesión</Link>
+                ¿Ya tienes tienda? <Link to="/login">Inicia sesión</Link>
               </Typography>
             </Box>
           </Paper>

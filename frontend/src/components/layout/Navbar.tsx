@@ -24,7 +24,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ChatIcon from '@mui/icons-material/Chat';
 import GavelIcon from '@mui/icons-material/Gavel';
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ForumIcon from '@mui/icons-material/Forum';
 import { styled, alpha } from '@mui/material/styles';
 import { useAuthStore } from '../../stores/authStore';
@@ -176,9 +176,9 @@ export default function Navbar() {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Memes y torneo">
-            <IconButton color="inherit" onClick={() => navigate('/cono')} aria-label="Memes y torneo">
-              <SentimentVeryDissatisfiedIcon />
+          <Tooltip title="Rinconcito Boliviano">
+            <IconButton color="inherit" onClick={() => navigate('/cono')} aria-label="Rinconcito Boliviano">
+              <EmojiEventsIcon />
             </IconButton>
           </Tooltip>
 

@@ -15,7 +15,7 @@ export default function Footer() {
               </Typography>
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Marketplace multi-vendedor. Encontrá los mejores precios de todas las tiendas en un solo lugar, con cálculo
+              Marketplace multi-vendedor. Encuentra los mejores precios de todas las tiendas en un solo lugar, con cálculo
               de envío según la ubicación del vendedor.
             </Typography>
           </Grid>
@@ -46,7 +46,7 @@ export default function Footer() {
             </Typography>
             <Box display="flex" flexDirection="column" gap={0.5}>
               <Typography component={Link} to="/registro-vendedor" variant="body2" color="text.secondary" sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}>
-                Abrí tu tienda
+                Abre tu tienda
               </Typography>
               <Typography component={Link} to="/ayuda" variant="body2" color="text.secondary" sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}>
                 Ayuda y preguntas frecuentes

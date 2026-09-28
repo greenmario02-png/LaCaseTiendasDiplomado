@@ -68,7 +68,7 @@ export default function CheckoutPage() {
   const checkShipping = async () => {
     if (fulfillmentType === 'PICKUP') {
       if (!pickupAddress.trim()) {
-        setError('Indicá la dirección de retiro');
+        setError('Indica la dirección de retiro');
         return;
       }
       setQuotes([]);
@@ -77,7 +77,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!selectedAddr) {
-      setError('Seleccioná una dirección de envío');
+      setError('Selecciona una dirección de envío');
       return;
     }
     setCheckingShipping(true);
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
         notes,
         couponCode: couponCode || undefined,
       });
-      toast.success('Compra realizada. Pagá con el QR del vendedor.');
+      toast.success('Compra realizada. Paga con el QR del vendedor.');
       const firstOrder = data.data[0];
       navigate(`/checkout/confirmacion/${firstOrder.id}`, { state: { orders: data.data } });
     } catch (err) {
@@ -184,11 +184,11 @@ export default function CheckoutPage() {
                 value={pickupAddress}
                 onChange={(e) => setPickupAddress(e.target.value)}
                 placeholder="Ej: Av. 16 de Julio 1523, tienda LaCase, La Paz"
-                helperText="Indicá dónde retirarás el pedido (punto de venta de la tienda)."
+                helperText="Indica dónde retirarás el pedido (punto de venta de la tienda)."
               />
             ) : addresses.length === 0 ? (
               <Alert severity="warning">
-                No tenés direcciones guardadas. Agregalas en <a href="/cuenta/direcciones">Mis direcciones</a>.
+                No tienes direcciones guardadas. Agrégalas en <a href="/cuenta/direcciones">Mis direcciones</a>.
               </Alert>
             ) : (
               <RadioGroup value={selectedAddress} onChange={(e) => setSelectedAddress(Number(e.target.value))}>
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                       {couponInfo.type === 'FIXED' && `${money(couponInfo.value)} de descuento aplicado`}
                       {couponInfo.type === 'GIFT' && (
                         <>
-                          Cupón de regalo de {money(couponInfo.value)}. Si gastás menos, la tienda te devuelve el
+                          Cupón de regalo de {money(couponInfo.value)}. Si gastas menos, la tienda te devuelve el
                           saldo en efectivo.
                         </>
                       )}
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
                   </Typography>
                 </Box>
                 <Alert severity="info" sx={{ mb: 2 }}>
-                  Retirás el pedido en la dirección que indicaste. El pago se realiza por <strong>QR del vendedor</strong>.
+                  Retiras el pedido en la dirección que indicaste. El pago se realiza por <strong>QR del vendedor</strong>.
                 </Alert>
                 <PrimaryButton size="large" fullWidth onClick={submitOrder} disabled={submitting || !checkedShipping}>
                   {submitting ? <CircularProgress size={22} color="inherit" /> : 'Confirmar compra'}
@@ -325,7 +325,7 @@ export default function CheckoutPage() {
             ) : (
               <Box textAlign="center" py={3}>
                 <Typography color="text.secondary">
-                  Calculá el envío o elegí retiro en tienda para ver el detalle
+                  Calcula el envío o elige retiro en tienda para ver el detalle
                 </Typography>
               </Box>
             )}

@@ -91,7 +91,7 @@ export default function AddressesPage() {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <PageHeader
         title="Mis direcciones"
-        subtitle="Administrá tus direcciones de envío"
+        subtitle="Administra tus direcciones de envío"
         icon={<LocationOnIcon />}
         actions={
           <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
@@ -102,7 +102,7 @@ export default function AddressesPage() {
 
       {addresses.length === 0 && (
         <SurfaceCard>
-          <EmptyState message="No tenés direcciones guardadas." />
+          <EmptyState message="No tienes direcciones guardadas." />
         </SurfaceCard>
       )}
 

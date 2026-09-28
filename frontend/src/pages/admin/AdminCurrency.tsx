@@ -131,7 +131,7 @@ export default function AdminCurrency() {
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
               El valor se obtiene automáticamente de APIs públicas de tasas de cambio (ej: open.er-api.com). Como hay
-              devaluación frecuente, podés actualizarla manualmente en cualquier momento.
+              devaluación frecuente, puedes actualizarla manualmente en cualquier momento.
             </Typography>
 
             <Box display="flex" gap={1} mb={2}>
@@ -159,7 +159,7 @@ export default function AdminCurrency() {
               </SecondaryButton>
             </Box>
             <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-              Ej: si 1 USD = 6.96 Bs, escribí 6.96. Los precios en dólares se calculan como precio_Bs / 6.96.
+              Ej: si 1 USD = 6.96 Bs, escribe 6.96. Los precios en dólares se calculan como precio_Bs / 6.96.
             </Typography>
           </Paper>
         </Grid>

@@ -11,7 +11,7 @@ export default function NotFoundPage() {
         Página no encontrada
       </Typography>
       <Typography color="text.secondary" mb={3}>
-        La página que buscás no existe o fue movida.
+        La página que buscas no existe o fue movida.
       </Typography>
       <PrimaryButton to="/">Volver al inicio</PrimaryButton>
     </Container>

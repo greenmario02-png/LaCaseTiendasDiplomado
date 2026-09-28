@@ -20,6 +20,6 @@ describe('ReturnsPage', () => {
       </MemoryRouter>
     );
     expect(await screen.findByText('Mis devoluciones')).toBeInTheDocument();
-    expect(screen.getByText(/No tenés solicitudes de devolución/)).toBeInTheDocument();
+    expect(screen.getByText(/No tienes solicitudes de devolución/)).toBeInTheDocument();
   });
 });

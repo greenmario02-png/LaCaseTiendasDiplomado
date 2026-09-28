@@ -67,11 +67,11 @@ export default function ConoThemeDetailPage() {
 
   const submitMatch = async () => {
     if (!theme || !matchForm.entryAId || !matchForm.entryBId) {
-      toast.error('Elegí las dos entradas que se enfrentan.');
+      toast.error('Elige las dos entradas que se enfrentan.');
       return;
     }
     if (matchForm.entryAId === matchForm.entryBId) {
-      toast.error('Elegí dos entradas distintas.');
+      toast.error('Elige dos entradas distintas.');
       return;
     }
     setSavingMatch(true);
@@ -99,7 +99,7 @@ export default function ConoThemeDetailPage() {
 
   const submitEntry = async () => {
     if (!theme || !file || !label.trim()) {
-      toast.error('Elegí una imagen y escribí un nombre/título.');
+      toast.error('Elige una imagen y escribe un nombre/título.');
       return;
     }
     setSaving(true);

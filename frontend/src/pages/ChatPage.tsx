@@ -295,11 +295,11 @@ const typingRef = useRef(false);
       {list.length === 0 ? (
         <Box p={3} textAlign="center">
           <Typography color={t.onSurface} variant="body2">
-            {tab === 'compras' ? 'No tenés compras/consultas aún.' : 'No tenés ventas en curso.'}
+            {tab === 'compras' ? 'No tienes compras/consultas aún.' : 'No tienes ventas en curso.'}
           </Typography>
           <Typography variant="caption" color={t.onSurfaceVariant} display="block" mt={1}>
             {tab === 'compras'
-              ? 'Iniciá una desde la ficha de un producto o de una tienda.'
+              ? 'Inicia una desde la ficha de un producto o de una tienda.'
               : 'Cuando un comprador te escriba o compre, aparecerá acá.'}
           </Typography>
         </Box>
@@ -394,7 +394,7 @@ const typingRef = useRef(false);
           <Box flex={1} overflow="auto" p={2} sx={{ bgcolor: t.background }}>
             {messages.length === 0 && (
               <Typography color={t.onSurfaceVariant} textAlign="center" mt={4}>
-                Sin mensajes todavía. Escribí para consultar por el producto.
+                Sin mensajes todavía. Escribe para consultar por el producto.
               </Typography>
             )}
             {messages.length === 0 && otherIsSeller && icebreakers.length > 0 && (
@@ -467,7 +467,7 @@ const typingRef = useRef(false);
             <TextField
               fullWidth
               size="small"
-              placeholder="Escribí un mensaje..."
+              placeholder="Escribe un mensaje..."
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
@@ -497,7 +497,7 @@ const typingRef = useRef(false);
       ) : (
         <Box p={4} textAlign="center">
           <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
-          <Typography color={t.onSurfaceVariant}>Seleccioná una conversación de la lista para ver los mensajes.</Typography>
+          <Typography color={t.onSurfaceVariant}>Selecciona una conversación de la lista para ver los mensajes.</Typography>
         </Box>
       )}
     </SurfaceCard>
@@ -508,7 +508,7 @@ const typingRef = useRef(false);
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
         <Typography variant="h5" mb={2} color={t.onSurface}>
-          Iniciá sesión para ver tus conversaciones
+          Inicia sesión para ver tus conversaciones
         </Typography>
         <PrimaryButton type="button" to="/login">
           Iniciar sesión

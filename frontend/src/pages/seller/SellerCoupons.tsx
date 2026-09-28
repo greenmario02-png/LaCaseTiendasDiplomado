@@ -169,7 +169,7 @@ export default function SellerCoupons() {
     <Box>
       <PageHeader
         title="Cupones de mi tienda"
-        subtitle="Creá cupones de descuento para tus productos o cupones de regalo. Elegí los productos de tu tienda a los que aplica el cupón."
+        subtitle="Crea cupones de descuento para tus productos o cupones de regalo. Elige los productos de tu tienda a los que aplica el cupón."
         icon={<LocalOfferIcon />}
         actions={
           <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
@@ -196,7 +196,7 @@ export default function SellerCoupons() {
             {coupons.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  No tenés cupones. Creá uno para incentivar tus ventas.
+                  No tienes cupones. Crea uno para incentivar tus ventas.
                 </TableCell>
               </TableRow>
             )}
@@ -264,7 +264,7 @@ export default function SellerCoupons() {
             />
             {form.type === 'GIFT' && (
               <Typography variant="caption" color="text.secondary">
-                El comprador puede gastar este monto en tu tienda. Si gasta menos, le devolvés el saldo en efectivo.
+                El comprador puede gastar este monto en tu tienda. Si gasta menos, le devuelves el saldo en efectivo.
               </Typography>
             )}
             <TextField

@@ -29,6 +29,6 @@ describe('AffiliatePage', () => {
     expect(await screen.findByText('Programa de afiliados')).toBeInTheDocument();
     expect(screen.getByDisplayValue('ABC123')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Copiar/i })).toBeInTheDocument();
-    expect(screen.getByText(/Aún no tenés referidos/)).toBeInTheDocument();
+    expect(screen.getByText(/Aún no tienes referidos/)).toBeInTheDocument();
   });
 });
