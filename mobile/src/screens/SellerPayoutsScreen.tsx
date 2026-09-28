@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Wallet, CreditCard } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
@@ -15,16 +16,16 @@ function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
 }
 
-const STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  PENDING: { label: 'Pendiente', color: themeColors.warning },
-  APPROVED: { label: 'Aprobado', color: themeColors.info },
-  PAID: { label: 'Pagado', color: themeColors.success },
-  REJECTED: { label: 'Rechazado', color: themeColors.error },
-};
-
 export default function SellerPayoutsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const STATUS_LABEL: Record<string, { label: string; color: string }> = useMemo(() => ({
+    PENDING: { label: t('mobile.common.pending'), color: themeColors.warning },
+    APPROVED: { label: t('mobile.common.approved'), color: themeColors.info },
+    PAID: { label: t('mobile.common.paid'), color: themeColors.success },
+    REJECTED: { label: t('mobile.common.rejected'), color: themeColors.error },
+  }), [t]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -52,11 +53,11 @@ export default function SellerPayoutsScreen({ navigation }: any) {
         setPhoneQr(a.phoneQr ?? '');
       }
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,7 +68,7 @@ export default function SellerPayoutsScreen({ navigation }: any) {
 
   const saveAccount = async () => {
     if (!accountHolder.trim() || !accountNumber.trim()) {
-      Alert.alert('Faltan datos', 'Completá titular y número de cuenta.');
+      Alert.alert(t('mobile.sellerPayouts.missingDataTitle'), t('mobile.sellerPayouts.missingDataMessage'));
       return;
     }
     setSaving(true);
@@ -80,10 +81,10 @@ export default function SellerPayoutsScreen({ navigation }: any) {
         phoneQr: phoneQr.trim() || undefined,
       });
       setAccountOpen(false);
-      Alert.alert('Listo', 'Datos de pago actualizados.');
+      Alert.alert(t('mobile.common.done'), t('mobile.sellerPayouts.accountUpdated'));
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -92,7 +93,7 @@ export default function SellerPayoutsScreen({ navigation }: any) {
   const requestWithdraw = async () => {
     const amt = Number(amount);
     if (!amt || amt <= 0) {
-      Alert.alert('Monto inválido', 'Ingresá un monto válido en Bs.');
+      Alert.alert(t('mobile.sellerPayouts.invalidAmountTitle'), t('mobile.sellerPayouts.invalidAmountMessage'));
       return;
     }
     setSaving(true);
@@ -101,10 +102,10 @@ export default function SellerPayoutsScreen({ navigation }: any) {
       setWithdrawOpen(false);
       setAmount('');
       setNote('');
-      Alert.alert('Solicitud enviada', 'Tu solicitud de retiro quedó pendiente de aprobación.');
+      Alert.alert(t('mobile.sellerPayouts.withdrawSentTitle'), t('mobile.sellerPayouts.withdrawSentMessage'));
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -125,7 +126,7 @@ export default function SellerPayoutsScreen({ navigation }: any) {
     return (
       <View style={styles.payoutCard}>
         <View style={styles.row}>
-          <Text style={styles.payoutId}>Retiro #{item.id}</Text>
+          <Text style={styles.payoutId}>{t('mobile.sellerPayouts.payoutId', { id: item.id })}</Text>
           <Text style={[styles.status, { color: st.color }]}>{st.label}</Text>
         </View>
         <Text style={styles.payoutAmount}>{money(item.amount)}</Text>
@@ -143,33 +144,33 @@ export default function SellerPayoutsScreen({ navigation }: any) {
         {/* Resumen */}
         <View style={styles.summaryGrid}>
           <View style={[styles.summaryCard, { backgroundColor: colors.success + '15' }]}>
-            <Text style={styles.summaryLabel}>Disponible</Text>
+            <Text style={styles.summaryLabel}>{t('mobile.sellerPayouts.summaryAvailable')}</Text>
             <Text style={[styles.summaryValue, { color: colors.success }]}>{money(summary?.available ?? 0)}</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: colors.warning + '15' }]}>
-            <Text style={styles.summaryLabel}>Pendiente</Text>
+            <Text style={styles.summaryLabel}>{t('mobile.common.pending')}</Text>
             <Text style={[styles.summaryValue, { color: colors.warning }]}>{money(summary?.pending ?? 0)}</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: colors.info + '15' }]}>
-            <Text style={styles.summaryLabel}>Liberado</Text>
+            <Text style={styles.summaryLabel}>{t('mobile.sellerPayouts.summaryLiberated')}</Text>
             <Text style={[styles.summaryValue, { color: colors.info }]}>{money(summary?.liberated ?? 0)}</Text>
           </View>
           <View style={[styles.summaryCard, { backgroundColor: colors.primary + '15' }]}>
-            <Text style={styles.summaryLabel}>Pagado</Text>
+            <Text style={styles.summaryLabel}>{t('mobile.common.paid')}</Text>
             <Text style={[styles.summaryValue, { color: colors.primary }]}>{money(summary?.paid ?? 0)}</Text>
           </View>
         </View>
 
         {/* Acciones */}
         <View style={{ marginBottom: 10 }}>
-          <NeoButton title="Configurar cuenta de pago" variant="secondary" onPress={() => setAccountOpen(true)} />
+          <NeoButton title={t('mobile.sellerPayouts.configureAccountButton')} variant="secondary" onPress={() => setAccountOpen(true)} />
         </View>
         <View style={{ marginBottom: 12 }}>
           <NeoButton
-            title="Solicitar retiro"
+            title={t('mobile.sellerPayouts.requestWithdrawButton')}
             onPress={() => {
               if (!summary?.account) {
-                Alert.alert('Sin cuenta', 'Configurá primero tu cuenta de pago.');
+                Alert.alert(t('mobile.sellerPayouts.noAccountTitle'), t('mobile.sellerPayouts.noAccountMessage'));
                 return;
               }
               setWithdrawOpen(true);
@@ -178,14 +179,14 @@ export default function SellerPayoutsScreen({ navigation }: any) {
         </View>
 
         {/* Historial */}
-        <Text style={styles.section}>Historial de pagos</Text>
+        <Text style={styles.section}>{t('mobile.sellerPayouts.historyTitle')}</Text>
         {payouts.length === 0 ? (
-          <EmptyState message="Aún no hay movimientos de pago." />
+          <EmptyState message={t('mobile.sellerPayouts.emptyHistory')} />
         ) : (
           payouts.map((p: any) => (
             <View key={p.id} style={styles.payoutCard}>
               <View style={styles.row}>
-                <Text style={styles.payoutId}>Retiro #{p.id}</Text>
+                <Text style={styles.payoutId}>{t('mobile.sellerPayouts.payoutId', { id: p.id })}</Text>
                 <Text style={[styles.status, { color: (STATUS_LABEL[p.status] ?? { color: colors.textSecondary }).color }]}>
                   {(STATUS_LABEL[p.status] ?? { label: p.status }).label}
                 </Text>
@@ -204,18 +205,18 @@ export default function SellerPayoutsScreen({ navigation }: any) {
       <Modal visible={accountOpen} transparent animationType="slide" onRequestClose={() => setAccountOpen(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Cuenta de pago</Text>
-            <Text style={styles.modalSub}>Usá BNB (QR) o una cuenta bancaria para recibir tus pagos.</Text>
-            <TextInput style={styles.input} value={method} onChangeText={setMethod} placeholder="Método (BNB / QR / Banco)" placeholderTextColor={colors.textSecondary} />
-            <TextInput style={styles.input} value={accountHolder} onChangeText={setAccountHolder} placeholder="Titular de la cuenta *" placeholderTextColor={colors.textSecondary} />
-            <TextInput style={styles.input} value={accountNumber} onChangeText={setAccountNumber} placeholder="Número de cuenta / wallet *" placeholderTextColor={colors.textSecondary} />
-            <TextInput style={styles.input} value={bankName} onChangeText={setBankName} placeholder="Banco (opcional)" placeholderTextColor={colors.textSecondary} />
-            <TextInput style={styles.input} value={phoneQr} onChangeText={setPhoneQr} placeholder="QR por celular (opcional)" placeholderTextColor={colors.textSecondary} />
+            <Text style={styles.modalTitle}>{t('mobile.sellerPayouts.accountModalTitle')}</Text>
+            <Text style={styles.modalSub}>{t('mobile.sellerPayouts.accountModalSubtitle')}</Text>
+            <TextInput style={styles.input} value={method} onChangeText={setMethod} placeholder={t('mobile.sellerPayouts.methodPlaceholder')} placeholderTextColor={colors.textSecondary} />
+            <TextInput style={styles.input} value={accountHolder} onChangeText={setAccountHolder} placeholder={t('mobile.sellerPayouts.accountHolderPlaceholder')} placeholderTextColor={colors.textSecondary} />
+            <TextInput style={styles.input} value={accountNumber} onChangeText={setAccountNumber} placeholder={t('mobile.sellerPayouts.accountNumberPlaceholder')} placeholderTextColor={colors.textSecondary} />
+            <TextInput style={styles.input} value={bankName} onChangeText={setBankName} placeholder={t('mobile.sellerPayouts.bankNamePlaceholder')} placeholderTextColor={colors.textSecondary} />
+            <TextInput style={styles.input} value={phoneQr} onChangeText={setPhoneQr} placeholder={t('mobile.sellerPayouts.phoneQrPlaceholder')} placeholderTextColor={colors.textSecondary} />
             <View style={{ marginTop: 8 }}>
-              <NeoButton title={saving ? 'Guardando...' : 'Guardar cuenta'} onPress={saveAccount} disabled={saving} />
+              <NeoButton title={saving ? t('mobile.sellerPayouts.savingAccount') : t('mobile.sellerPayouts.saveAccountButton')} onPress={saveAccount} disabled={saving} />
             </View>
             <View style={{ marginTop: 6 }}>
-              <NeoButton title="Cancelar" variant="ghost" onPress={() => setAccountOpen(false)} />
+              <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setAccountOpen(false)} />
             </View>
           </View>
         </View>
@@ -226,15 +227,15 @@ export default function SellerPayoutsScreen({ navigation }: any) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <Wallet size={22} color={colors.success} />
-            <Text style={styles.modalTitle}>Solicitar retiro</Text>
-            <Text style={styles.modalSub}>Disponible: {money(summary?.available ?? 0)}</Text>
-            <TextInput style={styles.input} value={amount} onChangeText={setAmount} placeholder="Monto en Bs *" keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
-            <TextInput style={[styles.input, styles.notesInput]} value={note} onChangeText={setNote} placeholder="Nota (opcional)" placeholderTextColor={colors.textSecondary} multiline />
+            <Text style={styles.modalTitle}>{t('mobile.sellerPayouts.withdrawModalTitle')}</Text>
+            <Text style={styles.modalSub}>{t('mobile.sellerPayouts.withdrawAvailable', { amount: money(summary?.available ?? 0) })}</Text>
+            <TextInput style={styles.input} value={amount} onChangeText={setAmount} placeholder={t('mobile.sellerPayouts.amountPlaceholder')} keyboardType="numeric" placeholderTextColor={colors.textSecondary} />
+            <TextInput style={[styles.input, styles.notesInput]} value={note} onChangeText={setNote} placeholder={t('mobile.sellerPayouts.notePlaceholder')} placeholderTextColor={colors.textSecondary} multiline />
             <View style={{ marginTop: 8 }}>
-              <NeoButton title={saving ? 'Enviando...' : 'Enviar solicitud'} onPress={requestWithdraw} disabled={saving} />
+              <NeoButton title={saving ? t('mobile.sellerPayouts.sendingRequest') : t('mobile.sellerPayouts.sendRequestButton')} onPress={requestWithdraw} disabled={saving} />
             </View>
             <View style={{ marginTop: 6 }}>
-              <NeoButton title="Cancelar" variant="ghost" onPress={() => setWithdrawOpen(false)} />
+              <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setWithdrawOpen(false)} />
             </View>
           </View>
         </View>

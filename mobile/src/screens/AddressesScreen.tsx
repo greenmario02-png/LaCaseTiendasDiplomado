@@ -1,5 +1,6 @@
 import React, { useMemo,  useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import { Package, Star, Trash2 } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
@@ -9,6 +10,7 @@ import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function AddressesScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function AddressesScreen({ navigation }: any) {
 
   const save = async () => {
     if (!form.street || !form.city || !form.state) {
-      Alert.alert('Faltan datos', 'Completá calle, ciudad y departamento');
+      Alert.alert(t('mobile.addresses.missingFieldsTitle'), t('mobile.addresses.missingFieldsMessage'));
       return;
     }
     setSaving(true);
@@ -51,7 +53,7 @@ export default function AddressesScreen({ navigation }: any) {
       setForm({ street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: true });
       load();
     } catch (err) {
-      Alert.alert('Error', getErrorMessage(err));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -65,9 +67,9 @@ export default function AddressesScreen({ navigation }: any) {
   };
 
   const remove = async (id: number) => {
-    Alert.alert('Eliminar', '¿Eliminar esta dirección?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: async () => { await api.delete(`/account/addresses/${id}`).catch(() => {}); load(); } },
+    Alert.alert(t('mobile.addresses.deleteTitle'), t('mobile.addresses.deleteConfirmMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
+      { text: t('mobile.addresses.deleteTitle'), style: 'destructive', onPress: async () => { await api.delete(`/account/addresses/${id}`).catch(() => {}); load(); } },
     ]);
   };
 
@@ -83,13 +85,13 @@ export default function AddressesScreen({ navigation }: any) {
         </TouchableOpacity>
         <View style={styles.titleRow}>
           <Package size={20} color={colors.primary} />
-          <Text style={styles.title}>Mis direcciones</Text>
+          <Text style={styles.title}>{t('mobile.addresses.title')}</Text>
         </View>
       </View>
 
       {addresses.length === 0 && !showForm ? (
         <View style={styles.center}>
-          <EmptyState message="No tenés direcciones guardadas" />
+          <EmptyState message={t('mobile.addresses.emptyMessage')} />
         </View>
       ) : (
         <FlatList
@@ -106,13 +108,13 @@ export default function AddressesScreen({ navigation }: any) {
                   {item.isDefault ? <Star size={13} color={colors.warning} fill={colors.warning} /> : null}
                 </View>
                 <Text style={styles.cardMeta}>
-                  {item.city}, {item.state} · CP {item.postalCode}
+                  {t('mobile.addresses.cityStateZip', { city: item.city, state: item.state, postalCode: item.postalCode })}
                 </Text>
-                {item.floor ? <Text style={styles.cardMeta}>Piso: {item.floor}</Text> : null}
+                {item.floor ? <Text style={styles.cardMeta}>{t('mobile.addresses.floorLabel', { floor: item.floor })}</Text> : null}
               </View>
               {!item.isDefault && (
                 <TouchableOpacity onPress={() => setDefault(item.id)}>
-                  <Text style={styles.defaultBtn}>Hacer principal</Text>
+                  <Text style={styles.defaultBtn}>{t('mobile.addresses.makeDefault')}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity onPress={() => remove(item.id)}>
@@ -125,20 +127,20 @@ export default function AddressesScreen({ navigation }: any) {
 
       {showForm && (
         <ScrollView style={styles.form}>
-          <NeoInput style={styles.input} placeholder="Calle" value={form.street} onChangeText={(t) => setForm({ ...form, street: t })} />
-          <NeoInput style={styles.input} placeholder="Número" value={form.number} onChangeText={(t) => setForm({ ...form, number: t })} keyboardType="numeric" />
-          <NeoInput style={styles.input} placeholder="Piso/Depto (opcional)" value={form.floor} onChangeText={(t) => setForm({ ...form, floor: t })} />
-          <NeoInput style={styles.input} placeholder="Ciudad" value={form.city} onChangeText={(t) => setForm({ ...form, city: t })} />
-          <NeoInput style={styles.input} placeholder="Departamento/Provincia" value={form.state} onChangeText={(t) => setForm({ ...form, state: t })} />
-          <NeoInput style={styles.input} placeholder="Código postal" value={form.postalCode} onChangeText={(t) => setForm({ ...form, postalCode: t })} />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.streetPlaceholder')} value={form.street} onChangeText={(v) => setForm({ ...form, street: v })} />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.numberPlaceholder')} value={form.number} onChangeText={(v) => setForm({ ...form, number: v })} keyboardType="numeric" />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.floorPlaceholder')} value={form.floor} onChangeText={(v) => setForm({ ...form, floor: v })} />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.cityPlaceholder')} value={form.city} onChangeText={(v) => setForm({ ...form, city: v })} />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.statePlaceholder')} value={form.state} onChangeText={(v) => setForm({ ...form, state: v })} />
+          <NeoInput style={styles.input} placeholder={t('mobile.addresses.postalCodePlaceholder')} value={form.postalCode} onChangeText={(v) => setForm({ ...form, postalCode: v })} />
           <View style={styles.saveWrap}>
-            <NeoButton title={saving ? 'Guardando...' : 'Guardar dirección'} onPress={save} disabled={saving} />
+            <NeoButton title={saving ? t('mobile.addresses.saving') : t('mobile.addresses.saveButton')} onPress={save} disabled={saving} />
           </View>
         </ScrollView>
       )}
 
       <View style={styles.addWrap}>
-        <NeoButton title={showForm ? 'Cancelar' : '+ Agregar dirección'} variant={showForm ? 'ghost' : 'secondary'} onPress={() => setShowForm((v) => !v)} />
+        <NeoButton title={showForm ? t('mobile.common.cancel') : t('mobile.addresses.addButton')} variant={showForm ? 'ghost' : 'secondary'} onPress={() => setShowForm((v) => !v)} />
       </View>
     </View>
   );

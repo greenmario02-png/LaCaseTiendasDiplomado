@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
 import {
   listCategories,
   createPost,
@@ -40,6 +41,7 @@ const POST_TYPES = [
 ];
 
 export default function NewPostScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { user } = useAuthStore();
@@ -95,7 +97,7 @@ export default function NewPostScreen({ navigation }: any) {
   const pickImages = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert('Permiso', 'Necesitamos acceso a tu galería de fotos.');
+      Alert.alert(t('mobile.newPost.galleryPermissionTitle'), t('mobile.newPost.galleryPermissionMessage'));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -119,15 +121,15 @@ export default function NewPostScreen({ navigation }: any) {
 
   const handleSubmit = async () => {
     if (title.trim().length < 10) {
-      Alert.alert('Título muy corto', 'Mínimo 10 caracteres.');
+      Alert.alert(t('mobile.newPost.titleTooShortTitle'), t('mobile.newPost.titleTooShortMessage'));
       return;
     }
     if (body.trim().length < 20) {
-      Alert.alert('Descripción muy corta', 'Mínimo 20 caracteres.');
+      Alert.alert(t('mobile.newPost.bodyTooShortTitle'), t('mobile.newPost.bodyTooShortMessage'));
       return;
     }
     if (!categoryId) {
-      Alert.alert('Falta subforo', 'Elige una categoría.');
+      Alert.alert(t('mobile.newPost.missingCategoryTitle'), t('mobile.newPost.missingCategoryMessage'));
       return;
     }
     setSending(true);
@@ -145,11 +147,11 @@ export default function NewPostScreen({ navigation }: any) {
         await uploadPostImages(post.id, images.slice(0, 4));
       }
       await fetchPosts({ reset: true });
-      Alert.alert('¡Pregunta publicada!', 'La comunidad ya puede responder.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
+      Alert.alert(t('mobile.newPost.publishedTitle'), t('mobile.newPost.publishedMessage'), [
+        { text: t('mobile.common.ok'), onPress: () => navigation.goBack() },
       ]);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -161,24 +163,24 @@ export default function NewPostScreen({ navigation }: any) {
       contentContainerStyle={{ padding: 12, gap: 12 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.label}>Título (10-200)</Text>
+      <Text style={styles.label}>{t('mobile.newPost.titleLabel')}</Text>
       <NeoInput
         style={styles.input}
         value={title}
         onChangeText={setTitle}
-        placeholder="¿Qué necesitas saber?"
+        placeholder={t('mobile.newPost.titlePlaceholder')}
       />
 
-      <Text style={styles.label}>Descripción (20-5000)</Text>
+      <Text style={styles.label}>{t('mobile.newPost.bodyLabel')}</Text>
       <NeoInput
         style={[styles.input, styles.bodyInput]}
         multiline
         value={body}
         onChangeText={setBody}
-        placeholder="Cuenta el detalle de tu duda..."
+        placeholder={t('mobile.newPost.bodyPlaceholder')}
       />
 
-      <Text style={styles.label}>Subforo</Text>
+      <Text style={styles.label}>{t('mobile.newPost.categoryLabel')}</Text>
       <View style={styles.chips}>
         {categories.map((c) => (
           <Pressable
@@ -201,18 +203,18 @@ export default function NewPostScreen({ navigation }: any) {
         ))}
       </View>
 
-      <Text style={styles.label}>Tipo</Text>
+      <Text style={styles.label}>{t('mobile.newPost.typeLabel')}</Text>
       <View style={styles.chips}>
-        {POST_TYPES.map((t) => (
+        {POST_TYPES.map((pt) => (
           <Pressable
-            key={t}
-            style={[styles.chip, type === t && styles.chipActive]}
-            onPress={() => setType(t)}
+            key={pt}
+            style={[styles.chip, type === pt && styles.chipActive]}
+            onPress={() => setType(pt)}
           >
             <Text
-              style={[styles.chipText, type === t && styles.chipTextActive]}
+              style={[styles.chipText, type === pt && styles.chipTextActive]}
             >
-              {t}
+              {pt}
             </Text>
           </Pressable>
         ))}
@@ -222,48 +224,47 @@ export default function NewPostScreen({ navigation }: any) {
         <View style={styles.botNoteRow}>
           <Bot size={14} color={colors.forumAccent} />
           <Text style={styles.botNote}>
-            El Bot LaCASE Multitienda responderá automáticamente con precios o
-            stock disponible.
+            {t('mobile.newPost.botNoteText')}
           </Text>
         </View>
       ) : null}
 
-      <Text style={styles.label}>Ciudad</Text>
+      <Text style={styles.label}>{t('mobile.newPost.cityLabel')}</Text>
       <NeoInput
         style={styles.input}
         value={city}
         onChangeText={setCity}
-        placeholder="Ej. santa cruz"
+        placeholder={t('mobile.newPost.cityPlaceholder')}
       />
 
-      <Text style={styles.label}>Etiquetas (máx. 5)</Text>
+      <Text style={styles.label}>{t('mobile.newPost.tagsLabel')}</Text>
       <View style={styles.tagRow}>
         <NeoInput
           style={[styles.input, styles.tagInput]}
           value={tag}
           onChangeText={setTag}
-          placeholder="#tag + Enter"
+          placeholder={t('mobile.newPost.tagPlaceholder')}
         />
         <Pressable style={styles.addTagBtn} onPress={addTag}>
           <Text style={styles.addTagText}>+</Text>
         </Pressable>
       </View>
       <View style={styles.chips}>
-        {tags.map((t) => (
+        {tags.map((tg) => (
           <Pressable
-            key={t}
+            key={tg}
             style={styles.tagChip}
-            onPress={() => setTags((prev) => prev.filter((x) => x !== t))}
+            onPress={() => setTags((prev) => prev.filter((x) => x !== tg))}
           >
             <View style={styles.tagChipRow}>
-              <Text style={styles.tagChipText}>#{t}</Text>
+              <Text style={styles.tagChipText}>#{tg}</Text>
               <X size={11} color={colors.forumAccent} />
             </View>
           </Pressable>
         ))}
       </View>
 
-      <Text style={styles.label}>Imágenes (opcional, máx. 4)</Text>
+      <Text style={styles.label}>{t('mobile.newPost.imagesLabel')}</Text>
       <View style={styles.chips}>
         {images.map((uri) => (
           <Image key={uri} source={{ uri }} style={styles.imgPreview} />
@@ -280,7 +281,7 @@ export default function NewPostScreen({ navigation }: any) {
         >
           <View style={styles.imgBtnRow}>
             <Camera size={14} color={colors.forumAccent} />
-            <Text style={styles.imgBtnText}>Añadir fotos</Text>
+            <Text style={styles.imgBtnText}>{t('mobile.newPost.addPhotosButton')}</Text>
           </View>
         </Pressable>
         <Pressable
@@ -290,13 +291,13 @@ export default function NewPostScreen({ navigation }: any) {
         >
           <View style={styles.imgBtnRow}>
             <Film size={14} color={colors.forumAccent} />
-            <Text style={styles.imgBtnText}>Buscar GIFs ({gifUrls.length})</Text>
+            <Text style={styles.imgBtnText}>{t('mobile.newPost.searchGifsButton', { count: gifUrls.length })}</Text>
           </View>
         </Pressable>
       </View>
 
       <NeoButton
-        title={sending ? 'Publicando...' : 'Publicar pregunta'}
+        title={sending ? t('mobile.newPost.publishing') : t('mobile.newPost.publishButton')}
         onPress={handleSubmit}
         disabled={sending}
       />
@@ -307,19 +308,19 @@ export default function NewPostScreen({ navigation }: any) {
           <View style={styles.gifModal}>
             <View style={styles.gifTitleRow}>
               <Film size={16} color={colors.forumAccent} />
-              <Text style={styles.gifTitle}>Buscar GIFs</Text>
+              <Text style={styles.gifTitle}>{t('mobile.newPost.gifModalTitle')}</Text>
             </View>
             <TextInput
               style={[styles.input, { marginBottom: 8 }]}
               value={gifQuery}
               onChangeText={setGifQuery}
-              placeholder="Ej: capibara"
+              placeholder={t('mobile.newPost.gifSearchPlaceholder')}
               placeholderTextColor={colors.forumMuted}
               autoFocus
             />            {gifLoading ? (
               <ActivityIndicator color={colors.forumAccent} style={{ marginVertical: 24 }} />
             ) : gifQuery.trim().length >= 2 && gifResults.length === 0 ? (
-              <Text style={styles.gifEmpty}>No se encontraron GIFs.</Text>
+              <Text style={styles.gifEmpty}>{t('mobile.newPost.noGifsFoundMessage')}</Text>
             ) : (
               <FlatList
                 data={gifResults}
@@ -345,7 +346,7 @@ export default function NewPostScreen({ navigation }: any) {
               />
             )}
             <Pressable style={styles.gifClose} onPress={() => { setGifOpen(false); setGifQuery(''); }}>
-              <Text style={styles.gifCloseText}>Cerrar</Text>
+              <Text style={styles.gifCloseText}>{t('mobile.common.close')}</Text>
             </Pressable>
           </View>
         </View>

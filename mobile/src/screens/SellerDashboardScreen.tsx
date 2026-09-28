@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { Store, PackageOpen, Flame } from 'lucide-react-native';
@@ -13,6 +14,7 @@ const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { max
 export default function SellerDashboardScreen({ navigation }: any) {
   const { colors, raised } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -42,14 +44,14 @@ export default function SellerDashboardScreen({ navigation }: any) {
   const topProducts: any[] = d.topProducts ?? [];
 
   const kpis: { label: string; value: string }[] = [
-    { label: 'Productos', value: String(d.totalProducts ?? d.productCount ?? 0) },
-    { label: 'Pendientes mod.', value: String(d.pendingProducts ?? 0) },
-    { label: 'Pedidos', value: String(d.totalSales ?? d.orderCount ?? 0) },
-    { label: 'Clientes atendidos', value: String(d.customersServed ?? 0) },
-    { label: 'Ventas', value: money(d.totalRevenue ?? d.sales ?? 0) },
-    { label: 'Ventas de la semana', value: money(d.revenueWeek ?? 0) },
-    { label: 'Ventas del mes', value: money(d.revenueMonth ?? 0) },
-    { label: 'Mensajes sin leer', value: String(d.unreadMessages ?? 0) },
+    { label: t('mobile.sellerDashboard.productsLabel'), value: String(d.totalProducts ?? d.productCount ?? 0) },
+    { label: t('mobile.sellerDashboard.pendingModerationLabel'), value: String(d.pendingProducts ?? 0) },
+    { label: t('mobile.sellerDashboard.ordersLabel'), value: String(d.totalSales ?? d.orderCount ?? 0) },
+    { label: t('mobile.sellerDashboard.customersServedLabel'), value: String(d.customersServed ?? 0) },
+    { label: t('mobile.sellerDashboard.salesLabel'), value: money(d.totalRevenue ?? d.sales ?? 0) },
+    { label: t('mobile.sellerDashboard.weeklySalesLabel'), value: money(d.revenueWeek ?? 0) },
+    { label: t('mobile.sellerDashboard.monthlySalesLabel'), value: money(d.revenueMonth ?? 0) },
+    { label: t('mobile.sellerDashboard.unreadMessagesLabel'), value: String(d.unreadMessages ?? 0) },
   ];
 
   return (
@@ -59,8 +61,8 @@ export default function SellerDashboardScreen({ navigation }: any) {
           <Store size={22} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{user?.storeName || 'Panel de vendedor'}</Text>
-          <Text style={styles.subtitle}>Rendimiento de tu tienda</Text>
+          <Text style={styles.title}>{user?.storeName || t('mobile.sellerDashboard.defaultTitle')}</Text>
+          <Text style={styles.subtitle}>{t('mobile.sellerDashboard.subtitle')}</Text>
         </View>
       </View>
 
@@ -74,10 +76,10 @@ export default function SellerDashboardScreen({ navigation }: any) {
 
       <View style={styles.btnRow}>
         <View style={{ flex: 1 }}>
-          <NeoButton title="Ver mi tienda" onPress={() => navigation.navigate('Seller', { id: user?.id })} />
+          <NeoButton title={t('mobile.sellerDashboard.viewStoreButton')} onPress={() => navigation.navigate('Seller', { id: user?.id })} />
         </View>
         <View style={{ flex: 1 }}>
-          <NeoButton title="Editar tienda" variant="ghost" onPress={() => navigation.navigate('EditStore')} />
+          <NeoButton title={t('mobile.sellerDashboard.editStoreButton')} variant="ghost" onPress={() => navigation.navigate('EditStore')} />
         </View>
       </View>
 
@@ -85,16 +87,16 @@ export default function SellerDashboardScreen({ navigation }: any) {
         <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
             <PackageOpen size={16} color={colors.textSecondary} />
-            <Text style={styles.sectionTitle}>Últimos pedidos</Text>
+            <Text style={styles.sectionTitle}>{t('mobile.sellerDashboard.recentOrdersTitle')}</Text>
           </View>
           {recentOrders.slice(0, 5).map((o: any) => (
             <View key={o.id} style={styles.row}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowTitle} numberOfLines={1}>
-                  Pedido #{o.id} · {o.buyer?.firstName} {o.buyer?.lastName}
+                  {t('mobile.sellerDashboard.orderRowTitle', { id: o.id, firstName: o.buyer?.firstName, lastName: o.buyer?.lastName })}
                 </Text>
                 <Text style={styles.rowSub} numberOfLines={1}>
-                  {o.items?.[0]?.product?.name ?? 'Producto'} · {o.status}
+                  {t('mobile.sellerDashboard.orderRowSub', { productName: o.items?.[0]?.product?.name ?? t('mobile.sellerDashboard.defaultProductName'), status: o.status })}
                 </Text>
               </View>
               <Text style={styles.rowValue}>{money(o.total)}</Text>
@@ -107,7 +109,7 @@ export default function SellerDashboardScreen({ navigation }: any) {
         <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
             <Flame size={16} color={colors.warning} />
-            <Text style={styles.sectionTitle}>Top productos</Text>
+            <Text style={styles.sectionTitle}>{t('mobile.sellerDashboard.topProductsTitle')}</Text>
           </View>
           {topProducts.slice(0, 5).map((p: any) => (
             <View key={p.id} style={styles.row}>
@@ -116,7 +118,7 @@ export default function SellerDashboardScreen({ navigation }: any) {
                   {p.name}
                 </Text>
                 <Text style={styles.rowSub}>
-                  Stock {p.stock} · {p.totalSold} vendido(s)
+                  {t('mobile.sellerDashboard.stockSold', { stock: p.stock, count: p.totalSold })}
                 </Text>
               </View>
               <Text style={styles.rowValue}>{money(p.price)}</Text>

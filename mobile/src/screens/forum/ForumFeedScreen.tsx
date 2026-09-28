@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import * as Location from 'expo-location';
+import { useTranslation } from 'react-i18next';
 import { useForumStore } from '../../stores/forumStore';
 import { useAuthStore } from '../../stores/authStore';
 import * as forumApi from '../../services/forum.api';
@@ -19,16 +20,17 @@ import { useAppTheme } from '../../theme/ThemeContext';
 import { VisionBackground } from '../../components/vision';
 
 const MODES = [
-  { key: 'RECIENTE', label: 'Reciente', icon: Clock },
-  { key: 'POPULAR', label: 'Popular', icon: Flame },
-  { key: 'SIN_RESPUESTA', label: 'Sin respuesta', icon: CircleQuestionMark },
-  { key: 'MI_CIUDAD', label: 'Mi ciudad', icon: MapPin },
+  { key: 'RECIENTE', labelKey: 'mobile.forumFeed.modes.reciente', icon: Clock },
+  { key: 'POPULAR', labelKey: 'mobile.forumFeed.modes.popular', icon: Flame },
+  { key: 'SIN_RESPUESTA', labelKey: 'mobile.forumFeed.modes.sinRespuesta', icon: CircleQuestionMark },
+  { key: 'MI_CIUDAD', labelKey: 'mobile.forumFeed.modes.miCiudad', icon: MapPin },
 ];
 
 // Detección de ciudad una sola vez por sesión (09-spec G6).
 let sessionGeoAttempted = false;
 
 export default function ForumFeedScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { posts, loading, activeMode, activeCategory, fetchPosts, loadMorePosts, setMode, setCategory, geo, geoLoaded } =
@@ -115,7 +117,7 @@ export default function ForumFeedScreen({ navigation }: any) {
             <MapPin size={13} color={colors.forumAccent} />
             <Text style={styles.cityBarText}>{geo.city}</Text>
             {geo.cityVerified ? <CheckCircle2 size={12} color={colors.karmaUp} /> : null}
-            <Text style={styles.cityBarText}>· Cambiar</Text>
+            <Text style={styles.cityBarText}>{t('mobile.forumFeed.changeCity')}</Text>
           </View>
         </Pressable>
       ) : geoLoaded ? (
@@ -123,7 +125,7 @@ export default function ForumFeedScreen({ navigation }: any) {
           <View style={styles.geoBannerRow}>
             <MapPin size={13} color={colors.forumTextSecondary} />
             <Text style={styles.geoBannerText}>
-              Configurá tu ciudad para ver los foros de tu zona
+              {t('mobile.forumFeed.geoBannerText')}
             </Text>
           </View>
         </Pressable>
@@ -132,7 +134,7 @@ export default function ForumFeedScreen({ navigation }: any) {
       {/* Chips de subforos de la ciudad activa */}
       {geo?.city && cityCategories.length > 0 && (
         <View style={styles.subforosWrap}>
-          <Text style={styles.subforosLabel}>Subforos de {geo.city}:</Text>
+          <Text style={styles.subforosLabel}>{t('mobile.forumFeed.subforosLabel', { city: geo.city })}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.subforosRow}>
             {cityCategories.map(({ category }) =>
               category ? (
@@ -156,7 +158,7 @@ export default function ForumFeedScreen({ navigation }: any) {
               <Pressable onPress={() => setCategory('')} style={styles.subforoChipAll}>
                 <View style={styles.subforoChipAllRow}>
                   <X size={11} color={colors.forumAccent} />
-                  <Text style={styles.subforoChipTextAll}>Ver todo</Text>
+                  <Text style={styles.subforoChipTextAll}>{t('mobile.forumFeed.verTodo')}</Text>
                 </View>
               </Pressable>
             ) : null}
@@ -176,7 +178,7 @@ export default function ForumFeedScreen({ navigation }: any) {
             >
               <View style={styles.tabRow}>
                 <ModeIcon size={12} color={active ? colors.forumAccent : colors.forumTextSecondary} />
-                <Text style={[styles.tabText, active && styles.tabTextActive]}>{m.label}</Text>
+                <Text style={[styles.tabText, active && styles.tabTextActive]}>{t(m.labelKey)}</Text>
               </View>
             </Pressable>
           );
@@ -224,7 +226,7 @@ export default function ForumFeedScreen({ navigation }: any) {
           }
           contentContainerStyle={{ padding: 12, gap: 10 }}
           ListEmptyComponent={
-            !loading ? <EmptyState message="No hay preguntas aún" /> : null
+            !loading ? <EmptyState message={t('mobile.forumFeed.emptyMessage')} /> : null
           }
         />
       )}

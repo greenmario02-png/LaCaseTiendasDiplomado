@@ -11,6 +11,7 @@ import { useAuthStore } from './src/stores/authStore';
 import { useNotificationsStore } from './src/stores/notificationsStore';
 import { registerPushToken, clearPushToken } from './src/services/notifications';
 import { ThemeProvider, useAppTheme } from './src/theme/ThemeContext';
+import { loadPersistedLanguage } from './src/i18n';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
@@ -179,6 +180,7 @@ export default function App() {
 
   useEffect(() => {
     init();
+    loadPersistedLanguage();
   }, []);
 
   // Registra el token de push al iniciar sesión y lo limpia al cerrar sesión.

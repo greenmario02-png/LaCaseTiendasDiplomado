@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import {
   getPublicProfile,
   getProfilePosts,
@@ -30,6 +31,7 @@ import {
 } from 'lucide-react-native';
 
 export default function ForumProfileScreen({ route, navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { username } = route.params;
@@ -52,7 +54,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
       setProfile(p);
       setPosts(postsRes?.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
@@ -63,7 +65,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
 
   const handleReputation = async () => {
     if (!rating) {
-      Alert.alert('Elige valoración', 'Pulsa el pulgar arriba o abajo primero.');
+      Alert.alert(t('mobile.forumProfile.chooseRatingTitle'), t('mobile.forumProfile.chooseRatingMessage'));
       return;
     }
     setSending(true);
@@ -72,12 +74,12 @@ export default function ForumProfileScreen({ route, navigation }: any) {
         value: rating,
         comment: comment.trim() || undefined,
       });
-      Alert.alert('Gracias', 'Tu valoración fue registrada.');
+      Alert.alert(t('mobile.forumProfile.thanksTitle'), t('mobile.forumProfile.thanksMessage'));
       setComment('');
       setRating(null);
       await load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -86,19 +88,19 @@ export default function ForumProfileScreen({ route, navigation }: any) {
   const handleRedeem = async () => {
     const amount = parseInt(redeemAmount, 10);
     if (!amount || amount < 100 || amount % 100 !== 0) {
-      Alert.alert('Monto inválido', 'Mínimo 100, en múltiplos de 100.');
+      Alert.alert(t('mobile.forumProfile.invalidAmountTitle'), t('mobile.forumProfile.invalidAmountMessage'));
       return;
     }
     setSending(true);
     try {
       const res = await redeemKarma(amount);
       Alert.alert(
-        'Canje exitoso',
-        `Recibiste ${res.coinsEarned} monedas del proyecto.`,
+        t('mobile.forumProfile.redeemSuccessTitle'),
+        t('mobile.forumProfile.redeemSuccessMessage', { coins: res.coinsEarned }),
       );
       await load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -107,7 +109,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
   if (!profile) {
     return (
       <View style={styles.container}>
-        <Text style={styles.empty}>Cargando perfil...</Text>
+        <Text style={styles.empty}>{t('mobile.forumProfile.loadingMessage')}</Text>
       </View>
     );
   }
@@ -128,28 +130,28 @@ export default function ForumProfileScreen({ route, navigation }: any) {
           {profile.isBanned && (
             <View style={styles.chipRow}>
               <Ban size={11} color={colors.karmaDown} />
-              <Text style={styles.banned}>Baneado</Text>
+              <Text style={styles.banned}>{t('mobile.forumProfile.bannedLabel')}</Text>
             </View>
           )}
         </View>
         <View style={styles.statsGrid}>
           <View style={styles.statCol}>
-            <StatCard title="Karma" value={profile.karma} icon="⭐" />
+            <StatCard title={t('mobile.forumProfile.statKarma')} value={profile.karma} icon="⭐" />
           </View>
           <View style={styles.statCol}>
-            <StatCard title="Preguntas" value={profile._count?.posts ?? 0} icon="📝" />
+            <StatCard title={t('mobile.forumProfile.statQuestions')} value={profile._count?.posts ?? 0} icon="📝" />
           </View>
           <View style={styles.statCol}>
-            <StatCard title="Respuestas" value={profile._count?.replies ?? 0} icon="💬" />
+            <StatCard title={t('mobile.forumProfile.statReplies')} value={profile._count?.replies ?? 0} icon="💬" />
           </View>
           <View style={styles.statCol}>
-            <StatCard title="Racha" value={profile.streakDays ?? 0} icon="🔥" />
+            <StatCard title={t('mobile.forumProfile.statStreak')} value={profile.streakDays ?? 0} icon="🔥" />
           </View>
         </View>
         <View style={styles.reputationRow}>
           <ThumbsUp size={12} color={colors.karmaUp} />
           <Text style={styles.reputation}>
-            Reputación: {profile.reputationScore ?? 0} ptos
+            {t('mobile.forumProfile.reputationLabel', { score: profile.reputationScore ?? 0 })}
           </Text>
         </View>
         {profile.signatureText ? (
@@ -161,10 +163,10 @@ export default function ForumProfileScreen({ route, navigation }: any) {
         <View style={styles.card}>
           <View style={styles.sectionTitleRow}>
             <Coins size={15} color={colors.karmaGold} />
-            <Text style={styles.sectionTitle}>Canjear karma por monedas</Text>
+            <Text style={styles.sectionTitle}>{t('mobile.forumProfile.redeemSectionTitle')}</Text>
           </View>
           <Text style={styles.muted}>
-            Disponible: {available} karma · Tasa: 100 karma = 10 monedas
+            {t('mobile.forumProfile.redeemAvailableInfo', { available })}
           </Text>
           <NeoInput
             style={styles.input}
@@ -173,12 +175,12 @@ export default function ForumProfileScreen({ route, navigation }: any) {
             onChangeText={setRedeemAmount}
           />
           <NeoButton
-            title="Canjear por monedas"
+            title={t('mobile.forumProfile.redeemButton')}
             onPress={handleRedeem}
             disabled={sending || available < 100}
           />
           <NeoButton
-            title="Configurar zona"
+            title={t('mobile.forumProfile.configureZoneButton')}
             variant="ghost"
             onPress={() => navigation.navigate('ForumGeoConfig')}
           />
@@ -187,7 +189,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
 
       {!isSelf && user && (
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>¿Confiable?</Text>
+          <Text style={styles.sectionTitle}>{t('mobile.forumProfile.trustworthyQuestion')}</Text>
           <View style={styles.rateRow}>
             <Pressable
               style={[styles.rateBtn, rating === 1 && styles.rateBtnUp]}
@@ -195,7 +197,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
             >
               <View style={styles.rateBtnRow}>
                 <ThumbsUp size={13} color={rating === 1 ? colors.karmaUp : colors.forumTextSecondary} />
-                <Text style={styles.rateText}>Confiable</Text>
+                <Text style={styles.rateText}>{t('mobile.forumProfile.trustworthyYes')}</Text>
               </View>
             </Pressable>
             <Pressable
@@ -204,26 +206,26 @@ export default function ForumProfileScreen({ route, navigation }: any) {
             >
               <View style={styles.rateBtnRow}>
                 <ThumbsDown size={13} color={rating === -1 ? colors.karmaDown : colors.forumTextSecondary} />
-                <Text style={styles.rateText}>No confiable</Text>
+                <Text style={styles.rateText}>{t('mobile.forumProfile.trustworthyNo')}</Text>
               </View>
             </Pressable>
           </View>
           <NeoInput
             style={styles.input}
-            placeholder="Comentario (opcional)"
+            placeholder={t('mobile.forumProfile.commentPlaceholder')}
             value={comment}
             onChangeText={setComment}
           />
           <NeoButton
-            title="Enviar valoración"
+            title={t('mobile.forumProfile.sendRatingButton')}
             onPress={handleReputation}
             disabled={sending}
           />
         </View>
       )}
 
-      <Text style={styles.sectionTitle}>Últimas preguntas</Text>
-      {posts.length === 0 && <Text style={styles.muted}>Sin preguntas aún</Text>}
+      <Text style={styles.sectionTitle}>{t('mobile.forumProfile.recentQuestionsTitle')}</Text>
+      {posts.length === 0 && <Text style={styles.muted}>{t('mobile.forumProfile.noQuestionsMessage')}</Text>}
       {posts.map((p) => (
         <ForumPostCard
           key={String(p.id)}

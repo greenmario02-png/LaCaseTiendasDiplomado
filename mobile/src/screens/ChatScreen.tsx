@@ -2,6 +2,7 @@ import React, { useMemo,  useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { MessageCircle, Package } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { NeoButton } from '../components/redesign/NeoButton';
@@ -9,6 +10,7 @@ import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function ChatScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore((s) => s.user);
@@ -42,14 +44,14 @@ export default function ChatScreen({ navigation }: any) {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <MessageCircle size={20} color={colors.primary} />
-          <Text style={styles.title}>Mensajes</Text>
+          <Text style={styles.title}>{t('mobile.chat.title')}</Text>
         </View>
-        <NeoButton title="Consultar" variant="ghost" onPress={() => navigation.navigate('Products')} style={styles.newBtn} />
+        <NeoButton title={t('mobile.chat.consultButton')} variant="ghost" onPress={() => navigation.navigate('Products')} style={styles.newBtn} />
       </View>
 
       {conversations.length === 0 ? (
         <View style={styles.center}>
-          <EmptyState message="No tenés conversaciones" />
+          <EmptyState message={t('mobile.chat.noConversations')} />
         </View>
       ) : (
         <FlatList
@@ -78,7 +80,7 @@ export default function ChatScreen({ navigation }: any) {
                     </View>
                   )}
                   <Text style={styles.convLast} numberOfLines={1}>
-                    {last?.content ?? 'Sin mensajes'}
+                    {last?.content ?? t('mobile.chat.noMessages')}
                   </Text>
                 </View>
                 {unread > 0 && (

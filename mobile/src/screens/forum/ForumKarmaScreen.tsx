@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { getKarmaHistory, redeemKarma } from '../../services/forum.api';
 import { getErrorMessage } from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
@@ -16,6 +17,7 @@ import { Star } from 'lucide-react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function ForumKarmaScreen() {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { user } = useAuthStore();
@@ -30,7 +32,7 @@ export default function ForumKarmaScreen() {
       setProfile(res?.profile ?? null);
       setTxs(res?.transactions ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
@@ -42,20 +44,20 @@ export default function ForumKarmaScreen() {
     const value = parseInt(amount, 10);
     const available = (profile?.karma ?? 0) - (profile?.karmaSpent ?? 0);
     if (!value || value < 100 || value % 100 !== 0) {
-      Alert.alert('Monto inválido', 'Mínimo 100, en múltiplos de 100.');
+      Alert.alert(t('mobile.forumKarma.invalidAmountTitle'), t('mobile.forumKarma.invalidAmountMessage'));
       return;
     }
     if (value > available) {
-      Alert.alert('Karma insuficiente', `Tienes ${available} disponible.`);
+      Alert.alert(t('mobile.forumKarma.insufficientKarmaTitle'), t('mobile.forumKarma.insufficientKarmaMessage', { available }));
       return;
     }
     setSending(true);
     try {
       const res = await redeemKarma(value);
-      Alert.alert('Canje exitoso', `Recibiste ${res.coinsEarned} monedas.`);
+      Alert.alert(t('mobile.forumKarma.redeemSuccessTitle'), t('mobile.forumKarma.redeemSuccessMessage', { coins: res.coinsEarned }));
       await load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -68,11 +70,11 @@ export default function ForumKarmaScreen() {
       <View style={styles.card}>
         <View style={styles.karmaRow}>
           <Star size={20} color={colors.karmaGold} fill={colors.karmaGold} />
-          <Text style={styles.karma}>{profile?.karma ?? 0} karma</Text>
+          <Text style={styles.karma}>{t('mobile.forumKarma.karmaLabel', { karma: profile?.karma ?? 0 })}</Text>
         </View>
         <KarmaLevelBadge level={profile?.tag} />
         <Text style={styles.muted}>
-          Disponible para canjear: {available} karma · Tasa: 100 karma = 10 monedas
+          {t('mobile.forumKarma.availableInfo', { available })}
         </Text>
         <NeoInput
           style={styles.input}
@@ -81,14 +83,14 @@ export default function ForumKarmaScreen() {
           onChangeText={setAmount}
         />
         <NeoButton
-          title={sending ? 'Canjeando...' : 'Canjear por monedas del proyecto'}
+          title={sending ? t('mobile.forumKarma.redeeming') : t('mobile.forumKarma.redeemButton')}
           onPress={handleRedeem}
           disabled={sending || available < 100}
         />
       </View>
 
-      <Text style={styles.sectionTitle}>Historial de karma</Text>
-      {txs.length === 0 && <Text style={styles.muted}>Sin transacciones aún</Text>}
+      <Text style={styles.sectionTitle}>{t('mobile.forumKarma.historyTitle')}</Text>
+      {txs.length === 0 && <Text style={styles.muted}>{t('mobile.forumKarma.noTransactionsMessage')}</Text>}
       {txs.map((t) => (
         <View key={String(t.id)} style={styles.card}>
           <View style={styles.txRow}>

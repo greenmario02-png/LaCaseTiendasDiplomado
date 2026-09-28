@@ -1,6 +1,7 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -8,9 +9,8 @@ import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
-const ROLE_LABEL: Record<string, string> = { OWNER: 'Dueño', ADMIN: 'Admin', EMPLOYEE: 'Empleado' };
-
 export default function SellerTeamScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore((s) => s.user);
@@ -22,16 +22,25 @@ export default function SellerTeamScreen({ navigation }: any) {
 
   const isOwner = user?.storeRole === 'OWNER';
 
+  const roleLabel = (role: string): string => {
+    const map: Record<string, string> = {
+      OWNER: t('mobile.sellerTeam.roleOwner'),
+      ADMIN: t('mobile.sellerTeam.roleAdmin'),
+      EMPLOYEE: t('mobile.sellerTeam.roleEmployee'),
+    };
+    return map[role] ?? role;
+  };
+
   const load = useCallback(async () => {
     try {
       const { data } = await api.get('/seller/team');
       setMembers(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -41,16 +50,16 @@ export default function SellerTeamScreen({ navigation }: any) {
   );
 
   const invite = async () => {
-    if (!inviteForm.email.trim()) return Alert.alert('Falta información', 'Escribí el email del usuario.');
+    if (!inviteForm.email.trim()) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.sellerTeam.emailRequiredMessage'));
     setInviting(true);
     try {
       await api.post('/seller/team/invite', { email: inviteForm.email.trim(), role: inviteForm.role });
-      Alert.alert('Listo', 'Empleado invitado correctamente.');
+      Alert.alert(t('mobile.common.doneTitle'), t('mobile.sellerTeam.inviteSuccessMessage'));
       setInviteOpen(false);
       setInviteForm({ email: '', role: 'EMPLOYEE' });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setInviting(false);
     }
@@ -61,22 +70,22 @@ export default function SellerTeamScreen({ navigation }: any) {
       await api.put(`/seller/team/${id}/role`, { role });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
   const remove = (id: number, name: string) => {
-    Alert.alert('Quitar del equipo', `¿Quitar a ${name}?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerTeam.removeConfirmTitle'), t('mobile.sellerTeam.removeConfirmMessage', { name }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Quitar',
+        text: t('mobile.common.remove'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/seller/team/${id}`);
             load();
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -90,20 +99,20 @@ export default function SellerTeamScreen({ navigation }: any) {
       <View style={styles.card}>
         <View style={styles.body}>
           <Text style={styles.name}>
-            {item.firstName} {item.lastName} {isSelf ? '(vos)' : ''}
+            {item.firstName} {item.lastName} {isSelf ? t('mobile.sellerTeam.youSuffix') : ''}
           </Text>
           <Text style={styles.email}>{item.email}</Text>
           <View style={styles.badgeRow}>
-            <Text style={styles.role}>{ROLE_LABEL[memberRole] ?? memberRole}</Text>
+            <Text style={styles.role}>{roleLabel(memberRole)}</Text>
           </View>
         </View>
         {isOwner && !isSelf && (
           <View style={styles.actions}>
             <TouchableOpacity style={styles.miniBtn} onPress={() => changeRole(item.id, memberRole === 'EMPLOYEE' ? 'ADMIN' : 'EMPLOYEE')}>
-              <Text style={styles.miniBtnText}>{memberRole === 'EMPLOYEE' ? 'Hacer Admin' : 'Hacer Empleado'}</Text>
+              <Text style={styles.miniBtnText}>{memberRole === 'EMPLOYEE' ? t('mobile.sellerTeam.makeAdminButton') : t('mobile.sellerTeam.makeEmployeeButton')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.error }]} onPress={() => remove(item.id, item.firstName ?? '')}>
-              <Text style={[styles.miniBtnText, { color: colors.error }]}>Quitar</Text>
+              <Text style={[styles.miniBtnText, { color: colors.error }]}>{t('mobile.common.remove')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -114,17 +123,17 @@ export default function SellerTeamScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Equipo de mi tienda</Text>
+        <Text style={styles.title}>{t('mobile.sellerTeam.title')}</Text>
         {isOwner && (
           <View style={styles.addWrap}>
-            <NeoButton title="Invitar empleado" onPress={() => setInviteOpen(true)} />
+            <NeoButton title={t('mobile.sellerTeam.inviteEmployeeButton')} onPress={() => setInviteOpen(true)} />
           </View>
         )}
       </View>
       {loading ? (
         <LoadingState />
       ) : members.length === 0 ? (
-        <EmptyState message={isOwner ? 'Todavía no tenés empleados. Invitá a alguien para que te ayude con la tienda.' : 'Tu tienda aún no tiene equipo.'} />
+        <EmptyState message={isOwner ? t('mobile.sellerTeam.emptyOwnerMessage') : t('mobile.sellerTeam.emptyNonOwnerMessage')} />
       ) : (
         <FlatList
           data={members}
@@ -137,22 +146,22 @@ export default function SellerTeamScreen({ navigation }: any) {
       <Modal visible={inviteOpen} transparent animationType="fade" onRequestClose={() => setInviteOpen(false)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Invitar empleado</Text>
-            <Text style={styles.label}>Email del usuario</Text>
-            <NeoInput style={styles.input} value={inviteForm.email} onChangeText={(v) => setInviteForm((f) => ({ ...f, email: v }))} placeholder="usuario@email.com" keyboardType="email-address" />
-            <Text style={styles.label}>Rol</Text>
+            <Text style={styles.modalTitle}>{t('mobile.sellerTeam.inviteEmployeeButton')}</Text>
+            <Text style={styles.label}>{t('mobile.sellerTeam.userEmailLabel')}</Text>
+            <NeoInput style={styles.input} value={inviteForm.email} onChangeText={(v) => setInviteForm((f) => ({ ...f, email: v }))} placeholder={t('mobile.sellerTeam.userEmailPlaceholder')} keyboardType="email-address" />
+            <Text style={styles.label}>{t('mobile.sellerTeam.roleLabel')}</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {['EMPLOYEE', 'ADMIN'].map((r) => {
                 const active = inviteForm.role === r;
                 return (
                   <TouchableOpacity key={r} style={[styles.chip, active && styles.chipActive]} onPress={() => setInviteForm((f) => ({ ...f, role: r }))}>
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{ROLE_LABEL[r]}</Text>
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{roleLabel(r)}</Text>
                   </TouchableOpacity>
                 );
               })}
             </View>
-            <NeoButton title="Enviar invitación" onPress={invite} disabled={inviting} style={styles.save} />
-            <NeoButton title="Cancelar" variant="ghost" onPress={() => setInviteOpen(false)} />
+            <NeoButton title={t('mobile.sellerTeam.sendInviteButton')} onPress={invite} disabled={inviting} style={styles.save} />
+            <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setInviteOpen(false)} />
           </View>
         </View>
       </Modal>

@@ -1,5 +1,6 @@
 import React, { useMemo,  useState  } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../stores/authStore';
 import { getErrorMessage } from '../services/api';
 import { COUNTRIES, STORE_CATEGORIES } from '../data/geo';
@@ -10,6 +11,7 @@ import { NeoInput } from '../components/redesign/NeoInput';
 
 export default function RegisterScreen({ navigation }: any) {
   const { colors, raised, pressed } = useAppTheme();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const register = useAuthStore((s) => s.register);
   const [mode, setMode] = useState<'CUSTOMER' | 'SELLER'>('CUSTOMER');
@@ -35,11 +37,11 @@ export default function RegisterScreen({ navigation }: any) {
   const submit = async () => {
     setError('');
     if (!firstName || !lastName || !email || !password) {
-      setError('Completá nombre, apellido, email y contraseña');
+      setError(t('mobile.register.errorMissingFields'));
       return;
     }
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+      setError(t('mobile.register.errorPasswordLength'));
       return;
     }
 
@@ -69,7 +71,7 @@ export default function RegisterScreen({ navigation }: any) {
     try {
       await register(payload);
       if (mode === 'SELLER') {
-        Alert.alert('¡Tienda registrada!', 'Tu tienda quedó pendiente de aprobación del administrador. Te avisaremos.');
+        Alert.alert(t('mobile.register.storeRegisteredTitle'), t('mobile.register.storeRegisteredMessage'));
       }
     } catch (err) {
       setError(getErrorMessage(err));
@@ -85,7 +87,7 @@ export default function RegisterScreen({ navigation }: any) {
           <View style={[styles.logoBox, raised]}>
             <Store size={28} color={colors.primary} />
           </View>
-          <Text style={styles.logo}>Crear cuenta</Text>
+          <Text style={styles.logo}>{t('mobile.register.title')}</Text>
 
           <View style={styles.tabs}>
             <TouchableOpacity
@@ -94,13 +96,13 @@ export default function RegisterScreen({ navigation }: any) {
             >
               <View style={styles.tabRow}>
                 <ShoppingCart size={15} color={mode === 'CUSTOMER' ? colors.primary : colors.textSecondary} />
-                <Text style={[styles.tabText, mode === 'CUSTOMER' && styles.tabTextActive]}>Comprador</Text>
+                <Text style={[styles.tabText, mode === 'CUSTOMER' && styles.tabTextActive]}>{t('mobile.profile.roles.customer')}</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.tab, mode === 'SELLER' ? { ...pressed } : { ...raised }]} onPress={() => setMode('SELLER')}>
               <View style={styles.tabRow}>
                 <Store size={15} color={mode === 'SELLER' ? colors.primary : colors.textSecondary} />
-                <Text style={[styles.tabText, mode === 'SELLER' && styles.tabTextActive]}>Vendedor</Text>
+                <Text style={[styles.tabText, mode === 'SELLER' && styles.tabTextActive]}>{t('mobile.profile.roles.seller')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -111,19 +113,19 @@ export default function RegisterScreen({ navigation }: any) {
             </View>
           ) : null}
 
-          <NeoInput placeholder="Nombre" value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
-          <NeoInput placeholder="Apellido" value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" returnKeyType="next" />
-          <NeoInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" keyboardType="email-address" returnKeyType="next" />
-          <NeoInput placeholder="Contraseña (mín. 8)" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoComplete="new-password" textContentType="newPassword" />
-          <NeoInput placeholder="Celular de contacto" value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" />
+          <NeoInput placeholder={t('mobile.common.firstName')} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
+          <NeoInput placeholder={t('mobile.common.lastName')} value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" returnKeyType="next" />
+          <NeoInput placeholder={t('mobile.common.email')} value={email} onChangeText={setEmail} autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" keyboardType="email-address" returnKeyType="next" />
+          <NeoInput placeholder={t('mobile.register.passwordPlaceholder')} value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoComplete="new-password" textContentType="newPassword" />
+          <NeoInput placeholder={t('mobile.register.phonePlaceholder')} value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" />
 
           {mode === 'SELLER' && (
             <>
-              <Text style={styles.sectionLabel}>Datos de la tienda</Text>
-              <NeoInput placeholder="Nombre de la tienda" value={storeName} onChangeText={setStoreName} />
-              <NeoInput placeholder="Descripción (mín. 10 caracteres)" value={storeDescription} onChangeText={setStoreDescription} multiline />
+              <Text style={styles.sectionLabel}>{t('mobile.register.storeDataSection')}</Text>
+              <NeoInput placeholder={t('mobile.register.storeNamePlaceholder')} value={storeName} onChangeText={setStoreName} />
+              <NeoInput placeholder={t('mobile.register.storeDescriptionPlaceholder')} value={storeDescription} onChangeText={setStoreDescription} multiline />
 
-              <Text style={styles.label}>Categoría de productos</Text>
+              <Text style={styles.label}>{t('mobile.register.categoryLabel')}</Text>
               <View style={styles.chips}>
                 {STORE_CATEGORIES.slice(0, 8).map((c) => (
                   <TouchableOpacity
@@ -136,7 +138,7 @@ export default function RegisterScreen({ navigation }: any) {
                 ))}
               </View>
 
-              <Text style={styles.label}>País</Text>
+              <Text style={styles.label}>{t('mobile.common.country')}</Text>
               <View style={styles.chips}>
                 {COUNTRIES.map((c) => (
                   <TouchableOpacity key={c.code} style={[styles.chip, countryCode === c.code ? { ...pressed } : { ...raised }]} onPress={() => { setCountryCode(c.code); setDivision(''); }}>
@@ -154,19 +156,19 @@ export default function RegisterScreen({ navigation }: any) {
                 ))}
               </View>
 
-              <NeoInput placeholder="Ciudad" value={city} onChangeText={setCity} />
+              <NeoInput placeholder={t('mobile.common.city')} value={city} onChangeText={setCity} />
             </>
           )}
 
           <NeoButton
-            title={loading ? 'Enviando...' : mode === 'SELLER' ? 'Crear tienda' : 'Registrarme'}
+            title={loading ? t('mobile.register.submitting') : mode === 'SELLER' ? t('mobile.register.submitSeller') : t('mobile.register.submitCustomer')}
             onPress={submit}
             disabled={loading}
             style={styles.button}
           />
 
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.linkWrap}>
-            <Text style={styles.link}>¿Ya tenés cuenta? Ingresá</Text>
+            <Text style={styles.link}>{t('mobile.register.haveAccountLink')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

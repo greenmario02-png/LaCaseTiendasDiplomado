@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Plus } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState } from '../components/redesign/States';
@@ -19,6 +20,7 @@ interface EditableItem {
 }
 
 export default function SellerBulkProductsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -52,7 +54,7 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
       );
     } catch (e) {
       setItems([]);
-      Alert.alert('Aviso', getErrorMessage(e));
+      Alert.alert(t('mobile.sellerBulkProducts.noticeTitle'), getErrorMessage(e));
     }
   };
 
@@ -71,11 +73,11 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
   const createAll = async () => {
     const valid = items.filter((it) => it.name.trim() && Number(it.price) > 0);
     if (valid.length === 0) {
-      Alert.alert('Nada para crear', 'Completá nombre y precio válidos en al menos un producto.');
+      Alert.alert(t('mobile.sellerBulkProducts.nothingToCreateTitle'), t('mobile.sellerBulkProducts.nothingToCreateMessage'));
       return;
     }
     if (!selectedCat) {
-      Alert.alert('Falta categoría', 'Elegí la categoría de los productos.');
+      Alert.alert(t('mobile.sellerBulkProducts.missingCategoryTitle'), t('mobile.sellerBulkProducts.missingCategoryMessage'));
       return;
     }
     setBusy(true);
@@ -99,10 +101,16 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
       }
     }
     setBusy(false);
-    Alert.alert('Carga masiva', `Se crearon ${created} producto(s).${errors ? ` ${errors} con error.` : ''}`, [
-      { text: 'Ver mis productos', onPress: () => navigation.navigate('SellerProducts') },
-      { text: 'OK' },
-    ]);
+    Alert.alert(
+      t('mobile.sellerBulkProducts.bulkLoadTitle'),
+      errors
+        ? t('mobile.sellerBulkProducts.bulkLoadResultWithErrorsMessage', { created, errors })
+        : t('mobile.sellerBulkProducts.bulkLoadResultMessage', { created }),
+      [
+        { text: t('mobile.sellerBulkProducts.viewMyProductsButton'), onPress: () => navigation.navigate('SellerProducts') },
+        { text: t('mobile.common.ok') },
+      ]
+    );
     setItems([]);
   };
 
@@ -112,7 +120,7 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
         style={styles.nameInput}
         value={item.name}
         onChangeText={(v) => updateItem(index, { name: v })}
-        placeholder="Nombre del producto *"
+        placeholder={t('mobile.sellerBulkProducts.namePlaceholder')}
         placeholderTextColor={colors.textSecondary}
       />
       <View style={styles.row}>
@@ -120,7 +128,7 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
           style={styles.smallInput}
           value={item.price}
           onChangeText={(v) => updateItem(index, { price: v })}
-          placeholder="Precio Bs *"
+          placeholder={t('mobile.sellerBulkProducts.pricePlaceholder')}
           keyboardType="numeric"
           placeholderTextColor={colors.textSecondary}
         />
@@ -128,12 +136,12 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
           style={styles.smallInput}
           value={item.stock}
           onChangeText={(v) => updateItem(index, { stock: v })}
-          placeholder="Stock"
+          placeholder={t('mobile.sellerProductForm.stockLabel')}
           keyboardType="numeric"
           placeholderTextColor={colors.textSecondary}
         />
         <TouchableOpacity style={styles.removeBtn} onPress={() => removeItem(index)}>
-          <Text style={styles.removeText}>Quitar</Text>
+          <Text style={styles.removeText}>{t('mobile.common.remove')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -142,8 +150,8 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Carga masiva de productos</Text>
-        <Text style={styles.subtitle}>Elegí una categoría, completá los datos y creá varios productos de una vez.</Text>
+        <Text style={styles.title}>{t('mobile.sellerBulkProducts.title')}</Text>
+        <Text style={styles.subtitle}>{t('mobile.sellerBulkProducts.subtitle')}</Text>
       </View>
 
       {/* Selector de categoría */}
@@ -173,16 +181,16 @@ export default function SellerBulkProductsScreen({ navigation }: any) {
           contentContainerStyle={{ padding: 12, gap: 10, paddingBottom: 32 }}
           ListHeaderComponent={
             <View style={{ marginBottom: 8 }}>
-              <NeoButton title="Agregar producto manual" variant="secondary" onPress={addManual} />
+              <NeoButton title={t('mobile.sellerBulkProducts.addManualButton')} variant="secondary" onPress={addManual} />
             </View>
           }
           ListEmptyComponent={
-            <EmptyState message={selectedCat ? 'No hay plantillas en esta categoría. Agregá productos manualmente.' : 'Elegí una categoría arriba.'} />
+            <EmptyState message={selectedCat ? t('mobile.sellerBulkProducts.emptyWithCategoryMessage') : t('mobile.sellerBulkProducts.emptyNoCategoryMessage')} />
           }
           ListFooterComponent={
             items.length > 0 ? (
               <View style={{ marginTop: 8 }}>
-                <NeoButton title={busy ? 'Creando...' : `Crear ${items.length} producto(s)`} onPress={createAll} disabled={busy} />
+                <NeoButton title={busy ? t('mobile.sellerBulkProducts.creatingButton') : t('mobile.sellerBulkProducts.createButton', { count: items.length })} onPress={createAll} disabled={busy} />
               </View>
             ) : null
           }

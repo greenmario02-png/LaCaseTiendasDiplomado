@@ -1,6 +1,7 @@
 import React, { useMemo,  useState  } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Store } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../stores/authStore';
 import { getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -9,6 +10,7 @@ import { NeoInput } from '../components/redesign/NeoInput';
 
 export default function LoginScreen({ navigation }: any) {
   const { colors, raised } = useAppTheme();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const login = useAuthStore((s) => s.login);
   const [email, setEmail] = useState('');
@@ -19,7 +21,7 @@ export default function LoginScreen({ navigation }: any) {
   const submit = async () => {
     setError('');
     if (!email || !password) {
-      setError('Ingresá tu email y contraseña');
+      setError(t('mobile.login.errorMissingFields'));
       return;
     }
     setLoading(true);
@@ -39,8 +41,8 @@ export default function LoginScreen({ navigation }: any) {
           <View style={[styles.logoBox, raised]}>
             <Store size={30} color={colors.primary} />
           </View>
-          <Text style={styles.logo}>LaCase Multi Tiendas</Text>
-          <Text style={styles.subtitle}>Bienvenido de nuevo</Text>
+          <Text style={styles.logo}>{t('mobile.login.brandTitle')}</Text>
+          <Text style={styles.subtitle}>{t('mobile.login.subtitle')}</Text>
 
           {error ? (
             <View style={styles.errorBox}>
@@ -49,7 +51,7 @@ export default function LoginScreen({ navigation }: any) {
           ) : null}
 
           <NeoInput
-            placeholder="Email"
+            placeholder={t('mobile.common.email')}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -60,7 +62,7 @@ export default function LoginScreen({ navigation }: any) {
             returnKeyType="next"
           />
           <NeoInput
-            placeholder="Contraseña"
+            placeholder={t('mobile.common.password')}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -71,10 +73,10 @@ export default function LoginScreen({ navigation }: any) {
             onSubmitEditing={submit}
           />
 
-          <NeoButton title={loading ? 'Ingresando...' : 'Ingresar'} onPress={submit} disabled={loading} />
+          <NeoButton title={loading ? t('mobile.login.submitting') : t('mobile.login.submit')} onPress={submit} disabled={loading} />
 
           <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.linkWrap}>
-            <Text style={styles.link}>¿No tenés cuenta? Registrate</Text>
+            <Text style={styles.link}>{t('mobile.login.noAccountLink')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

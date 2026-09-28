@@ -1,6 +1,7 @@
 import React, { useMemo,  useEffect, useState, useCallback  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, resolveImageUrl } from '../services/api';
 import { cartCacheGet, cartCacheSet, queueList, queueRemove, queuePush } from '../services/offlineCache';
 import { NeoButton } from '../components/redesign/NeoButton';
@@ -13,6 +14,7 @@ function money(v: string | number): string {
 }
 
 export default function CartScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [cart, setCart] = useState<any>(null);
@@ -75,8 +77,8 @@ export default function CartScreen({ navigation }: any) {
     <View style={styles.flex}>
       {items.length === 0 ? (
         <View style={styles.center}>
-          <EmptyState message="Tu carrito está vacío" />
-          <NeoButton title="Ir a comprar" onPress={() => navigation.navigate('Home')} />
+          <EmptyState message={t('mobile.cart.emptyCart')} />
+          <NeoButton title={t('mobile.cart.goShopping')} onPress={() => navigation.navigate('Home')} />
         </View>
       ) : (
         <>
@@ -107,11 +109,11 @@ export default function CartScreen({ navigation }: any) {
             )}
           />
           <View style={styles.footer}>
-            <Text style={styles.total}>Total:</Text>
+            <Text style={styles.total}>{t('mobile.cart.total')}</Text>
             <View style={styles.totalRow}>
               <PriceDisplay price={Number(cart.subtotal)} />
             </View>
-            <NeoButton title="Finalizar compra" onPress={() => navigation.navigate('Checkout')} />
+            <NeoButton title={t('mobile.cart.checkoutButton')} onPress={() => navigation.navigate('Checkout')} />
           </View>
         </>
       )}

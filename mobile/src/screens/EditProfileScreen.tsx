@@ -1,5 +1,6 @@
 import React, { useMemo,  useState  } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { uploadImage } from '../services/upload';
 import { useAuthStore } from '../stores/authStore';
@@ -10,6 +11,7 @@ import ImagePickerButton from '../components/ImagePickerButton';
 
 export default function EditProfileScreen({ navigation }: any) {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore((s) => s.user);
   const refreshUser = useAuthStore((s) => s.refreshUser);
@@ -34,7 +36,7 @@ export default function EditProfileScreen({ navigation }: any) {
       const url = await uploadImage(uri, '/account/upload');
       setProfileImage(url);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setUploading(false);
     }
@@ -42,7 +44,7 @@ export default function EditProfileScreen({ navigation }: any) {
 
   const save = async () => {
     if (!form.firstName.trim() || !form.lastName.trim()) {
-      Alert.alert('Falta información', 'El nombre y apellido son obligatorios.');
+      Alert.alert(t('mobile.editProfile.missingInfoTitle'), t('mobile.editProfile.missingInfoMessage'));
       return;
     }
     setSaving(true);
@@ -58,10 +60,10 @@ export default function EditProfileScreen({ navigation }: any) {
         ...(profileImage ? { profileImage } : {}),
       });
       await refreshUser();
-      Alert.alert('Listo', 'Perfil actualizado correctamente.');
+      Alert.alert(t('mobile.common.done'), t('mobile.editProfile.updateSuccessMessage'));
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -69,49 +71,49 @@ export default function EditProfileScreen({ navigation }: any) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Editar perfil</Text>
-      <Text style={styles.subtitle}>Actualizá tus datos personales.</Text>
+      <Text style={styles.title}>{t('mobile.editProfile.title')}</Text>
+      <Text style={styles.subtitle}>{t('mobile.editProfile.subtitle')}</Text>
 
-      <Text style={styles.label}>Foto de perfil</Text>
+      <Text style={styles.label}>{t('mobile.editProfile.photoLabel')}</Text>
       <ImagePickerButton
-        label={uploading ? 'Subiendo...' : 'Cambiar foto'}
+        label={uploading ? t('mobile.common.uploading') : t('mobile.editProfile.changePhotoButton')}
         currentUri={profileImage}
         onPicked={handlePickedImage}
         square
         uploading={uploading}
       />
 
-      <Text style={styles.label}>Nombre *</Text>
-      <NeoInput style={styles.input} value={form.firstName} onChangeText={(v) => set('firstName', v)} placeholder="Tu nombre" />
+      <Text style={styles.label}>{t('mobile.editProfile.firstNameLabel')}</Text>
+      <NeoInput style={styles.input} value={form.firstName} onChangeText={(v) => set('firstName', v)} placeholder={t('mobile.editProfile.firstNamePlaceholder')} />
 
-      <Text style={styles.label}>Apellido *</Text>
-      <NeoInput style={styles.input} value={form.lastName} onChangeText={(v) => set('lastName', v)} placeholder="Tu apellido" />
+      <Text style={styles.label}>{t('mobile.editProfile.lastNameLabel')}</Text>
+      <NeoInput style={styles.input} value={form.lastName} onChangeText={(v) => set('lastName', v)} placeholder={t('mobile.editProfile.lastNamePlaceholder')} />
 
-      <Text style={styles.label}>Teléfono</Text>
-      <NeoInput style={styles.input} value={form.phone} onChangeText={(v) => set('phone', v)} placeholder="Ej: 591 70000000" keyboardType="phone-pad" />
+      <Text style={styles.label}>{t('mobile.common.phone')}</Text>
+      <NeoInput style={styles.input} value={form.phone} onChangeText={(v) => set('phone', v)} placeholder={t('mobile.editProfile.phonePlaceholder')} keyboardType="phone-pad" />
 
-      <Text style={styles.label}>País</Text>
-      <NeoInput style={styles.input} value={form.country} onChangeText={(v) => set('country', v)} placeholder="Ej: Bolivia" />
+      <Text style={styles.label}>{t('mobile.common.country')}</Text>
+      <NeoInput style={styles.input} value={form.country} onChangeText={(v) => set('country', v)} placeholder={t('mobile.editProfile.countryPlaceholder')} />
 
-      <Text style={styles.label}>Ciudad</Text>
-      <NeoInput style={styles.input} value={form.locationCity} onChangeText={(v) => set('locationCity', v)} placeholder="Ej: La Paz" />
+      <Text style={styles.label}>{t('mobile.common.city')}</Text>
+      <NeoInput style={styles.input} value={form.locationCity} onChangeText={(v) => set('locationCity', v)} placeholder={t('mobile.editProfile.cityPlaceholder')} />
 
-      <Text style={styles.label}>Departamento / Provincia</Text>
-      <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder="Ej: La Paz" />
+      <Text style={styles.label}>{t('mobile.common.stateProvince')}</Text>
+      <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder={t('mobile.editProfile.cityPlaceholder')} />
 
-      <Text style={styles.label}>Sobre vos</Text>
+      <Text style={styles.label}>{t('mobile.editProfile.bioLabel')}</Text>
       <NeoInput
         style={styles.textarea}
         value={form.bio}
         onChangeText={(v) => set('bio', v)}
-        placeholder="Contá algo sobre vos..."
+        placeholder={t('mobile.editProfile.bioPlaceholder')}
         multiline
       />
 
       <View style={styles.buttonWrap}>
-        <NeoButton title={saving ? 'Guardando...' : 'Guardar cambios'} onPress={save} disabled={saving} />
+        <NeoButton title={saving ? t('mobile.common.saving') : t('mobile.common.saveChanges')} onPress={save} disabled={saving} />
       </View>
-      <NeoButton title="Cancelar" variant="ghost" onPress={() => navigation.goBack()} />
+      <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => navigation.goBack()} />
     </ScrollView>
   );
 }

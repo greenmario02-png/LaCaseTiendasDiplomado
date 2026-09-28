@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { queuePush } from '../services/offlineCache';
 import { useAuthStore } from '../stores/authStore';
@@ -15,13 +16,14 @@ function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
 }
 
-function verdict(rating: number): { label: string; color: string } {
-  if (rating >= 4.5) return { label: 'Muy recomendado', color: themeColors.success };
-  if (rating >= 3.5) return { label: 'Recomendado', color: themeColors.info };
-  return { label: 'No recomendado', color: themeColors.warning };
+function verdict(rating: number, t: (key: string) => string): { label: string; color: string } {
+  if (rating >= 4.5) return { label: t('mobile.productDetail.verdictHighlyRecommended'), color: themeColors.success };
+  if (rating >= 3.5) return { label: t('mobile.productDetail.verdictRecommended'), color: themeColors.info };
+  return { label: t('mobile.productDetail.verdictNotRecommended'), color: themeColors.warning };
 }
 
 export default function ProductDetailScreen({ route, navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
@@ -53,11 +55,11 @@ export default function ProductDetailScreen({ route, navigation }: any) {
     setAdding(true);
     try {
       await api.post('/cart/items', { productId: id, quantity: qty });
-      Alert.alert('¡Listo!', 'Producto agregado al carrito');
+      Alert.alert(t('mobile.productDetail.addedTitle'), t('mobile.productDetail.addedMessage'));
     } catch (err) {
       // Sin conexión: encolar para que se agregue cuando vuelva la red
       await queuePush({ method: 'post', url: '/cart/items', data: { productId: id, quantity: qty } });
-      Alert.alert('Sin conexión', 'Se guardó en tu carrito offline. Se sincronizará cuando vuelva la conexión.');
+      Alert.alert(t('mobile.productDetail.offlineTitle'), t('mobile.productDetail.offlineMessage'));
     } finally {
       setAdding(false);
     }
@@ -65,9 +67,9 @@ export default function ProductDetailScreen({ route, navigation }: any) {
 
   const consult = async () => {
     if (!user) {
-      Alert.alert('Iniciá sesión', 'Para consultar por un producto necesitás iniciar sesión.', [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Iniciar sesión', onPress: () => navigation.navigate('Login') },
+      Alert.alert(t('mobile.productDetail.loginRequiredTitle'), t('mobile.productDetail.loginRequiredMessage'), [
+        { text: t('mobile.common.cancel'), style: 'cancel' },
+        { text: t('mobile.productDetail.loginButton'), onPress: () => navigation.navigate('Login') },
       ]);
       return;
     }
@@ -75,7 +77,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
       const { data } = await api.post('/chat', { sellerId: product.seller.id, productId: product.id });
       navigation.navigate('ChatThread', { id: data.data.id });
     } catch (err) {
-      Alert.alert('Error', getErrorMessage(err));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(err));
     }
   };
 
@@ -85,7 +87,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
   if (!product) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>Producto no encontrado</Text>
+        <Text style={styles.error}>{t('mobile.productDetail.notFound')}</Text>
       </View>
     );
   }
@@ -101,12 +103,12 @@ export default function ProductDetailScreen({ route, navigation }: any) {
 
       <View style={styles.body}>
         <Text style={styles.name}>{product.name}</Text>
-        {product.condition === 'NEW' && <Text style={styles.new}>Nuevo</Text>}
-        {product.condition === 'USED' && <Text style={styles.used}>Usado ({product.conditionScore}/10)</Text>}
+        {product.condition === 'NEW' && <Text style={styles.new}>{t('mobile.productDetail.new')}</Text>}
+        {product.condition === 'USED' && <Text style={styles.used}>{t('mobile.productDetail.used', { score: product.conditionScore })}</Text>}
         {product.saleCount ? (
           <View style={styles.soldRow}>
             <BadgeCheck size={14} color={colors.success} />
-            <Text style={styles.sold}>{product.saleCount} vendidos</Text>
+            <Text style={styles.sold}>{t('mobile.productDetail.soldCount', { count: product.saleCount })}</Text>
           </View>
         ) : null}
 
@@ -114,8 +116,8 @@ export default function ProductDetailScreen({ route, navigation }: any) {
           <View style={styles.viewsRow}>
             <Eye size={14} color={colors.info} />
             <Text style={styles.views}>
-              {product.viewingNow > 0 && `${product.viewingNow} persona(s) están viendo ahora · `}
-              Visto por {product.viewCount} persona(s)
+              {product.viewingNow > 0 && t('mobile.productDetail.viewingNow', { count: product.viewingNow })}
+              {t('mobile.productDetail.viewedBy', { count: product.viewCount })}
             </Text>
           </View>
         )}
@@ -131,16 +133,16 @@ export default function ProductDetailScreen({ route, navigation }: any) {
         {product.seller?.freeShippingThreshold ? (
           <View style={styles.freeShipRow}>
             <Truck size={14} color={colors.success} />
-            <Text style={styles.freeShip}>Envío gratis desde {money(product.seller.freeShippingThreshold)}</Text>
+            <Text style={styles.freeShip}>{t('mobile.productDetail.freeShipping', { amount: money(product.seller.freeShippingThreshold) })}</Text>
           </View>
         ) : null}
 
-        <Text style={styles.section}>Descripción</Text>
-        <Text style={styles.desc}>{product.description || 'Sin descripción'}</Text>
+        <Text style={styles.section}>{t('mobile.productDetail.descriptionTitle')}</Text>
+        <Text style={styles.desc}>{product.description || t('mobile.productDetail.noDescription')}</Text>
 
         {product.attributes?.length > 0 && (
           <>
-            <Text style={styles.section}>Especificaciones</Text>
+            <Text style={styles.section}>{t('mobile.productDetail.specificationsTitle')}</Text>
             {product.attributes.map((a: any, idx: number) => (
               <View key={idx} style={styles.specRow}>
                 <Text style={styles.specName}>{a.attributeDefinition?.name || a.name}:</Text>
@@ -166,14 +168,14 @@ export default function ProductDetailScreen({ route, navigation }: any) {
         )}
 
         {/* Reseñas */}
-        <Text style={styles.section}>Reseñas ({reviews.length})</Text>
+        <Text style={styles.section}>{t('mobile.productDetail.reviewsTitle', { count: reviews.length })}</Text>
         {reviews.length === 0 ? (
-          <Text style={styles.desc}>Aún no hay reseñas. Sé el primero.</Text>
+          <Text style={styles.desc}>{t('mobile.productDetail.noReviews')}</Text>
         ) : (
           <>
             {(() => {
               const avg = reviews.reduce((a, r) => a + r.rating, 0) / reviews.length;
-              const v = verdict(avg);
+              const v = verdict(avg, t);
               const dist = [5, 4, 3, 2, 1].map((star) => ({
                 star,
                 pct: (reviews.filter((r) => r.rating === star).length / reviews.length) * 100,
@@ -184,7 +186,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
                     <Text style={styles.reviewAvg}>{avg.toFixed(1)}</Text>
                     <Text style={[styles.reviewVerdict, { color: v.color }]}>{v.label}</Text>
                   </View>
-                  <Text style={styles.reviewTotal}>{reviews.length} persona(s) calificaron</Text>
+                  <Text style={styles.reviewTotal}>{t('mobile.productDetail.ratedByCount', { count: reviews.length })}</Text>
                   {dist.map((d) => (
                     <View key={d.star} style={styles.distRow}>
                       <View style={styles.distLabelRow}>
@@ -238,17 +240,17 @@ export default function ProductDetailScreen({ route, navigation }: any) {
             </View>
           )}
           <NeoButton
-            title={outOfStock ? 'Sin stock' : adding ? 'Agregando...' : 'Agregar al carrito'}
+            title={outOfStock ? t('mobile.productDetail.outOfStock') : adding ? t('mobile.productDetail.adding') : t('mobile.productDetail.addToCart')}
             onPress={addToCart}
             disabled={outOfStock || adding}
             style={styles.addBtn}
           />
           {product.seller && (
-            <NeoButton title="Consultar" onPress={consult} />
+            <NeoButton title={t('mobile.productDetail.consult')} onPress={consult} />
           )}
         </View>
 
-        {!user && <Text style={styles.loginHint}>Iniciá sesión para un carrito persistente</Text>}
+        {!user && <Text style={styles.loginHint}>{t('mobile.productDetail.loginHint')}</Text>}
       </View>
     </ScrollView>
   );

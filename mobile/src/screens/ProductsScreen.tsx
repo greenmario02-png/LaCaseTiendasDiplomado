@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, resolveImageUrl } from '../services/api';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { NeoInput } from '../components/redesign/NeoInput';
@@ -7,6 +8,7 @@ import { LoadingState, EmptyState, ErrorState } from '../components/redesign/Sta
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function ProductsScreen({ navigation, route }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { categoryId: initialCategoryId, categoryName: initialCategoryName } = route.params ?? {};
@@ -44,7 +46,7 @@ export default function ProductsScreen({ navigation, route }: any) {
       setNextCursor(data.meta?.nextCursor ?? null);
       setHasMore(Boolean(data.meta?.hasMore));
     } catch (err: any) {
-      setError(err?.response?.data?.error?.message || 'Error al cargar productos');
+      setError(err?.response?.data?.error?.message || t('mobile.products.loadError'));
     }
   };
 
@@ -73,7 +75,7 @@ export default function ProductsScreen({ navigation, route }: any) {
     <View style={styles.flex}>
       <NeoInput
         style={styles.search}
-        placeholder="Buscar productos..."
+        placeholder={t('mobile.products.searchPlaceholder')}
         value={search}
         onChangeText={setSearch}
       />
@@ -85,7 +87,7 @@ export default function ProductsScreen({ navigation, route }: any) {
             style={[styles.chip, categoryId === null && styles.chipActive]}
             onPress={() => selectCategory(null, null)}
           >
-            <Text style={[styles.chipText, categoryId === null && styles.chipTextActive]}>Todas</Text>
+            <Text style={[styles.chipText, categoryId === null && styles.chipTextActive]}>{t('mobile.products.allChip')}</Text>
           </TouchableOpacity>
           {categories.map((c) => (
             <TouchableOpacity
@@ -115,7 +117,7 @@ export default function ProductsScreen({ navigation, route }: any) {
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}
           ListFooterComponent={loadingMore ? <ActivityIndicator color={colors.primary} style={{ marginVertical: 16 }} /> : null}
-          ListEmptyComponent={<EmptyState message="No hay productos" />}
+          ListEmptyComponent={<EmptyState message={t('mobile.products.emptyProducts')} />}
           renderItem={({ item }) => (
             <View style={{ flex: 1, maxWidth: '48%' }}>
               <ProductCard

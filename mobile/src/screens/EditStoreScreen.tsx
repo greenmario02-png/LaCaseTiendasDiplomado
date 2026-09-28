@@ -1,5 +1,6 @@
 import React, { useMemo,  useState  } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { uploadImage } from '../services/upload';
 import { useAuthStore } from '../stores/authStore';
@@ -10,6 +11,7 @@ import ImagePickerButton from '../components/ImagePickerButton';
 
 export default function EditStoreScreen({ navigation }: any) {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore((s) => s.user);
   const refreshUser = useAuthStore((s) => s.refreshUser);
@@ -37,7 +39,7 @@ export default function EditStoreScreen({ navigation }: any) {
       const url = await uploadImage(uri, '/seller/upload');
       setStoreLogo(url);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setUploading(false);
     }
@@ -45,7 +47,7 @@ export default function EditStoreScreen({ navigation }: any) {
 
   const save = async () => {
     if (!form.storeName.trim()) {
-      Alert.alert('Falta información', 'El nombre de la tienda es obligatorio.');
+      Alert.alert(t('mobile.editStore.missingInfoTitle'), t('mobile.editStore.missingInfoMessage'));
       return;
     }
     setSaving(true);
@@ -67,10 +69,10 @@ export default function EditStoreScreen({ navigation }: any) {
       }
       await api.put('/seller/profile', payload);
       await refreshUser();
-      Alert.alert('Listo', 'Tienda actualizada correctamente.');
+      Alert.alert(t('mobile.common.done'), t('mobile.editStore.updateSuccessMessage'));
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -78,60 +80,60 @@ export default function EditStoreScreen({ navigation }: any) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Editar tienda</Text>
-      <Text style={styles.subtitle}>Actualizá la información pública de tu tienda.</Text>
+      <Text style={styles.title}>{t('mobile.editStore.title')}</Text>
+      <Text style={styles.subtitle}>{t('mobile.editStore.subtitle')}</Text>
 
-      <Text style={styles.label}>Logo de la tienda</Text>
+      <Text style={styles.label}>{t('mobile.editStore.logoLabel')}</Text>
       <ImagePickerButton
-        label={uploading ? 'Subiendo...' : 'Cambiar logo'}
+        label={uploading ? t('mobile.common.uploading') : t('mobile.editStore.changeLogoButton')}
         currentUri={storeLogo}
         onPicked={handlePickedLogo}
         square
         uploading={uploading}
       />
 
-      <Text style={styles.label}>Nombre de la tienda *</Text>
-      <NeoInput style={styles.input} value={form.storeName} onChangeText={(v) => set('storeName', v)} placeholder="Ej: Gislason - Kreiger" />
+      <Text style={styles.label}>{t('mobile.editStore.storeNameLabel')}</Text>
+      <NeoInput style={styles.input} value={form.storeName} onChangeText={(v) => set('storeName', v)} placeholder={t('mobile.editStore.storeNamePlaceholder')} />
 
-      <Text style={styles.label}>Categoría de la tienda</Text>
-      <NeoInput style={styles.input} value={form.storeCategory} onChangeText={(v) => set('storeCategory', v)} placeholder="Ej: Tecnología, Moda, Hogar..." />
+      <Text style={styles.label}>{t('mobile.editStore.categoryLabel')}</Text>
+      <NeoInput style={styles.input} value={form.storeCategory} onChangeText={(v) => set('storeCategory', v)} placeholder={t('mobile.editStore.categoryPlaceholder')} />
 
-      <Text style={styles.label}>Descripción</Text>
+      <Text style={styles.label}>{t('mobile.editStore.descriptionLabel')}</Text>
       <NeoInput
         style={styles.textarea}
         value={form.storeDescription}
         onChangeText={(v) => set('storeDescription', v)}
-        placeholder="Contá qué vendés..."
+        placeholder={t('mobile.editStore.descriptionPlaceholder')}
         multiline
       />
 
-      <Text style={styles.label}>WhatsApp</Text>
-      <NeoInput style={styles.input} value={form.whatsappPhone} onChangeText={(v) => set('whatsappPhone', v)} placeholder="Ej: 59170000000" keyboardType="phone-pad" />
+      <Text style={styles.label}>{t('mobile.editStore.whatsappLabel')}</Text>
+      <NeoInput style={styles.input} value={form.whatsappPhone} onChangeText={(v) => set('whatsappPhone', v)} placeholder={t('mobile.editStore.whatsappPlaceholder')} keyboardType="phone-pad" />
 
-      <Text style={styles.label}>Ciudad</Text>
-      <NeoInput style={styles.input} value={form.locationCity} onChangeText={(v) => set('locationCity', v)} placeholder="Ej: La Paz" />
+      <Text style={styles.label}>{t('mobile.common.city')}</Text>
+      <NeoInput style={styles.input} value={form.locationCity} onChangeText={(v) => set('locationCity', v)} placeholder={t('mobile.editStore.cityPlaceholder')} />
 
-      <Text style={styles.label}>Departamento / Provincia</Text>
-      <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder="Ej: La Paz" />
+      <Text style={styles.label}>{t('mobile.common.stateProvince')}</Text>
+      <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder={t('mobile.editStore.statePlaceholder')} />
 
-      <Text style={styles.label}>Envío gratis desde (Bs)</Text>
-      <NeoInput style={styles.input} value={form.freeShippingThreshold} onChangeText={(v) => set('freeShippingThreshold', v)} placeholder="Ej: 300" keyboardType="numeric" />
+      <Text style={styles.label}>{t('mobile.editStore.freeShippingLabel')}</Text>
+      <NeoInput style={styles.input} value={form.freeShippingThreshold} onChangeText={(v) => set('freeShippingThreshold', v)} placeholder={t('mobile.editStore.freeShippingPlaceholder')} keyboardType="numeric" />
 
-      <Text style={styles.section}>Redes sociales</Text>
+      <Text style={styles.section}>{t('mobile.editStore.socialSection')}</Text>
 
-      <Text style={styles.label}>Instagram</Text>
-      <NeoInput style={styles.input} value={form.instagramUrl} onChangeText={(v) => set('instagramUrl', v)} placeholder="https://instagram.com/..." />
+      <Text style={styles.label}>{t('mobile.editStore.instagramLabel')}</Text>
+      <NeoInput style={styles.input} value={form.instagramUrl} onChangeText={(v) => set('instagramUrl', v)} placeholder={t('mobile.editStore.instagramPlaceholder')} />
 
-      <Text style={styles.label}>Facebook</Text>
-      <NeoInput style={styles.input} value={form.facebookUrl} onChangeText={(v) => set('facebookUrl', v)} placeholder="https://facebook.com/..." />
+      <Text style={styles.label}>{t('mobile.editStore.facebookLabel')}</Text>
+      <NeoInput style={styles.input} value={form.facebookUrl} onChangeText={(v) => set('facebookUrl', v)} placeholder={t('mobile.editStore.facebookPlaceholder')} />
 
-      <Text style={styles.label}>TikTok</Text>
-      <NeoInput style={styles.input} value={form.tiktokUrl} onChangeText={(v) => set('tiktokUrl', v)} placeholder="https://tiktok.com/..." />
+      <Text style={styles.label}>{t('mobile.editStore.tiktokLabel')}</Text>
+      <NeoInput style={styles.input} value={form.tiktokUrl} onChangeText={(v) => set('tiktokUrl', v)} placeholder={t('mobile.editStore.tiktokPlaceholder')} />
 
       <View style={styles.buttonWrap}>
-        <NeoButton title={saving ? 'Guardando...' : 'Guardar cambios'} onPress={save} disabled={saving} />
+        <NeoButton title={saving ? t('mobile.common.saving') : t('mobile.common.saveChanges')} onPress={save} disabled={saving} />
       </View>
-      <NeoButton title="Cancelar" variant="ghost" onPress={() => navigation.goBack()} />
+      <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => navigation.goBack()} />
     </ScrollView>
   );
 }

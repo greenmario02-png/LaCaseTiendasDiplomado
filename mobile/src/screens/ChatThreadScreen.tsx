@@ -1,6 +1,7 @@
-﻿import React, { useMemo,  useEffect, useState, useRef  } from 'react';
+import React, { useMemo,  useEffect, useState, useRef  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { io, Socket } from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, tokenStore } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { SOCKET_URL } from '../config/env';
@@ -8,6 +9,7 @@ import { LoadingState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function ChatThreadScreen({ route, navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { id } = route.params;
@@ -125,11 +127,11 @@ export default function ChatThreadScreen({ route, navigation }: any) {
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'padding'} keyboardVerticalOffset={Platform.OS === 'android' ? 40 : 0}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>â†</Text>
+          <Text style={styles.back}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1, marginLeft: 10 }}>
           <Text style={styles.headerName}>{other?.storeName ?? `${other?.firstName} ${other?.lastName}`}</Text>
-          {conversation?.product && <Text style={styles.headerProduct} numberOfLines={1}>ðŸ“¦ {conversation.product.name}</Text>}
+          {conversation?.product && <Text style={styles.headerProduct} numberOfLines={1}>📦 {conversation.product.name}</Text>}
         </View>
       </View>
 
@@ -146,7 +148,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
               <Text style={[styles.bubbleText, mine ? styles.bubbleTextMine : styles.bubbleTextOther]}>{item.content}</Text>
               <Text style={styles.bubbleTime}>
                 {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                {mine && (item.readAt ? ' âœ“âœ“' : ' âœ“')}
+                {mine && (item.readAt ? ' ✓✓' : ' ✓')}
               </Text>
             </View>
           );
@@ -155,7 +157,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
 
       {messages.length === 0 && icebreakers.length > 0 && (
         <View style={styles.suggestBox}>
-          <Text style={styles.suggestTitle}>💬 Sugerencias para empezar ({suggestions?.region ?? ''}):</Text>
+          <Text style={styles.suggestTitle}>{t('mobile.chatThread.startSuggestions', { region: suggestions?.region ?? '' })}</Text>
           <View style={styles.suggestRow}>
             {icebreakers.slice(0, 4).map((p) => (
               <TouchableOpacity key={p} style={styles.suggestChip} onPress={() => sendPhrase(p)} disabled={sending}>
@@ -167,7 +169,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
       )}
       {suggestions?.inactive && messages.length > 0 && (
         <View style={styles.suggestBox}>
-          <Text style={styles.suggestTitle}>⏰ Sin respuesta todavía — sugerencias ({suggestions.region}):</Text>
+          <Text style={styles.suggestTitle}>{t('mobile.chatThread.inactiveSuggestions', { region: suggestions.region })}</Text>
           <View style={styles.suggestRow}>
             {(suggestions.followUps ?? []).slice(0, 2).map((p: string) => (
               <TouchableOpacity key={p} style={styles.suggestChip} onPress={() => sendPhrase(p)} disabled={sending}>
@@ -186,14 +188,14 @@ export default function ChatThreadScreen({ route, navigation }: any) {
       <View style={styles.inputBar}>
         <TextInput
           style={styles.input}
-          placeholder="EscribÃ­ un mensaje..."
+          placeholder={t('mobile.chatThread.inputPlaceholder')}
           value={text}
           onChangeText={setText}
           placeholderTextColor="#999"
           multiline
         />
         <TouchableOpacity style={styles.sendBtn} onPress={send} disabled={sending || !text.trim()}>
-          <Text style={styles.sendText}>âž¤</Text>
+          <Text style={styles.sendText}>➤</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -225,4 +227,3 @@ const makeStyles = (colors: any) =>
   suggestChip: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 18, paddingHorizontal: 10, paddingVertical: 5 },
   suggestChipText: { fontSize: 12, color: colors.primary, fontWeight: '600' },
 });
-

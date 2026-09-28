@@ -1,0 +1,8 @@
+{
+  "es": { "name": "Español", "nativeName": "Español", "status": "stable", "isDefault": true },
+  "qu": { "name": "Quechua", "nativeName": "Runasimi", "status": "stable" },
+  "ay": { "name": "Aymara", "nativeName": "Aymar aru", "status": "stable" },
+  "gn": { "name": "Guaraní", "nativeName": "Avañe'ẽ", "status": "stable" },
+  "pt": { "name": "Portuguese", "nativeName": "Português", "status": "stable" },
+  "en": { "name": "English", "nativeName": "English", "status": "stub" }
+}

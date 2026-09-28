@@ -2,24 +2,25 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView, RefreshControl, Linking } from 'react-native';
 import { Phone, MessageCircle, Mail, FileText, Users, X } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, openApplicationCv } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState, ErrorState } from '../components/redesign/States';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: 'Pendiente de aprobación',
-  APPROVED: 'Publicado',
-  REJECTED: 'Rechazado',
-  CLOSED: 'Cerrado',
+const JOB_STATUS_KEY: Record<string, string> = {
+  PENDING: 'mobile.sellerJobs.statusPendingApproval',
+  APPROVED: 'mobile.sellerJobs.statusPublished',
+  REJECTED: 'mobile.common.rejected',
+  CLOSED: 'mobile.common.closed',
 };
-const PERIODS: { key: string; label: string }[] = [
-  { key: 'DAILY', label: 'Diario' },
-  { key: 'WEEKLY', label: 'Semanal' },
-  { key: 'MONTHLY', label: 'Mensual' },
+const PERIODS: { key: string; labelKey: string }[] = [
+  { key: 'DAILY', labelKey: 'periodDaily' },
+  { key: 'WEEKLY', labelKey: 'periodWeekly' },
+  { key: 'MONTHLY', labelKey: 'periodMonthly' },
 ];
-const PERIOD_LABEL: Record<string, string> = { DAILY: 'Diario', WEEKLY: 'Semanal', MONTHLY: 'Mensual' };
+const PERIOD_KEY: Record<string, string> = { DAILY: 'periodDaily', WEEKLY: 'periodWeekly', MONTHLY: 'periodMonthly' };
 
 const emptyForm = {
   categoryId: '',
@@ -39,19 +40,26 @@ const emptyForm = {
 function fmt(v: any) {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 });
 }
-function salaryText(j: any) {
-  const p = PERIOD_LABEL[j.payPeriod] ?? '';
+function periodLabel(period: string, t: any) {
+  const key = PERIOD_KEY[period];
+  return key ? t(`mobile.sellerJobs.${key}`) : '';
+}
+function salaryText(j: any, t: any) {
+  const p = periodLabel(j.payPeriod, t);
   const hasMin = j.salaryMin != null && j.salaryMin !== '';
   const hasMax = j.salaryMax != null && j.salaryMax !== '';
-  if (!hasMin && !hasMax) return `Sueldo a convenir · ${p}`;
-  if (hasMin && hasMax) return `${fmt(j.salaryMin)} - ${fmt(j.salaryMax)} Bs · ${p}`;
-  return `${hasMin ? 'Desde' : 'Hasta'} ${fmt(hasMin ? j.salaryMin : j.salaryMax)} Bs · ${p}`;
+  if (!hasMin && !hasMax) return t('mobile.sellerJobs.salaryNegotiated', { period: p });
+  if (hasMin && hasMax) return t('mobile.sellerJobs.salaryRange', { min: fmt(j.salaryMin), max: fmt(j.salaryMax), period: p });
+  return hasMin
+    ? t('mobile.sellerJobs.salaryFrom', { amount: fmt(j.salaryMin), period: p })
+    : t('mobile.sellerJobs.salaryTo', { amount: fmt(j.salaryMax), period: p });
 }
 function dateText(d: string) {
   return new Date(d).toLocaleDateString('es-BO');
 }
 
 export default function SellerJobsScreen() {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [appsJob, setAppsJob] = useState<any | null>(null);
@@ -104,10 +112,10 @@ export default function SellerJobsScreen() {
   };
 
   const openEdit = (j: any) => {
-    Alert.alert('Editar empleo', 'Al guardar los cambios, el empleo vuelve a revisión y queda pendiente de aprobación.', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerJobs.editJobTitle'), t('mobile.sellerJobs.editJobMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Continuar',
+        text: t('mobile.sellerJobs.continueButton'),
         onPress: () => {
           setEditingId(j.id);
           setForm({
@@ -133,20 +141,20 @@ export default function SellerJobsScreen() {
   const save = async () => {
     const title = form.title.trim();
     const description = form.description.trim();
-    if (!form.categoryId) return Alert.alert('Falta información', 'Elegí una categoría.');
-    if (title.length < 5) return Alert.alert('Falta información', 'El título debe tener al menos 5 caracteres.');
-    if (description.length < 20) return Alert.alert('Falta información', 'La descripción debe tener al menos 20 caracteres.');
-    if (!form.city.trim()) return Alert.alert('Falta información', 'La ciudad es obligatoria.');
+    if (!form.categoryId) return Alert.alert(t('mobile.sellerJobs.missingInfoTitle'), t('mobile.sellerJobs.missingCategoryMessage'));
+    if (title.length < 5) return Alert.alert(t('mobile.sellerJobs.missingInfoTitle'), t('mobile.sellerJobs.titleTooShortMessage'));
+    if (description.length < 20) return Alert.alert(t('mobile.sellerJobs.missingInfoTitle'), t('mobile.sellerJobs.descriptionTooShortMessage'));
+    if (!form.city.trim()) return Alert.alert(t('mobile.sellerJobs.missingInfoTitle'), t('mobile.sellerJobs.cityRequiredMessage'));
     const min = form.salaryMin.trim() ? Number(form.salaryMin) : undefined;
     const max = form.salaryMax.trim() ? Number(form.salaryMax) : undefined;
     if ((min !== undefined && (isNaN(min) || min < 0)) || (max !== undefined && (isNaN(max) || max < 0))) {
-      return Alert.alert('Sueldo inválido', 'Ingresá montos numéricos válidos.');
+      return Alert.alert(t('mobile.sellerJobs.invalidSalaryTitle'), t('mobile.sellerJobs.invalidSalaryAmountsMessage'));
     }
     if (min !== undefined && max !== undefined && min > max) {
-      return Alert.alert('Sueldo inválido', 'El sueldo mínimo no puede ser mayor al máximo.');
+      return Alert.alert(t('mobile.sellerJobs.invalidSalaryTitle'), t('mobile.sellerJobs.invalidSalaryRangeMessage'));
     }
     const vacancies = Number(form.vacancies);
-    if (!Number.isInteger(vacancies) || vacancies < 1) return Alert.alert('Falta información', 'Las vacantes deben ser al menos 1.');
+    if (!Number.isInteger(vacancies) || vacancies < 1) return Alert.alert(t('mobile.sellerJobs.missingInfoTitle'), t('mobile.sellerJobs.vacanciesMinMessage'));
 
     const body = {
       categoryId: form.categoryId,
@@ -166,32 +174,32 @@ export default function SellerJobsScreen() {
     try {
       if (editingId) {
         await api.put(`/seller/jobs/${editingId}`, body);
-        Alert.alert('Listo', 'Empleo actualizado. Quedó pendiente de aprobación.');
+        Alert.alert(t('mobile.common.done'), t('mobile.sellerJobs.jobUpdatedMessage'));
       } else {
         await api.post('/seller/jobs', body);
-        Alert.alert('Listo', 'Empleo enviado. Será publicado cuando un administrador lo apruebe.');
+        Alert.alert(t('mobile.common.done'), t('mobile.sellerJobs.jobSubmittedMessage'));
       }
       setModalOpen(false);
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
   };
 
   const close = (j: any) => {
-    Alert.alert('Cerrar empleo', `¿Cerrar «${j.title}»? Dejará de mostrarse a los postulantes.`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerJobs.closeJobTitle'), t('mobile.sellerJobs.closeJobMessage', { title: j.title }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Cerrar empleo',
+        text: t('mobile.sellerJobs.closeJobTitle'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.post(`/seller/jobs/${j.id}/close`);
             load();
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -206,14 +214,16 @@ export default function SellerJobsScreen() {
       <View style={styles.row}>
         <Text style={styles.jobTitle} numberOfLines={2}>{item.title}</Text>
         <View style={[styles.statusChip, { borderColor: statusColor(item.status) }]}>
-          <Text style={[styles.statusText, { color: statusColor(item.status) }]}>{STATUS_LABEL[item.status] ?? item.status}</Text>
+          <Text style={[styles.statusText, { color: statusColor(item.status) }]}>
+            {JOB_STATUS_KEY[item.status] ? t(JOB_STATUS_KEY[item.status]) : item.status}
+          </Text>
         </View>
       </View>
       <Text style={styles.meta}>{item.category?.name} · {item.city}</Text>
-      <Text style={styles.salary}>{salaryText(item)}</Text>
-      {item.status === 'APPROVED' && item.expiresAt ? <Text style={styles.meta}>Vence el {dateText(item.expiresAt)}</Text> : null}
+      <Text style={styles.salary}>{salaryText(item, t)}</Text>
+      {item.status === 'APPROVED' && item.expiresAt ? <Text style={styles.meta}>{t('mobile.sellerJobs.expiresLabel', { date: dateText(item.expiresAt) })}</Text> : null}
       {item.status === 'REJECTED' && item.rejectionReason ? (
-        <Text style={[styles.meta, { color: colors.error }]}>Motivo: {item.rejectionReason}</Text>
+        <Text style={[styles.meta, { color: colors.error }]}>{t('mobile.sellerJobs.rejectionReasonLabel', { reason: item.rejectionReason })}</Text>
       ) : null}
       {(item.status === 'APPROVED' || item.status === 'CLOSED') && (
         <TouchableOpacity
@@ -222,17 +232,17 @@ export default function SellerJobsScreen() {
         >
           <Users size={14} color={(item._count?.applications ?? 0) > 0 ? '#fff' : colors.primary} />
           <Text style={[styles.miniBtnText, (item._count?.applications ?? 0) > 0 && { color: '#fff' }]}>
-            Postulantes ({item._count?.applications ?? 0})
+            {t('mobile.sellerJobs.applicantsButton', { count: item._count?.applications ?? 0 })}
           </Text>
         </TouchableOpacity>
       )}
       {item.status !== 'CLOSED' && (
         <View style={styles.actions}>
           <TouchableOpacity style={styles.miniBtn} onPress={() => openEdit(item)}>
-            <Text style={styles.miniBtnText}>Editar</Text>
+            <Text style={styles.miniBtnText}>{t('mobile.common.edit')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.error }]} onPress={() => close(item)}>
-            <Text style={[styles.miniBtnText, { color: colors.error }]}>Cerrar</Text>
+            <Text style={[styles.miniBtnText, { color: colors.error }]}>{t('mobile.common.close')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -242,15 +252,15 @@ export default function SellerJobsScreen() {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis empleos</Text>
+        <Text style={styles.title}>{t('mobile.sellerJobs.title')}</Text>
         <View style={styles.addWrap}>
-          <NeoButton title="Publicar empleo" onPress={openCreate} disabled={!canPublish} />
+          <NeoButton title={t('mobile.sellerJobs.publishButton')} onPress={openCreate} disabled={!canPublish} />
         </View>
       </View>
       {!loading && !canPublish && (
         <View style={styles.notice}>
           <Text style={styles.noticeText}>
-            Solo las tiendas verificadas pueden publicar empleos. Verificá tu tienda para poder publicar.
+            {t('mobile.sellerJobs.verificationNotice')}
           </Text>
         </View>
       )}
@@ -265,7 +275,7 @@ export default function SellerJobsScreen() {
           contentContainerStyle={{ padding: 12, gap: 10, paddingBottom: 32 }}
           renderItem={renderItem}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} colors={[colors.primary]} />}
-          ListEmptyComponent={<EmptyState message="Todavía no publicaste empleos." />}
+          ListEmptyComponent={<EmptyState message={t('mobile.sellerJobs.emptyJobs')} />}
         />
       )}
 
@@ -273,9 +283,9 @@ export default function SellerJobsScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
             <ScrollView keyboardShouldPersistTaps="handled">
-              <Text style={styles.modalTitle}>{editingId ? 'Editar empleo' : 'Publicar empleo'}</Text>
-              {editingId ? <Text style={styles.hint}>Al guardar, vuelve a revisión del administrador.</Text> : null}
-              <Text style={styles.label}>Categoría *</Text>
+              <Text style={styles.modalTitle}>{editingId ? t('mobile.sellerJobs.editJobTitle') : t('mobile.sellerJobs.publishButton')}</Text>
+              {editingId ? <Text style={styles.hint}>{t('mobile.sellerJobs.editHint')}</Text> : null}
+              <Text style={styles.label}>{t('mobile.sellerJobs.categoryLabel')}</Text>
               <View style={styles.chips}>
                 {categories.map((c) => {
                   const active = form.categoryId === c.id;
@@ -286,57 +296,57 @@ export default function SellerJobsScreen() {
                   );
                 })}
               </View>
-              <Text style={styles.label}>Título *</Text>
-              <NeoInput value={form.title} onChangeText={(v) => set('title', v)} placeholder="Ej: Vendedor/a de mostrador" />
-              <Text style={styles.label}>Descripción * (mín. 20 caracteres)</Text>
-              <NeoInput value={form.description} onChangeText={(v) => set('description', v)} multiline placeholder="Describí las tareas del puesto" />
-              <Text style={styles.label}>Requisitos</Text>
-              <NeoInput value={form.requirements} onChangeText={(v) => set('requirements', v)} multiline placeholder="Experiencia, estudios, etc." />
+              <Text style={styles.label}>{t('mobile.sellerJobs.titleLabel')}</Text>
+              <NeoInput value={form.title} onChangeText={(v) => set('title', v)} placeholder={t('mobile.sellerJobs.titlePlaceholder')} />
+              <Text style={styles.label}>{t('mobile.sellerJobs.descriptionLabel')}</Text>
+              <NeoInput value={form.description} onChangeText={(v) => set('description', v)} multiline placeholder={t('mobile.sellerJobs.descriptionPlaceholder')} />
+              <Text style={styles.label}>{t('mobile.sellerJobs.requirementsLabel')}</Text>
+              <NeoInput value={form.requirements} onChangeText={(v) => set('requirements', v)} multiline placeholder={t('mobile.sellerJobs.requirementsPlaceholder')} />
               <View style={styles.row2}>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Ciudad *</Text>
-                  <NeoInput value={form.city} onChangeText={(v) => set('city', v)} placeholder="Tarija" />
+                  <Text style={styles.label}>{t('mobile.sellerJobs.cityLabel')}</Text>
+                  <NeoInput value={form.city} onChangeText={(v) => set('city', v)} placeholder={t('mobile.sellerJobs.cityPlaceholder')} />
                 </View>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Departamento</Text>
-                  <NeoInput value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder="Tarija" />
+                  <Text style={styles.label}>{t('mobile.sellerJobs.stateLabel')}</Text>
+                  <NeoInput value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder={t('mobile.sellerJobs.statePlaceholder')} />
                 </View>
               </View>
-              <Text style={styles.label}>Período de pago *</Text>
+              <Text style={styles.label}>{t('mobile.sellerJobs.payPeriodLabel')}</Text>
               <View style={styles.segment}>
                 {PERIODS.map((p) => {
                   const active = form.payPeriod === p.key;
                   return (
                     <TouchableOpacity key={p.key} style={[styles.segBtn, active && styles.chipActive]} onPress={() => set('payPeriod', p.key)}>
-                      <Text style={[styles.chipText, active && styles.chipTextActive]}>{p.label}</Text>
+                      <Text style={[styles.chipText, active && styles.chipTextActive]}>{t(`mobile.sellerJobs.${p.labelKey}`)}</Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
               <View style={styles.row2}>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Sueldo mín. (Bs)</Text>
+                  <Text style={styles.label}>{t('mobile.sellerJobs.salaryMinLabel')}</Text>
                   <NeoInput value={form.salaryMin} onChangeText={(v) => set('salaryMin', v)} keyboardType="numeric" placeholder="0" />
                 </View>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Sueldo máx. (Bs)</Text>
+                  <Text style={styles.label}>{t('mobile.sellerJobs.salaryMaxLabel')}</Text>
                   <NeoInput value={form.salaryMax} onChangeText={(v) => set('salaryMax', v)} keyboardType="numeric" placeholder="0" />
                 </View>
               </View>
               <View style={styles.row2}>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Vacantes *</Text>
+                  <Text style={styles.label}>{t('mobile.sellerJobs.vacanciesLabel')}</Text>
                   <NeoInput value={form.vacancies} onChangeText={(v) => set('vacancies', v)} keyboardType="numeric" placeholder="1" />
                 </View>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Horario</Text>
-                  <NeoInput value={form.schedule} onChangeText={(v) => set('schedule', v)} placeholder="Lun a Vie 9-18" />
+                  <Text style={styles.label}>{t('mobile.sellerJobs.scheduleLabel')}</Text>
+                  <NeoInput value={form.schedule} onChangeText={(v) => set('schedule', v)} placeholder={t('mobile.sellerJobs.schedulePlaceholder')} />
                 </View>
               </View>
-              <Text style={styles.label}>Teléfono / WhatsApp</Text>
-              <NeoInput value={form.contactPhone} onChangeText={(v) => set('contactPhone', v)} keyboardType="numeric" placeholder="70000000" />
-              <NeoButton title={editingId ? 'Guardar cambios' : 'Enviar a revisión'} onPress={save} disabled={saving} style={styles.save} />
-              <NeoButton title="Cancelar" variant="ghost" onPress={() => setModalOpen(false)} />
+              <Text style={styles.label}>{t('mobile.sellerJobs.phoneLabel')}</Text>
+              <NeoInput value={form.contactPhone} onChangeText={(v) => set('contactPhone', v)} keyboardType="numeric" placeholder={t('mobile.sellerJobs.phonePlaceholder')} />
+              <NeoButton title={editingId ? t('mobile.sellerJobs.saveChangesButton') : t('mobile.sellerJobs.submitForReviewButton')} onPress={save} disabled={saving} style={styles.save} />
+              <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setModalOpen(false)} />
             </ScrollView>
           </View>
         </View>
@@ -346,28 +356,29 @@ export default function SellerJobsScreen() {
   );
 }
 
-const APP_STATUS: Record<string, string> = {
-  RECEIVED: 'Nueva',
-  VIEWED: 'Vista',
-  SHORTLISTED: 'Preseleccionado/a',
-  REJECTED: 'Rechazado/a',
-  HIRED: 'Contratado/a',
+const APP_STATUS_KEY: Record<string, string> = {
+  RECEIVED: 'appStatusNew',
+  VIEWED: 'appStatusViewed',
+  SHORTLISTED: 'appStatusShortlisted',
+  REJECTED: 'appStatusRejected',
+  HIRED: 'appStatusHired',
 };
-const APP_FILTERS: { key: string; label: string }[] = [
-  { key: 'ALL', label: 'Todos' },
-  { key: 'RECEIVED', label: 'Nuevas' },
-  { key: 'SHORTLISTED', label: 'Preseleccionados' },
-  { key: 'HIRED', label: 'Contratados' },
-  { key: 'REJECTED', label: 'Rechazados' },
+const APP_FILTERS: { key: string; labelKey: string }[] = [
+  { key: 'ALL', labelKey: 'filterAll' },
+  { key: 'RECEIVED', labelKey: 'filterNew' },
+  { key: 'SHORTLISTED', labelKey: 'filterShortlisted' },
+  { key: 'HIRED', labelKey: 'filterHired' },
+  { key: 'REJECTED', labelKey: 'filterRejected' },
 ];
-const APP_ACTIONS: { status: string; label: string; ok: string }[] = [
-  { status: 'VIEWED', label: 'Marcar vista', ok: 'Postulación marcada como vista.' },
-  { status: 'SHORTLISTED', label: 'Preseleccionar', ok: 'Candidato preseleccionado.' },
-  { status: 'REJECTED', label: 'Rechazar', ok: 'Postulación rechazada.' },
-  { status: 'HIRED', label: 'Contratar', ok: 'Candidato contratado.' },
+const APP_ACTIONS: { status: string; labelKey: string; okKey: string }[] = [
+  { status: 'VIEWED', labelKey: 'markViewedAction', okKey: 'markViewedOk' },
+  { status: 'SHORTLISTED', labelKey: 'shortlistAction', okKey: 'shortlistOk' },
+  { status: 'REJECTED', labelKey: 'rejectAction', okKey: 'rejectOk' },
+  { status: 'HIRED', labelKey: 'hireAction', okKey: 'hireOk' },
 ];
 
 function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose: () => void; onChanged: () => void }) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [apps, setApps] = useState<any[]>([]);
@@ -410,13 +421,13 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
       const body: any = { status: pending.action.status };
       if (note.trim()) body.note = note.trim();
       await api.put(`/seller/jobs/applications/${pending.app.id}/status`, body);
-      Alert.alert('Listo', pending.action.ok);
+      Alert.alert(t('mobile.common.done'), t(`mobile.sellerJobs.${pending.action.okKey}`));
       setPending(null);
       setNote('');
       loadApps();
       onChanged();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -429,7 +440,7 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
 
   const renderApp = ({ item }: { item: any }) => {
     const a = item.applicant ?? {};
-    const name = `${a.firstName ?? ''} ${a.lastName ?? ''}`.trim() || 'Postulante';
+    const name = `${a.firstName ?? ''} ${a.lastName ?? ''}`.trim() || t('mobile.sellerJobs.applicantDefaultName');
     const initials = `${(a.firstName ?? '?')[0] ?? ''}${(a.lastName ?? '')[0] ?? ''}`.toUpperCase();
     const phone = item.contactPhone || a.phone;
     const digits = phone ? String(phone).replace(/\D/g, '') : '';
@@ -443,43 +454,48 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
             <Text style={styles.meta}>{dateText(item.createdAt)}</Text>
           </View>
           <View style={[styles.statusChip, { borderColor: statusColor(item.status) }]}>
-            <Text style={[styles.statusText, { color: statusColor(item.status) }]}>{APP_STATUS[item.status] ?? item.status}</Text>
+            <Text style={[styles.statusText, { color: statusColor(item.status) }]}>
+              {APP_STATUS_KEY[item.status] ? t(`mobile.sellerJobs.${APP_STATUS_KEY[item.status]}`) : item.status}
+            </Text>
           </View>
         </View>
         {item.message ? <Text style={styles.message}>{item.message}</Text> : null}
         {item.expectedSalary != null && item.expectedSalary !== '' ? (
-          <Text style={styles.salary}>Pretende: {fmt(item.expectedSalary)} Bs</Text>
+          <Text style={styles.salary}>{t('mobile.sellerJobs.expectedSalary', { amount: fmt(item.expectedSalary) })}</Text>
         ) : null}
-        {phone ? <Text style={styles.meta}>Tel: {phone}</Text> : null}
+        {phone ? <Text style={styles.meta}>{t('mobile.sellerJobs.phoneMetaLabel', { phone })}</Text> : null}
         {a.email ? <Text style={styles.meta}>{a.email}</Text> : null}
-        {item.storeNote ? <Text style={styles.meta}>Tu mensaje: {item.storeNote}</Text> : null}
+        {item.storeNote ? <Text style={styles.meta}>{t('mobile.sellerJobs.yourMessageLabel', { note: item.storeNote })}</Text> : null}
         <View style={styles.actions}>
           {digits ? (
             <>
               <TouchableOpacity style={styles.linkBtn} onPress={() => Linking.openURL(`tel:${digits}`)}>
-                <Phone size={14} color={colors.primary} /><Text style={styles.miniBtnText}>Llamar</Text>
+                <Phone size={14} color={colors.primary} /><Text style={styles.miniBtnText}>{t('mobile.sellerJobs.callAction')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.linkBtn} onPress={() => Linking.openURL(`https://wa.me/${wa}`)}>
-                <MessageCircle size={14} color={colors.primary} /><Text style={styles.miniBtnText}>WhatsApp</Text>
+                <MessageCircle size={14} color={colors.primary} /><Text style={styles.miniBtnText}>{t('mobile.sellerJobs.whatsappAction')}</Text>
               </TouchableOpacity>
             </>
           ) : null}
           {a.email ? (
             <TouchableOpacity style={styles.linkBtn} onPress={() => Linking.openURL(`mailto:${a.email}`)}>
-              <Mail size={14} color={colors.primary} /><Text style={styles.miniBtnText}>Email</Text>
+              <Mail size={14} color={colors.primary} /><Text style={styles.miniBtnText}>{t('mobile.sellerJobs.emailAction')}</Text>
             </TouchableOpacity>
           ) : null}
           {item.hasCv ? (
             <TouchableOpacity
               style={styles.linkBtn}
-              onPress={() => openApplicationCv(item.id).catch((e) => Alert.alert('No se pudo abrir el CV', getErrorMessage(e)))}
+              onPress={() => openApplicationCv(item.id).catch((e) => Alert.alert(t('mobile.sellerJobs.cvOpenErrorTitle'), getErrorMessage(e)))}
             >
-              <FileText size={14} color={colors.primary} /><Text style={styles.miniBtnText}>Ver CV{item.cvName ? ` (${item.cvName})` : ''}</Text>
+              <FileText size={14} color={colors.primary} />
+              <Text style={styles.miniBtnText}>
+                {item.cvName ? t('mobile.sellerJobs.viewCvActionNamed', { name: item.cvName }) : t('mobile.sellerJobs.viewCvAction')}
+              </Text>
             </TouchableOpacity>
           ) : null}
           {item.resumeUrl ? (
             <TouchableOpacity style={styles.linkBtn} onPress={() => Linking.openURL(item.resumeUrl)}>
-              <FileText size={14} color={colors.primary} /><Text style={styles.miniBtnText}>Ver CV</Text>
+              <FileText size={14} color={colors.primary} /><Text style={styles.miniBtnText}>{t('mobile.sellerJobs.viewCvAction')}</Text>
             </TouchableOpacity>
           ) : null}
         </View>
@@ -490,7 +506,7 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
               style={[styles.miniBtn, x.status === 'REJECTED' && { borderColor: colors.error }]}
               onPress={() => { setNote(''); setPending({ app: item, action: x }); }}
             >
-              <Text style={[styles.miniBtnText, x.status === 'REJECTED' && { color: colors.error }]}>{x.label}</Text>
+              <Text style={[styles.miniBtnText, x.status === 'REJECTED' && { color: colors.error }]}>{t(`mobile.sellerJobs.${x.labelKey}`)}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -503,15 +519,15 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
       <View style={styles.modalBackdrop}>
         <View style={[styles.modal, { height: '94%' }]}>
           <View style={styles.row}>
-            <Text style={[styles.modalTitle, { flex: 1 }]} numberOfLines={2}>Postulantes de {job?.title}</Text>
-            <TouchableOpacity onPress={onClose} accessibilityLabel="Cerrar"><X size={22} color={colors.text} /></TouchableOpacity>
+            <Text style={[styles.modalTitle, { flex: 1 }]} numberOfLines={2}>{t('mobile.sellerJobs.applicantsOf', { title: job?.title })}</Text>
+            <TouchableOpacity onPress={onClose} accessibilityLabel={t('mobile.common.close')}><X size={22} color={colors.text} /></TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginVertical: 8 }} contentContainerStyle={{ gap: 8 }}>
             {APP_FILTERS.map((f) => {
               const active = filter === f.key;
               return (
                 <TouchableOpacity key={f.key} style={[styles.chip, active && styles.chipActive]} onPress={() => setFilter(f.key)}>
-                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{f.label}</Text>
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{t(`mobile.sellerJobs.${f.labelKey}`)}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -527,7 +543,7 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
               renderItem={renderApp}
               contentContainerStyle={{ gap: 10, paddingBottom: 24 }}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadApps(); }} tintColor={colors.primary} colors={[colors.primary]} />}
-              ListEmptyComponent={<EmptyState message={apps.length === 0 ? 'Todavía no hay postulantes' : 'No hay postulantes con este estado'} />}
+              ListEmptyComponent={<EmptyState message={apps.length === 0 ? t('mobile.sellerJobs.emptyApplicantsNone') : t('mobile.sellerJobs.emptyApplicantsFiltered')} />}
             />
           )}
         </View>
@@ -536,11 +552,11 @@ function ApplicantsModal({ job, onClose, onChanged }: { job: any | null; onClose
       <Modal visible={!!pending} transparent animationType="fade" onRequestClose={() => setPending(null)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>{pending?.action.label}</Text>
-            <Text style={styles.label}>Mensaje para el candidato (opcional)</Text>
-            <NeoInput value={note} onChangeText={setNote} multiline placeholder="Ej: Te esperamos el lunes a las 9:00" />
-            <NeoButton title="Confirmar" onPress={submit} disabled={sending} style={styles.save} />
-            <NeoButton title="Cancelar" variant="ghost" onPress={() => setPending(null)} />
+            <Text style={styles.modalTitle}>{pending ? t(`mobile.sellerJobs.${pending.action.labelKey}`) : ''}</Text>
+            <Text style={styles.label}>{t('mobile.sellerJobs.actionModalNoteLabel')}</Text>
+            <NeoInput value={note} onChangeText={setNote} multiline placeholder={t('mobile.sellerJobs.actionModalNotePlaceholder')} />
+            <NeoButton title={t('mobile.common.confirm')} onPress={submit} disabled={sending} style={styles.save} />
+            <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setPending(null)} />
           </View>
         </View>
       </Modal>

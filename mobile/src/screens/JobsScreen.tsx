@@ -15,10 +15,11 @@ import {
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { BadgeCheck, MapPin, Users, Clock, X, Paperclip } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useAuthStore } from '../stores/authStore';
-import { APPLICATION_LABEL, statusColor, canWithdraw, type ApplicationStatus } from './MyApplicationsScreen';
+import { applicationLabel, statusColor, canWithdraw, type ApplicationStatus } from './MyApplicationsScreen';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { LoadingState, EmptyState, ErrorState } from '../components/redesign/States';
@@ -26,16 +27,17 @@ import { JobCard, formatSalary, timeAgo, type Job, type PayPeriod } from '../com
 
 const LIMIT = 10;
 
-const PERIODS: { value: '' | PayPeriod; label: string }[] = [
-  { value: '', label: 'Todos' },
-  { value: 'DAILY', label: 'Por día' },
-  { value: 'WEEKLY', label: 'Por semana' },
-  { value: 'MONTHLY', label: 'Por mes' },
-];
-
 export default function JobsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors, raised, pressed } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+
+  const PERIODS: { value: '' | PayPeriod; label: string }[] = [
+    { value: '', label: t('mobile.jobs.periodAll') },
+    { value: 'DAILY', label: t('mobile.jobs.periodDaily') },
+    { value: 'WEEKLY', label: t('mobile.jobs.periodWeekly') },
+    { value: 'MONTHLY', label: t('mobile.jobs.periodMonthly') },
+  ];
 
   const [categories, setCategories] = useState<any[]>([]);
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -104,8 +106,8 @@ export default function JobsScreen({ navigation }: any) {
       });
       if (r.canceled || !r.assets?.[0]) return;
       const f = r.assets[0];
-      if (!/\.(pdf|doc|docx)$/i.test(f.name)) return setFormError('El CV debe ser PDF, DOC o DOCX');
-      if (f.size != null && f.size > 5 * 1024 * 1024) return setFormError('El CV no puede superar 5 MB');
+      if (!/\.(pdf|doc|docx)$/i.test(f.name)) return setFormError(t('mobile.jobs.cvTypeError'));
+      if (f.size != null && f.size > 5 * 1024 * 1024) return setFormError(t('mobile.jobs.cvSizeError'));
       setFormError(null);
       setCvFile(f);
     } catch (e) {
@@ -118,14 +120,14 @@ export default function JobsScreen({ navigation }: any) {
     const msg = message.trim();
     const ph = phone.trim();
     const res = resume.trim();
-    if (msg.length < 10) return setFormError('El mensaje debe tener al menos 10 caracteres');
-    if (ph.length < 6) return setFormError('Ingresá un teléfono de contacto válido (mín. 6 caracteres)');
+    if (msg.length < 10) return setFormError(t('mobile.jobs.messageTooShort'));
+    if (ph.length < 6) return setFormError(t('mobile.jobs.phoneInvalid'));
     let expectedSalary: number | undefined;
     if (salary.trim()) {
       expectedSalary = Number(salary.replace(',', '.'));
-      if (!isFinite(expectedSalary) || expectedSalary < 0) return setFormError('El sueldo pretendido no es válido');
+      if (!isFinite(expectedSalary) || expectedSalary < 0) return setFormError(t('mobile.jobs.salaryInvalid'));
     }
-    if (res && !/^https?:\/\/\S+\.\S+/i.test(res)) return setFormError('El enlace al CV debe ser una URL válida (https://...)');
+    if (res && !/^https?:\/\/\S+\.\S+/i.test(res)) return setFormError(t('mobile.jobs.cvUrlInvalid'));
     const body: Record<string, any> = { message: msg, contactPhone: ph };
     if (expectedSalary !== undefined) body.expectedSalary = expectedSalary;
     if (res) body.resumeUrl = res;
@@ -152,14 +154,14 @@ export default function JobsScreen({ navigation }: any) {
       const { data } = await api.post(`/jobs/${selected.id}/apply`, payload, config);
       setMyApp(data.data ? { id: data.data.id, status: data.data.status ?? 'RECEIVED', createdAt: data.data.createdAt } : { id: 0, status: 'RECEIVED', createdAt: '' });
       setApplyOpen(false);
-      Alert.alert('¡Postulación enviada!', 'La tienda va a revisar tu postulación. Podés seguirla en "Mis postulaciones".');
+      Alert.alert(t('mobile.jobs.applicationSentTitle'), t('mobile.jobs.applicationSentMessage'));
     } catch (e: any) {
       const code = e?.response?.status;
       setFormError(
         code === 403
-          ? 'No podés postularte a un empleo de tu propia tienda.'
+          ? t('mobile.jobs.forbiddenOwnJob')
           : code === 404
-          ? 'Este empleo ya no está disponible.'
+          ? t('mobile.jobs.jobUnavailable')
           : getErrorMessage(e)
       );
     } finally {
@@ -169,17 +171,17 @@ export default function JobsScreen({ navigation }: any) {
 
   const withdrawApply = () => {
     if (!selected) return;
-    Alert.alert('Retirar postulación', '¿Querés retirar tu postulación a este empleo?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.jobs.withdrawConfirmTitle'), t('mobile.jobs.withdrawConfirmMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Retirar',
+        text: t('mobile.common.withdraw'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/jobs/${selected.id}/apply`);
             setMyApp((m) => (m ? { ...m, status: 'WITHDRAWN' } : m));
           } catch (e) {
-            Alert.alert('No se pudo retirar', getErrorMessage(e));
+            Alert.alert(t('mobile.jobs.withdrawFailedTitle'), getErrorMessage(e));
           }
         },
       },
@@ -194,8 +196,8 @@ export default function JobsScreen({ navigation }: any) {
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => setQ(text.trim()), 400);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setQ(text.trim()), 400);
+    return () => clearTimeout(timer);
   }, [text]);
 
   const fetchPage = useCallback(
@@ -255,7 +257,7 @@ export default function JobsScreen({ navigation }: any) {
       <NeoInput
         value={text}
         onChangeText={setText}
-        placeholder="Buscar empleos..."
+        placeholder={t('mobile.jobs.searchPlaceholder')}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="search"
@@ -263,7 +265,7 @@ export default function JobsScreen({ navigation }: any) {
       />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
         <Pressable style={chip(categoryId === null)} onPress={() => setCategoryId(null)}>
-          <Text style={[styles.chipText, categoryId === null && styles.chipTextActive]}>Todas</Text>
+          <Text style={[styles.chipText, categoryId === null && styles.chipTextActive]}>{t('mobile.jobs.categoryAll')}</Text>
         </Pressable>
         {categories.map((cat) => (
           <Pressable key={cat.id} style={chip(categoryId === cat.id)} onPress={() => setCategoryId(cat.id)}>
@@ -294,7 +296,7 @@ export default function JobsScreen({ navigation }: any) {
         keyExtractor={(j) => String(j.id)}
         renderItem={({ item }) => <JobCard job={item} onPress={() => setSelected(item)} />}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={<EmptyState message="No hay empleos con esos filtros" />}
+        ListEmptyComponent={<EmptyState message={t('mobile.jobs.emptyFiltered')} />}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.4}
         refreshControl={
@@ -351,7 +353,7 @@ export default function JobsScreen({ navigation }: any) {
                       <View style={styles.row}>
                         <Users size={14} color={colors.textSecondary} />
                         <Text style={styles.meta}>
-                          {`${selected.vacancies} ${selected.vacancies === 1 ? 'vacante' : 'vacantes'}`}
+                          {t('mobile.jobs.vacancies', { count: selected.vacancies })}
                         </Text>
                       </View>
                     ) : null}
@@ -365,13 +367,13 @@ export default function JobsScreen({ navigation }: any) {
                   {selected.publishedAt ? <Text style={styles.meta}>{timeAgo(selected.publishedAt)}</Text> : null}
                   {selected.description ? (
                     <>
-                      <Text style={styles.label}>Descripción</Text>
+                      <Text style={styles.label}>{t('mobile.jobs.descriptionLabel')}</Text>
                       <Text style={styles.body}>{selected.description}</Text>
                     </>
                   ) : null}
                   {selected.requirements ? (
                     <>
-                      <Text style={styles.label}>Requisitos</Text>
+                      <Text style={styles.label}>{t('mobile.jobs.requirementsLabel')}</Text>
                       <Text style={styles.body}>{selected.requirements}</Text>
                     </>
                   ) : null}
@@ -379,25 +381,25 @@ export default function JobsScreen({ navigation }: any) {
                 <View style={styles.actions}>
                   {myApp && myApp.status !== 'WITHDRAWN' ? (
                     <View style={styles.row}>
-                      <Text style={styles.meta}>Tu postulación:</Text>
+                      <Text style={styles.meta}>{t('mobile.jobs.yourApplicationLabel')}</Text>
                       <View style={[styles.statusChip, { borderColor: statusColor(myApp.status, colors) }]}>
                         <Text style={[styles.statusText, { color: statusColor(myApp.status, colors) }]}>
-                          {APPLICATION_LABEL[myApp.status] ?? myApp.status}
+                          {applicationLabel(myApp.status, t)}
                         </Text>
                       </View>
                     </View>
                   ) : (
-                    <NeoButton title="Postularme" onPress={startApply} />
+                    <NeoButton title={t('mobile.jobs.applyButton')} onPress={startApply} />
                   )}
                   {myApp && canWithdraw(myApp.status) ? (
-                    <NeoButton title="Retirar postulación" variant="ghost" onPress={withdrawApply} />
+                    <NeoButton title={t('mobile.jobs.withdrawButton')} variant="ghost" onPress={withdrawApply} />
                   ) : null}
                   {selected.contactPhone ? (
-                    <NeoButton title="Contactar por WhatsApp" onPress={() => openWhatsApp(selected.contactPhone!)} />
+                    <NeoButton title={t('mobile.jobs.contactWhatsApp')} onPress={() => openWhatsApp(selected.contactPhone!)} />
                   ) : null}
                   {selected.store ? (
                     <NeoButton
-                      title="Ver tienda"
+                      title={t('mobile.jobs.viewStore')}
                       variant="ghost"
                       onPress={() => {
                         const id = selected.store!.id;
@@ -417,7 +419,7 @@ export default function JobsScreen({ navigation }: any) {
         <View style={styles.overlay}>
           <View style={styles.sheet}>
             <View style={styles.sheetHead}>
-              <Text style={[styles.sheetTitle, { flex: 1 }]}>Postularme</Text>
+              <Text style={[styles.sheetTitle, { flex: 1 }]}>{t('mobile.jobs.applyButton')}</Text>
               <Pressable onPress={() => setApplyOpen(false)} hitSlop={10}>
                 <X size={22} color={colors.text} />
               </Pressable>
@@ -427,21 +429,21 @@ export default function JobsScreen({ navigation }: any) {
               <NeoInput
                 value={message}
                 onChangeText={setMessage}
-                placeholder="Contale a la tienda por qué sos el/la indicado/a (mín. 10 caracteres)"
+                placeholder={t('mobile.jobs.messagePlaceholder')}
                 multiline
                 style={{ minHeight: 100 }}
               />
-              <NeoInput value={phone} onChangeText={setPhone} placeholder="Teléfono de contacto" keyboardType="phone-pad" />
+              <NeoInput value={phone} onChangeText={setPhone} placeholder={t('mobile.jobs.phonePlaceholder')} keyboardType="phone-pad" />
               <NeoInput
                 value={salary}
                 onChangeText={setSalary}
-                placeholder="Sueldo pretendido en Bs (opcional)"
+                placeholder={t('mobile.jobs.salaryPlaceholder')}
                 keyboardType="numeric"
               />
               <NeoInput
                 value={resume}
                 onChangeText={setResume}
-                placeholder="Enlace a tu CV (opcional)"
+                placeholder={t('mobile.jobs.resumePlaceholder')}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="url"
@@ -455,11 +457,11 @@ export default function JobsScreen({ navigation }: any) {
                   </Pressable>
                 </View>
               ) : (
-                <NeoButton title="Adjuntar CV (PDF, DOC o DOCX, máx. 5 MB)" variant="ghost" onPress={pickCv} />
+                <NeoButton title={t('mobile.jobs.attachCv')} variant="ghost" onPress={pickCv} />
               )}
               {formError ? <Text style={{ color: colors.error, fontSize: 13 }}>{formError}</Text> : null}
             </ScrollView>
-            <NeoButton title={submitting ? 'Enviando...' : 'Enviar postulación'} onPress={submitApply} disabled={submitting} />
+            <NeoButton title={submitting ? t('mobile.common.sending') : t('mobile.jobs.submitApplication')} onPress={submitApply} disabled={submitting} />
           </View>
         </View>
       </Modal>
