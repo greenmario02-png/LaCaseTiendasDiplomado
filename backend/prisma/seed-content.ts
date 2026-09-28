@@ -574,6 +574,42 @@ async function corregirTextosPrevios() {
   }
 }
 
+/**
+ * Reemplaza toda foto que haya quedado apuntando a loremflickr.com (servicio que ahora bloquea
+ * las peticiones con una verificación anti-bot en vez de servir la imagen, por eso se veían
+ * "rotas" en el sitio) por una foto estable de Picsum. Es idempotente: una vez corregida una
+ * fila, ya no vuelve a coincidir con el filtro y no se toca de nuevo.
+ */
+async function corregirImagenesRotas() {
+  let total = 0;
+
+  const images = await prisma.productImage.findMany({ where: { url: { contains: 'loremflickr.com' } } });
+  for (const img of images) {
+    await prisma.productImage.update({ where: { id: img.id }, data: { url: `https://picsum.photos/seed/product-image-${img.id}/800/800` } });
+  }
+  total += images.length;
+
+  const categories = await prisma.category.findMany({ where: { imageUrl: { contains: 'loremflickr.com' } } });
+  for (const c of categories) {
+    await prisma.category.update({ where: { id: c.id }, data: { imageUrl: `https://picsum.photos/seed/category-${c.id}/800/600` } });
+  }
+  total += categories.length;
+
+  const stores = await prisma.user.findMany({ where: { storeLogo: { contains: 'loremflickr.com' } } });
+  for (const u of stores) {
+    await prisma.user.update({ where: { id: u.id }, data: { storeLogo: `https://picsum.photos/seed/store-logo-${u.id}/400/400` } });
+  }
+  total += stores.length;
+
+  const entries = await prisma.conoEntry.findMany({ where: { imageUrl: { contains: 'loremflickr.com' } } });
+  for (const e of entries) {
+    await prisma.conoEntry.update({ where: { id: e.id }, data: { imageUrl: `https://picsum.photos/seed/cono-entry-${e.id}/700/700` } });
+  }
+  total += entries.length;
+
+  if (total > 0) console.log(`[seed-content] Imágenes rotas de LoremFlickr corregidas: ${total}`);
+}
+
 async function main() {
   const demoPassword = process.env.DEMO_PASSWORD;
   if (!demoPassword) throw new Error('Falta DEMO_PASSWORD en el entorno (se reutiliza para los usuarios adicionales de demostración).');
@@ -631,6 +667,9 @@ async function main() {
   console.log('[seed-content] Sembrando carreras universitarias con publicaciones...');
   await seedUniversityCareers(allProfileIds);
   await corregirTextosPrevios();
+
+  console.log('[seed-content] Corrigiendo imágenes que hayan quedado rotas...');
+  await corregirImagenesRotas();
 
   console.log('[seed-content] Sembrando Rinconcito Boliviano (memes + torneos)...');
   await seedRinconcitoBoliviano(allProfileIds);
