@@ -1,5 +1,6 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useForumPalette } from '../../theme/forumTheme';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
  * Iconos de la librería Lucide (reemplazan las flechas/emojis de antes).
  */
 export default function PostVoteBar({ score, userVote, onVote, size = 'small' }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const fs = size === 'small' ? 18 : 22;
   return (
@@ -36,7 +38,7 @@ export default function PostVoteBar({ score, userVote, onVote, size = 'small' }:
       <IconButton
         size="small"
         onClick={() => onVote(1)}
-        aria-label="Votar positivo"
+        aria-label={t('forum.postVoteBar.voteUp')}
         sx={{
           color: userVote === 1 ? forumPalette.karmaUp : forumPalette.textMuted,
           p: 0.25,
@@ -59,7 +61,7 @@ export default function PostVoteBar({ score, userVote, onVote, size = 'small' }:
       <IconButton
         size="small"
         onClick={() => onVote(-1)}
-        aria-label="Votar negativo"
+        aria-label={t('forum.postVoteBar.voteDown')}
         sx={{
           color: userVote === -1 ? forumPalette.karmaDown : forumPalette.textMuted,
           p: 0.25,

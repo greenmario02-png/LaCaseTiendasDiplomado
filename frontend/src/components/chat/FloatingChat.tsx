@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Avatar,
@@ -53,6 +54,7 @@ const PANEL_W = 372;
 const PANEL_H = 540;
 
 export default function FloatingChat() {
+  const { t: tr } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
   const navigate = useNavigate();
@@ -180,13 +182,13 @@ export default function FloatingChat() {
   };
 
   const otherName = (c: Conversation) => {
-    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName} ${c.buyer.lastName}` : 'Comprador';
-    return c.seller?.storeName || 'Vendedor';
+    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName} ${c.buyer.lastName}` : tr('chat.buyer');
+    return c.seller?.storeName || tr('chat.seller');
   };
 
   const otherAvatarLabel = (c: Conversation) => {
-    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName?.[0] ?? ''}${c.buyer.lastName?.[0] ?? ''}` : 'C';
-    return (c.seller?.storeName?.[0] ?? 'V').toUpperCase();
+    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName?.[0] ?? ''}${c.buyer.lastName?.[0] ?? ''}` : tr('chat.buyerInitial');
+    return (c.seller?.storeName?.[0] ?? tr('chat.sellerInitial')).toUpperCase();
   };
 
   const unreadOf = (c: Conversation): number => {
@@ -195,7 +197,7 @@ export default function FloatingChat() {
     return 0;
   };
 
-  const lastMsg = (c: Conversation) => c.messages?.[0]?.content || `${c._count?.messages ?? 0} mensajes`;
+  const lastMsg = (c: Conversation) => c.messages?.[0]?.content || tr('chat.messagesCount', { count: c._count?.messages ?? 0 });
 
   // El "otro" participante es un vendedor cuando YO soy el comprador de la conversación
   const otherIsSeller = active ? isBuyer(active) : false;
@@ -215,10 +217,10 @@ export default function FloatingChat() {
       {conversations.length === 0 ? (
         <Box p={3} textAlign="center">
           <Typography color="text.secondary" variant="body2">
-            No tienes conversaciones todavía.
+            {tr('chat.floating.noConversations')}
           </Typography>
           <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-            Inicia una desde la ficha de un producto o de una tienda.
+            {tr('chat.emptyList.purchasesHint')}
           </Typography>
         </Box>
       ) : (
@@ -306,7 +308,7 @@ export default function FloatingChat() {
         <Box flex={1} overflow="auto" p={1.5} sx={{ bgcolor: 'background.default' }}>
           {messages.length === 0 && (
             <Typography color="text.secondary" textAlign="center" mt={3} variant="body2">
-              Sin mensajes todavía. Escribe para consultar.
+              {tr('chat.floating.noMessagesYet')}
             </Typography>
           )}
           {messages.map((m) => {
@@ -341,7 +343,7 @@ export default function FloatingChat() {
           <div ref={bottomRef} />
           {otherTyping && (
             <Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
-              Escribiendo...
+              {tr('chat.typing')}
             </Typography>
           )}
         </Box>
@@ -350,7 +352,7 @@ export default function FloatingChat() {
           <TextField
             fullWidth
             size="small"
-            placeholder="Escribe un mensaje..."
+            placeholder={tr('chat.messagePlaceholder')}
             value={text}
             onChange={(e) => {
               setText(e.target.value);
@@ -411,13 +413,13 @@ export default function FloatingChat() {
           <Box p={1.5} borderBottom={1} borderColor="divider" display="flex" alignItems="center" gap={1}>
             <Box flex={1}>
               <Typography variant="subtitle1" fontWeight={700}>
-                Mensajes
+                {tr('chat.title')}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Conversaciones de compra y venta
+                {tr('chat.floating.purchaseAndSaleConversations')}
               </Typography>
             </Box>
-            <Tooltip title="Ver página completa">
+            <Tooltip title={tr('chat.floating.viewFullPage')}>
               <IconButton size="small" onClick={() => navigate('/mensajes')}>
                 <ChatIcon fontSize="small" />
               </IconButton>
@@ -437,17 +439,17 @@ export default function FloatingChat() {
       >
         {otherIsSeller && active?.seller && (
           <MenuItem onClick={goStore}>
-            <StorefrontIcon fontSize="small" sx={{ mr: 1 }} /> Visitar tienda
+            <StorefrontIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.visitStore')}
           </MenuItem>
         )}
         {otherIsSeller && active?.seller && (
           <MenuItem onClick={goStore}>
-            <PersonIcon fontSize="small" sx={{ mr: 1 }} /> Ver perfil
+            <PersonIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.viewProfile')}
           </MenuItem>
         )}
         {active?.product && (
           <MenuItem onClick={goProduct}>
-            <ShoppingCartIcon fontSize="small" sx={{ mr: 1 }} /> Ir al producto
+            <ShoppingCartIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.goToProduct')}
           </MenuItem>
         )}
       </Menu>

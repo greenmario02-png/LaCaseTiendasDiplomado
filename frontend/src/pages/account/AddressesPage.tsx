@@ -19,6 +19,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarIcon from '@mui/icons-material/Star';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerLi
 const EMPTY_FORM = { street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: false };
 
 export default function AddressesPage() {
+  const { t: tt } = useTranslation();
   const t = useUnifiedTokens();
   const [addresses, setAddresses] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function AddressesPage() {
       } else {
         await api.post('/account/addresses', form);
       }
-      toast.success('Dirección guardada');
+      toast.success(tt('account.addresses.saved'));
       setDialogOpen(false);
       load();
     } catch (err) {
@@ -80,7 +82,7 @@ export default function AddressesPage() {
   const remove = async (id: number) => {
     try {
       await api.delete(`/account/addresses/${id}`);
-      toast.success('Dirección eliminada');
+      toast.success(tt('account.addresses.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -90,19 +92,19 @@ export default function AddressesPage() {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <PageHeader
-        title="Mis direcciones"
-        subtitle="Administra tus direcciones de envío"
+        title={tt('account.addresses.title')}
+        subtitle={tt('account.addresses.subtitle')}
         icon={<LocationOnIcon />}
         actions={
           <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
-            Nueva dirección
+            {tt('account.addresses.newAddress')}
           </PrimaryButton>
         }
       />
 
       {addresses.length === 0 && (
         <SurfaceCard>
-          <EmptyState message="No tienes direcciones guardadas." />
+          <EmptyState message={tt('account.addresses.emptyMessage')} />
         </SurfaceCard>
       )}
 
@@ -120,7 +122,7 @@ export default function AddressesPage() {
             </Typography>
             {a.isDefault && (
               <Typography variant="caption" color={t.primary} fontWeight={600} display="inline-flex" alignItems="center" gap={0.5}>
-                <StarIcon sx={{ fontSize: 14 }} /> Dirección por defecto
+                <StarIcon sx={{ fontSize: 14 }} /> {tt('account.addresses.defaultAddress')}
               </Typography>
             )}
           </Box>
@@ -136,39 +138,39 @@ export default function AddressesPage() {
       </StaggerContainer>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? 'Editar dirección' : 'Nueva dirección'}</DialogTitle>
+        <DialogTitle>{editingId ? tt('account.addresses.editAddress') : tt('account.addresses.newAddress')}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} mt={0}>
             <Grid item xs={8}>
-              <TextField label="Calle" value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.street')} value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={4}>
-              <TextField label="Número" value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.number')} value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Piso/Dpto" value={form.floor} onChange={(e) => setForm({ ...form, floor: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.floor')} value={form.floor} onChange={(e) => setForm({ ...form, floor: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Ciudad" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.city')} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Provincia" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.state')} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="CP" value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.postalCode')} value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox checked={form.isDefault} onChange={(e) => setForm({ ...form, isDefault: e.target.checked })} />}
-                label="Usar como dirección por defecto"
+                label={tt('account.addresses.useAsDefault')}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)}>{tt('account.addresses.cancel')}</Button>
           <Button variant="contained" onClick={save}>
-            Guardar
+            {tt('account.addresses.save')}
           </Button>
         </DialogActions>
       </Dialog>

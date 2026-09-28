@@ -1,26 +1,28 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Package, Coins } from 'lucide-react';
 import { Box, Typography, Card, CardContent, Chip, Alert, Grid, CircularProgress, Avatar, Stack } from '@mui/material';
 import { SecondaryButton } from '../components/redesign/Buttons';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 
-const STATUS: Record<string, { label: string; color: any }> = {
-  PENDING: { label: 'Pendiente', color: 'warning' },
-  APPROVED: { label: 'Aprobada', color: 'info' },
-  REJECTED: { label: 'Rechazada', color: 'error' },
-  COMPLETED: { label: 'Completada', color: 'success' },
-  CANCELLED: { label: 'Cancelada', color: 'default' },
-};
-
-const REASONS: Record<string, string> = {
-  PRODUCTO_DEFECTUOSO: 'Producto defectuoso',
-  PRODUCTO_INCORRECTO: 'Producto incorrecto',
-  NO_COINCIDE_DESCRIPCION: 'No coincide con la descripción',
-  YA_NO_LO_NECESITO: 'Ya no lo necesito',
-  OTRO: 'Otro motivo',
-};
-
 export default function ReturnsPage() {
+  const { t: tr } = useTranslation();
+  const STATUS: Record<string, { label: string; color: any }> = {
+    PENDING: { label: tr('returns.status.pending'), color: 'warning' },
+    APPROVED: { label: tr('returns.status.approved'), color: 'info' },
+    REJECTED: { label: tr('returns.status.rejected'), color: 'error' },
+    COMPLETED: { label: tr('returns.status.completed'), color: 'success' },
+    CANCELLED: { label: tr('returns.status.cancelled'), color: 'default' },
+  };
+
+  const REASONS: Record<string, string> = {
+    PRODUCTO_DEFECTUOSO: tr('returns.reasons.defective'),
+    PRODUCTO_INCORRECTO: tr('returns.reasons.incorrect'),
+    NO_COINCIDE_DESCRIPCION: tr('returns.reasons.notAsDescribed'),
+    YA_NO_LO_NECESITO: tr('returns.reasons.noLongerNeeded'),
+    OTRO: tr('returns.reasons.other'),
+  };
+
   const [returns, setReturns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,7 +56,7 @@ export default function ReturnsPage() {
   return (
     <Box p={3} maxWidth={900} mx="auto">
       <Typography variant="h5" fontWeight={800} gutterBottom>
-        Mis devoluciones
+        {tr('returns.title')}
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -62,11 +64,11 @@ export default function ReturnsPage() {
         </Alert>
       )}
       <Typography variant="body2" color="text.secondary" mb={2}>
-        Solo puedes solicitar una devolución después de recibir la compra con el pago verificado.
+        {tr('returns.requestNote')}
       </Typography>
 
       {returns.length === 0 ? (
-        <Alert severity="info">No tienes solicitudes de devolución.</Alert>
+        <Alert severity="info">{tr('returns.empty')}</Alert>
       ) : (
         <Stack spacing={2}>
           {returns.map((r) => (
@@ -83,7 +85,7 @@ export default function ReturnsPage() {
                   <Grid item xs={10} md={8}>
                     <Typography fontWeight={700}>{r.orderItem?.product?.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {REASONS[r.reason] ?? r.reason} · Tienda: {r.seller?.storeName}
+                      {tr('returns.reasonAndStore', { reason: REASONS[r.reason] ?? r.reason, store: r.seller?.storeName })}
                     </Typography>
                     {r.details && (
                       <Typography variant="body2" mt={0.5}>
@@ -92,12 +94,12 @@ export default function ReturnsPage() {
                     )}
                     {r.responseNote && (
                       <Typography variant="body2" mt={0.5} color="text.secondary">
-                        Respuesta del vendedor: {r.responseNote}
+                        {tr('returns.sellerResponse', { response: r.responseNote })}
                       </Typography>
                     )}
                     {r.refundAmount != null && (
                       <Typography variant="body2" fontWeight={700} color="success.main" mt={0.5}>
-                        Reembolso: Bs {Number(r.refundAmount).toLocaleString('es-BO')}
+                        {tr('returns.refund', { amount: Number(r.refundAmount).toLocaleString('es-BO') })}
                       </Typography>
                     )}
                   </Grid>
@@ -110,7 +112,7 @@ export default function ReturnsPage() {
                     {r.status === 'PENDING' && (
                       <Box mt={1}>
                         <SecondaryButton size="small" color="error" onClick={() => cancel(r.id)}>
-                          Cancelar
+                          {tr('returns.cancel')}
                         </SecondaryButton>
                       </Box>
                     )}

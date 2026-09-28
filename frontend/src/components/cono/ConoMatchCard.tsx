@@ -3,6 +3,7 @@ import { Box, Card, CardContent, Typography, Button, LinearProgress, Chip, Colla
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { voteConoMatch } from '../../services/cono.api';
 import type { ConoMatch } from '../../services/cono.api';
 import { getErrorMessage, resolveImageUrl } from '../../services/api';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function ConoMatchCard({ match: initial }: Props) {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const [match, setMatch] = useState(initial);
   const [expanded, setExpanded] = useState<'A' | 'B' | null>(null);
@@ -31,7 +33,7 @@ export function ConoMatchCard({ match: initial }: Props) {
 
   const vote = async (choice: 'A' | 'B') => {
     if (match.status !== 'ACTIVE') {
-      toast.error('Este enfrentamiento ya no está abierto a votación.');
+      toast.error(t('cono.matchCard.votingClosed'));
       return;
     }
     try {
@@ -46,9 +48,9 @@ export function ConoMatchCard({ match: initial }: Props) {
     <Card sx={{ bgcolor: tokens.surfaceContainerLowest, borderRadius: '14px', boxShadow: tokens.cardShadow }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Chip label={`Ronda ${match.round}`} size="small" />
+          <Chip label={t('cono.matchCard.round', { round: match.round })} size="small" />
           <Chip
-            label={match.status === 'ACTIVE' ? 'Votación abierta' : match.status === 'RESOLVED' ? 'Cerrado' : 'Pendiente'}
+            label={match.status === 'ACTIVE' ? t('cono.matchCard.statusOpen') : match.status === 'RESOLVED' ? t('cono.matchCard.statusClosed') : t('cono.matchCard.statusPending')}
             size="small"
             color={match.status === 'ACTIVE' ? 'success' : match.status === 'RESOLVED' ? 'default' : 'warning'}
           />
@@ -70,7 +72,7 @@ export function ConoMatchCard({ match: initial }: Props) {
                 <Typography fontWeight={700} sx={{ color: tokens.onSurface, mt: 0.5 }}>
                   {entry.label} {isWinner && <EmojiEventsIcon sx={{ fontSize: 16, color: '#F9A825', verticalAlign: 'middle' }} />}
                 </Typography>
-                <Typography variant="caption" sx={{ color: tokens.onSurfaceVariant }}>{votes} votos</Typography>
+                <Typography variant="caption" sx={{ color: tokens.onSurfaceVariant }}>{t('cono.matchCard.votes', { count: votes })}</Typography>
                 <Box sx={{ mt: 1 }}>
                   <Button
                     fullWidth size="small" variant="outlined"
@@ -85,7 +87,7 @@ export function ConoMatchCard({ match: initial }: Props) {
                     onClick={() => setExpanded(expanded === side ? null : side)}
                     sx={{ mt: 0.5, textTransform: 'none' }}
                   >
-                    Info/comentarios
+                    {t('cono.matchCard.infoComments')}
                   </Button>
                 </Box>
               </Box>

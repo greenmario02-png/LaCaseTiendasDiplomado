@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import {
@@ -40,9 +41,14 @@ import { SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { useUnifiedTokens } from '../../theme';
 
-const WIZARD_STEPS = ['Información', 'Fotos', 'Atributos', 'Vista previa'];
-
 export default function SellerProductForm() {
+  const { t } = useTranslation();
+  const WIZARD_STEPS = [
+    t('seller.productForm.steps.info'),
+    t('seller.productForm.steps.photos'),
+    t('seller.productForm.steps.attributes'),
+    t('seller.productForm.steps.preview'),
+  ];
   const tk = useUnifiedTokens();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -238,7 +244,7 @@ export default function SellerProductForm() {
         categoryId: Number(form.categoryId),
         attributes: [],
       });
-      toast.success('Producto conocido creado. Asignale atributos con el botón +');
+      toast.success(t('seller.productForm.toast.knownProductCreated'));
       setTemplates((prev) => [...prev, data.data]);
       setSelectedTemplate(String(data.data.id));
       setNewKnownName('');
@@ -335,7 +341,7 @@ export default function SellerProductForm() {
     setBulkError('');
     const raw = bulkNames.trim();
     if (!raw) {
-      setBulkError('Escribe al menos un nombre.');
+      setBulkError(t('seller.productForm.errors.bulkNameRequired'));
       return;
     }
     setBulkLoading(true);
@@ -343,7 +349,7 @@ export default function SellerProductForm() {
       const { data } = await api.post('/seller/attributes', { names: raw });
       const defs: any[] = data.data;
       if (!defs.length) {
-        setBulkError('No se pudo crear ningún atributo.');
+        setBulkError(t('seller.productForm.errors.bulkCreateFailed'));
         return;
       }
       setCustomAttrs((prev) => [...prev, ...defs.filter((d) => !prev.some((a) => a.id === d.id))]);
@@ -356,7 +362,7 @@ export default function SellerProductForm() {
         }
         return { ...f, attributes: next };
       });
-      toast.success(`Se crearon ${defs.length} atributo(s). Asignales un valor a cada uno.`);
+      toast.success(t('seller.productForm.toast.bulkAttributesCreated', { count: defs.length }));
       setBulkNames('');
       setAttrDialogOpen(false);
       setDefsQuery('');
@@ -436,8 +442,8 @@ export default function SellerProductForm() {
           fullWidth
           size="small"
         >
-          <MenuItem value="true">Sí</MenuItem>
-          <MenuItem value="false">No</MenuItem>
+          <MenuItem value="true">{t('seller.productForm.attributes.yes')}</MenuItem>
+          <MenuItem value="false">{t('seller.productForm.attributes.no')}</MenuItem>
         </TextField>
       ) : (
         <Autocomplete
@@ -457,7 +463,7 @@ export default function SellerProductForm() {
           <IconButton
             size="small"
             onClick={() => removeAttr(attr.id, keyPrefix === 'cat')}
-            title={`Quitar ${attr.name}`}
+            title={t('seller.productForm.attributes.remove', { name: attr.name })}
             sx={{ mt: 0.5, flexShrink: 0 }}
           >
             <CloseIcon fontSize="small" color="error" />
@@ -469,10 +475,10 @@ export default function SellerProductForm() {
 
   const validateStep = (step: number): string => {
     if (step === 0) {
-      if (!form.name.trim()) return 'Escribe el nombre del producto.';
-      if (!form.categoryId) return 'Elige la categoría del producto.';
-      if (!form.asAuction && !form.price) return 'Indica el precio del producto.';
-      if (form.asAuction && !form.auctionEndDate) return 'Para subasta, indica la fecha de fin.';
+      if (!form.name.trim()) return t('seller.productForm.errors.nameRequired');
+      if (!form.categoryId) return t('seller.productForm.errors.categoryRequired');
+      if (!form.asAuction && !form.price) return t('seller.productForm.errors.priceRequired');
+      if (form.asAuction && !form.auctionEndDate) return t('seller.productForm.errors.auctionEndDateRequired');
     }
     return '';
   };
@@ -499,7 +505,7 @@ export default function SellerProductForm() {
       // Publicar como SUBASTA
       if (form.asAuction) {
         if (!form.auctionEndDate) {
-          setError('Para subasta, indica la fecha de fin');
+          setError(t('seller.productForm.errors.auctionEndDateRequiredSubmit'));
           setLoading(false);
           return;
         }
@@ -517,7 +523,7 @@ export default function SellerProductForm() {
           endDate: new Date(form.auctionEndDate).toISOString(),
         };
         await api.post('/auctions', auctionPayload);
-        toast.success('Subasta creada. Aparecerá en la sección de subastas.');
+        toast.success(t('seller.productForm.toast.auctionCreated'));
         close();
         return;
       }
@@ -549,10 +555,10 @@ export default function SellerProductForm() {
 
       if (isEdit) {
         await api.put(`/seller/products/${id}`, payload);
-        toast.success('Producto actualizado');
+        toast.success(t('seller.productForm.toast.productUpdated'));
       } else {
         await api.post('/seller/products', payload);
-        toast.success('Producto creado. Espera la moderación del admin.');
+        toast.success(t('seller.productForm.toast.productCreated'));
       }
       close();
     } catch (err) {
@@ -565,12 +571,12 @@ export default function SellerProductForm() {
   // Objeto para la vista previa del card (ProductCard)
   const previewProduct: any = {
     id: 0,
-    name: form.name || 'Sin nombre',
+    name: form.name || t('seller.productForm.preview.noName'),
     price: Number(form.price) || 0,
     originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
     stock: Number(form.stock) || 0,
     condition: form.condition || 'NEW',
-    seller: { storeName: user?.storeName || 'Mi tienda' },
+    seller: { storeName: user?.storeName || t('seller.productForm.preview.myStore') },
     images: images.length > 0 ? images : [],
     tags: [],
     saleCount: 0,
@@ -581,9 +587,9 @@ export default function SellerProductForm() {
       <DialogTitle sx={{ pb: 1 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="h6" fontWeight={800} color={tk.onSurface}>
-            {isEdit ? 'Editar producto' : 'Nuevo producto'}
+            {isEdit ? t('seller.productForm.title.edit') : t('seller.productForm.title.new')}
           </Typography>
-          <IconButton onClick={close} title="Cerrar" aria-label="Cerrar">
+          <IconButton onClick={close} title={t('seller.productForm.close')} aria-label={t('seller.productForm.close')}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -609,12 +615,12 @@ export default function SellerProductForm() {
         {!isEdit && activeStep === 0 && (
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField label="Nombre del producto" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} fullWidth required />
+              <TextField label={t('seller.productForm.fields.name')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-                label="Categoría"
+                label={t('seller.productForm.fields.category')}
                 value={form.categoryId}
                 onChange={(e) => handleCategoryChange(Number(e.target.value))}
                 fullWidth
@@ -648,11 +654,11 @@ export default function SellerProductForm() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Producto conocido (atributos precargados)"
+                      label={t('seller.productForm.fields.knownProduct')}
                       helperText={
                         newKnownName
-                          ? 'No existe todavía: puedes crearlo y luego asignarle atributos con el botón +.'
-                          : 'Elige un producto conocido de la categoría para precargar atributos, o escribe uno nuevo.'
+                          ? t('seller.productForm.knownProduct.helperNew')
+                          : t('seller.productForm.knownProduct.helperChoose')
                       }
                     />
                   )}
@@ -660,10 +666,10 @@ export default function SellerProductForm() {
                 {newKnownName && (
                   <Box display="flex" gap={1} mt={1}>
                     <Button size="small" variant="contained" onClick={createKnownProduct} disabled={knownLoading || !form.categoryId}>
-                      {knownLoading ? 'Creando…' : `Crear producto conocido «${newKnownName}»`}
+                      {knownLoading ? t('seller.productForm.actions.creating') : t('seller.productForm.knownProduct.createButton', { name: newKnownName })}
                     </Button>
                     <Button size="small" variant="outlined" onClick={() => setNewKnownName('')}>
-                      Descartar
+                      {t('seller.productForm.actions.discard')}
                     </Button>
                   </Box>
                 )}
@@ -672,7 +678,7 @@ export default function SellerProductForm() {
             {selectedTemplate && (
               <Grid item xs={12}>
                 <Chip
-                  label={`Producto conocido seleccionado: ${templates.find((t) => String(t.id) === selectedTemplate)?.name ?? ''}`}
+                  label={t('seller.productForm.knownProduct.selectedLabel', { name: templates.find((t) => String(t.id) === selectedTemplate)?.name ?? '' })}
                   onDelete={() => {
                     setSelectedTemplate('');
                     setNewKnownName('');
@@ -685,41 +691,41 @@ export default function SellerProductForm() {
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-                label="Condición"
+                label={t('seller.productForm.fields.condition')}
                 value={form.condition}
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
                 fullWidth
               >
-                <MenuItem value="NEW">Nuevo</MenuItem>
-                <MenuItem value="USED">Usado</MenuItem>
-                <MenuItem value="REFURBISHED">Reacondicionado</MenuItem>
+                <MenuItem value="NEW">{t('seller.productForm.fields.conditionNew')}</MenuItem>
+                <MenuItem value="USED">{t('seller.productForm.fields.conditionUsed')}</MenuItem>
+                <MenuItem value="REFURBISHED">{t('seller.productForm.fields.conditionRefurbished')}</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Descripción" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} fullWidth multiline rows={3} />
+              <TextField label={t('seller.productForm.fields.description')} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} fullWidth multiline rows={3} />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Precio (Bs)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} fullWidth required />
+              <TextField label={t('seller.productForm.fields.price')} type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Precio original" type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} fullWidth />
+              <TextField label={t('seller.productForm.fields.originalPrice')} type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Stock" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} fullWidth />
+              <TextField label={t('seller.productForm.fields.stock')} type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="SKU"
+                label={t('seller.productForm.fields.sku')}
                 value={form.sku}
                 onChange={(e) => setForm({ ...form, sku: e.target.value })}
                 fullWidth
-                placeholder="Ej: PRO-0001"
-                helperText="Dejalo en blanco y se genera automáticamente según la categoría"
+                placeholder={t('seller.productForm.fields.skuPlaceholder')}
+                helperText={t('seller.productForm.fields.skuHelper')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <Button size="small" onClick={handleGenerateSku}>
-                        Generar
+                        {t('seller.productForm.actions.generate')}
                       </Button>
                     </InputAdornment>
                   ),
@@ -727,7 +733,7 @@ export default function SellerProductForm() {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField label="Garantía" value={form.warrantyInfo} onChange={(e) => setForm({ ...form, warrantyInfo: e.target.value })} fullWidth placeholder="Ej: Garantía 12 meses" />
+              <TextField label={t('seller.productForm.fields.warranty')} value={form.warrantyInfo} onChange={(e) => setForm({ ...form, warrantyInfo: e.target.value })} fullWidth placeholder={t('seller.productForm.fields.warrantyPlaceholder')} />
             </Grid>
 
             {/* ===== PUBLICAR COMO SUBASTA ===== */}
@@ -741,20 +747,20 @@ export default function SellerProductForm() {
                     <Box display="flex" alignItems="center" gap={1}>
                       <GavelIcon color="primary" />
                       <Typography variant="body1" fontWeight={600}>
-                        Publicar como subasta
+                        {t('seller.productForm.auction.toggleLabel')}
                       </Typography>
                     </Box>
                   }
                 />
                 <Typography variant="caption" color="text.secondary" display="block" mb={form.asAuction ? 2 : 0}>
-                  Los compradores ofertarán por este producto en tiempo real hasta la fecha de fin.
+                  {t('seller.productForm.auction.helper')}
                 </Typography>
 
                 {form.asAuction && (
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={3}>
                       <TextField
-                        label="Precio inicial (Bs)"
+                        label={t('seller.productForm.auction.startingPrice')}
                         type="number"
                         value={form.auctionStartingPrice}
                         onChange={(e) => setForm({ ...form, auctionStartingPrice: e.target.value })}
@@ -764,7 +770,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={6} sm={3}>
                       <TextField
-                        label="Incremento mín."
+                        label={t('seller.productForm.auction.minIncrement')}
                         type="number"
                         value={form.auctionMinIncrement}
                         onChange={(e) => setForm({ ...form, auctionMinIncrement: e.target.value })}
@@ -773,7 +779,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={6} sm={3}>
                       <TextField
-                        label="Incremento máx."
+                        label={t('seller.productForm.auction.maxIncrement')}
                         type="number"
                         value={form.auctionMaxIncrement}
                         onChange={(e) => setForm({ ...form, auctionMaxIncrement: e.target.value })}
@@ -783,52 +789,52 @@ export default function SellerProductForm() {
                     <Grid item xs={12} sm={3}>
                       <TextField
                         select
-                        label="Tipo de incremento"
+                        label={t('seller.productForm.auction.incrementType')}
                         value={form.auctionIncrementType}
                         onChange={(e) => setForm({ ...form, auctionIncrementType: e.target.value })}
                         fullWidth
                       >
-                        <MenuItem value="dynamic">Dinámico (sube con el precio)</MenuItem>
-                        <MenuItem value="fixed">Fijo</MenuItem>
+                        <MenuItem value="dynamic">{t('seller.productForm.auction.incrementDynamic')}</MenuItem>
+                        <MenuItem value="fixed">{t('seller.productForm.auction.incrementFixed')}</MenuItem>
                       </TextField>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Precio de reserva (opcional)"
+                        label={t('seller.productForm.auction.reservePrice')}
                         type="number"
                         value={form.auctionReservePrice}
                         onChange={(e) => setForm({ ...form, auctionReservePrice: e.target.value })}
                         fullWidth
-                        helperText="Mínimo para que la subasta se cierre con éxito"
+                        helperText={t('seller.productForm.auction.reservePriceHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Comprar ahora (opcional)"
+                        label={t('seller.productForm.auction.buyNowPrice')}
                         type="number"
                         value={form.auctionBuyNowPrice}
                         onChange={(e) => setForm({ ...form, auctionBuyNowPrice: e.target.value })}
                         fullWidth
-                        helperText="Compra directa inmediata a este precio"
+                        helperText={t('seller.productForm.auction.buyNowPriceHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Anti-sniping (minutos)"
+                        label={t('seller.productForm.auction.antiSniping')}
                         type="number"
                         value={form.auctionExtensionMinutes}
                         onChange={(e) => setForm({ ...form, auctionExtensionMinutes: e.target.value })}
                         fullWidth
-                        helperText="Extiende el tiempo si ofertan al final (0 = desactivado)"
+                        helperText={t('seller.productForm.auction.antiSnipingHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <DateTimePicker
-                        label="Fecha de fin"
+                        label={t('seller.productForm.auction.endDate')}
                         value={form.auctionEndDate ? dayjs(form.auctionEndDate) : null}
                         onChange={(v) => setForm({ ...form, auctionEndDate: v ? v.toISOString() : '' })}
                         format="DD/MM/YYYY HH:mm"
-                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elige la fecha y hora de cierre de la subasta.' } }}
+                        slotProps={{ textField: { fullWidth: true, required: true, helperText: t('seller.productForm.auction.endDateHelper') } }}
                       />
                     </Grid>
                   </Grid>
@@ -842,7 +848,7 @@ export default function SellerProductForm() {
         {!isEdit && activeStep === 1 && (
           <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={1}>
-              Fotos del producto
+              {t('seller.productForm.photos.title')}
             </Typography>
             <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
               {images.map((img) => (
@@ -865,7 +871,7 @@ export default function SellerProductForm() {
                         fontSize: 10,
                       }}
                     >
-                      Principal
+                      {t('seller.productForm.photos.primary')}
                     </Box>
                   )}
                   <IconButton
@@ -880,7 +886,7 @@ export default function SellerProductForm() {
                       size="small"
                       onClick={() => setPrimary(img.url)}
                       sx={{ position: 'absolute', bottom: -8, left: -8, bgcolor: 'background.paper', boxShadow: 1 }}
-                      title="Hacer principal"
+                      title={t('seller.productForm.photos.makePrimary')}
                     >
                       <StarIcon fontSize="small" color="primary" />
                     </IconButton>
@@ -890,11 +896,11 @@ export default function SellerProductForm() {
             </Box>
             <Box display="flex" alignItems="center" gap={1}>
               <Button variant="outlined" component="label" startIcon={<AddPhotoAlternateIcon />} disabled={uploading || images.length >= 8}>
-                {uploading ? <CircularProgress size={18} /> : 'Subir fotos'}
+                {uploading ? <CircularProgress size={18} /> : t('seller.productForm.actions.uploadPhotos')}
                 <input type="file" accept="image/*" multiple hidden onChange={handleUpload} />
               </Button>
               <Typography variant="caption" color="text.secondary">
-                {images.length}/8 · Puedes subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
+                {t('seller.productForm.photos.count', { count: images.length })}
               </Typography>
             </Box>
           </Box>
@@ -905,10 +911,10 @@ export default function SellerProductForm() {
           <Box>
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
               <Typography variant="subtitle2" fontWeight={700}>
-                Especificaciones ({attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length})
+                {t('seller.productForm.attributes.title', { count: attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length })}
               </Typography>
               <Button size="small" startIcon={<AddIcon />} onClick={() => setAttrDialogOpen(true)}>
-                Agregar atributo
+                {t('seller.productForm.actions.addAttribute')}
               </Button>
             </Box>
 
@@ -920,7 +926,7 @@ export default function SellerProductForm() {
                     size="small"
                     label={attr.name}
                     onDelete={() => removeAttr(attr.id, false)}
-                    title={`Quitar ${attr.name}`}
+                    title={t('seller.productForm.attributes.remove', { name: attr.name })}
                   />
                 ))}
               </Box>
@@ -939,7 +945,7 @@ export default function SellerProductForm() {
         {!isEdit && activeStep === 3 && (
           <Box>
             <Typography variant="subtitle2" fontWeight={700} mb={2}>
-              Vista previa del card del producto
+              {t('seller.productForm.preview.title')}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -948,42 +954,42 @@ export default function SellerProductForm() {
               <Grid item xs={12} sm={6}>
                 <SurfaceCard sx={{ p: 2 }}>
                   <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                    Resumen del producto
+                    {t('seller.productForm.preview.summaryTitle')}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Nombre:</strong> {form.name || '—'}
+                    <strong>{t('seller.productForm.preview.name')}</strong> {form.name || '—'}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Categoría:</strong> {categories.find((c) => c.id === form.categoryId)?.name ?? '—'}
+                    <strong>{t('seller.productForm.preview.category')}</strong> {categories.find((c) => c.id === form.categoryId)?.name ?? '—'}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Condición:</strong> {form.condition || '—'}
+                    <strong>{t('seller.productForm.preview.condition')}</strong> {form.condition || '—'}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Precio:</strong> {form.price ? `Bs ${Number(form.price).toLocaleString('es-BO')}` : '—'}
+                    <strong>{t('seller.productForm.preview.price')}</strong> {form.price ? `Bs ${Number(form.price).toLocaleString('es-BO')}` : '—'}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Stock:</strong> {form.stock ?? '0'}
+                    <strong>{t('seller.productForm.preview.stock')}</strong> {form.stock ?? '0'}
                   </Typography>
                   {form.sku && (
                     <Typography variant="body2">
-                      <strong>SKU:</strong> {form.sku}
+                      <strong>{t('seller.productForm.preview.sku')}</strong> {form.sku}
                     </Typography>
                   )}
                   <Typography variant="body2">
-                    <strong>Fotos:</strong> {images.length}
+                    <strong>{t('seller.productForm.preview.photos')}</strong> {images.length}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Atributos:</strong> {attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length}
+                    <strong>{t('seller.productForm.preview.attributes')}</strong> {attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length}
                   </Typography>
                   <Typography variant="body2" sx={{ mt: 1 }}>
-                    <strong>Garantía:</strong> {form.warrantyInfo || '—'}
+                    <strong>{t('seller.productForm.preview.warranty')}</strong> {form.warrantyInfo || '—'}
                   </Typography>
                 </SurfaceCard>
               </Grid>
             </Grid>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-              Revisa que la información esté completa. Al publicar, el producto queda pendiente de moderación del administrador.
+              {t('seller.productForm.preview.footer')}
             </Typography>
           </Box>
         )}
@@ -992,12 +998,12 @@ export default function SellerProductForm() {
         {isEdit && (
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField label="Nombre del producto" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} fullWidth required />
+              <TextField label={t('seller.productForm.fields.name')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-                label="Categoría"
+                label={t('seller.productForm.fields.category')}
                 value={form.categoryId}
                 onChange={(e) => handleCategoryChange(Number(e.target.value))}
                 fullWidth
@@ -1031,11 +1037,11 @@ export default function SellerProductForm() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Producto conocido (atributos precargados)"
+                      label={t('seller.productForm.fields.knownProduct')}
                       helperText={
                         newKnownName
-                          ? 'No existe todavía: puedes crearlo y luego asignarle atributos con el botón +.'
-                          : 'Elige un producto conocido de la categoría para precargar atributos, o escribe uno nuevo.'
+                          ? t('seller.productForm.knownProduct.helperNew')
+                          : t('seller.productForm.knownProduct.helperChoose')
                       }
                     />
                   )}
@@ -1043,10 +1049,10 @@ export default function SellerProductForm() {
                 {newKnownName && (
                   <Box display="flex" gap={1} mt={1}>
                     <Button size="small" variant="contained" onClick={createKnownProduct} disabled={knownLoading || !form.categoryId}>
-                      {knownLoading ? 'Creando…' : `Crear producto conocido «${newKnownName}»`}
+                      {knownLoading ? t('seller.productForm.actions.creating') : t('seller.productForm.knownProduct.createButton', { name: newKnownName })}
                     </Button>
                     <Button size="small" variant="outlined" onClick={() => setNewKnownName('')}>
-                      Descartar
+                      {t('seller.productForm.actions.discard')}
                     </Button>
                   </Box>
                 )}
@@ -1055,7 +1061,7 @@ export default function SellerProductForm() {
             {selectedTemplate && (
               <Grid item xs={12}>
                 <Chip
-                  label={`Producto conocido seleccionado: ${templates.find((t) => String(t.id) === selectedTemplate)?.name ?? ''}`}
+                  label={t('seller.productForm.knownProduct.selectedLabel', { name: templates.find((t) => String(t.id) === selectedTemplate)?.name ?? '' })}
                   onDelete={() => {
                     setSelectedTemplate('');
                     setNewKnownName('');
@@ -1068,23 +1074,23 @@ export default function SellerProductForm() {
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-                label="Condición"
+                label={t('seller.productForm.fields.condition')}
                 value={form.condition}
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
                 fullWidth
               >
-                <MenuItem value="NEW">Nuevo</MenuItem>
-                <MenuItem value="USED">Usado</MenuItem>
-                <MenuItem value="REFURBISHED">Reacondicionado</MenuItem>
+                <MenuItem value="NEW">{t('seller.productForm.fields.conditionNew')}</MenuItem>
+                <MenuItem value="USED">{t('seller.productForm.fields.conditionUsed')}</MenuItem>
+                <MenuItem value="REFURBISHED">{t('seller.productForm.fields.conditionRefurbished')}</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Descripción" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} fullWidth multiline rows={3} />
+              <TextField label={t('seller.productForm.fields.description')} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} fullWidth multiline rows={3} />
             </Grid>
             <Grid item xs={12}>
               <Box>
                 <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                  Fotos del producto
+                  {t('seller.productForm.photos.title')}
                 </Typography>
                 <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
                   {images.map((img) => (
@@ -1107,7 +1113,7 @@ export default function SellerProductForm() {
                             fontSize: 10,
                           }}
                         >
-                          Principal
+                          {t('seller.productForm.photos.primary')}
                         </Box>
                       )}
                       <IconButton
@@ -1122,7 +1128,7 @@ export default function SellerProductForm() {
                           size="small"
                           onClick={() => setPrimary(img.url)}
                           sx={{ position: 'absolute', bottom: -8, left: -8, bgcolor: 'background.paper', boxShadow: 1 }}
-                          title="Hacer principal"
+                          title={t('seller.productForm.photos.makePrimary')}
                         >
                           <StarIcon fontSize="small" color="primary" />
                         </IconButton>
@@ -1132,32 +1138,32 @@ export default function SellerProductForm() {
                 </Box>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Button variant="outlined" component="label" startIcon={<AddPhotoAlternateIcon />} disabled={uploading || images.length >= 8}>
-                    {uploading ? <CircularProgress size={18} /> : 'Subir fotos'}
+                    {uploading ? <CircularProgress size={18} /> : t('seller.productForm.actions.uploadPhotos')}
                     <input type="file" accept="image/*" multiple hidden onChange={handleUpload} />
                   </Button>
                   <Typography variant="caption" color="text.secondary">
-                    {images.length}/8 · Puedes subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)
+                    {t('seller.productForm.photos.count', { count: images.length })}
                   </Typography>
                 </Box>
               </Box>
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField
-                label="Precio (Bs)"
+                label={t('seller.productForm.fields.price')}
                 type="number"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 fullWidth
                 required
                 disabled={isEmployee && isEdit}
-                helperText={isEmployee && isEdit ? 'Solo el administrador de la tienda puede modificar el precio' : undefined}
+                helperText={isEmployee && isEdit ? t('seller.productForm.fields.priceEmployeeLocked') : undefined}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Precio original" type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} fullWidth />
+              <TextField label={t('seller.productForm.fields.originalPrice')} type="number" value={form.originalPrice} onChange={(e) => setForm({ ...form, originalPrice: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label="Stock" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} fullWidth />
+              <TextField label={t('seller.productForm.fields.stock')} type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} fullWidth />
             </Grid>
 
             {/* ===== PUBLICAR COMO SUBASTA ===== */}
@@ -1171,20 +1177,20 @@ export default function SellerProductForm() {
                     <Box display="flex" alignItems="center" gap={1}>
                       <GavelIcon color="primary" />
                       <Typography variant="body1" fontWeight={600}>
-                        Publicar como subasta
+                        {t('seller.productForm.auction.toggleLabel')}
                       </Typography>
                     </Box>
                   }
                 />
                 <Typography variant="caption" color="text.secondary" display="block" mb={form.asAuction ? 2 : 0}>
-                  Los compradores ofertarán por este producto en tiempo real hasta la fecha de fin.
+                  {t('seller.productForm.auction.helper')}
                 </Typography>
 
                 {form.asAuction && (
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={3}>
                       <TextField
-                        label="Precio inicial (Bs)"
+                        label={t('seller.productForm.auction.startingPrice')}
                         type="number"
                         value={form.auctionStartingPrice}
                         onChange={(e) => setForm({ ...form, auctionStartingPrice: e.target.value })}
@@ -1194,7 +1200,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={6} sm={3}>
                       <TextField
-                        label="Incremento mín."
+                        label={t('seller.productForm.auction.minIncrement')}
                         type="number"
                         value={form.auctionMinIncrement}
                         onChange={(e) => setForm({ ...form, auctionMinIncrement: e.target.value })}
@@ -1203,7 +1209,7 @@ export default function SellerProductForm() {
                     </Grid>
                     <Grid item xs={6} sm={3}>
                       <TextField
-                        label="Incremento máx."
+                        label={t('seller.productForm.auction.maxIncrement')}
                         type="number"
                         value={form.auctionMaxIncrement}
                         onChange={(e) => setForm({ ...form, auctionMaxIncrement: e.target.value })}
@@ -1213,52 +1219,52 @@ export default function SellerProductForm() {
                     <Grid item xs={12} sm={3}>
                       <TextField
                         select
-                        label="Tipo de incremento"
+                        label={t('seller.productForm.auction.incrementType')}
                         value={form.auctionIncrementType}
                         onChange={(e) => setForm({ ...form, auctionIncrementType: e.target.value })}
                         fullWidth
                       >
-                        <MenuItem value="dynamic">Dinámico (sube con el precio)</MenuItem>
-                        <MenuItem value="fixed">Fijo</MenuItem>
+                        <MenuItem value="dynamic">{t('seller.productForm.auction.incrementDynamic')}</MenuItem>
+                        <MenuItem value="fixed">{t('seller.productForm.auction.incrementFixed')}</MenuItem>
                       </TextField>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Precio de reserva (opcional)"
+                        label={t('seller.productForm.auction.reservePrice')}
                         type="number"
                         value={form.auctionReservePrice}
                         onChange={(e) => setForm({ ...form, auctionReservePrice: e.target.value })}
                         fullWidth
-                        helperText="Mínimo para que la subasta se cierre con éxito"
+                        helperText={t('seller.productForm.auction.reservePriceHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Comprar ahora (opcional)"
+                        label={t('seller.productForm.auction.buyNowPrice')}
                         type="number"
                         value={form.auctionBuyNowPrice}
                         onChange={(e) => setForm({ ...form, auctionBuyNowPrice: e.target.value })}
                         fullWidth
-                        helperText="Compra directa inmediata a este precio"
+                        helperText={t('seller.productForm.auction.buyNowPriceHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Anti-sniping (minutos)"
+                        label={t('seller.productForm.auction.antiSniping')}
                         type="number"
                         value={form.auctionExtensionMinutes}
                         onChange={(e) => setForm({ ...form, auctionExtensionMinutes: e.target.value })}
                         fullWidth
-                        helperText="Extiende el tiempo si ofertan al final (0 = desactivado)"
+                        helperText={t('seller.productForm.auction.antiSnipingHelper')}
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <DateTimePicker
-                        label="Fecha de fin"
+                        label={t('seller.productForm.auction.endDate')}
                         value={form.auctionEndDate ? dayjs(form.auctionEndDate) : null}
                         onChange={(v) => setForm({ ...form, auctionEndDate: v ? v.toISOString() : '' })}
                         format="DD/MM/YYYY HH:mm"
-                        slotProps={{ textField: { fullWidth: true, required: true, helperText: 'Elige la fecha y hora de cierre de la subasta.' } }}
+                        slotProps={{ textField: { fullWidth: true, required: true, helperText: t('seller.productForm.auction.endDateHelper') } }}
                       />
                     </Grid>
                   </Grid>
@@ -1267,17 +1273,17 @@ export default function SellerProductForm() {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="SKU"
+                label={t('seller.productForm.fields.sku')}
                 value={form.sku}
                 onChange={(e) => setForm({ ...form, sku: e.target.value })}
                 fullWidth
-                placeholder="Ej: PRO-0001"
-                helperText="Dejalo en blanco y se genera automáticamente según la categoría"
+                placeholder={t('seller.productForm.fields.skuPlaceholder')}
+                helperText={t('seller.productForm.fields.skuHelper')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <Button size="small" onClick={handleGenerateSku}>
-                        Generar
+                        {t('seller.productForm.actions.generate')}
                       </Button>
                     </InputAdornment>
                   ),
@@ -1285,7 +1291,7 @@ export default function SellerProductForm() {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField label="Garantía" value={form.warrantyInfo} onChange={(e) => setForm({ ...form, warrantyInfo: e.target.value })} fullWidth placeholder="Ej: Garantía 12 meses" />
+              <TextField label={t('seller.productForm.fields.warranty')} value={form.warrantyInfo} onChange={(e) => setForm({ ...form, warrantyInfo: e.target.value })} fullWidth placeholder={t('seller.productForm.fields.warrantyPlaceholder')} />
             </Grid>
           </Grid>
         )}
@@ -1295,10 +1301,10 @@ export default function SellerProductForm() {
           <Box mt={3}>
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
               <Typography variant="subtitle2" fontWeight={700}>
-                Especificaciones ({attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length})
+                {t('seller.productForm.attributes.title', { count: attrs.filter((a) => !removedAttrs.includes(a.id)).length + customAttrs.length })}
               </Typography>
               <Button size="small" startIcon={<AddIcon />} onClick={() => setAttrDialogOpen(true)}>
-                Agregar atributo
+                {t('seller.productForm.actions.addAttribute')}
               </Button>
             </Box>
 
@@ -1310,7 +1316,7 @@ export default function SellerProductForm() {
                     size="small"
                     label={attr.name}
                     onDelete={() => removeAttr(attr.id, false)}
-                    title={`Quitar ${attr.name}`}
+                    title={t('seller.productForm.attributes.remove', { name: attr.name })}
                   />
                 ))}
               </Box>
@@ -1327,7 +1333,7 @@ export default function SellerProductForm() {
 
         {/* Diálogo "+" Agregar atributo (compartido por wizard y edición) */}
         <Dialog open={attrDialogOpen} onClose={() => setAttrDialogOpen(false)} fullWidth maxWidth="sm">
-          <DialogTitle>Agregar atributo</DialogTitle>
+          <DialogTitle>{t('seller.productForm.attributes.addDialog.title')}</DialogTitle>
           <DialogContent>
             <Autocomplete
               options={defOptions}
@@ -1343,25 +1349,24 @@ export default function SellerProductForm() {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Buscar atributo por nombre"
-                  placeholder="Ej: Velocidad, Tamaño, Color..."
+                  label={t('seller.productForm.attributes.addDialog.searchLabel')}
+                  placeholder={t('seller.productForm.attributes.addDialog.searchPlaceholder')}
                   autoFocus
                   onChange={(e) => setDefsQuery(e.target.value)}
                 />
               )}
             />
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              Puedes sumar atributos de otras categorías o que no están definidos para la actual. Se guardan como
-              especificación del producto.
+              {t('seller.productForm.attributes.addDialog.helper')}
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle2" gutterBottom>
-              ¿Falta un atributo? Crea varios separándolos con coma
+              {t('seller.productForm.attributes.addDialog.bulkTitle')}
             </Typography>
             <Box display="flex" gap={1} alignItems="flex-start">
               <TextField
-                label="Nombres separados por coma"
-                placeholder="Ej: Marca, Color, Tamaño"
+                label={t('seller.productForm.attributes.addDialog.bulkLabel')}
+                placeholder={t('seller.productForm.attributes.addDialog.bulkPlaceholder')}
                 value={bulkNames}
                 onChange={(e) => setBulkNames(e.target.value)}
                 onKeyDown={(e) => {
@@ -1373,7 +1378,7 @@ export default function SellerProductForm() {
                 fullWidth
                 size="small"
                 error={Boolean(bulkError)}
-                helperText={bulkError || 'Se crean como atributos globales y quedan listos para asignarles valor.'}
+                helperText={bulkError || t('seller.productForm.attributes.addDialog.bulkHelper')}
                 disabled={bulkLoading}
               />
               <Button
@@ -1383,7 +1388,7 @@ export default function SellerProductForm() {
                 disabled={bulkLoading || !bulkNames.trim()}
                 sx={{ whiteSpace: 'nowrap', mt: 0.5 }}
               >
-                {bulkLoading ? <CircularProgress size={18} color="inherit" /> : 'Crear'}
+                {bulkLoading ? <CircularProgress size={18} color="inherit" /> : t('seller.productForm.attributes.addDialog.bulkCreate')}
               </Button>
             </Box>
           </DialogContent>
@@ -1394,7 +1399,7 @@ export default function SellerProductForm() {
                 setDefsQuery('');
               }}
             >
-              Cancelar
+              {t('seller.productForm.actions.cancel')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -1404,29 +1409,29 @@ export default function SellerProductForm() {
         {isEdit ? (
           <Box display="flex" gap={1} alignItems="center">
             <GhostButton type="button" onClick={close}>
-              Cancelar
+              {t('seller.productForm.actions.cancel')}
             </GhostButton>
             <PrimaryButton type="button" onClick={submit} disabled={loading}>
-              {loading ? <CircularProgress size={20} color="inherit" /> : 'Guardar cambios'}
+              {loading ? <CircularProgress size={20} color="inherit" /> : t('seller.productForm.actions.save')}
             </PrimaryButton>
           </Box>
         ) : (
           <>
             <Box display="flex" gap={1} alignItems="center">
               <GhostButton type="button" onClick={close}>
-                Cancelar
+                {t('seller.productForm.actions.cancel')}
               </GhostButton>
               <GhostButton type="button" onClick={handleBack} disabled={activeStep === 0}>
-                Anterior
+                {t('seller.productForm.actions.back')}
               </GhostButton>
             </Box>
             {activeStep < WIZARD_STEPS.length - 1 ? (
               <PrimaryButton type="button" onClick={handleNext}>
-                Siguiente
+                {t('seller.productForm.actions.next')}
               </PrimaryButton>
             ) : (
               <PrimaryButton type="button" onClick={submit} disabled={loading}>
-                {loading ? <CircularProgress size={20} color="inherit" /> : 'Publicar producto'}
+                {loading ? <CircularProgress size={20} color="inherit" /> : t('seller.productForm.actions.publish')}
               </PrimaryButton>
             )}
           </>

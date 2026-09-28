@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -60,6 +61,7 @@ interface Conversation {
 type TabKind = 'compras' | 'ventas';
 
 export default function ChatPage() {
+  const { t: tr } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
@@ -229,21 +231,21 @@ const typingRef = useRef(false);
   };
 
   const otherName = (c: Conversation) => {
-    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName} ${c.buyer.lastName}` : 'Comprador';
-    return c.seller?.storeName || 'Vendedor';
+    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName} ${c.buyer.lastName}` : tr('chat.buyer');
+    return c.seller?.storeName || tr('chat.seller');
   };
 
-  const lastMsg = (c: Conversation) => c.messages?.[0]?.content || `${c._count?.messages ?? 0} mensajes`;
+  const lastMsg = (c: Conversation) => c.messages?.[0]?.content || tr('chat.messagesCount', { count: c._count?.messages ?? 0 });
 
   const otherAvatarLabel = (c: Conversation) => {
-    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName?.[0] ?? ''}${c.buyer.lastName?.[0] ?? ''}` : 'C';
-    return (c.seller?.storeName?.[0] ?? 'V').toUpperCase();
+    if (!isBuyer(c)) return c.buyer ? `${c.buyer.firstName?.[0] ?? ''}${c.buyer.lastName?.[0] ?? ''}` : tr('chat.buyerInitial');
+    return (c.seller?.storeName?.[0] ?? tr('chat.sellerInitial')).toUpperCase();
   };
 
   const headerTitle = () => {
     if (!active) return '';
-    if (!isBuyer(active)) return active.buyer ? `${active.buyer.firstName} ${active.buyer.lastName}` : 'Comprador';
-    return active.seller?.storeName || 'Vendedor';
+    if (!isBuyer(active)) return active.buyer ? `${active.buyer.firstName} ${active.buyer.lastName}` : tr('chat.buyer');
+    return active.seller?.storeName || tr('chat.seller');
   };
 
   // El "otro" participante es un vendedor cuando YO soy el comprador de la conversación
@@ -274,7 +276,7 @@ const typingRef = useRef(false);
           label={
             <Badge badgeContent={unreadByTab('compras')} color="error">
               <Box display="flex" alignItems="center" gap={0.5}>
-                <ShoppingCartIcon fontSize="small" /> Compras
+                <ShoppingCartIcon fontSize="small" /> {tr('chat.tabs.purchases')}
               </Box>
             </Badge>
           }
@@ -284,7 +286,7 @@ const typingRef = useRef(false);
           label={
             <Badge badgeContent={unreadByTab('ventas')} color="error">
               <Box display="flex" alignItems="center" gap={0.5}>
-                <StorefrontIcon fontSize="small" /> Ventas
+                <StorefrontIcon fontSize="small" /> {tr('chat.tabs.sales')}
               </Box>
             </Badge>
           }
@@ -295,12 +297,12 @@ const typingRef = useRef(false);
       {list.length === 0 ? (
         <Box p={3} textAlign="center">
           <Typography color={t.onSurface} variant="body2">
-            {tab === 'compras' ? 'No tienes compras/consultas aún.' : 'No tienes ventas en curso.'}
+            {tab === 'compras' ? tr('chat.emptyList.purchases') : tr('chat.emptyList.sales')}
           </Typography>
           <Typography variant="caption" color={t.onSurfaceVariant} display="block" mt={1}>
             {tab === 'compras'
-              ? 'Inicia una desde la ficha de un producto o de una tienda.'
-              : 'Cuando un comprador te escriba o compre, aparecerá acá.'}
+              ? tr('chat.emptyList.purchasesHint')
+              : tr('chat.emptyList.salesHint')}
           </Typography>
         </Box>
       ) : (
@@ -394,13 +396,13 @@ const typingRef = useRef(false);
           <Box flex={1} overflow="auto" p={2} sx={{ bgcolor: t.background }}>
             {messages.length === 0 && (
               <Typography color={t.onSurfaceVariant} textAlign="center" mt={4}>
-                Sin mensajes todavía. Escribe para consultar por el producto.
+                {tr('chat.noMessagesYet')}
               </Typography>
             )}
             {messages.length === 0 && otherIsSeller && icebreakers.length > 0 && (
               <Box mt={2} mb={1}>
                 <Typography variant="caption" color={t.onSurfaceVariant} display="block" mb={0.5}>
-                  💬 Sugerencias para empezar la conversación:
+                  {tr('chat.icebreakersHint')}
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {icebreakers.slice(0, 4).map((p) => (
@@ -442,7 +444,7 @@ const typingRef = useRef(false);
             <div ref={bottomRef} />
             {otherTyping && (
               <Typography variant="caption" color={t.onSurfaceVariant} sx={{ px: 1, pb: 0.5 }}>
-                Escribiendo...
+                {tr('chat.typing')}
               </Typography>
             )}
           </Box>
@@ -451,7 +453,7 @@ const typingRef = useRef(false);
             {suggestions?.inactive && (
               <Box mb={1}>
                 <Typography variant="caption" color={t.onSurfaceVariant} display="block" mb={0.5}>
-                  ⏰ Sin respuesta todavía — sugerencias ({suggestions.region ?? ''}):
+                  {tr('chat.inactivityHint', { region: suggestions.region ?? '' })}
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {(suggestions.followUps ?? []).slice(0, 2).map((p) => (
@@ -467,7 +469,7 @@ const typingRef = useRef(false);
             <TextField
               fullWidth
               size="small"
-              placeholder="Escribe un mensaje..."
+              placeholder={tr('chat.messagePlaceholder')}
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
@@ -497,7 +499,7 @@ const typingRef = useRef(false);
       ) : (
         <Box p={4} textAlign="center">
           <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
-          <Typography color={t.onSurfaceVariant}>Selecciona una conversación de la lista para ver los mensajes.</Typography>
+          <Typography color={t.onSurfaceVariant}>{tr('chat.selectConversation')}</Typography>
         </Box>
       )}
     </SurfaceCard>
@@ -508,10 +510,10 @@ const typingRef = useRef(false);
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <ChatIcon sx={{ fontSize: 64, color: t.outline, mb: 2 }} />
         <Typography variant="h5" mb={2} color={t.onSurface}>
-          Inicia sesión para ver tus conversaciones
+          {tr('chat.loginPrompt')}
         </Typography>
         <PrimaryButton type="button" to="/login">
-          Iniciar sesión
+          {tr('chat.loginButton')}
         </PrimaryButton>
       </Container>
     );
@@ -527,8 +529,8 @@ const typingRef = useRef(false);
     <>
       <Container maxWidth="lg" sx={{ py: 3 }}>
         <PageHeader
-          title="Mensajes"
-          subtitle="Compras y ventas separadas"
+          title={tr('chat.title')}
+          subtitle={tr('chat.subtitle')}
           icon={
             <Badge badgeContent={unreadByTab('compras') + unreadByTab('ventas')} color="error">
               <ChatIcon />
@@ -554,17 +556,17 @@ const typingRef = useRef(false);
       >
         {otherIsSeller && active?.seller && (
           <MenuItem onClick={goStore}>
-            <StorefrontIcon fontSize="small" sx={{ mr: 1 }} /> Visitar tienda
+            <StorefrontIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.visitStore')}
           </MenuItem>
         )}
         {otherIsSeller && active?.seller && (
           <MenuItem onClick={goStore}>
-            <PersonIcon fontSize="small" sx={{ mr: 1 }} /> Ver perfil
+            <PersonIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.viewProfile')}
           </MenuItem>
         )}
         {active?.product && (
           <MenuItem onClick={goProduct}>
-            <ShoppingCartIcon fontSize="small" sx={{ mr: 1 }} /> Ir al producto
+            <ShoppingCartIcon fontSize="small" sx={{ mr: 1 }} /> {tr('chat.menu.goToProduct')}
           </MenuItem>
         )}
       </Menu>

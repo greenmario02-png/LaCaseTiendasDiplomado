@@ -18,12 +18,14 @@ import { ReplyCard } from '../../components/redesign/ReplyCard';
 import { PrimaryButton } from '../../components/redesign/Buttons';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 import { MapPin, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { CategoryIcon } from '../../theme/forumIcons';
 import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 
 type PostDetail = any;
 
 export function ForumPostPage() {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { id } = useParams();
   const postId = Number(id);
@@ -141,16 +143,16 @@ export function ForumPostPage() {
   }
 
   if (!post) {
-    return <Alert severity="error">{error || 'No se pudo cargar la pregunta.'}</Alert>;
+    return <Alert severity="error">{error || t('forum.postDetail.loadError')}</Alert>;
   }
 
   const canAccept = user != null && post.author != null && post.author.forumUsername === user.forumProfile?.forumUsername;
-  const safeAuthor = post.author ?? { forumUsername: 'usuario', tag: 'Novato', karma: 0 };
+  const safeAuthor = post.author ?? { forumUsername: t('forum.postDetail.defaultUsername'), tag: t('forum.postDetail.defaultTag'), karma: 0 };
 
   return (
     <Box>
       <Button size="small" onClick={() => navigate('/foro')} sx={{ color: forumPalette.textSecondary, mb: 1, textTransform: 'none' }}>
-        ← Volver al feed
+        ← {t('forum.postDetail.backToFeed')}
       </Button>
 
       {/* Post */}
@@ -161,15 +163,15 @@ export function ForumPostPage() {
           <Chip icon={<MapPin size={13} strokeWidth={2.2} />} label={post.city} size="small"
             sx={{ bgcolor: 'rgba(249,168,37,0.1)', color: forumPalette.amarillo }} />
           {post.type !== 'GENERAL' && <Chip label={post.type} size="small" sx={{ color: forumPalette.textSecondary }} />}
-          {post.status === 'RESOLVED' && <Chip label="✓ Resuelta" size="small" sx={{ color: forumPalette.verde }} />}
+          {post.status === 'RESOLVED' && <Chip label={`✓ ${t('forum.postDetail.resolved')}`} size="small" sx={{ color: forumPalette.verde }} />}
         </Stack>
 
         <Typography variant="h5" fontWeight={800} sx={{ color: forumPalette.textPrimary, mb: 0.5 }}>
           {post.title}
         </Typography>
         <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>
-          por <strong style={{ color: forumPalette.textSecondary }}>{safeAuthor.forumUsername}</strong>
-          {' · '}{formatTimeAgo(post.createdAt)} · {post.viewCount || 0} vistas
+          {t('forum.postDetail.byAuthorPrefix')} <strong style={{ color: forumPalette.textSecondary }}>{safeAuthor.forumUsername}</strong>
+          {' · '}{formatTimeAgo(post.createdAt)} · {t('forum.postDetail.viewsCount', { count: post.viewCount || 0 })}
         </Typography>
 
         <Typography variant="body1" sx={{ color: forumPalette.textSecondary, my: 1.5, whiteSpace: 'pre-line' }}>
@@ -211,11 +213,11 @@ export function ForumPostPage() {
 
       {/* Replies */}
       <Typography variant="subtitle1" fontWeight={700} sx={{ color: forumPalette.textPrimary, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <MessageSquare size={18} strokeWidth={2.2} color={forumPalette.accent} /> {post.replyCount} {post.replyCount === 1 ? 'respuesta' : 'respuestas'}
+        <MessageSquare size={18} strokeWidth={2.2} color={forumPalette.accent} /> {t('forum.postDetail.replyCount', { count: post.replyCount })}
       </Typography>
 
       {post.replies?.length === 0 && (
-        <EmptyState message="Aún no hay respuestas. ¡Sé el primero!" />
+        <EmptyState message={t('forum.postDetail.emptyReplies')} />
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
@@ -252,8 +254,8 @@ export function ForumPostPage() {
           maxRows={8}
           placeholder={
             user
-              ? 'Escribe tu respuesta... (mínimo 10 caracteres)'
-              : 'Inicia sesión para responder...'
+              ? t('forum.postDetail.replyPlaceholder')
+              : t('forum.postDetail.loginToReplyPlaceholder')
           }
           value={replyText}
           onChange={(e) => setReplyText(e.target.value)}
@@ -271,7 +273,7 @@ export function ForumPostPage() {
             onClick={handleSendReply}
             disabled={sending || replyText.trim().length < 10}
           >
-            {sending ? 'Publicando...' : 'Publicar respuesta'}
+            {sending ? t('forum.postDetail.publishing') : t('forum.postDetail.publishReply')}
           </PrimaryButton>
         </Box>
       </Box>

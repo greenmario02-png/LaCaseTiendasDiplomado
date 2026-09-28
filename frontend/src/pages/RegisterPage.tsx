@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TextField, Box, Alert, CircularProgress } from '@mui/material';
 import AuthCard from '../components/redesign/AuthCard';
 import { PrimaryButton } from '../components/redesign/Buttons';
@@ -8,6 +9,7 @@ import { getErrorMessage } from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const register = useAuthStore((s) => s.register);
   const refParam = new URLSearchParams(window.location.search).get('ref') ?? '';
@@ -24,7 +26,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(form);
-      toast.success('Registro exitoso. Ahora inicia sesión.');
+      toast.success(t('auth.register.successToast'));
       navigate('/login');
     } catch (err) {
       setError(getErrorMessage(err));
@@ -35,11 +37,11 @@ export default function RegisterPage() {
 
   return (
     <AuthCard
-      title="Crear cuenta"
-      subtitle="Es gratis y toma menos de un minuto"
+      title={t('auth.register.title')}
+      subtitle={t('auth.register.subtitle')}
       footer={
         <>
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link> · ¿Quieres vender? <Link to="/registro-vendedor">Abre tu tienda</Link>
+          {t('auth.register.alreadyHaveAccount')} <Link to="/login">{t('auth.register.signIn')}</Link> · {t('auth.register.wantToSell')} <Link to="/registro-vendedor">{t('auth.register.openStore')}</Link>
         </>
       }
     >
@@ -49,19 +51,19 @@ export default function RegisterPage() {
         </Alert>
       )}
       <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
-        <TextField label="Nombre" required value={form.firstName} onChange={handleChange('firstName')} />
-          <TextField label="Apellido" required value={form.lastName} onChange={handleChange('lastName')} />
-          <TextField label="Email" type="email" required value={form.email} onChange={handleChange('email')} />
-          <TextField label="Teléfono" value={form.phone} onChange={handleChange('phone')} />
-          <TextField label="Contraseña" type="password" required value={form.password} onChange={handleChange('password')} helperText="Mínimo 8 caracteres" />
+        <TextField label={t('auth.register.firstNameLabel')} required value={form.firstName} onChange={handleChange('firstName')} />
+          <TextField label={t('auth.register.lastNameLabel')} required value={form.lastName} onChange={handleChange('lastName')} />
+          <TextField label={t('auth.register.emailLabel')} type="email" required value={form.email} onChange={handleChange('email')} />
+          <TextField label={t('auth.register.phoneLabel')} value={form.phone} onChange={handleChange('phone')} />
+          <TextField label={t('auth.register.passwordLabel')} type="password" required value={form.password} onChange={handleChange('password')} helperText={t('auth.register.passwordHelper')} />
           <TextField
-            label="Código de invitación (opcional)"
+            label={t('auth.register.referralCodeLabel')}
             value={form.referralCode}
             onChange={handleChange('referralCode')}
-            helperText="¿Te invitó un amigo? Escribe su código y quien te invitó gana 50 monedas del proyecto."
+            helperText={t('auth.register.referralCodeHelper')}
           />
         <PrimaryButton type="submit" size="large" fullWidth disabled={loading}>
-          {loading ? <CircularProgress size={22} color="inherit" /> : 'Registrarme'}
+          {loading ? <CircularProgress size={22} color="inherit" /> : t('auth.register.submit')}
         </PrimaryButton>
       </Box>
     </AuthCard>

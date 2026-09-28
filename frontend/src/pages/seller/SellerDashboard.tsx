@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Grid, Typography, Box, Chip, CircularProgress, } from '@mui/material';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
@@ -29,13 +30,13 @@ import { useAuthStore } from '../../stores/authStore';
 import SalesTodayWidget from '../../components/ui/SalesTodayWidget';
 import { vision } from '../../theme/vision';
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: 'Pendiente',
-  CONFIRMED: 'Confirmada',
-  PREPARING: 'En preparación',
-  SHIPPED: 'Enviada',
-  DELIVERED: 'Entregada',
-  CANCELLED: 'Cancelada',
+const STATUS_KEYS: Record<string, string> = {
+  PENDING: 'pending',
+  CONFIRMED: 'confirmed',
+  PREPARING: 'preparing',
+  SHIPPED: 'shipped',
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled',
 };
 
 const STATUS_COLORS = ['#4318ff', '#6ad2ff', '#ffb800', '#00d12a', '#f857a6', '#ff5858'];
@@ -49,6 +50,7 @@ const KPI_GRADIENTS: Record<string, string> = {
 };
 
 export default function SellerDashboard() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [data, setData] = useState<any>(null);
   const [promoStats, setPromoStats] = useState<any>(null);
@@ -70,26 +72,26 @@ export default function SellerDashboard() {
 
   const kpis = isEmployee
     ? [
-        { label: 'Ventas realizadas', value: data.totalSales, icon: <ReceiptLongIcon />, color: 'info.main' },
-        { label: 'Clientes atendidos', value: data.customersServed ?? 0, icon: <ChatIcon />, color: 'success.main' },
-        { label: 'Ingresos', value: money(data.totalRevenue), icon: <AttachMoneyIcon />, color: 'warning.main' },
-        { label: 'Mensajes sin leer', value: data.unreadMessages, icon: <PendingIcon />, color: 'error.main' },
+        { label: t('seller.dashboard.kpis.salesMade'), value: data.totalSales, icon: <ReceiptLongIcon />, color: 'info.main' },
+        { label: t('seller.dashboard.kpis.customersServed'), value: data.customersServed ?? 0, icon: <ChatIcon />, color: 'success.main' },
+        { label: t('seller.dashboard.kpis.revenue'), value: money(data.totalRevenue), icon: <AttachMoneyIcon />, color: 'warning.main' },
+        { label: t('seller.dashboard.kpis.unreadMessages'), value: data.unreadMessages, icon: <PendingIcon />, color: 'error.main' },
       ]
     : [
-        { label: 'Productos totales', value: data.totalProducts, sub: `${data.activeProducts} activos`, icon: <InventoryIcon />, color: 'primary.main' },
-        { label: 'Pendientes moderación', value: data.pendingProducts, icon: <PendingIcon />, color: 'error.main' },
-        { label: 'Ventas', value: data.totalSales, icon: <ReceiptLongIcon />, color: 'info.main' },
-        { label: 'Ingresos totales', value: money(data.totalRevenue), icon: <AttachMoneyIcon />, color: 'warning.main' },
+        { label: t('seller.dashboard.kpis.totalProducts'), value: data.totalProducts, sub: t('seller.dashboard.kpis.activeProducts', { count: data.activeProducts }), icon: <InventoryIcon />, color: 'primary.main' },
+        { label: t('seller.dashboard.kpis.pendingModeration'), value: data.pendingProducts, icon: <PendingIcon />, color: 'error.main' },
+        { label: t('seller.dashboard.kpis.sales'), value: data.totalSales, icon: <ReceiptLongIcon />, color: 'info.main' },
+        { label: t('seller.dashboard.kpis.totalRevenue'), value: money(data.totalRevenue), icon: <AttachMoneyIcon />, color: 'warning.main' },
       ];
 
   const revenueKpis = [
-    { label: 'Ingresos de la semana', value: money(data.revenueWeek), color: '#00d12a' },
-    { label: 'Ingresos del mes', value: money(data.revenueMonth), color: '#6ad2ff' },
-    { label: 'Mensajes sin leer', value: data.unreadMessages, color: '#ff5858' },
+    { label: t('seller.dashboard.kpis.revenueWeek'), value: money(data.revenueWeek), color: '#00d12a' },
+    { label: t('seller.dashboard.kpis.revenueMonth'), value: money(data.revenueMonth), color: '#6ad2ff' },
+    { label: t('seller.dashboard.kpis.unreadMessages'), value: data.unreadMessages, color: '#ff5858' },
   ];
 
   const salesChart = (data.salesByDay ?? []).map((d: any) => ({ ...d, revenue: Math.round(Number(d.revenue)) }));
-  const statusChart = (data.ordersByStatus ?? []).map((o: any) => ({ name: STATUS_LABEL[o.status] || o.status, value: o._count }));
+  const statusChart = (data.ordersByStatus ?? []).map((o: any) => ({ name: STATUS_KEYS[o.status] ? t(`seller.dashboard.status.${STATUS_KEYS[o.status]}`) : o.status, value: o._count }));
 
   const darkTooltip = {
     contentStyle: {
@@ -124,10 +126,10 @@ export default function SellerDashboard() {
         <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} mb={3}>
           <Box>
             <Typography variant="h5" fontWeight={800} sx={{ fontFamily: vision.font, color: vision.text.primary }}>
-              {isEmployee ? 'Panel del empleado' : 'Panel del vendedor'}
+              {isEmployee ? t('seller.dashboard.header.titleEmployee') : t('seller.dashboard.header.titleSeller')}
             </Typography>
             <Typography variant="body2" sx={{ color: vision.text.secondary }}>
-              Desempeño de tu tienda en LaCase Multi Tiendas
+              {t('seller.dashboard.header.subtitle')}
             </Typography>
           </Box>
           <Box>
@@ -135,8 +137,8 @@ export default function SellerDashboard() {
               size="small"
               startIcon={<LocalOfferOutlinedIcon />}
             >
-              Promociones: {promoStats?.active ?? 0} activas · {promoStats?.finished ?? 0} finalizadas
-              {promoStats?.totalSpent ? ` · invertido ${money(promoStats.totalSpent)}` : ''}
+              {t('seller.dashboard.promotions.summary', { active: promoStats?.active ?? 0, finished: promoStats?.finished ?? 0 })}
+              {promoStats?.totalSpent ? t('seller.dashboard.promotions.invested', { amount: money(promoStats.totalSpent) }) : ''}
             </SecondaryButton>
           </Box>
         </Box>
@@ -210,7 +212,7 @@ export default function SellerDashboard() {
           <Grid item xs={12} md={8}>
             <Box sx={{ ...vision.card, p: 3 }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Tus ventas — últimos 30 días
+                {t('seller.dashboard.charts.salesLast30Days')}
               </Typography>
               <ResponsiveContainer width="100%" height={260}>
                 <AreaChart data={salesChart}>
@@ -228,7 +230,7 @@ export default function SellerDashboard() {
                   <XAxis dataKey="date" tick={{ fontSize: 10, fill: vision.text.muted }} tickFormatter={(d: string) => d.slice(5)} />
                   <YAxis tick={{ fontSize: 10, fill: vision.text.muted }} />
                   <Tooltip {...darkTooltip} formatter={(v: any) => money(v)} />
-                  <Area type="monotone" dataKey="revenue" stroke="url(#sellerGrad)" strokeWidth={3} fill="url(#sellerFill)" name="Ingresos" />
+                  <Area type="monotone" dataKey="revenue" stroke="url(#sellerGrad)" strokeWidth={3} fill="url(#sellerFill)" name={t('seller.dashboard.charts.revenueSeriesName')} />
                 </AreaChart>
               </ResponsiveContainer>
             </Box>
@@ -238,7 +240,7 @@ export default function SellerDashboard() {
           <Grid item xs={12} md={4}>
             <Box sx={{ ...vision.card, p: 3, height: '100%' }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Pedidos por estado
+                {t('seller.dashboard.charts.ordersByStatus')}
               </Typography>
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
@@ -259,7 +261,7 @@ export default function SellerDashboard() {
         {data.topProducts?.length > 0 && (
           <Box sx={{ ...vision.card, p: 3, mt: 3 }}>
             <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-              Tus productos más vendidos
+              {t('seller.dashboard.topProducts.title')}
             </Typography>
             <Box>
               {data.topProducts.map((p: any, i: number) => (
@@ -290,10 +292,10 @@ export default function SellerDashboard() {
                       {p.name}
                     </Typography>
                     <Typography variant="caption" sx={{ color: vision.text.muted }}>
-                      {money(p.price)} · stock {p.stock}
+                      {t('seller.dashboard.topProducts.priceStock', { price: money(p.price), stock: p.stock })}
                     </Typography>
                   </Box>
-                  <Chip label={`${p.totalSold} vendidos`} size="small" sx={vision.chipGhost('#00d12a')} />
+                  <Chip label={t('seller.dashboard.topProducts.sold', { count: p.totalSold })} size="small" sx={vision.chipGhost('#00d12a')} />
                 </Box>
               ))}
             </Box>
@@ -304,31 +306,31 @@ export default function SellerDashboard() {
         <Box sx={{ ...vision.card, p: 3, mt: 3 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, fontFamily: vision.font }}>
-              Pedidos recientes
+              {t('seller.dashboard.recentOrders.title')}
             </Typography>
             <Typography component={Link} to="/seller/pedidos" variant="body2" sx={{ color: '#6ad2ff', textDecoration: 'none' }}>
-              Ver todos →
+              {t('seller.dashboard.recentOrders.viewAll')}
             </Typography>
           </Box>
           {data.recentOrders.length === 0 && (
-            <Typography sx={{ color: vision.text.muted }}>Aún no recibiste pedidos.</Typography>
+            <Typography sx={{ color: vision.text.muted }}>{t('seller.dashboard.recentOrders.empty')}</Typography>
           )}
           {data.recentOrders.map((o: any) => (
             <Box key={o.id} py={1} sx={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="body2" fontWeight={700} sx={{ color: vision.text.primary }}>
-                    #{o.id} — {o.buyer?.firstName} {o.buyer?.lastName}
+                    {t('seller.dashboard.recentOrders.orderLabel', { id: o.id, buyerName: `${o.buyer?.firstName ?? ''} ${o.buyer?.lastName ?? ''}`.trim() })}
                   </Typography>
                   <Typography variant="caption" sx={{ color: vision.text.muted }}>
-                    {new Date(o.createdAt).toLocaleString('es-BO')} · {o.items?.length} ítems
+                    {t('seller.dashboard.recentOrders.dateItems', { date: new Date(o.createdAt).toLocaleString('es-BO'), count: o.items?.length })}
                   </Typography>
                 </Box>
                 <Box textAlign="right">
                   <Typography variant="body2" fontWeight={800} sx={{ color: vision.text.primary }}>
                     {money(o.total)}
                   </Typography>
-                  <Chip label={STATUS_LABEL[o.status] || o.status} size="small" variant="outlined" sx={vision.chipGhost('#6ad2ff')} />
+                  <Chip label={STATUS_KEYS[o.status] ? t(`seller.dashboard.status.${STATUS_KEYS[o.status]}`) : o.status} size="small" variant="outlined" sx={vision.chipGhost('#6ad2ff')} />
                 </Box>
               </Box>
             </Box>

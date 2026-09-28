@@ -1,0 +1,2067 @@
+{
+  "common": {
+    "loading": "Apnaqasa...",
+    "error": "Pantjata utji",
+    "retry": "Wasitat lurañani",
+    "empty": "Janiw kunas utjkiti",
+    "save": "Imantaña",
+    "cancel": "Jaytaña",
+    "close": "Jistt'aña",
+    "confirm": "Chiqapachaña",
+    "delete": "Apaqaña",
+    "edit": "Askichaña",
+    "add": "Yapaña",
+    "search": "Thaqhaña",
+    "seeAll": "Taqpach uñjaña",
+    "back": "Kuttaña",
+    "next": "Qhiparu",
+    "previous": "Nayraru",
+    "yes": "Jisa",
+    "no": "Janiw",
+    "notFound": {
+      "title": "Jan jikxatasa pana",
+      "message": "Thaqhta pananaka jan utjkiti jan ukax mayjt'ayataw.",
+      "backHome": "Qallantaru kuttaña"
+    }
+  },
+  "account": {
+    "profile": {
+      "title": "Nayana kwinta",
+      "buyCoins": "Alasiña qullqinaka",
+      "myOrders": "Nayana mayiwinaka",
+      "addresses": "Utjawinaka",
+      "wishlist": "Munatanaka",
+      "returns": "Dewolusiyunes",
+      "affiliateProgram": "Programa afiliadunaka",
+      "notifications": "Yatiyawinaka",
+      "myAuctions": "Nayana subastanaka",
+      "goToMyStore": "Ir ru nayana qhatu",
+      "coinsChipLabel": "qullqinaka",
+      "coinsTitle": "Qullqinaka proyekto",
+      "coinsInfo": "qullqi ofisial Lakase Multi Qhatunaka: se <b>alasiwi</b> kunjamas token, se <b>atipi</b> ru luraña alasiwinaka qullqini (janiw...mpi kuttayawi) ukat ayudando jupa foru, ukat se <b>apnaqam</b> taki alasiña aljatanaka, tikitinaka regalo ukat tikitinaka pisiptayawi.",
+      "balanceLabel": "Jakhu qullqi: {{balance}} qullqinaka",
+      "noCoinMovements": "Jichhakamasa janiw utjtam sarnaqawinaka qullqinaka.",
+      "inviteTitle": "Imbitam jilanaka ukat atipi 50 qullqinaka",
+      "inviteDescription": "Komparte jumana kudigu: kunapachati khitis se registre mpi jupa, ganas 50 qullqinaka.",
+      "invitedCount": "Jichha inwitaste ru {{count}} jaqi(s).",
+      "copy": "Katukipaña",
+      "copyCodeSuccess": "Kudigu katukipata ru qillqata imaña",
+      "copyLink": "Katukipaña link",
+      "copyLinkSuccess": "Link inwitasiyun katukipata",
+      "personalDataTitle": "Datos jaqina",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Apillidu",
+      "phoneLabel": "Telefunu",
+      "countryLabel": "Suyu",
+      "cityLabel": "Marka",
+      "provinceLabel": "Purwinsya",
+      "postalCodeLabel": "Kudigu postal",
+      "bioLabel": "Biografia",
+      "bioPlaceholder": "Kwinta maya pisi patxa jumaru u jumana qhatu...",
+      "saveChanges": "Imantaña turkatanaka",
+      "profileUpdated": "Perfil aktualisado",
+      "profileImageUpdated": "Uñacht'awi perfil machaqaptayata",
+      "invalidCoinAmount": "Mantam maya jakhu walida qullqinaka.",
+      "boughtCoins": "Alasita {{amount}} qullqi(s).",
+      "lastOrdersTitle": "Qhipa mayiwinaka",
+      "viewAll": "Uñjaña taqi",
+      "noOrdersYet": "Janiw hisiste alasiwinaka jichhakamasa.",
+      "buyCoinsDialogTitle": "Alasiña qullqinaka proyekto",
+      "buyCoinsDialogDescription": "Alasiwinaka qullqinaka ru modo tokens kuna atiwta apnaqaña Lakase Multi Qhatunaka (aljatanaka, tikitinaka regalo, tikitinaka pisiptayawi).",
+      "coinsQuantityLabel": "Jakhu qullqinaka",
+      "cancel": "Jaytaña",
+      "buy": "Alasiña"
+    },
+    "applications": {
+      "title": "Nayana mayiwinaka",
+      "subtitle": "Arkam jupa istadu jumana mayiwinaka ru irnaqawinaka",
+      "statusReceived": "Resibida",
+      "statusViewed": "Wista tama qhatu",
+      "statusShortlisted": "Preseleksiyunado/ru",
+      "statusRejected": "Janiw ajllita/ru",
+      "statusHired": "¡Kontratado/ru!",
+      "statusWithdrawn": "Apsuta",
+      "closedNotice": "Aka irnaqawi jichha wensio u se serro.",
+      "appliedOn": "Te mayta jupa {{date}}",
+      "cvAttached": "CV adjunto",
+      "cvAttachedWithName": "CV adjunto: {{name}}",
+      "storeMessage": "Arsuwi qhatu",
+      "downloadCv": "Aptayaña CV",
+      "withdraw": "Apsuña",
+      "viewJob": "Uñjaña irnaqawi",
+      "viewJobs": "Uñjaña irnaqawinaka",
+      "emptyMessage": "Jichhakamasa janiw te mayta ru ni mayakis irnaqawi.",
+      "withdrawConfirm": "¿Munta apsuña jumana mayiwi ru \"{{title}}\"?",
+      "withdrawSuccess": "Mayiwi apsuta"
+    },
+    "myOrders": "Nayana mayiwinaka",
+    "myOrdersSubtitle": "Arkam jupa istadu jumana alasiwinaka",
+    "addresses": {
+      "saved": "Utjawi imantata",
+      "deleted": "Utjawi eliminada",
+      "title": "Nayana utjawinaka",
+      "subtitle": "Administra jumana utjawinaka apayawi",
+      "newAddress": "Machaqa utjawi",
+      "emptyMessage": "Janiw utjtam utjawinaka imantatanaka.",
+      "defaultAddress": "Utjawi tama defekto",
+      "editAddress": "Askichaña utjawi",
+      "street": "Kaye",
+      "number": "Numiru",
+      "floor": "Piso/Dpto",
+      "city": "Marka",
+      "state": "Purwinsya",
+      "postalCode": "KP",
+      "useAsDefault": "Apnaqaña kunjamas utjawi tama defekto",
+      "cancel": "Jaytaña",
+      "save": "Imantaña"
+    },
+    "wishlist": {
+      "title": "Nayana munatanaka",
+      "productCount": "{{count}} aljata(s)",
+      "emptyMessage": "Janiw utjtam aljatanaka munatanaka"
+    }
+  },
+  "affiliate": {
+    "title": "Programa afiliadunaka",
+    "referralCode": "Jumana kudigu apayata jaqi",
+    "copy": "Katukipaña",
+    "copied": "¡Katukipata!",
+    "shareNote": "Kompartelo mpi jumana jilanaka. Kunapachati se registren ukat kompren, ganas kumisyun.",
+    "commission": "Kumisyun",
+    "balanceEarned": "Balansi atipata",
+    "amountBs": "Bs {{amount}}",
+    "referralStats": "{{referrals}} apayata jaqinaka · {{orders}} alasiwinaka pagarata",
+    "myReferrals": "Nayana apayata jaqinaka",
+    "empty": "Jichhakamasa janiw utjtam apayata jaqinaka. Komparte jumana kudigu taki qalltaña ru atipaña.",
+    "table": {
+      "referred": "Apayata jaqi",
+      "email": "Imeyl",
+      "date": "Urupa",
+      "commission": "Kumisyun"
+    },
+    "pendingPurchase": "Suyt'ata alasiwi"
+  },
+  "auctions": {
+    "title": "Subastanaka",
+    "subtitle": "Puja tama aljatanaka unikos ukat yewate askirinaka churawinaka",
+    "search": {
+      "placeholder": "Thaqhaña subastanaka... (Ej: Game Boy, koyar, rysen)"
+    },
+    "filters": {
+      "category": "Categoria",
+      "categoryAll": "Taqi",
+      "sort": "Ordenar",
+      "hasBids": "Mpi churawinaka"
+    },
+    "sorts": {
+      "interest": "Taki jumaru (interes + churawinaka)",
+      "priceAsc": "Chani jukampi bajo",
+      "priceDesc": "Chani jukampi alto",
+      "endingSoon": "Terminan jaykaki",
+      "mostBids": "Jukampi pujas",
+      "newest": "🆕 Jukampi resientes"
+    },
+    "interestNote": "Ordenadas ukhamarjama jumana interes ukat askirinaka churawinaka (chaninaka jukampi bajos ukat aktiwanaka nayrïri).",
+    "empty": "Janiw se jikxatapxi subastanaka. Prueba mpi yaqhanaka terminos u kita filtrunaka.",
+    "emptyWithSearch": "Janiw se jikxatapxi subastanaka taki \"{{search}}\". Prueba mpi yaqhanaka terminos u kita filtrunaka.",
+    "badges": {
+      "lastHours": "Qhipa pachanaka",
+      "buyNow": "Alasiña jichha"
+    },
+    "card": {
+      "bids": "{{count}} pujas"
+    },
+    "time": {
+      "ended": "Terminada",
+      "dhm": "{{d}}d {{h}}h {{m}}m",
+      "hm": "{{h}}h {{m}}m",
+      "m": "{{m}}m",
+      "dhms": "{{d}}d {{h}}h {{m}}m {{s}}s",
+      "hms": "{{h}}h {{m}}m {{s}}s",
+      "ms": "{{m}}m {{s}}s",
+      "s": "{{s}}s"
+    },
+    "detail": {
+      "toasts": {
+        "extended": "¡Churawi qhipa minutos! Jupa pacha se extendio.",
+        "closed": "Subasta serrada",
+        "enterAmount": "Mantam maya jakhu",
+        "bidPlaced": "Churawi registrada",
+        "purchaseDone": "Alasiwi realisada",
+        "watchAdded": "Yapata ru jumana watchlist",
+        "watchRemoved": "Kitado watchlist"
+      },
+      "confirmBuyNow": "¿Alasiña ru instante tama {{price}}?",
+      "notFound": "Subasta janiw enkontrada",
+      "breadcrumbHome": "Inisio",
+      "breadcrumbAuctions": "Subastanaka",
+      "watch": {
+        "remove": "Kitar watchlist",
+        "add": "Yapaña ru watchlist"
+      },
+      "chips": {
+        "currentPrice": "Chani aktual: {{price}}",
+        "startingPrice": "Inisial: {{price}}",
+        "bidsCount": "{{count}} churawinaka",
+        "buyNowPrice": "Alasiña jichha: {{price}}",
+        "reserveMet": "Imantata alkansada ✓",
+        "reserveNotMet": "Imantata janiw alkansada ({{price}})",
+        "reserveNotMetShort": "Imantata janiw alkansada"
+      },
+      "finished": "Subasta terminada",
+      "sellerLabel": "Aljiri:",
+      "wonBy": "Atipata tama {{firstName}} {{lastName}} mpi {{price}}",
+      "finishedReserveNotMet": "Subasta finalisada (janiw se alkanso imantata).",
+      "finishedNoWinner": "Subasta finalisada (janiw...mpi ganador).",
+      "isYourAuction": "Utji wa jumana subasta. Janiw atiwta churaña nisa komprarla.",
+      "youAreWinning": "Was ganando mpi {{price}}",
+      "yourBestBid": "Jumana askiri churawi: {{price}}",
+      "proxyMax": "(proxy jach'a: {{price}})",
+      "nextMinBid": "Proxima churawi pisin:",
+      "bidButton": "Churaña",
+      "buyNowButton": "Alasiña jichha",
+      "proxyBiddingNote": "Jumana churawi aktua kunjamas proxy bidding: pagarta kikpa nesesario taki atipaña, kama jupa jakhu kuna indikas.",
+      "bidHistory": "Nayra qillqata churawinaka ({{count}})",
+      "noBidsYet": "Jichhakamasa janiw utji churawinaka. ¡Se jupa nayrïri!",
+      "you": "(jumana)"
+    },
+    "watchlist": {
+      "title": "Nayana subastanaka",
+      "activeInPlay": "{{count}} aktiwanaka juego",
+      "tabs": {
+        "active": "⚡ Aktiwanaka ({{count}})",
+        "followed": "Seguidas ({{count}})",
+        "won": "Ganadas ({{count}})"
+      },
+      "empty": {
+        "active": "Janiw akanaka pujando ni mayakis subasta aktiwa. Explora subastanaka ukat partisipa: adrenalina atipaña mpi maya buena churawi te espera. ⚡",
+        "followed": "Janiw sigues ni mayakis subasta. Apnaqam jupa ikono markador maya subasta taki seguirla.",
+        "won": "Jichhakamasa janiw ganaste ni mayakis subasta."
+      },
+      "paymentWarning": "¡Felisidades! Ganaste maya u jukampi subastanaka. Utjtam 48 pachanaka taki pagaraña nayra kuna wuelwan ru subasta. Toka \"Pagaraña\" sapa tarjeta.",
+      "level": {
+        "winning": "Was ganando",
+        "lastHour": "¡Qhipa pacha!",
+        "competing": "Kompetis"
+      },
+      "wonBy": "Gano: {{firstName}}",
+      "remove": "Kitar",
+      "wonFor": "Atipata tama {{price}} Bs",
+      "pendingPayment": "⏳ Suyt'ata pagarawi",
+      "timeToPay": "⏱️ Te kedan {{hours}}h taki pagaraña",
+      "paid": "Pagarata",
+      "payNow": "Pagaraña jichha"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Inisiar mantawi",
+      "subtitle": "Mantam taki alasiña, aljaña ukat partisipar jupa foru",
+      "noAccount": "¿Janiw utjtam kwinta?",
+      "signUp": "Registrate",
+      "wantToSell": "¿Munta aljaña?",
+      "openStore": "Jist'aram jumana qhatu",
+      "emailLabel": "Imeyl",
+      "passwordLabel": "Kuntrasiña",
+      "submit": "Mantaña"
+    },
+    "register": {
+      "title": "Luraña kwinta",
+      "subtitle": "Wa jani qullqini ukat toma pisi maya minuto",
+      "alreadyHaveAccount": "¿Jichha utjtam kwinta?",
+      "signIn": "Inisia mantawi",
+      "wantToSell": "¿Munta aljaña?",
+      "openStore": "Jist'aram jumana qhatu",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Apillidu",
+      "emailLabel": "Imeyl",
+      "phoneLabel": "Telefunu",
+      "passwordLabel": "Kuntrasiña",
+      "passwordHelper": "Pisin 8 qillqatanaka",
+      "referralCodeLabel": "Kudigu inwitasiyun (munpach)",
+      "referralCodeHelper": "¿Te inwito maya jila? Qillqam jupana kudigu ukat khiti te inwito atipi 50 qullqinaka proyekto.",
+      "submit": "Registrarme",
+      "successToast": "Qillqantasiwi exitoso. Jichha inisia mantawi."
+    },
+    "sellerRegister": {
+      "heroTitle": "Jist'aram jumana qhatu Lakase Multi Qhatunaka",
+      "heroItems": [
+        "Yatiyi aljatanaka kunas rubro",
+        "Ajllim jumana suyu ukat tipartamintu/purwinsya",
+        "Jupa apayawi se jakhuchi ukhamarjama jumana utjawi",
+        "Katuqi pagarawinaka tama QR",
+        "Te kontaktamos tama selular"
+      ],
+      "formTitle": "Qillqantasiwi aljiri",
+      "formSubtitle": "Jumana solisitud sera rewisada tama maya apnaqiri. Atiwta yatiyaña aljatanaka maya wes chiqapayata.",
+      "section1Title": "1. Datos jumana qhatu",
+      "storeNameLabel": "Suti jumana qhatu",
+      "storeDescriptionLabel": "Qhanañchawi jumana qhatu",
+      "storeDescriptionHelper": "Pisin 10 qillqatanaka",
+      "storeCategoryLabel": "Categoria aljatanaka kuna aljta",
+      "section2Title": "2. Utjawi",
+      "countryLabel": "Suyu",
+      "divisionHelper": "Atiwta qillqaña u ajlliña",
+      "cityLabel": "Marka",
+      "phoneLabel": "Selular kuntaktu ({{code}})",
+      "phoneHelper": "aljirinaka ukat alasirinaka te kontaktaran tama aka numiru",
+      "phonePlaceholderBolivia": "Ej: 71234567",
+      "phonePlaceholderOther": "Ej: 1123456789",
+      "section3Title": "3. Datos akseso",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Apillidu",
+      "emailLabel": "Imeyl",
+      "passwordLabel": "Kuntrasiña",
+      "passwordHelper": "Pisin 8 qillqatanaka",
+      "submit": "Apayaña solisitud",
+      "alreadyHaveStore": "¿Jichha utjtam qhatu?",
+      "signIn": "Inisia mantawi",
+      "successToast": "Solisitud apayata. Espera aprobasiyun apnaqiri.",
+      "reviewFields": "Rewisa kampos markados rojo",
+      "errors": {
+        "storeName": "Jupa suti qhatu wa wakiskiri",
+        "storeDescription": "qhanañchawi debe utjaña ru pisi 10 qillqatanaka",
+        "storeCategory": "Ajllim categoria aljatanaka kuna aljta",
+        "country": "Ajllim jupa suyu",
+        "locationState": "Ajllim jupa {{division}}",
+        "locationCity": "marka wa obligatoria",
+        "phone": "Jupa selular kuntaktu wa wakiskiri",
+        "firstName": "Jupa suti wa wakiskiri",
+        "lastName": "Jupa apillidu wa wakiskiri",
+        "email": "Imeyl jan walja",
+        "password": "kuntrasiña debe utjaña ru pisi 8 qillqatanaka"
+      }
+    }
+  },
+  "cart": {
+    "emptyMessage": "Jumana karritu utji wasio",
+    "exploreProducts": "Explorar aljatanaka",
+    "title": "Karritu ({{count}} items)",
+    "shippingCalculatedAtCheckout": "Apayawi se jakhuchi checkout",
+    "noImage": "janiw...mpi img",
+    "variant": "Wariante: {{variant}}",
+    "storeSubtotal": "Subtutal qhatu: {{amount}}",
+    "qrAlt": "QR {{storeName}}",
+    "qrTitle": "QR pagarawi {{storeName}}",
+    "qrDescription": "Eskanea aka QR taki pagaraña jupa taqpach utji qhatu. Jupa qillqata comprobante konfirmas jupa checkout.",
+    "summary": "Risumin",
+    "subtotal": "Subtutal",
+    "shipping": "Apayawi",
+    "calculatedAtCheckout": "Kalkulado checkout",
+    "total": "Taqpach",
+    "loginLink": "Inisia mantawi",
+    "loginToCheckoutSuffix": "taki tukuyaña alasiwi",
+    "checkoutButton": "Tukuyaña alasiwi"
+  },
+  "chat": {
+    "title": "Arsuwinaka",
+    "subtitle": "Alasiwinaka ukat aljawinaka separadas",
+    "buyer": "Alasiri",
+    "seller": "Aljiri",
+    "buyerInitial": "K",
+    "sellerInitial": "W",
+    "messagesCount": "{{count}} arsuwinaka",
+    "tabs": {
+      "purchases": "Alasiwinaka",
+      "sales": "Aljawinaka"
+    },
+    "emptyList": {
+      "purchases": "Janiw utjtam alasiwinaka/konsultas jichhakamasa.",
+      "sales": "Janiw utjtam aljawinaka kurso.",
+      "purchasesHint": "Inisia maya tpacha fikha maya aljata u maya qhatu.",
+      "salesHint": "Kunapachati maya alasiri te eskriba u kompre, aparesera aka."
+    },
+    "noMessagesYet": "Janiw...mpi arsuwinaka jichhakamasa. Qillqam taki konsultar tama jupa aljata.",
+    "icebreakersHint": "💬 Sugerensias taki qalltaña konwersasiyun:",
+    "typing": "Eskribiendo...",
+    "inactivityHint": "⏰ Janiw...mpi kutiyawi jichhakamasa — sugerensias ({{region}}):",
+    "messagePlaceholder": "Qillqam maya arsuwi...",
+    "selectConversation": "Ajllim maya konwersasiyun lista taki uñjaña arsuwinaka.",
+    "loginPrompt": "Inisia mantawi taki uñjaña jumana konwersasiyunes",
+    "loginButton": "Inisiar mantawi",
+    "menu": {
+      "visitStore": "Wisitar qhatu",
+      "viewProfile": "Uñjaña perfil",
+      "goToProduct": "Ir ru aljata"
+    },
+    "floating": {
+      "noConversations": "Janiw utjtam konwersasiyunes jichhakamasa.",
+      "noMessagesYet": "Janiw...mpi arsuwinaka jichhakamasa. Qillqam taki konsultar.",
+      "purchaseAndSaleConversations": "Konwersasiyunes alasiwi ukat aljawi",
+      "viewFullPage": "Uñjaña pagina phuqhata"
+    }
+  },
+  "checkout": {
+    "errors": {
+      "pickupAddressRequired": "Qhanañcham utjawi apsuwi",
+      "shippingAddressRequired": "Ajllim maya utjawi apayawi"
+    },
+    "orderSuccessToast": "Alasiwi realisada. Paga mpi jupa QR aljiri.",
+    "title": "Checkout",
+    "deliveryType": "Laya churawi",
+    "homeDelivery": "Apayawi ru domisilio",
+    "storePickupFree": "🏬 Apsuwi qhatu (jani qullqini)",
+    "storePickupLabel": "🏬 Apsuwi qhatu",
+    "pickupAddress": "Utjawi apsuwi",
+    "shippingAddress": "Utjawi apayawi",
+    "pickupAddressPlaceholder": "Ej: Aw. 16 Julio 1523, qhatu Lakase, Pas",
+    "pickupAddressHelper": "Qhanañcham kawkina retiraras jupa mayiwi (punto aljawi qhatu).",
+    "noAddressesPrefix": "Janiw utjtam utjawinaka imantatanaka. Agregalas",
+    "myAddressesLink": "Nayana utjawinaka",
+    "continueWithoutShipping": "Kontinuar janiw...mpi apayawi",
+    "calculateShipping": "Jakhuchaña apayawi",
+    "sellerNotes": "Notas taki jupa aljiri (munpach)",
+    "sellerNotesPlaceholder": "Ej: yamar nayra entregar",
+    "orderSummary": "Risumin alasiwi",
+    "subtotal": "Subtutal",
+    "shipping": "Apayawi",
+    "storeTotal": "Taqpach qhatu",
+    "couponLabel": "Kudigu pisiptayawi",
+    "couponPlaceholder": "Ej: BIENWENIDO10",
+    "couponAppliedPercentage": "{{value}}% pisiptayawi aplikado",
+    "couponAppliedFixed": "{{amount}} pisiptayawi aplikado",
+    "couponAppliedGift": "Kupun regalo {{amount}}. Jisa gastas pisi, qhatu te dewuelwe jupa jakhu qullqi qullqi.",
+    "applyCoupon": "Aplikar kupun",
+    "total": "Taqpach",
+    "paymentQrInfoPrefix": "Jupa pagarawi se luri tama",
+    "paymentQrInfoStrong": "QR aljiri",
+    "paymentQrInfoSuffix": ". Ru chiqapachaña weras jupa QR ukat deberas apkataña jupa qillqata comprobante transfirinsya.",
+    "confirmPurchase": "Chiqapachaña alasiwi",
+    "freePickup": "Jani qullqini (apsuwi qhatu)",
+    "pickupPaymentInfoPrefix": "Retiras jupa mayiwi utjawi kuna indikaste. Jupa pagarawi se luri tama",
+    "calculateShippingPrompt": "Jakhuchi jupa apayawi u ajllim apsuwi qhatu taki uñjaña jupa detaye"
+  },
+  "cono": {
+    "home": {
+      "title": "Rinkonsito Boliwiano",
+      "subtitle": "Rankings kumunidad, mpi humor ukat mpi datos. Wota positiwo u nika, u arkam maya atipasiwi eliminatorias.",
+      "tabMemes": "Memes",
+      "tabTournaments": "Torneos",
+      "tournamentSingular": "Atipasiwi",
+      "newTheme": "Machaqa tima",
+      "emptyThemes": "Jichhakamasa janiw utji temas utji categoria. ¡Luri jupa nayrïri!",
+      "entriesCount": "{{count}} mantawinaka",
+      "byAuthor": "tama {{username}}",
+      "newThemeDialogTitle": "Machaqa tima — {{type}}",
+      "verificationRequired": "Munta ru pisi maya chiqapayawi profesiyunal chiqapayata taki luraña maya tima.",
+      "verifyMe": "Werifikarme",
+      "slugLabel": "Slug (URL)",
+      "titleLabel": "Titulu",
+      "descriptionLabel": "Qhanañchawi (munpach)",
+      "cancel": "Jaytaña",
+      "create": "Luraña",
+      "slugAndTitleRequired": "Slug ukat titulu wa obligatorios."
+    },
+    "themeDetail": {
+      "windowHistoric": "Historiko",
+      "windowDaily": "Hoy",
+      "windowWeekly": "Simana sapa",
+      "windowMonthly": "Phaxsi sapa",
+      "uploadMeme": "Apkataña meme",
+      "noEntries": "Jichhakamasa janiw utji mantawinaka.",
+      "noEntriesInPeriod": "Jichhakamasa janiw utji mantawinaka aka periodo.",
+      "proposeCompetitor": "Proponer atipasiri",
+      "buildMatch": "Armar atipasiwi",
+      "noMatches": "Jichhakamasa janiw utji enfrentamientos armados aka atipasiwi.",
+      "memeTitleLabel": "Titulu meme",
+      "competitorNameLabel": "Suti atipasiri",
+      "chooseImage": "Ajlliña uñacht'awi",
+      "cancel": "Jaytaña",
+      "publish": "Yatiyaña",
+      "competitorALabel": "Atipasiri Ru",
+      "competitorBLabel": "Atipasiri B",
+      "votingDateLabel": "Urupa wutuwi",
+      "themeNotFound": "Tima janiw jikxatata.",
+      "chooseTwoEntries": "Ajllim paya mantawinaka kuna se enfrentan.",
+      "chooseDistinctEntries": "Ajllim paya mantawinaka distintas.",
+      "matchCreated": "Atipasiwi lurata.",
+      "chooseImageAndTitle": "Ajllim maya uñacht'awi ukat qillqam maya suti/titulu.",
+      "entryPublished": "¡Mantawi publikada!"
+    },
+    "entryDetail": {
+      "entryNotFound": "Mantawi janiw enkontrada.",
+      "byAuthor": "tama {{username}}",
+      "net": "Neto: {{value}}"
+    },
+    "matchCard": {
+      "round": "Ronda {{round}}",
+      "statusOpen": "Wutuwi abierta",
+      "statusClosed": "Jistt'ata",
+      "statusPending": "Suyt'ata",
+      "votes": "{{count}} wotos",
+      "infoComments": "Info/kumintarionaka",
+      "votingClosed": "Aka atipasiwi jichha janiw utji abierto ru wutuwi."
+    }
+  },
+  "footer": {
+    "brandName": "Lakase Multi Qhatunaka",
+    "description": "Marketplase multi-aljiri. Enkuentra askirinaka chaninaka taqi qhatunaka maya kikpa lugar, mpi kalkulo apayawi ukhamarjama utjawi aljiri.",
+    "buyHeading": "Alasiña",
+    "allProducts": "Taqi aljatanaka",
+    "auctions": "Subastanaka",
+    "promotions": "Promosyunanaka",
+    "buildYourPc": "Arma jumana PC",
+    "sellHeading": "Aljaña",
+    "openStore": "Jist'aram jumana qhatu",
+    "helpFaq": "Ayuda ukat jisktawinaka frekuentes",
+    "copyright": "© {{year}} Lakase Multi Qhatunaka. Taqi derekhos reserwados.",
+    "developedBy": "Desarroyado tama Alwaro Dias Wayejos"
+  },
+  "forum": {
+    "botReplyBadge": {
+      "label": "Bot Lakase MultiQhatu"
+    },
+    "categories": {
+      "title": "Foru lakinaka",
+      "emptySubforums": "Janiw utji foru lakinaka jichhakamasa.",
+      "postsCount": "{{count}} posts",
+      "citiesTitle": "Siudades",
+      "emptyCityQuestions": "Jichhakamasa janiw utji jisktawinaka tama marka."
+    },
+    "cityBar": {
+      "cityVerified": "{{city}} (werifikada)",
+      "defaultCity": "Nayana marka",
+      "changeCityTooltip": "Kambiar marka",
+      "configurePrompt": "Konfigura jumana marka taki uñjaña foros jumana suyu.",
+      "configureButton": "Konfigurar"
+    },
+    "citySelector": {
+      "dialogTitle": "Jumana suyu foru",
+      "close": "Jistt'aña"
+    },
+    "comments": {
+      "title": "Kumintarionaka ({{count}})",
+      "placeholder": "Qillqam maya kumintariu…",
+      "send": "Apayaña",
+      "empty": "Jichhakamasa janiw utji kumintarionaka.",
+      "agree": "akuerdo",
+      "isAi": "Wa IA",
+      "loadMore": "Apkataña jukampi ({{count}})"
+    },
+    "feed": {
+      "modeRecent": "Resiente",
+      "modePopular": "Popular",
+      "modeUnanswered": "Janiw...mpi kutiyawi",
+      "modeMyCity": "Nayana marka",
+      "headerTitle": "Lakase — ¿khitis sabe?",
+      "askQuestion": "Luraña maya jisktawi",
+      "citySubforums": "Foru lakinaka {{city}}:",
+      "viewAll": "Uñjaña taqpacha",
+      "emptyPosts": "Janiw utji jisktawinaka jichhakamasa. ¡Se jupa nayrïri preguntar!",
+      "defaultUsername": "apnaqiri",
+      "defaultCategory": "General",
+      "loading": "Kargando...",
+      "loadMore": "Apkataña jukampi"
+    },
+    "geoConfig": {
+      "geolocationNotSupported": "Jumana nawegador janiw soporta geolokalisasiyun.",
+      "locationFailed": "Janiw pudimos obtener jumana utjawi. Ajllim jumana marka manualmente.",
+      "chooseCity": "Ajllim jumana marka.",
+      "radiusLabel": "Radio suyu:",
+      "radiusValue": "{{km}} km",
+      "verifiedByGps": "Werifikada tama GPS",
+      "searching": "Thaqhaskiwa...",
+      "useMyLocation": "Apnaqaña nayana utjawi",
+      "saving": "Guardando...",
+      "save": "Imantaña",
+      "citySummary": "Marka: {{name}} ({{department}}) · radio estimado {{radius}} km",
+      "cityFieldLabel": "Marka",
+      "cityFieldPlaceholder": "Ajllim jumana marka (Ej: Oruro)"
+    },
+    "gifPicker": {
+      "title": "Thaqhaña GIFnaka",
+      "searchLabel": "Thaqhaña GIF (Ej: kapibara)",
+      "noResults": "Janiw se jikxatapxi GIFnaka.",
+      "cancel": "Jaytaña"
+    },
+    "karmaCard": {
+      "karma": "Karma",
+      "available": "Utjki taki turkaña: {{available}} (kanjeados: {{spent}})",
+      "progressToLegend": "{{pct}}% hasia Leyenda (3000)",
+      "redeemButton": "Turkaña karma tama qullqinaka"
+    },
+    "newPostModal": {
+      "title": "Luraña maya jisktawi",
+      "titleLabel": "Titulu",
+      "titleHelper": "{{length}}/200 · pisin 10",
+      "bodyLabel": "Qhanañchawi",
+      "subforumLabel": "Foru laki",
+      "typeLabel": "Laya",
+      "cityLabel": "Marka",
+      "cityHelper": "Se apnaqawi jumana marka perfil; atiwta kambiarla.",
+      "tagsLabel": "Etiketas (jach'a 5)",
+      "addTag": "Anadir",
+      "addImages": "Anadir uñacht'awinaka ({{count}}/4)",
+      "gifCount": "GIF ({{count}})",
+      "removeAllImages": "Kitar taqi",
+      "removeGifs": "Kitar GIFnaka",
+      "botNotice": "Jupa Bot Lakase MultiQhatu respondera automatikamente thaqhaskiwa aljatanaka utjapxi.",
+      "cancel": "Jaytaña",
+      "submit": "Yatiyaña jisktawi",
+      "titleTooShort": "Jupa titulu debe utjaña ru pisi 10 qillqatanaka.",
+      "bodyTooShort": "qhanañchawi debe utjaña ru pisi 20 qillqatanaka.",
+      "selectCategory": "Ajllim maya categoria."
+    },
+    "postCard": {
+      "byAuthorPrefix": "tama",
+      "deletedAuthor": "apaqata",
+      "replyCount_one": "{{count}} kutiyawi",
+      "replyCount_other": "{{count}} kutiyawinaka",
+      "share": "Kompartir",
+      "save": "Imantaña",
+      "noReplyYet": "Janiw...mpi kutiyawi jichhakamasa"
+    },
+    "postDetail": {
+      "loadError": "Janiw se atiwayxi apkataña jisktawi.",
+      "defaultUsername": "apnaqiri",
+      "defaultTag": "Nowato",
+      "backToFeed": "Kuttaña ru feed",
+      "resolved": "Resuelta",
+      "byAuthorPrefix": "tama",
+      "viewsCount": "{{count}} wistas",
+      "replyCount_one": "{{count}} kutiyawi",
+      "replyCount_other": "{{count}} kutiyawinaka",
+      "emptyReplies": "Jichhakamasa janiw utji kutiyawinaka. ¡Se jupa nayrïri!",
+      "replyPlaceholder": "Qillqam jumana kutiyawi... (pisin 10 qillqatanaka)",
+      "loginToReplyPlaceholder": "Inisia mantawi taki kutiyaña...",
+      "publishing": "Publikando...",
+      "publishReply": "Yatiyaña kutiyawi"
+    },
+    "postVoteBar": {
+      "voteUp": "Wutuña positiwo",
+      "voteDown": "Wutuña negatiwo"
+    },
+    "professionalVerification": {
+      "title": "Komunidades profesiyunales",
+      "description": "Responde maya kwistiunariu basiko jumana area taki atiña yatiyaña Siensia, Debates, Notisias ukat Jisktawinaka uka kumunidad. Atiwta arkaña leyendo ukanaka seksiyunes janiw...mpi werifikarte.",
+      "verifiedChip": "Werifikado",
+      "retryQuiz": "Reintentar kwistiunariu",
+      "takeQuiz": "Rendir kwistiunariu",
+      "answerAllQuestions": "Responde taqi jisktawinaka nayra apayaña.",
+      "quizTitle": "Kwistiunariu — {{field}}",
+      "passedMessage": "¡Aprobaste! {{score}}/{{total}} korrektas. Jichha atiwta yatiyaña utji kumunidad.",
+      "failedMessage": "Janiw aprobaste ({{score}}/{{total}} korrektas). Atiwta reintentar jukampi tarde.",
+      "close": "Jistt'aña",
+      "cancel": "Jaytaña",
+      "submitAnswers": "Apayaña kutiyawinaka"
+    },
+    "profile": {
+      "notFound": "Janiw se enkontro jupa perfil foru.",
+      "banned": "Baneado",
+      "myKarma": "Nayana karma",
+      "statKarma": "karma",
+      "statQuestions": "jisktawinaka",
+      "statReplies": "kutiyawinaka",
+      "statStreakDays": "uru rakha",
+      "myLocation": "Nayana utjawi",
+      "reputationLine": "Reputasiyun: {{pct}}% positiwa ({{count}} walorasiyunes)",
+      "reputationCommentPlaceholder": "¿Wa konfiable? (munpach)",
+      "rate": "Walorar",
+      "loginToRate": "Inisia mantawi taki walorar",
+      "latestQuestions": "Qhipa jisktawinaka {{username}}",
+      "emptyPosts": "Jichhakamasa janiw ha yatiyata jisktawinaka."
+    },
+    "redeemKarmaDialog": {
+      "title": "Turkaña karma tama qullqinaka",
+      "rateNotice": "Tasa: 100 karma = 10 qullqinaka. Jupa karma historiko ukat jumana etiketa janiw bajan; kikpa se deskuenta \"utjki\".",
+      "amountLabel": "Karma ru turkaña",
+      "karmaUnit": "karma",
+      "availableHelper": "Utjki: {{available}} karma",
+      "willReceive": "Resibiras:",
+      "coinsCount": "{{count}} qullqinaka",
+      "cancel": "Jaytaña",
+      "redeeming": "Kanjeando...",
+      "redeem": "Turkaña"
+    },
+    "replyCard": {
+      "botLabel": "Bot Lakase MultiQhatu",
+      "deletedAuthor": "apaqata",
+      "bestAnswer": "Askiri kutiyawi",
+      "markAsAnswer": "Chimpuchaña kunjamas kutiyawi"
+    },
+    "sidebarLeft": {
+      "navigation": "Nawegasiyun",
+      "home": "Inisio",
+      "modeRecent": "Resientes",
+      "modePopular": "Popular",
+      "modeUnanswered": "Janiw...mpi kutiyawi",
+      "professionalCommunities": "Komunidades profesiyunales",
+      "universities": "Uniwersidades",
+      "categories": "Categorianaka",
+      "cities": "Siudades"
+    },
+    "sidebarRight": {
+      "askQuestion": "Luraña maya jisktawi",
+      "topContributors": "Top kolaboradores",
+      "trending24h": "Tendensia (24h)",
+      "noDataYet": "Janiw...mpi datos jichhakamasa",
+      "footerNotePrefix": "Jupa foru funsiyuna mpi jumana kwinta Lakase Multi Qhatunaka. Jumana karma se atiwa turkaña tama qullqinaka"
+    },
+    "universities": {
+      "title": "Uniwersidades",
+      "description": "Sapa foru laki wa exklusiwo kumunidad uniwersitaria jupana marka — kikpa wen kienes esten uka marka, u jichha tengan aktiwidad prewia ahi.",
+      "enterSubforum": "Entrar ru foru laki"
+    }
+  },
+  "home": {
+    "ticker": {
+      "soldIn": "{{store}} · {{city}} · {{amount}}"
+    },
+    "hero": {
+      "title": "Taqi qhatunaka, maya kikpa lugar",
+      "subtitle": "Kompara chaninaka taypina sientos aljirinaka, enkuentra jupa askiri chani ukat jakhuchi jupa apayawi ukhamarjama utjawi sapa qhatu.",
+      "exploreProducts": "Explorar aljatanaka",
+      "auctions": "Subastanaka",
+      "openYourStore": "Jist'aram jumana qhatu",
+      "categoriesAndFeatured": "{{categories}} categorianaka · {{featured}}+ aljatanaka destakados"
+    },
+    "jobs": {
+      "title": "Irnaqawinaka",
+      "viewAll": "Uñjaña taqi irnaqawinaka"
+    },
+    "nearYou": {
+      "title": "Aljatanaka serka jumaru",
+      "titleWithCity": "Aljatanaka serka jumaru ({{city}})"
+    },
+    "common": {
+      "viewAll": "Uñjaña taqpacha →"
+    },
+    "banners": {
+      "fallbackAlt": "Banner"
+    },
+    "categories": {
+      "title": "Categorianaka",
+      "productCount": "{{count}} aljatanaka",
+      "fallbackName": "Categoria"
+    },
+    "promotions": {
+      "title": "Churawinaka relampago",
+      "limitedTime": "tama pacha limitado",
+      "viewAllFeminine": "Uñjaña taqi →",
+      "offLabel": "{{value}} OFF",
+      "storeLabel": "🏪 {{store}}"
+    },
+    "forYou": {
+      "title": "Taki jumaru 👋",
+      "reasonHistory": "Ukhamarjama jumana buskedas ukat aljatanaka kuna wiste",
+      "reasonPopular": "Aljatanaka populares taki qalltaña"
+    },
+    "auctions": {
+      "title": "Subastanaka aktiwanaka — termina jaykaki"
+    },
+    "featured": {
+      "title": "Destakados",
+      "mostViewed": "Jukampi wistos",
+      "viewAll": "Uñjaña taqi →",
+      "empty": "Janiw utji aljatanaka destakados jichhakamasa"
+    }
+  },
+  "jobs": {
+    "title": "Irnaqawinaka",
+    "subtitle": "Churawinaka trabajo qhatunaka jumana suyu",
+    "appStatus": {
+      "received": "Resibida",
+      "viewed": "Wista tama qhatu",
+      "shortlisted": "Preseleksiyunado/ru",
+      "rejected": "Janiw ajllita/ru",
+      "hired": "¡Kontratado/ru!",
+      "withdrawn": "Apsuta"
+    },
+    "errors": {
+      "cvType": "Jupa CV debe ser PDF, DOK u DOKX",
+      "cvSize": "Jupa CV janiw atiwa superar 5 MB",
+      "messageMinLength": "Jupa arsuwi debe utjaña ru pisi 10 qillqatanaka",
+      "phoneMinLength": "Jupa telefunu debe utjaña ru pisi 6 qillqatanaka",
+      "invalidAmount": "Mantam maya jakhu walido",
+      "invalidUrl": "Mantam maya inlasi walido (https://...)",
+      "ownStore": "Janiw atiwta postularte ru maya irnaqawi jumana propia qhatu."
+    },
+    "toasts": {
+      "applicationSent": "¡Mayiwi apayata!",
+      "applicationWithdrawn": "Mayiwi apsuta"
+    },
+    "confirmWithdraw": "¿Munta apsuña jumana mayiwi?",
+    "search": {
+      "placeholder": "Thaqhaña irnaqawi",
+      "city": "Marka"
+    },
+    "filters": {
+      "pay": "Pagarawi",
+      "payAll": "Taqi",
+      "payDaily": "Tama uru",
+      "payWeekly": "Tama simana",
+      "payMonthly": "Tama phaxsi",
+      "categoryAll": "Taqi"
+    },
+    "empty": "Janiw enkontramos irnaqawinaka mpi ukanaka filtrunaka.",
+    "detail": {
+      "verified": "Werifikada",
+      "vacancyOne": "1 wakanti",
+      "vacanciesCount": "{{count}} wakantinaka",
+      "schedule": "Horario: {{schedule}}",
+      "description": "Qhanañchawi",
+      "requirements": "Rekisitos",
+      "yourApplication": "Jumana mayiwi: {{status}}",
+      "withdrawApplication": "Apsuña mayiwi",
+      "applyButton": "Postularme",
+      "viewStore": "Uñjaña qhatu",
+      "close": "Jistt'aña",
+      "contactWhatsApp": "Kontaktar tama WhatsApp"
+    },
+    "applyDialog": {
+      "title": "Postularme ru {{title}}",
+      "messageLabel": "Arsuwi taki qhatu",
+      "messageHelp": "Kontales tama kuna te interesa (pisin 10 qillqatanaka)",
+      "phoneLabel": "Telefunu kuntaktu",
+      "salaryLabel": "Irnaqa chani pretendido Bs (munpach)",
+      "resumeLabel": "Inlasi ru jumana CV (munpach)",
+      "attachCv": "Adjuntar CV (PDF, DOK u DOKX, jach'a. 5 MB)",
+      "cancel": "Jaytaña",
+      "sending": "Apayaskiwa...",
+      "submit": "Apayaña mayiwi"
+    }
+  },
+  "nav": {
+    "search": {
+      "placeholder": "Thaqhaña aljatanaka, markas, aljirinaka..."
+    },
+    "currency": {
+      "selectAriaLabel": "Ajlliña qullqi"
+    },
+    "theme": {
+      "light": "Modo klaro",
+      "dark": "Modo oskuro"
+    },
+    "jobs": {
+      "tooltip": "Irnaqawinaka"
+    },
+    "forum": {
+      "tooltip": "Foru Lakase"
+    },
+    "cono": {
+      "tooltip": "Rinkonsito Boliwiano"
+    },
+    "cart": {
+      "tooltip": "Karritu"
+    },
+    "messages": {
+      "tooltip": "Arsuwinaka"
+    },
+    "auctions": {
+      "tooltip": "Nayana subastanaka"
+    },
+    "menu": {
+      "myAccount": "Nayana kwinta",
+      "myApplications": "Nayana mayiwinaka",
+      "myStore": "Nayana qhatu",
+      "adminPanel": "Panel admin",
+      "logout": "Jistt'aña mantawi"
+    }
+  },
+  "notifications": {
+    "centerTitle": "Sentro Yatiyawinaka",
+    "countSummary": "{{total}} yatiyawinaka · {{unread}} janiw...mpi liyiña",
+    "showAll": "Mostrar taqi",
+    "onlyUnread": "Kikpa janiw...mpi liyiña",
+    "markAllRead": "Chimpuchaña taqi leidas",
+    "emptyUnread": "Janiw utjtam yatiyawinaka janiw...mpi liyiña 🎉",
+    "emptyAll": "Janiw utjtam yatiyawinaka jichhakamasa",
+    "bellTooltip": "Yatiyawinaka",
+    "bellTitle": "Yatiyawinaka",
+    "bellEmpty": "Janiw utjtam yatiyawinaka",
+    "time": {
+      "now": "jichha",
+      "minutes": "hase {{count}} min",
+      "hours": "hase {{count}} h",
+      "days": "hase {{count}} d"
+    }
+  },
+  "orders": {
+    "errors": {
+      "proofUrlRequired": "Mantam URL qillqata comprobante"
+    },
+    "proofSentToast": "Qillqata comprobante apayata. Jupa aljiri werifikara.",
+    "confirmation": {
+      "title": "¡Alasiwi chiqapachata!",
+      "subtitle": "Se generaron {{count}} mayiwi(wa), maya tama sapa qhatu. Jichha luri jupa pagarawi tama QR."
+    },
+    "orderNumber": "Mayiwi #{{id}}",
+    "defaultStoreName": "Qhatu",
+    "subtotal": "Subtutal",
+    "shipping": "Apayawi",
+    "total": "Taqpach",
+    "qrPaymentTitle": "Pagarawi tama QR — {{storeName}}",
+    "paymentVerified": "Pagarawi werifikado",
+    "proofSubmittedWaiting": "Qillqata comprobante apayata. Esperando chiqapayawi aljiri.",
+    "scanQrInstructions": "Eskanea jupa QR aljiri ukat luri transfirinsya. Luego apkatam jupa qillqata comprobante.",
+    "qrAlt": "QR pagarawi",
+    "proofUrlPlaceholder": "URL qillqata comprobante (u subilo Nayana mayiwinaka)",
+    "uploadProof": "Apkataña qillqata comprobante",
+    "viewMyOrders": "Uñjaña nayana mayiwinaka",
+    "continueShopping": "Arkaña komprando",
+    "status": {
+      "pending": "Suyt'ata",
+      "confirmed": "Chiqapachata",
+      "preparing": "preparasiyun",
+      "shipped": "Apayata",
+      "delivered": "Entregada",
+      "cancelled": "Jaytata"
+    },
+    "paymentStatus": {
+      "pending": "Pagarawi suyt'ata",
+      "proofSubmitted": "Qillqata comprobante apayata",
+      "verified": "Pagarawi werifikado",
+      "rejected": "Pagarawi jan katuqata"
+    },
+    "noOrdersYet": "Janiw utjtam mayiwinaka jichhakamasa.",
+    "buySomething": "Alasiña kunas",
+    "moreItems": "+{{count}} jukampi",
+    "viewDetail": "Uñjaña detaye",
+    "proofSentToastShort": "Qillqata comprobante apayata",
+    "deliveryConfirmedToast": "¡Grasias! Konfirmaste churawi. Jupa pagarawi se libero ru aljiri",
+    "orderNotFound": "Mayiwi janiw enkontrada",
+    "detailSubtitle": "{{date}} · Qhatu: {{storeName}}",
+    "products": "Aljatanaka",
+    "itemQuantityAt": "×{{quantity}} ru {{price}}",
+    "giftLabel": "Regalo",
+    "qrPayment": "Pagarawi tama QR",
+    "paymentVerifiedBySeller": "Pagarawi werifikado tama jupa aljiri.",
+    "proofSubmittedWaitingShort": "Qillqata comprobante apayata. Esperando chiqapayawi.",
+    "qrNotAvailable": "QR janiw utjki",
+    "proofUrlPlaceholderLong": "URL qillqata comprobante transfirinsya",
+    "didYouReceiveTitle": "¿Katuqta jumana mayiwi?",
+    "confirmDeliveryDescription": "Chiqapachaña churawi protege jumana alasiwi ukat libera jupa pagarawi ru aljiri. Wa garantiya kunfiansa plataforma.",
+    "confirmDeliveryButton": "Jisa, konfirmo kuna resibi jupa mayiwi ✓",
+    "shipTo": "Apayawi ru",
+    "pickupAtStoreDefault": "Retira jupa mayiwi qhatu aljiri."
+  },
+  "pcBuilder": {
+    "title": "Arma jumana PC",
+    "subtitle": "Ajllim sapa laki kunas qhatu. Werifikamos kuna sean kompatibles ukat kalkulamos jupa kosto taqpach.",
+    "slots": {
+      "cpu": "Prosesador",
+      "motherboard": "Motherboard",
+      "ram": "Memoria RAM",
+      "gpu": "Plaka Wideo",
+      "storage": "Almasenamiento",
+      "psu": "Fuente Atiña",
+      "case": "Gabinete",
+      "cooler": "Refrigerasiyun"
+    },
+    "toasts": {
+      "loginToSave": "Inisia mantawi taki imantaña jumana build",
+      "minComponents": "Ajllim ru pisi 3 lakinaka",
+      "buildSaved": "Build imantata",
+      "allAddedToCart": "Taqi lakinaka yapatanaka ru karritu"
+    },
+    "defaultBuildName": "Nayana PC",
+    "notSelected": "Janiw...mpi ajlliña",
+    "change": "Kambiar",
+    "select": "Ajlliña",
+    "summary": "Risumin",
+    "selectedComponents": "Lakinaka seleksiyunados: {{count}}/8",
+    "estimatedTotal": "Taqpach estimado",
+    "buildNamePlaceholder": "Suti build (Ej: PC Gamer Pro)",
+    "saveBuild": "Imantaña build",
+    "addAllToCart": "Yapaña taqpacha ru karritu",
+    "savedBuilds": "Jumana builds imantatanaka",
+    "buildSummary": "{{price}} · {{count}} lakinaka",
+    "selectDialogTitle": "Ajlliña {{slot}}",
+    "searchingProducts": "Thaqhaskiwa aljatanaka...",
+    "noProductsForSlot": "Janiw utji aljatanaka utjapxi taki aka slot.",
+    "outOfStock": "JANIW...MPI STOCK",
+    "stock": "stock {{count}}",
+    "close": "Jistt'aña"
+  },
+  "product": {
+    "condition": {
+      "new": "Machaqa",
+      "used": "Apnaqata",
+      "usedWithScore": "Apnaqata ({{score}}/10)",
+      "refurbished": "Wasitat askichata"
+    },
+    "card": {
+      "addToCart": "Yapaña ru karritu",
+      "outOfStock": "Janiw...mpi stock",
+      "available": "{{count}} utjapxi",
+      "addToWishlist": "Yapaña ru munatanaka",
+      "removeFromWishlist": "Kitar munatanaka",
+      "homeDelivery": "Apayawi ru domisilio",
+      "tradeIn": "Permuta",
+      "lastUnit": "Qhipa unidad",
+      "lastUnits": "Qhipa {{count}} unidades",
+      "sold_one": "{{count}} wendido",
+      "sold_other": "{{count}} wendidos"
+    },
+    "filters": {
+      "title": "Filtrunaka",
+      "priceWithFormat": "Chani ({{format}})",
+      "categories": "Categorianaka",
+      "condition": "Kundisyun",
+      "department": "Tipartamintu",
+      "regionCity": "Suyu / Marka",
+      "cityPlaceholder": "Marka (Ej: Pas, Tarija...)",
+      "deliveryType": "Laya churawi",
+      "brand": "Marka",
+      "acceptsTrade": "Asepta permuta",
+      "apply": "Aplikar filtrunaka",
+      "clear": "Limpiar filtrunaka ({{count}})"
+    },
+    "search": {
+      "tabs": {
+        "products": "Aljatanaka",
+        "brands": "Markas",
+        "sellers": "Aljirinaka",
+        "categories": "Categorianaka"
+      },
+      "placeholders": {
+        "products": "Thaqhaña aljatanaka... (Ej: RTX, selular, juego)",
+        "brands": "Thaqhaña marka... (Ej: Samsung, Sony, Logitekh)",
+        "sellers": "Thaqhaña aljiri u marka... (Ej: Pas, \"Tekh Store\")"
+      },
+      "searchButton": "Thaqhaña",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "noSellersMatch": "Janiw...mpi aljirinaka kuna koinsidan mpi \"{{term}}\"",
+      "exploreByCategory": "Explora tama categoria u subkategoria:",
+      "selectedStore": "Qhatu seleksiyunada:",
+      "removeStoreFilter": "Kitar filtru qhatu"
+    },
+    "list": {
+      "resultsFor": "Jikxatatanaka taki \"{{term}}\"",
+      "allProducts": "Taqi aljatanaka",
+      "totalFromAllStores": "{{count}} aljatanaka taqi qhatunaka",
+      "sort": {
+        "newest": "Jukampi resientes",
+        "priceAsc": "Menor chani",
+        "priceDesc": "Mayor chani",
+        "bestSellers": "Jukampi wendidos"
+      },
+      "emptyFiltered": "Janiw se jikxatapxi aljatanaka mpi ukanaka filtrunaka"
+    },
+    "detail": {
+      "notFound": "Aljata janiw jikxatata",
+      "backToCatalog": "Kuttaña ru katalogo",
+      "addedToCart": "Yapata ru karritu",
+      "reviewPublished": "Risiña publikada",
+      "breadcrumbHome": "Inisio",
+      "noImage": "Janiw...mpi uñacht'awi",
+      "outOfStock": "Janiw...mpi stock",
+      "lastUnit": "Qhipa unidad",
+      "lastUnits": "Qhipa {{count}}",
+      "viewingNow_one": "{{count}} jaqi utji wiendo aka aljata jichha",
+      "viewingNow_other": "{{count}} jaqinaka utjapxi wiendo aka aljata jichha",
+      "viewedBy_one": "Wisto tama {{count}} jaqi",
+      "viewedBy_other": "Wisto tama {{count}} jaqinaka",
+      "sellerLocationRating": "{{city}}, {{state}} · Rating {{rating}}",
+      "freeShippingOver": "Apayawi jani qullqini alasiwinaka mayores ru {{amount}}",
+      "addToCart": "Yapaña ru karritu",
+      "contact": "Konsultar",
+      "soldAndShippedBy": "Wendido ukat despakhado tama {{store}}. Jupa kosto apayawi se jakhuchi jupa checkout ukhamarjama jumana utjawi.",
+      "specifications": "Ispisifikasyunanaka",
+      "description": "Qhanañchawi",
+      "related": "Aljatanaka relasiyunados",
+      "verdict": {
+        "highlyRecommended": "Walja rekomendado",
+        "recommended": "Rekomendado",
+        "notRecommended": "Janiw rekomendado"
+      },
+      "offers": {
+        "title": "Kompara chaninaka — {{count}} qhatunaka wenden aka aljata",
+        "bestPrice": "Jupa askiri chani wa {{price}}. Ajllim qhatu kuna jukampi te konwenga.",
+        "bestPriceChip": "Askiri chani",
+        "viewingChip": "Akanaka wiendo"
+      },
+      "reviews": {
+        "title": "Risiñanaka ({{count}})",
+        "viewAll": "Uñjaña taqi risiñanaka",
+        "empty": "Jichhakamasa janiw utji risiñanaka. Se jupa nayrïri.",
+        "count": "{{count}} risiña(s)",
+        "writePlaceholder": "Qillqam jumana risiña...",
+        "publish": "Yatiyaña risiña",
+        "loginToReview": "<0>Inisia mantawi</0> taki dejar maya risiña.",
+        "dialogTitle": "Risiñanaka aljata ({{count}})",
+        "filters": {
+          "all": "Taqi"
+        },
+        "noneInCategory": "Janiw utji risiñanaka utji categoria.",
+        "close": "Jistt'aña"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Promosyunanaka aktiwanaka",
+    "subtitle": "Aprowekha askirinaka deskuentos",
+    "empty": "Janiw utji promosyunanaka aktiwanaka aka momento.",
+    "discountPercent": "{{value}}% OFF",
+    "discountAmount": "{{value}} OFF",
+    "until": "Kama jupa {{date}}"
+  },
+  "returns": {
+    "title": "Nayana dewolusiyunes",
+    "requestNote": "Kikpa atiwta mayiña maya kuttayawi qhiparu katuqaña alasiwi mpi jupa pagarawi werifikado.",
+    "empty": "Janiw utjtam solisitudes kuttayawi.",
+    "status": {
+      "pending": "Suyt'ata",
+      "approved": "Chiqapayata",
+      "rejected": "Jan katuqata",
+      "completed": "Kompletada",
+      "cancelled": "Jaytata"
+    },
+    "reasons": {
+      "defective": "Aljata defektuoso",
+      "incorrect": "Aljata inkorrekto",
+      "notAsDescribed": "Janiw koinside mpi qhanañchawi",
+      "noLongerNeeded": "Jichha janiw nesesito",
+      "other": "Yaqha motiwo"
+    },
+    "reasonAndStore": "{{reason}} · Qhatu: {{store}}",
+    "sellerResponse": "Kutiyawi aljiri: {{response}}",
+    "refund": "Reembolso: Bs {{amount}}",
+    "cancel": "Jaytaña"
+  },
+  "sellerProfile": {
+    "toasts": {
+      "requestSent": "Solisitud apayata"
+    },
+    "veredicto": {
+      "highlyRecommended": "Walja rekomendado",
+      "recommended": "Rekomendado",
+      "notRecommended": "Janiw rekomendado"
+    },
+    "notFound": "Aljiri janiw jikxatata",
+    "breadcrumbHome": "Inisio",
+    "salesCount": "{{count}} aljawinaka",
+    "reviewsCount": "{{count}} risiñanaka",
+    "activeProductsCount": "{{count}} aljatanaka aktiwanaka",
+    "monthlySalesCount": "{{count}} aljawinaka aka phaxsi",
+    "freeShippingFrom": "Apayawi jani qullqini tpacha {{amount}} Bs",
+    "contact": "Kontaktar",
+    "privilegedBuyer": "✓ Alasiri priwilegiado",
+    "requestPending": "Solisitud suyt'ata",
+    "requestPrivilegedAccess": "Mayiña akseso priwilegiado",
+    "whatsappMessage": "Hola {{storeName}}, wi jumana qhatu Lakase Multi Qhatunaka ukat munta luraña maya konsulta.",
+    "storeLocation": "Utjawi qhatu",
+    "locationVerified": "Utjawi werifikada tama jupa apnaqiri (qhatu fisika komprobada)",
+    "locationNotSpecified": "Utjawi janiw espesifikada",
+    "privilegedProductsTitle": "Aljatanaka machaqanaka — kikpa taki alasirinaka priwilegiados 🔑",
+    "privilegedProductsNote": "Akanaka aljatanaka jichhakamasa janiw se publikan ru taqpach jaqi general. Sos primeros werlos.",
+    "productsOf": "Aljatanaka {{storeName}}",
+    "noProducts": "Utji qhatu jichhakamasa janiw yatiyi aljatanaka.",
+    "recentPurchasesTitle": "Referensias — alasiwinaka resientes",
+    "recentPurchasesNote": "chimpu post-alasiwi wa obligatoria: akanaka jaqinaka resibieron jupana alasiwi ukat kalifikaron ru utji qhatu.",
+    "purchasedOn": "Kompro · {{date}}",
+    "reviewsAndTrust": "Risiñanaka ukat kunfiansa",
+    "viewAllReviews": "Uñjaña taqi risiñanaka",
+    "noReviewsYet": "Jichhakamasa janiw utji risiñanaka. risiñanaka kikpa aparesen qhiparu maya alasiwi entregada — generan kunfiansa kumunidad.",
+    "ratedByCount": "{{count}} jaqi(s) kalifikaron",
+    "sales": {
+      "title": "Aljawinaka",
+      "totalSales": "Aljawinaka taqpachanaka",
+      "monthSales": "Aljawinaka phaxsi",
+      "monthRevenue": "Ingresos phaxsi",
+      "lastSales": "Qhipa aljawinaka",
+      "noSalesYet": "Janiw...mpi aljawinaka jichhakamasa"
+    },
+    "amountBs": "Bs {{amount}}",
+    "tags": {
+      "howIsItTitle": "¿Kunjamas wa tratar mpi aka aljiri?",
+      "noTagsYet": "Jichhakamasa janiw utji etiketas. Apareseran kunapachati alasirinaka kalifiken jupana experiensia.",
+      "voteTitle": "¿Kunjamas fue jumana experiensia mpi utji qhatu?",
+      "voteNote": "Wota sapa par ukhamarjama jumana experiensia. Jupa konteo muestra kuantas jaqinaka eligieron sapa etiketa."
+    },
+    "reviewBy": "tama {{firstName}} {{lastName}}",
+    "reviewsDialog": {
+      "title": "Risiñanaka aljiri ({{count}})",
+      "tabAll": "Taqi",
+      "noneInCategory": "Janiw utji risiñanaka utji categoria."
+    },
+    "close": "Jistt'aña"
+  },
+  "seller": {
+    "bulkProducts": {
+      "title": "Yapaña waljanaka aljatanaka",
+      "subtitle": "Karga mukhas uñacht'awinaka distintos aljatanaka ukat yatiyi sapa maya reutilisando datos base (categoria, kundisyun, chani, stock ukat atributunaka) taki taqi.",
+      "employeeWarning": "Kunjamas irnaqiri janiw atiwta askichaña jupa chani; apnaqam jupa chani base kuna deje jupa apnaqiri.",
+      "defaultProductName": "Aljata {{index}}",
+      "baseData": {
+        "title": "Datos base (se reutilisan taqi)",
+        "categoryLabel": "Categoria",
+        "categoryPlaceholder": "Ajllim maya categoria",
+        "conditionLabel": "Kundisyun",
+        "conditionNew": "Machaqa",
+        "conditionUsed": "Apnaqata",
+        "conditionRefurbished": "Wasitat askichata",
+        "templateLabel": "Plantiya (atributunaka prekargados)",
+        "templateHelper": "Ajllim maya plantiya taki prekargar atributunaka komunes taqi aljatanaka.",
+        "templateNone": "Janiw...mpi plantiya",
+        "templateGlobalSuffix": "· Global",
+        "basePriceLabel": "Chani base (Bs)",
+        "basePriceHelperEmployee": "define jupa apnaqiri",
+        "basePriceHelperSeller": "Atiwa wariar tama aljata",
+        "baseStockLabel": "Stock base",
+        "warrantyLabel": "Garantiya",
+        "warrantyPlaceholder": "Ej: 12 phaxsinaka",
+        "descriptionLabel": "Qhanañchawi (se aplika ru taqi, munpach)"
+      },
+      "photos": {
+        "title": "Uñacht'awinaka aljatanaka ({{count}})",
+        "uploadButton": "Apkataña uñacht'awinaka (maya tama aljata)",
+        "uploading": "Apkataskiwa…",
+        "removeTitle": "Kitar",
+        "itemAlt": "Aljata {{index}}",
+        "itemLabel": "Aljata {{index}}",
+        "nameLabel": "Suti",
+        "namePlaceholder": "Ej: Kuaderno Rayado N° {{index}}",
+        "priceLabel": "Chani (Bs)",
+        "pricePlaceholder": "Chani base"
+      },
+      "actions": {
+        "publish": "Yatiyaña {{count}} aljata(s)",
+        "publishing": "Publikando…",
+        "cancel": "Jaytaña",
+        "clearPhotos": "Limpiar uñacht'awinaka"
+      },
+      "errors": {
+        "selectCategory": "Ajllim maya categoria taki aljatanaka.",
+        "uploadAtLeastOne": "Apkatam ru pisi maya uñacht'awi aljata.",
+        "enterPrice": "Qhanañcham maya chani (atiwa ser distinto tama aljata).",
+        "uploadFailed": "Janiw se atiwayxi apkataña {{fileName}}: {{error}}",
+        "productFailed": "Aljata {{index}} ({{name}}): {{error}}",
+        "unnamedProduct": "janiw...mpi suti",
+        "noneCould": "Janiw se atiwayxi yatiyaña ni mayakis aljata."
+      },
+      "success": {
+        "published": "Se publikaron {{count}} aljata(s). Esperan uñakipawi admin."
+      }
+    },
+    "payouts": {
+      "title": "Nayana pagarawinaka",
+      "escrowInfoBefore": "Jupa dinero jumana aljawinaka keda",
+      "escrowInfoStrong": "retenido (eskrow)",
+      "escrowInfoAfter": "kama kuna jupa alasiri katuqi jupa aljata ukat jupa pagarawi se werifika. Qhiparu churawi, jupa jakhu qullqi se libera ukat atiwta retirarlo ru jumana kwinta BNB, wanku u QR.",
+      "balanceAvailable": "Balansi utjki",
+      "withdraw": "Apsuña",
+      "escrowReleased": "Eskrow liberado",
+      "deliveredAndPaid": "Aljawinaka entregadas ukat pagarata",
+      "inProgress": "proseso",
+      "pendingApprovedWithdrawals": "Apsuwinaka suyt'atanaka/aprobados",
+      "accountSaved": "Kwinta kobro imantata",
+      "requestSubmitted": "Apsuwi mayita. Jupa apnaqiri rewisara.",
+      "status": {
+        "pending": "Suyt'ata",
+        "approved": "Chiqapayata",
+        "paid": "Pagarata",
+        "rejected": "Jan katuqata"
+      },
+      "accountSection": {
+        "title": "Kwinta kobro",
+        "methodLabel": "Metodo",
+        "methodBnb": "BNB (Biyetera mowil)",
+        "methodBank": "Transfirinsya bankaria",
+        "methodQr": "QR / Alias",
+        "holderLabel": "Titular",
+        "numberLabelBnb": "Numiru selular BNB",
+        "numberLabelBank": "Numiru kwinta",
+        "numberLabelQr": "Alias / QR",
+        "bankLabel": "Wanku",
+        "idLabel": "Sirula identidad",
+        "saveButton": "Imantaña kwinta"
+      },
+      "history": {
+        "title": "Nayra qillqata apsuwinaka",
+        "empty": "Jichhakamasa janiw solisitaste apsuwinaka.",
+        "columnDate": "Urupa",
+        "columnAmount": "Jakhu",
+        "columnMethod": "Metodo",
+        "columnStatus": "Istadu",
+        "columnNote": "Nota"
+      },
+      "requestDialog": {
+        "title": "Mayiña apsuwi",
+        "availableBalance": "Balansi utjki:",
+        "amountLabel": "Jakhu ru apsuña (Bs)",
+        "noteLabel": "Nota (munpach)",
+        "cancel": "Jaytaña",
+        "submit": "Mayiña"
+      }
+    },
+    "privileged": {
+      "title": "Alasirinaka priwilegiados",
+      "subtitle": "Akanaka alasirinaka wen jumana aljatanaka machaqanaka nayra kuna jupa taqpach jaqi general ukat atipxi reserwarlos. Jumana desides kienes wa priwilegiados.",
+      "pendingRequestsTitle": "Solisitudes suyt'atanaka ({{count}})",
+      "noPendingRequests": "Janiw utji solisitudes suyt'atanaka.",
+      "requestMeta": "{{email}} · {{totalSales}} alasiwinaka · solisito jupa {{date}}",
+      "approveButton": "Chiqapayaña",
+      "rejectButton": "Jan katuqaña",
+      "approvedToast": "Alasiri priwilegiado chiqapayata",
+      "rejectedToast": "Solisitud jan katuqata",
+      "buyersTitle": "Alasirinaka priwilegiados ({{count}})",
+      "noBuyers": "Jichhakamasa janiw utjtam alasirinaka priwilegiados. Kunapachati apruebes solisitudes, ukanaka alasirinaka weran jumana aljatanaka machaqanaka mpi akseso antisipado.",
+      "buyerMeta": "{{email}} · tpacha {{date}}",
+      "privilegedChip": "Priwilegiado"
+    },
+    "jobs": {
+      "title": "Irnaqawinaka",
+      "subtitle": "Yatiyi churawinaka trabajo taki jumana qhatu",
+      "payPeriod": {
+        "daily": "Uru sapa",
+        "weekly": "Simana sapa",
+        "monthly": "Phaxsi sapa"
+      },
+      "status": {
+        "pending": "Suyt'ata aprobasiyun",
+        "approved": "Yatiyata",
+        "rejected": "Jan katuqata",
+        "closed": "Jistt'ata"
+      },
+      "salary": {
+        "range": "{{min}} - {{max}} ({{period}})",
+        "from": "Tpacha {{min}} ({{period}})",
+        "upTo": "Kama {{max}} ({{period}})",
+        "negotiable": "Irnaqa chani ru konwenir ({{period}})"
+      },
+      "form": {
+        "errors": {
+          "category": "Ajllim maya categoria",
+          "titleMin": "Jupa titulu debe utjaña ru pisi 5 qillqatanaka",
+          "descriptionMin": "qhanañchawi debe utjaña ru pisi 20 qillqatanaka",
+          "city": "Qhanañcham marka",
+          "vacanciesMin": "Pisin 1 wakanti",
+          "salaryInvalid": "Irnaqa chani jan walja",
+          "salaryMaxLessThanMin": "Jupa jach'a janiw atiwa ser menor ru pisin"
+        },
+        "category": "Categoria",
+        "title": "Titulu",
+        "description": "Qhanañchawi",
+        "descriptionHint": "Pisin 20 qillqatanaka",
+        "requirements": "Rekisitos (munpach)",
+        "city": "Marka",
+        "locationState": "Tipartamintu",
+        "payPeriodLabel": "Periodo pagarawi",
+        "salaryMin": "Irnaqa chani pisin",
+        "salaryMax": "Irnaqa chani jach'a",
+        "vacancies": "Wakantinaka",
+        "schedule": "Horario (munpach)",
+        "contactPhone": "Telefunu / WhatsApp (munpach)"
+      },
+      "appStatus": {
+        "received": "Machaqa",
+        "viewed": "Wista",
+        "shortlisted": "Preseleksiyunado/ru",
+        "rejected": "Jan katuqata/ru",
+        "hired": "Kontratado/ru"
+      },
+      "actions": {
+        "markViewed": "Chimpuchaña wista",
+        "shortlist": "Preseleksiyunar",
+        "reject": "Jan katuqaña",
+        "hire": "Kontratar",
+        "create": "Yatiyaña irnaqawi",
+        "cancel": "Jaytaña",
+        "saveAndSubmit": "Imantaña ukat apayaña ru rewisiyun",
+        "submit": "Apayaña ru rewisiyun",
+        "closeJob": "Jistt'aña"
+      },
+      "actionVerbs": {
+        "markViewed": "chimpuchaña kunjamas wista ru",
+        "shortlist": "preseleksiyunar ru",
+        "reject": "jan katuqaña ru",
+        "hire": "kontratar ru"
+      },
+      "filters": {
+        "all": "Taqi",
+        "new": "Machaqanaka",
+        "shortlisted": "Preseleksiyunados",
+        "hired": "Kontratados",
+        "rejected": "Rekhasados"
+      },
+      "vacancyCount_one": "{{count}} wakanti",
+      "vacancyCount_other": "{{count}} wakantinaka",
+      "expiresOn": "Wense: {{date}}",
+      "createdOn": "Lurata: {{date}}",
+      "applicantsChip": "Mayirinaka ({{count}})",
+      "editTooltip": "Askichaña (wuelwe ru rewisiyun)",
+      "editAriaLabel": "Askichaña irnaqawi",
+      "rejectionReason": "Motiwo rekhaso: {{reason}}. Atiwta editarlo ukat kuttaña ru enwiarlo.",
+      "empty": "Jichhakamasa janiw publikaste ni mayakis irnaqawi.",
+      "verification": {
+        "notVerifiedPrefix": "Kikpa qhatunaka werifikadas atipxi yatiyaña irnaqawinaka. Phuqhata chiqapayawi jumana qhatu",
+        "settingsLink": "Kunfigurasyun",
+        "goToSettings": "Ir ru kunfigurasyun",
+        "notApproved": "Jumana qhatu debe estar chiqapayata ukat aktiwa (janiw pausada) taki yatiyaña irnaqawinaka."
+      },
+      "infoBanner": "irnaqawinaka machaqanaka u editados kedan suyt'atanaka kama kuna maya apnaqiri apruebe. Maya wes aprobados se publikan tama 30 uru.",
+      "dialog": {
+        "editTitle": "Askichaña irnaqawi",
+        "editWarning": "Ru imantaña turkatanaka, jupa irnaqawi wuelwe ru rewisiyun ukat deja estar yatiyata kama kuna se apruebe."
+      },
+      "closeDialog": {
+        "title": "Jistt'aña irnaqawi",
+        "confirm": "¿Jistt'aña \"{{title}}\"? Dejara mostrarse ukat janiw podras reabrirlo (tendrias kuna yatiyaña maya machaqa)."
+      },
+      "toasts": {
+        "statusUpdated": "Istadu aktualisado. Se notifiko ru kandidato.",
+        "updated": "Irnaqawi aktualisado. Kedo suyt'ata aprobasiyun.",
+        "created": "Irnaqawi apayata. Maya apnaqiri rewisara jaykaki.",
+        "closed": "Irnaqawi jistt'ata"
+      },
+      "applicants": {
+        "drawerTitle": "Mayirinaka {{title}}",
+        "closeDrawer": "Jistt'aña",
+        "hiredHint_one": "Kontrataste ru {{hired}} {{count}} wakanti. Kunapachati kubras wakantinaka, te konwiene jistt'aña jupa irnaqawi.",
+        "hiredHint_other": "Kontrataste ru {{hired}} {{count}} wakantinaka. Kunapachati kubras wakantinaka, te konwiene jistt'aña jupa irnaqawi.",
+        "empty": "Jichhakamasa janiw utji mayirinaka",
+        "emptyFiltered": "Janiw utji mayirinaka aka istadu",
+        "expectedSalary": "Irnaqa chani pretendido:",
+        "viewCv": "Uñjaña CV",
+        "downloadCv": "Aptayaña CV",
+        "downloadCvNamed": "Aptayaña CV ({{name}})",
+        "yourMessage": "Jumana arsuwi: {{note}}",
+        "confirmMessage": "Was ru {{verb}} {{firstName}} {{lastName}}. Se jupar enwiara maya yatiyawi.",
+        "noteLabel": "Arsuwi taki jupa kandidato (munpach)",
+        "confirm": "Chiqapachaña"
+      }
+    },
+    "auctions": {
+      "title": "Nayana subastanaka ({{count}})",
+      "empty": {
+        "message": "Janiw kreaste subastanaka jichhakamasa. Ru yatiyaña maya aljata aktiwa opsiyun \"Yatiyaña kunjamas subasta\".",
+        "cta": "Luraña subasta"
+      },
+      "table": {
+        "title": "Titulu",
+        "currentPrice": "Chani aktual",
+        "bids": "Churawinaka",
+        "status": "Istadu",
+        "actions": "Lurawinaka"
+      },
+      "endDate": "Fin: {{date}}",
+      "status": {
+        "wonBy": "Atipata: {{name}}",
+        "noWinner": "Janiw...mpi ganador",
+        "active": "Aktiwa"
+      },
+      "actions": {
+        "view": "Uñjaña"
+      }
+    },
+    "calendar": {
+      "title": "Kalendario nayana qhatu",
+      "subtitle": "Promosyunanaka aktiwanaka (rojo), tukuyawi subastanaka (morado) ukat aljawinaka tama uru (werde) jumana qhatu."
+    },
+    "productForm": {
+      "title": {
+        "edit": "Askichaña aljata",
+        "new": "Machaqa aljata"
+      },
+      "close": "Jistt'aña",
+      "steps": {
+        "info": "Informasiyun",
+        "photos": "Uñacht'awinaka",
+        "attributes": "Atributunaka",
+        "preview": "Wista prewia"
+      },
+      "fields": {
+        "name": "Suti aljata",
+        "category": "Categoria",
+        "knownProduct": "Aljata unt'ata (atributunaka prekargados)",
+        "condition": "Kundisyun",
+        "conditionNew": "Machaqa",
+        "conditionUsed": "Apnaqata",
+        "conditionRefurbished": "Wasitat askichata",
+        "description": "Qhanañchawi",
+        "price": "Chani (Bs)",
+        "priceEmployeeLocked": "Kikpa jupa apnaqiri qhatu atiwa modifikar jupa chani",
+        "originalPrice": "Chani original",
+        "stock": "Stock",
+        "sku": "SKU",
+        "skuPlaceholder": "Ej: PRO-0001",
+        "skuHelper": "Dejalo blanko ukat se genera automatikamente ukhamarjama categoria",
+        "warranty": "Garantiya",
+        "warrantyPlaceholder": "Ej: Garantiya 12 phaxsinaka"
+      },
+      "knownProduct": {
+        "helperNew": "Janiw existe jichhakamasa: atiwta krearlo ukat luego asignarle atributunaka mpi jupa boton +.",
+        "helperChoose": "Ajllim maya aljata unt'ata categoria taki prekargar atributunaka, u qillqam maya machaqa.",
+        "createButton": "Luraña aljata unt'ata «{{name}}»",
+        "selectedLabel": "Aljata unt'ata ajllita: {{name}}"
+      },
+      "actions": {
+        "generate": "Generar",
+        "creating": "Kreando…",
+        "discard": "Deskartar",
+        "cancel": "Jaytaña",
+        "back": "Anterior",
+        "next": "Qhiparu",
+        "save": "Imantaña turkatanaka",
+        "publish": "Yatiyaña aljata",
+        "addAttribute": "Yapaña atributu",
+        "uploadPhotos": "Apkataña uñacht'awinaka"
+      },
+      "auction": {
+        "toggleLabel": "Yatiyaña kunjamas subasta",
+        "helper": "alasirinaka ofertaran tama aka aljata pacha real kama urupa fin.",
+        "startingPrice": "Chani inisial (Bs)",
+        "minIncrement": "Inkremento min.",
+        "maxIncrement": "Inkremento jach'a.",
+        "incrementType": "Laya inkremento",
+        "incrementDynamic": "Dinamiko (apkatam mpi jupa chani)",
+        "incrementFixed": "Chiqpacha",
+        "reservePrice": "Chani imantata (munpach)",
+        "reservePriceHelper": "Pisin taki kuna subasta se tukuyawi mpi exito",
+        "buyNowPrice": "Alasiña jichha (munpach)",
+        "buyNowPriceHelper": "Alasiwi direkta inmediata ru aka chani",
+        "antiSniping": "Anti-sniping (minutos)",
+        "antiSnipingHelper": "Extiende jupa pacha jisa churapxi ru final (0 = desaktiwado)",
+        "endDate": "Urupa fin",
+        "endDateHelper": "Ajllim urupa ukat pacha tukuyawi subasta."
+      },
+      "photos": {
+        "title": "Uñacht'awinaka aljata",
+        "primary": "Prinsipal",
+        "makePrimary": "Luraña prinsipal",
+        "count": "{{count}}/8 · Atiwta apkataña maya u waljanaka uñacht'awinaka (JPG, PNG, Webp, SWG · jach'a 5MB)"
+      },
+      "attributes": {
+        "title": "Ispisifikasyunanaka ({{count}})",
+        "remove": "Kitar {{name}}",
+        "yes": "Jisa",
+        "no": "Janiw",
+        "addDialog": {
+          "title": "Yapaña atributu",
+          "searchLabel": "Thaqhaña atributu tama suti",
+          "searchPlaceholder": "Ej: Welosidad, Tamano, Kolor...",
+          "helper": "Atiwta sumar atributunaka yaqhanaka categorianaka u kuna janiw utjapxi definidos taki aktual. Se guardan kunjamas ispisifikasyun aljata.",
+          "bulkTitle": "¿Falta maya atributu? Luri waljanaka separandolos mpi koma",
+          "bulkLabel": "Nombres separados tama koma",
+          "bulkPlaceholder": "Ej: Marka, Kolor, Tamano",
+          "bulkHelper": "Se krean kunjamas atributunaka globales ukat kedan listos taki asignarles walor.",
+          "bulkCreate": "Luraña"
+        }
+      },
+      "preview": {
+        "title": "Wista prewia kard aljata",
+        "summaryTitle": "Risumin aljata",
+        "name": "Suti:",
+        "category": "Categoria:",
+        "condition": "Kundisyun:",
+        "price": "Chani:",
+        "stock": "Stock:",
+        "sku": "SKU:",
+        "photos": "Uñacht'awinaka:",
+        "attributes": "Atributunaka:",
+        "warranty": "Garantiya:",
+        "footer": "Rewisa kuna informasiyun aka phuqhata. Ru yatiyaña, jupa aljata keda suyt'ata uñakipawi apnaqiri.",
+        "noName": "Janiw...mpi suti",
+        "myStore": "Nayana qhatu"
+      },
+      "errors": {
+        "nameRequired": "Qillqam jupa suti aljata.",
+        "categoryRequired": "Ajllim categoria aljata.",
+        "priceRequired": "Qhanañcham jupa chani aljata.",
+        "auctionEndDateRequired": "Taki subasta, qhanañcham urupa fin.",
+        "auctionEndDateRequiredSubmit": "Taki subasta, qhanañcham urupa fin",
+        "bulkNameRequired": "Qillqam ru pisi maya suti.",
+        "bulkCreateFailed": "Janiw se atiwayxi luraña ni mayakis atributu."
+      },
+      "toast": {
+        "knownProductCreated": "Aljata unt'ata lurata. Asignale atributunaka mpi jupa boton +",
+        "auctionCreated": "Subasta lurata. Aparesera seksiyun subastanaka.",
+        "productUpdated": "Aljata aktualisado",
+        "productCreated": "Aljata lurata. Espera uñakipawi admin.",
+        "bulkAttributesCreated": "Se krearon {{count}} atributu(s). Asignales maya walor ru sapa maya."
+      }
+    },
+    "products": {
+      "title": "Nayana aljatanaka ({{count}})",
+      "actions": {
+        "scan": "Eskanear",
+        "copyProduct": "Katukipaña aljata",
+        "labels": "Etiketas",
+        "addMultiple": "Yapaña waljanaka",
+        "newProduct": "Machaqa aljata"
+      },
+      "table": {
+        "product": "Aljata",
+        "category": "Categoria",
+        "price": "Chani",
+        "stock": "Stock",
+        "status": "Istadu",
+        "actions": "Lurawinaka"
+      },
+      "status": {
+        "approved": "Chiqapayata",
+        "pending": "Suyt'ata",
+        "deleted": "Apaqata"
+      },
+      "confirmDelete": "¿Apaqaña aka aljata?",
+      "toast": {
+        "deleted": "Aljata apaqata",
+        "copied": "Aljata katukipata. Phuqhata uñacht'awi ukat chani taki publikarlo."
+      },
+      "emptyState": "Jichhakamasa janiw kargaste aljatanaka",
+      "history": {
+        "tooltip": "Nayra qillqata",
+        "title": "Nayra qillqata — {{name}}",
+        "empty": "Janiw...mpi aktiwidad registrada jichhakamasa.",
+        "action": "Lurawi",
+        "author": "Autor",
+        "note": "Nota",
+        "date": "Urupa",
+        "close": "Jistt'aña"
+      },
+      "copyDialog": {
+        "title": "Katukipaña aljata",
+        "description": "Buska maya aljata MultiQhatu taki katukipaña jupana datos (suti, qhanañchawi, categoria ukat karakteristikas). Qhiparu tendras kuna poner jumana propia uñacht'awi ukat chani.",
+        "searchLabel": "Thaqhaña aljata tama suti u kudigu",
+        "searchPlaceholder": "Ej: rysen 5 5600g",
+        "noResults": "Janiw se enkontro ni mayakis aljata.",
+        "copyButton": "Katukipaña",
+        "noSku": "Janiw...mpi SKU",
+        "minChars": "Qillqam ru pisi 2 qillqatanaka taki thaqhaña.",
+        "cancel": "Jaytaña"
+      }
+    },
+    "coupons": {
+      "title": "Kupunanaka nayana qhatu",
+      "subtitle": "Luri kupunanaka pisiptayawi taki jumana aljatanaka u kupunanaka regalo. Ajllim aljatanaka jumana qhatu ru kuna aplika jupa kupun.",
+      "actions": {
+        "create": "Luraña kupun"
+      },
+      "table": {
+        "code": "Kudigu",
+        "type": "Laya",
+        "value": "Walor",
+        "products": "Aljatanaka",
+        "uses": "Apnaqawinaka",
+        "status": "Istadu",
+        "actions": "Lurawinaka",
+        "giftValue": "{{value}} (gastado {{spent}})",
+        "productCount": "{{count}} aljata(s)",
+        "allProducts": "Taqi"
+      },
+      "emptyState": "Janiw utjtam kupunanaka. Luri maya taki insentiwar jumana aljawinaka.",
+      "status": {
+        "active": "Aktiwa",
+        "inactive": "Jan aktiwa"
+      },
+      "type": {
+        "percentage": "Porsintaji",
+        "fixed": "Jakhu chiqpacha",
+        "gift": "Regalo"
+      },
+      "toast": {
+        "updated": "Kupun aktualisado",
+        "created": "Kupun lurata",
+        "deleted": "Kupun apaqata"
+      },
+      "dialog": {
+        "editTitle": "Askichaña kupun",
+        "createTitle": "Luraña kupun",
+        "codeLabel": "Kudigu uniko",
+        "descriptionLabel": "Qhanañchawi",
+        "descriptionPlaceholder": "Ej: 10% alasiwi maya S7 Edge / Regalo 100 Bs taki aljasiña nayana qhatu",
+        "typeLabel": "Laya kupun",
+        "typeOptions": {
+          "percentage": "Porsintaji pisiptayawi (%)",
+          "fixed": "Jakhu chiqpacha pisiptayawi (Bs)",
+          "gift": "Regalo (jakhu taki aljasiña, se dewuelwe jupa jakhu qullqi)"
+        },
+        "valueLabel": {
+          "percentage": "Pisiptayawi (%)",
+          "gift": "Jakhu regalo (Bs)",
+          "fixed": "Pisiptayawi (Bs)"
+        },
+        "giftHint": "Jupa alasiri atiwa aljasiña aka jakhu jumana qhatu. Jisa gasta pisi, jupar dewuelwes jupa jakhu qullqi qullqi.",
+        "minSpendLabel": "Mayiwi pisin (Bs, munpach)",
+        "maxUsesLabel": "Limite apnaqawinaka (munpach)",
+        "endDateLabel": "Wense (munpach)",
+        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productsLabel": "Aljatanaka ru kuna aplika (wasio = taqi)",
+        "cancel": "Jaytaña",
+        "save": "Imantaña"
+      }
+    },
+    "layout": {
+      "nav": {
+        "dashboard": "Dashboard",
+        "products": "Aljatanaka",
+        "labels": "Etiketas",
+        "calendar": "Kalendario",
+        "auctions": "Subastanaka",
+        "jobs": "Irnaqawinaka",
+        "vipBuyers": "Alasirinaka WIP",
+        "promotions": "Promosyunanaka",
+        "coupons": "Kupunanaka",
+        "giftPromos": "Promonaka regalo",
+        "payments": "Nayana pagarawinaka",
+        "team": "Irnaqirinaka",
+        "returns": "Dewolusiyunes",
+        "messages": "Arsuwinaka",
+        "orders": "Mayiwinaka",
+        "settings": "Kunfigurasyun"
+      },
+      "header": {
+        "employeePanel": "Panel irnaqiri",
+        "sellerPanel": "Panel aljiri"
+      },
+      "reauth": {
+        "title": "Chiqapayawi seguridad",
+        "description": "Taki mantaña ru panel qhatu, konfirma jumana kuntrasiña.",
+        "passwordLabel": "Kuntrasiña",
+        "verifying": "Werifikando…",
+        "verify": "Chiqapayaña"
+      }
+    },
+    "promotions": {
+      "pageTitle": "Promosyunanaka",
+      "pageSubtitle": "Deskuentos aljatanaka, kupunanaka ukat promonaka regalo jumana qhatu",
+      "newPromotion": "Machaqa promosyun",
+      "tabs": {
+        "active": "Aktiwanaka ({{count}})",
+        "finished": "Finalisadas ({{count}})"
+      },
+      "empty": {
+        "active": "Janiw utjtam promosyunanaka aktiwanaka. Toka \"Machaqa promosyun\" taki luraña maya.",
+        "finished": "Janiw utjtam promosyunanaka finalisadas."
+      },
+      "card": {
+        "percentOff": "{{value}}% OFF",
+        "amountOff": "{{value}} OFF",
+        "statusActive": "Aktiwa",
+        "statusFinished": "Finalisada",
+        "minSpend": "min {{amount}}",
+        "maxSpend": "presupuesto {{amount}}",
+        "spent": "apnaqata {{amount}}",
+        "deactivateTooltip": "Tukuyaña promosyun",
+        "productPrice": "{{name}} · {{price}}"
+      },
+      "toasts": {
+        "fillTitleDiscount": "Phuqhata titulu ukat pisiptayawi",
+        "selectProduct": "Ajllim ru pisi maya aljata",
+        "promoCreated": "Promosyun lurata",
+        "promoDeactivated": "Promosyun finalisada",
+        "fillCodeValue": "Phuqhata kudigu ukat walor",
+        "couponCreated": "Kupun lurata",
+        "fillTitleGiftProducts": "Phuqhata titulu ukat aljatanaka regalo",
+        "giftCreated": "Promo regalo lurata"
+      },
+      "dialog": {
+        "title": "Machaqa promosyun",
+        "typeLabel": "Laya promosyun",
+        "typeProduct": "Pisiptayawi aljatanaka",
+        "typeCoupon": "Kupun pisiptayawi (kudigu)",
+        "typeGift": "Promo regalo (alasiwi ukat katuqi)",
+        "cancel": "Jaytaña",
+        "create": "Luraña",
+        "product": {
+          "titleLabel": "Titulu",
+          "descriptionLabel": "Qhanañchawi",
+          "discountTypeLabel": "Laya pisiptayawi",
+          "percentageOption": "Porsintaji (%)",
+          "fixedOption": "Jakhu chiqpacha (Bs)",
+          "percentageFieldLabel": "Porsintaji",
+          "amountFieldLabel": "Jakhu",
+          "minSpendLabel": "Alasiwi pisin (Bs, munpach)",
+          "maxSpendLabel": "Presupuesto taqpach pisiptayawi (Bs, munpach)",
+          "startDateLabel": "Inisio",
+          "endDateLabel": "Fin",
+          "productsLabel": "Aljatanaka promosyun",
+          "productOptionLabel": "{{name}} ({{price}})"
+        },
+        "coupon": {
+          "codeLabel": "Kudigu uniko",
+          "codeHelper": "alasirinaka ingresan aka kudigu jupa checkout",
+          "descriptionLabel": "Qhanañchawi",
+          "typeLabel": "Laya",
+          "percentageOption": "Porsintaji (%)",
+          "fixedOption": "Jakhu chiqpacha (Bs)",
+          "giftOption": "Tikket regalo (Bs taki aljasiña)",
+          "percentageFieldLabel": "Porsintaji",
+          "amountFieldLabel": "Jakhu",
+          "singleUseLabel": "Maya kikpa apnaqawi tama alasiri",
+          "maxUsesLabel": "Apnaqawinaka taqpachanaka maximos (munpach)",
+          "perUserLimitLabel": "Apnaqawinaka tama alasiri (munpach)",
+          "minSpendLabel": "Alasiwi pisin (Bs, munpach)",
+          "maxSpendLabel": "Presupuesto taqpach pisiptayawi (Bs, munpach)",
+          "maxSpendHelper": "Jupa kupun deja funsiyunar kunapachati se agota aka jakhu taqpach"
+        },
+        "gift": {
+          "titleLabel": "Titulu",
+          "descriptionLabel": "Qhanañchawi",
+          "triggerLabel": "Qalltayiri",
+          "triggerUnits": "Ru alasiña N unidades maya aljata",
+          "triggerAmount": "Ru superar maya jakhu qhatu",
+          "triggerProduct": "Ru alasiña maya aljata espesifiko",
+          "quantityLabel": "Jakhu unidades",
+          "triggerProductLabel": "Aljata qalltayiri",
+          "minAmountLabel": "Jakhu pisin (Bs)",
+          "allowChoiceLabel": "Permitir kuna jupa alasiri elija jupa regalo",
+          "giftProductsLabel": "Aljatanaka regalo"
+        }
+      }
+    },
+    "team": {
+      "pageTitle": "Irnaqirinaka nayana qhatu",
+      "pageSubtitle": "Imbitam ru jaqinaka kunfiansa taki kuna te ayuden ru gestionar qhatu. administradores gestionan taqpacha; empleados kikpa atipxi apkataña aljatanaka ukat uñjaña mayiwinaka (janiw...mpi chaninaka nisa kobros).",
+      "inviteEmployee": "Imbitaña irnaqiri",
+      "empty": "Jichhakamasa janiw utjtam empleados. Imbitam ru khitis taki kuna te ayude ru gestionar qhatu.",
+      "removeTooltip": "Kitar irnaqirinaka",
+      "removeTooltipDisabled": "Kikpa jupa apu atiwa kitar empleados",
+      "table": {
+        "member": "Irnaqiri",
+        "email": "Imeyl",
+        "role": "Rol",
+        "actions": "Lurawinaka",
+        "owner": "Apu"
+      },
+      "roles": {
+        "admin": "Apnaqiri",
+        "employee": "Irnaqiri"
+      },
+      "toasts": {
+        "invited": "Irnaqiri inwitado",
+        "roleUpdated": "Rol aktualisado",
+        "removed": "Irnaqiri remowido irnaqirinaka"
+      },
+      "dialog": {
+        "title": "Imbitaña irnaqiri",
+        "searchLabel": "Thaqhaña apnaqiri tama imeyl u suti",
+        "typeMoreLetters": "Qillqam ru pisi 2 letras",
+        "noResults": "Janiw...mpi jikxatatanaka",
+        "roleLabel": "Rol",
+        "roleAdminOption": "Apnaqiri — gestiona taqpacha qhatu",
+        "roleEmployeeOption": "Irnaqiri — kikpa aljatanaka ukat mayiwinaka",
+        "cancel": "Jaytaña",
+        "invite": "Imbitaña"
+      }
+    },
+    "labels": {
+      "defaultStoreName": "Nayana qhatu",
+      "pageTitle": "Etiketas aljatanaka ({{count}})",
+      "printButton": "Imprimir etiketas",
+      "selectAll": "Ajlliña taqi",
+      "noProducts": "Jichhakamasa janiw utjtam aljatanaka.",
+      "selectAtLeastOne": "Ajllim ru pisi maya aljata taki imprimir etiketas."
+    },
+    "returns": {
+      "title": "Solisitudes kuttayawi",
+      "empty": "Janiw utjtam solisitudes kuttayawi.",
+      "respond": "Kutiyaña",
+      "buyerLabel": "Alasiri:",
+      "itemAmount": "Jakhu item: Bs {{amount}}",
+      "status": {
+        "pending": "Suyt'ata",
+        "approved": "Chiqapayata",
+        "rejected": "Jan katuqata",
+        "completed": "Kompletada",
+        "cancelled": "Jaytata"
+      },
+      "reasons": {
+        "productoDefectuoso": "Aljata defektuoso",
+        "productoIncorrecto": "Aljata inkorrekto",
+        "noCoincideDescripcion": "Janiw koinside mpi qhanañchawi",
+        "yaNoLoNecesito": "Jichha janiw nesesito",
+        "otro": "Yaqha motiwo"
+      },
+      "dialog": {
+        "title": "Kutiyaña kuttayawi",
+        "productLabel": "Aljata:",
+        "decisionLabel": "Desisiyun",
+        "decisionApprove": "Chiqapayaña (reembolsar)",
+        "decisionReject": "Jan katuqaña",
+        "refundAmountLabel": "Jakhu reembolso (Bs)",
+        "responseNoteLabel": "Nota ru alasiri",
+        "cancel": "Jaytaña",
+        "save": "Imantaña",
+        "saving": "Guardando..."
+      }
+    },
+    "dashboard": {
+      "header": {
+        "titleSeller": "Panel aljiri",
+        "titleEmployee": "Panel irnaqiri",
+        "subtitle": "Desempeno jumana qhatu Lakase Multi Qhatunaka"
+      },
+      "promotions": {
+        "summary": "Promosyunanaka: {{active}} aktiwanaka · {{finished}} finalisadas",
+        "invested": "· inwertido {{amount}}"
+      },
+      "kpis": {
+        "salesMade": "Aljawinaka realisadas",
+        "customersServed": "Alasirinaka atendidos",
+        "revenue": "Ingresos",
+        "unreadMessages": "Arsuwinaka janiw...mpi liyiña",
+        "totalProducts": "Aljatanaka taqpachanaka",
+        "activeProducts": "{{count}} aktiwanaka",
+        "pendingModeration": "Suyt'atanaka uñakipawi",
+        "sales": "Aljawinaka",
+        "totalRevenue": "Ingresos taqpachanaka",
+        "revenueWeek": "Ingresos simana",
+        "revenueMonth": "Ingresos phaxsi"
+      },
+      "status": {
+        "pending": "Suyt'ata",
+        "confirmed": "Chiqapachata",
+        "preparing": "preparasiyun",
+        "shipped": "Apayata",
+        "delivered": "Entregada",
+        "cancelled": "Jaytata"
+      },
+      "charts": {
+        "salesLast30Days": "Jumana aljawinaka — qhipa 30 uru",
+        "revenueSeriesName": "Ingresos",
+        "ordersByStatus": "Mayiwinaka tama istadu"
+      },
+      "topProducts": {
+        "title": "Jumana aljatanaka jukampi wendidos",
+        "priceStock": "{{price}} · stock {{stock}}",
+        "sold": "{{count}} wendidos"
+      },
+      "recentOrders": {
+        "title": "Mayiwinaka resientes",
+        "viewAll": "Uñjaña taqi →",
+        "empty": "Jichhakamasa janiw katuqta mayiwinaka.",
+        "orderLabel": "#{{id}} — {{buyerName}}",
+        "dateItems": "{{date}} · {{count}} items"
+      }
+    },
+    "settings": {
+      "title": "Kunfigurasyun jumana qhatu",
+      "profilePhotoLabel": "Uñacht'awi perfil qhatu",
+      "storeNameLabel": "Suti qhatu",
+      "descriptionLabel": "Qhanañchawi",
+      "bioLabel": "Bio apu / qhatu",
+      "bioPlaceholder": "Kwinta historia jumana qhatu u kuna aljta...",
+      "categoryLabel": "Categoria aljatanaka",
+      "countryLabel": "Suyu",
+      "logoLabel": "Logo (URL)",
+      "bannerLabel": "Banner (URL)",
+      "cityLabel": "Marka",
+      "stateLabel": "Tipartamintu/Purwinsya",
+      "selectPlaceholder": "Ajlliña...",
+      "postalCodeLabel": "Kudigu postal (munpach)",
+      "mapLocationTitle": "Utjawi jupa mapa",
+      "mapHelperText": "Buska jumana marka, luram klik jupa mapa u maya jikxatata taki chimpuchaña jupa punto exakto. Utji utjawi se mostrara ru jumana alasirinaka.",
+      "defaultLocationLabel": "Qhatu",
+      "socialTitle": "🌐 Redes sosiales ukat kuntaktu",
+      "instagramLabel": "Instagram (URL)",
+      "facebookLabel": "Fasebook (URL)",
+      "tiktokLabel": "Tiktok (URL)",
+      "youtubeLabel": "Youtube (URL)",
+      "whatsappLabel": "WhatsApp (numiru)",
+      "whatsappPlaceholder": "59170000000 (mpi kudigu suyu, janiw...mpi +)",
+      "socialHelperText": "Wa opsiyunales. Kikpa se muestran jumana perfil taqpach jaqi jisa kompletas.",
+      "shippingLocationInfo": "Jumana utjawi se apnaqam taki jakhuchaña jupa kosto apayawi hasia jupa alasiri.",
+      "paymentQrLabel": "QR pagarawi (URL uñacht'awi)",
+      "paymentQrHelperText": "Apkatam maya uñacht'awi mpi jumana alias/QR Merkado Pagarawi u KBU. Se mostrara ru alasiri ru tukuyaña alasiwi.",
+      "freeShippingLabel": "Apayawi jani qullqini tpacha (Bs)",
+      "freeShippingPlaceholder": "Ej: 500",
+      "freeShippingHelperText": "Jisa jupa alasiri supera aka jakhu, jupa apayawi wa jani qullqini. Dejalo wasio taki janiw ofreser apayawi jani qullqini.",
+      "saveButton": "Imantaña",
+      "verifiedSealTitle": "Chimpu aljiri werifikado",
+      "verifiedChip": "Werifikado",
+      "storeLocationLabel": "Utjawi qhatu",
+      "locationVerifiedChip": "Werifikada tama jupa admin",
+      "locationPendingChip": "Suyt'ata chiqapayawi",
+      "verificationDescription": "Jupa apnaqiri komprueba existensia fisika jumana qhatu (koinsidensia mpi NIT ukat dokumentasiyun) taki chiqapayaña jumana utjawi jupa mapa. qhatunaka mpi utjawi werifikada inspiran jukampi kunfiansa.",
+      "verifiedSuccessAlert": "Jumana qhatu utji werifikada. Muestras jupa logo junto ru jumana suti, kuna genera jukampi kunfiansa alasirinaka.",
+      "pendingReviewAlert": "Jumana solisitud chiqapayawi utji rewisiyun tama jupa apnaqiri. Kunjamas Koukhsurfing u Twitter, se werifika existensia fisika jumana qhatu (NIT ukat dokumentasiyun) nayra otorgar jupa chimpu.",
+      "requestVerificationAlert": "Obtiene jupa chimpu aljiri werifikado (kunjamas kwinta asul Twitter): presenta jumana NIT ukat jupa apnaqiri werifikara fisikamente jumana qhatu. qhatunaka werifikadas generan jukampi kunfiansa ukat jukampi aljawinaka.",
+      "nitLabel": "NIT (Numiru Identifikasiyun Tributaria)",
+      "nitPlaceholder": "Ej: 10203040123",
+      "noteLabel": "Nota taki jupa apnaqiri (dokumentos, utjawi lokal, etk.)",
+      "notePlaceholder": "Ej: Nayana qhatu utji Kaye 5, suyu Sentral. Adjunto nayana NIT ukat matrikula komersio.",
+      "requestSentButton": "Solisitud apayata — rewisiyun",
+      "sendingButton": "Apayaskiwa...",
+      "requestVerificationButton": "Mayiña chiqapayawi",
+      "errors": {
+        "nitRequired": "Jupa NIT wa wakiskiri taki mayiña chiqapayawi"
+      },
+      "toasts": {
+        "requestSent": "Solisitud apayata",
+        "profileImageReady": "Uñacht'awi perfil lista — imantam turkatanaka",
+        "settingsSaved": "Kunfigurasyun imantata"
+      }
+    },
+    "gifts": {
+      "triggerLabels": {
+        "units": "Tama jakhu maya aljata",
+        "amount": "Tama jakhu alasiwi",
+        "product": "Tama alasiña maya aljata espesifiko"
+      },
+      "errors": {
+        "titleRequired": "Jupa titulu wa wakiskiri",
+        "giftProductRequired": "Ajllim ru pisi maya aljata regalo",
+        "unitsFieldsRequired": "Taki jupa laya \"tama jakhu\" qhanañcham jupa aljata ukat jakhu",
+        "amountFieldRequired": "Taki jupa laya \"tama jakhu\" qhanañcham jupa jakhu pisin",
+        "productFieldRequired": "Taki jupa laya \"tama aljata\" qhanañcham jupa aljata"
+      },
+      "toasts": {
+        "promoUpdated": "Promosyun machaqaptayata",
+        "promoCreated": "Promosyun lurata",
+        "promoDeleted": "Promosyun eliminada"
+      },
+      "confirmDelete": "¿Apaqaña utji promosyun regalo?",
+      "triggerText": {
+        "units": "Komprando {{quantity}} maya. {{product}}",
+        "amount": "Alasiwinaka tpacha {{amount}} Bs",
+        "product": "Komprando {{product}}",
+        "defaultProduct": "aljata",
+        "defaultProductGeneric": "maya aljata"
+      },
+      "pageTitle": "Promonaka regalo",
+      "newPromoButton": "Machaqa promo",
+      "infoBanner": "Ofrese regalos ru jumana alasirinaka mpi logika tikket regalo: ru alasiña maya jakhu maya aljata, ru superar maya jakhu u ru alasiña maya aljata espesifiko, jupa alasiri katuqi maya aljata jumana qhatu regalo. Ukhamaraki atiwta dejar kuna elija taypina waljanaka regalos.",
+      "emptyState": "Janiw kreaste promonaka regalo jichhakamasa.",
+      "activeChip": "Aktiwa",
+      "inactiveChip": "Jan aktiwa",
+      "triggerLabelPrefix": "Qalltayiri:",
+      "giftsLabel": "Regalo(s): {{names}}",
+      "customerChoosesChip": "Jupa alasiri ajllim",
+      "editButton": "Askichaña",
+      "deactivateButton": "Desaktiwar",
+      "activateButton": "Aktiwar",
+      "deleteButton": "Apaqaña",
+      "dialog": {
+        "editTitle": "Askichaña promo regalo",
+        "createTitle": "Machaqa promo regalo",
+        "titleLabel": "Titulu",
+        "titlePlaceholder": "Ej: Alasiwi 2 ukat yewate 1 regalo",
+        "descriptionLabel": "Qhanañchawi (munpach)",
+        "triggerTypeLabel": "Laya qalltayiri",
+        "triggerProductLabel": "Aljata kuna dispara",
+        "selectPlaceholder": "Ajlliña...",
+        "minQuantityLabel": "Jakhu pisin",
+        "minQuantityPlaceholder": "Ej: 2",
+        "minAmountLabel": "Jakhu pisin (Bs)",
+        "minAmountPlaceholder": "Ej: 3000",
+        "giftProductsLabel": "Aljatanaka regalo (ajllim maya u jukampi)",
+        "allowChoiceLabel": "Jupa alasiri atiwa ajlliña taypina aljatanaka regalo",
+        "activeLabel": "Promosyun aktiwa",
+        "cancelButton": "Jaytaña",
+        "saveButton": "Imantaña"
+      }
+    },
+    "orders": {
+      "pageTitle": "Mayiwinaka resibidos",
+      "allStatuses": "Taqi estados",
+      "columns": {
+        "buyer": "Alasiri",
+        "total": "Taqpach",
+        "delivery": "Churawi",
+        "status": "Istadu",
+        "payment": "Pagarawi"
+      },
+      "pickupChip": "🏬 Apsuwi",
+      "shippingChip": "Apayawi",
+      "viewProofLink": "uñjaña qillqata comprobante",
+      "verifyPlaceholder": "Chiqapayaña...",
+      "emptyState": "Jichhakamasa janiw katuqta mayiwinaka",
+      "toasts": {
+        "statusUpdated": "Istadu aktualisado",
+        "paymentStatusUpdated": "Istadu pagarawi aktualisado"
+      }
+    }
+  }
+}

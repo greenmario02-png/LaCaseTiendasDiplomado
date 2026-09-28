@@ -20,10 +20,12 @@ import { KarmaCard } from '../../components/forum/KarmaCard';
 import { RedeemKarmaDialog } from '../../components/forum/RedeemKarmaDialog';
 import { GeoConfig } from '../../components/forum/GeoConfig';
 import { MapPin, ThumbsUp, LocateFixed } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useForumPalette, getTag, formatTimeAgo } from '../../theme/forumTheme';
 import { useUnifiedTokens } from '../../theme';
 
 export function ForumProfilePage() {
+  const { t } = useTranslation();
   const { username } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -77,7 +79,7 @@ export function ForumProfilePage() {
   }
 
   if (!data) {
-    return <Alert severity="error">No se encontró el perfil del foro.</Alert>;
+    return <Alert severity="error">{t('forum.profile.notFound')}</Alert>;
   }
 
   const reputationPct = data.reputationScore && data._count?.reputationGot
@@ -106,19 +108,19 @@ export function ForumProfilePage() {
             <Stack direction="row" spacing={1} mt={0.5} flexWrap="wrap" alignItems="center">
               <KarmaLevelBadge level={getTag(data.karma)} />
               <ChipMapPin city={data.city} />
-              {data.isBanned && <Alert severity="error" sx={{ p: 0.25, py: 0, borderRadius: 2, fontSize: '0.7rem' }}>Baneado</Alert>}
+              {data.isBanned && <Alert severity="error" sx={{ p: 0.25, py: 0, borderRadius: 2, fontSize: '0.7rem' }}>{t('forum.profile.banned')}</Alert>}
             </Stack>
           </Box>
           {isSelf && (
-            <PrimaryButton onClick={() => setOpenRedeem(true)}>Mi karma</PrimaryButton>
+            <PrimaryButton onClick={() => setOpenRedeem(true)}>{t('forum.profile.myKarma')}</PrimaryButton>
           )}
         </Stack>
 
         <Grid container spacing={1.5} mt={1}>
-          <Grid item xs={6} sm={3}><StatCard title="karma" value={data.karma} /></Grid>
-          <Grid item xs={6} sm={3}><StatCard title="preguntas" value={data._count?.posts ?? 0} /></Grid>
-          <Grid item xs={6} sm={3}><StatCard title="respuestas" value={data._count?.replies ?? 0} /></Grid>
-          <Grid item xs={6} sm={3}><StatCard title="días de racha" value={data.streakDays ?? 0} /></Grid>
+          <Grid item xs={6} sm={3}><StatCard title={t('forum.profile.statKarma')} value={data.karma} /></Grid>
+          <Grid item xs={6} sm={3}><StatCard title={t('forum.profile.statQuestions')} value={data._count?.posts ?? 0} /></Grid>
+          <Grid item xs={6} sm={3}><StatCard title={t('forum.profile.statReplies')} value={data._count?.replies ?? 0} /></Grid>
+          <Grid item xs={6} sm={3}><StatCard title={t('forum.profile.statStreakDays')} value={data.streakDays ?? 0} /></Grid>
         </Grid>
 
         {isSelf && profile && (
@@ -131,7 +133,7 @@ export function ForumProfilePage() {
         {isSelf && (
           <Box mt={2} sx={{ borderTop: `1px solid ${tokens.outline}22`, pt: 2 }}>
             <Typography variant="subtitle2" fontWeight={700} sx={{ color: tokens.onSurface, mb: 1, display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <LocateFixed size={16} strokeWidth={2.2} color={tokens.primary} /> Mi ubicación
+              <LocateFixed size={16} strokeWidth={2.2} color={tokens.primary} /> {t('forum.profile.myLocation')}
             </Typography>
             <GeoConfig onSaved={() => { setLoading(true); getPublicProfile(String(username)).then(setData).finally(() => setLoading(false)); }} />
           </Box>
@@ -141,11 +143,11 @@ export function ForumProfilePage() {
           <Box mt={2}>
             <Divider sx={{ borderColor: tokens.outline + '22', mb: 1.5 }} />
             <Typography variant="subtitle2" fontWeight={700} sx={{ color: tokens.onSurface, mb: 1, display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <ThumbsUp size={15} strokeWidth={2.2} color={tokens.tertiaryContainer} /> Reputación: {reputationPct}% positiva ({data._count?.reputationGot ?? 0} valoraciones)
+              <ThumbsUp size={15} strokeWidth={2.2} color={tokens.tertiaryContainer} /> {t('forum.profile.reputationLine', { pct: reputationPct, count: data._count?.reputationGot ?? 0 })}
             </Typography>
             {user ? (
               <Stack direction="row" spacing={1} flexWrap="wrap">
-                <TextField size="small" placeholder="¿Es confiable? (opcional)"
+                <TextField size="small" placeholder={t('forum.profile.reputationCommentPlaceholder')}
                   value={repComment} onChange={(e) => setRepComment(e.target.value)}
                   sx={{ '& fieldset': { borderColor: tokens.outline }, flex: 1, minWidth: 180 }}
                   inputProps={{ maxLength: 300 }} />
@@ -157,10 +159,10 @@ export function ForumProfilePage() {
                   sx={{ color: repValue === -1 ? tokens.error : tokens.onSurfaceVariant }}>
                   <ThumbDownIcon />
                 </IconButton>
-                <PrimaryButton disabled={!repValue} onClick={handleReputation}>Valorar</PrimaryButton>
+                <PrimaryButton disabled={!repValue} onClick={handleReputation}>{t('forum.profile.rate')}</PrimaryButton>
               </Stack>
             ) : (
-              <SecondaryButton onClick={() => navigate('/login')}>Inicia sesión para valorar</SecondaryButton>
+              <SecondaryButton onClick={() => navigate('/login')}>{t('forum.profile.loginToRate')}</SecondaryButton>
             )}
             {repError && <Alert severity="error" sx={{ mt: 1, fontSize: '0.85rem' }}>{repError}</Alert>}
           </Box>
@@ -169,17 +171,17 @@ export function ForumProfilePage() {
 
       {/* Posts del usuario */}
       <Typography variant="subtitle1" fontWeight={700} sx={{ color: tokens.onSurface, mb: 1 }}>
-        Últimas preguntas de {data.forumUsername}
+        {t('forum.profile.latestQuestions', { username: data.forumUsername })}
       </Typography>
       {posts.length === 0 ? (
-        <EmptyState message="Aún no ha publicado preguntas." />
+        <EmptyState message={t('forum.profile.emptyPosts')} />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {posts.map((p) => (
             <ForumPostCard key={p.id} post={{
               id: p.id, title: p.title, body: p.body, city: p.city,
-              category: { icon: p.category?.icon ?? '💬', name: p.category?.name ?? 'General', color: p.category?.color ?? '#FF6B35' },
-              author: { forumUsername: p.author?.forumUsername ?? 'usuario' },
+              category: { icon: p.category?.icon ?? '💬', name: p.category?.name ?? t('forum.feed.defaultCategory'), color: p.category?.color ?? '#FF6B35' },
+              author: { forumUsername: p.author?.forumUsername ?? t('forum.feed.defaultUsername') },
               status: (p.status as 'OPEN' | 'RESOLVED' | 'CLOSED') ?? 'OPEN',
               replyCount: p.replyCount, positives: p.score ?? 0, createdAt: p.createdAt,
             }} onOpen={(id) => { navigate(`/foro/post/${id}`); }} onPositive={() => {}} />

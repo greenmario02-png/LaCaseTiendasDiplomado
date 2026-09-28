@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Gift } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -67,6 +68,7 @@ const emptyForm = {
 };
 
 export default function SellerCoupons() {
+  const { t: tr } = useTranslation();
   const money = useMoney();
   const t = useUnifiedTokens();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -128,10 +130,10 @@ export default function SellerCoupons() {
       };
       if (editing) {
         await api.put(`/seller/coupons/${editing.id}`, payload);
-        toast.success('Cupón actualizado');
+        toast.success(tr('seller.coupons.toast.updated'));
       } else {
         await api.post('/seller/coupons', payload);
-        toast.success('Cupón creado');
+        toast.success(tr('seller.coupons.toast.created'));
       }
       setOpen(false);
       load();
@@ -145,7 +147,7 @@ export default function SellerCoupons() {
   const remove = async (id: number) => {
     try {
       await api.delete(`/seller/coupons/${id}`);
-      toast.success('Cupón eliminado');
+      toast.success(tr('seller.coupons.toast.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -161,19 +163,24 @@ export default function SellerCoupons() {
     }
   };
 
-  const typeLabel = (t: string) => (t === 'PERCENTAGE' ? 'Porcentaje' : t === 'FIXED' ? 'Monto fijo' : 'Regalo');
+  const typeLabel = (type: string) =>
+    type === 'PERCENTAGE'
+      ? tr('seller.coupons.type.percentage')
+      : type === 'FIXED'
+      ? tr('seller.coupons.type.fixed')
+      : tr('seller.coupons.type.gift');
 
   if (loading) return <LoadingState />;
 
   return (
     <Box>
       <PageHeader
-        title="Cupones de mi tienda"
-        subtitle="Crea cupones de descuento para tus productos o cupones de regalo. Elige los productos de tu tienda a los que aplica el cupón."
+        title={tr('seller.coupons.title')}
+        subtitle={tr('seller.coupons.subtitle')}
         icon={<LocalOfferIcon />}
         actions={
           <PrimaryButton type="button" startIcon={<AddIcon />} onClick={openNew}>
-            Crear cupón
+            {tr('seller.coupons.actions.create')}
           </PrimaryButton>
         }
       />
@@ -183,20 +190,20 @@ export default function SellerCoupons() {
         <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: t.surface, '& th': { color: t.onSurfaceVariant, fontWeight: 700 } }}>
-              <TableCell>Código</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Valor</TableCell>
-              <TableCell>Productos</TableCell>
-              <TableCell>Usos</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell align="right">Acciones</TableCell>
+              <TableCell>{tr('seller.coupons.table.code')}</TableCell>
+              <TableCell>{tr('seller.coupons.table.type')}</TableCell>
+              <TableCell>{tr('seller.coupons.table.value')}</TableCell>
+              <TableCell>{tr('seller.coupons.table.products')}</TableCell>
+              <TableCell>{tr('seller.coupons.table.uses')}</TableCell>
+              <TableCell>{tr('seller.coupons.table.status')}</TableCell>
+              <TableCell align="right">{tr('seller.coupons.table.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {coupons.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  No tienes cupones. Crea uno para incentivar tus ventas.
+                  {tr('seller.coupons.emptyState')}
                 </TableCell>
               </TableRow>
             )}
@@ -205,13 +212,17 @@ export default function SellerCoupons() {
                 <TableCell sx={{ fontWeight: 700 }}>{c.code}</TableCell>
                 <TableCell>{typeLabel(c.type)}</TableCell>
                 <TableCell>
-                  {c.type === 'PERCENTAGE' ? `${c.value}%` : c.type === 'GIFT' ? `${money(c.value)} (gastado ${money(c.spentAmount ?? 0)})` : money(c.value)}
+                  {c.type === 'PERCENTAGE'
+                    ? `${c.value}%`
+                    : c.type === 'GIFT'
+                    ? tr('seller.coupons.table.giftValue', { value: money(c.value), spent: money(c.spentAmount ?? 0) })
+                    : money(c.value)}
                 </TableCell>
                 <TableCell>
                   {c.products && c.products.length > 0 ? (
-                    <Chip size="small" label={`${c.products.length} producto(s)`} />
+                    <Chip size="small" label={tr('seller.coupons.table.productCount', { count: c.products.length })} />
                   ) : (
-                    <Chip size="small" label="Todos" variant="outlined" />
+                    <Chip size="small" label={tr('seller.coupons.table.allProducts')} variant="outlined" />
                   )}
                 </TableCell>
                 <TableCell>
@@ -219,7 +230,12 @@ export default function SellerCoupons() {
                   {c.maxUses ? `/${c.maxUses}` : ''}
                 </TableCell>
                 <TableCell>
-                  <Chip size="small" label={c.isActive ? 'Activo' : 'Inactivo'} color={c.isActive ? 'success' : 'default'} onClick={() => toggleActive(c)} />
+                  <Chip
+                    size="small"
+                    label={c.isActive ? tr('seller.coupons.status.active') : tr('seller.coupons.status.inactive')}
+                    color={c.isActive ? 'success' : 'default'}
+                    onClick={() => toggleActive(c)}
+                  />
                 </TableCell>
                 <TableCell align="right">
                   <IconButton size="small" onClick={() => openEdit(c)}>
@@ -237,26 +253,38 @@ export default function SellerCoupons() {
       </SurfaceCard>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? 'Editar cupón' : 'Crear cupón'}</DialogTitle>
+        <DialogTitle>{editing ? tr('seller.coupons.dialog.editTitle') : tr('seller.coupons.dialog.createTitle')}</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            <TextField label="Código único" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} fullWidth disabled={Boolean(editing)} />
             <TextField
-              label="Descripción"
+              label={tr('seller.coupons.dialog.codeLabel')}
+              value={form.code}
+              onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+              fullWidth
+              disabled={Boolean(editing)}
+            />
+            <TextField
+              label={tr('seller.coupons.dialog.descriptionLabel')}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               fullWidth
               multiline
               rows={2}
-              placeholder="Ej: 10% en la compra de un S7 Edge / Regalo de 100 Bs para gastar en mi tienda"
+              placeholder={tr('seller.coupons.dialog.descriptionPlaceholder')}
             />
-            <TextField select label="Tipo de cupón" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} fullWidth>
-              <MenuItem value="PERCENTAGE">Porcentaje de descuento (%)</MenuItem>
-              <MenuItem value="FIXED">Monto fijo de descuento (Bs)</MenuItem>
-              <MenuItem value="GIFT">Regalo (monto para gastar, se devuelve el saldo)</MenuItem>
+            <TextField select label={tr('seller.coupons.dialog.typeLabel')} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} fullWidth>
+              <MenuItem value="PERCENTAGE">{tr('seller.coupons.dialog.typeOptions.percentage')}</MenuItem>
+              <MenuItem value="FIXED">{tr('seller.coupons.dialog.typeOptions.fixed')}</MenuItem>
+              <MenuItem value="GIFT">{tr('seller.coupons.dialog.typeOptions.gift')}</MenuItem>
             </TextField>
             <TextField
-              label={form.type === 'PERCENTAGE' ? 'Descuento (%)' : form.type === 'GIFT' ? 'Monto del regalo (Bs)' : 'Descuento (Bs)'}
+              label={
+                form.type === 'PERCENTAGE'
+                  ? tr('seller.coupons.dialog.valueLabel.percentage')
+                  : form.type === 'GIFT'
+                  ? tr('seller.coupons.dialog.valueLabel.gift')
+                  : tr('seller.coupons.dialog.valueLabel.fixed')
+              }
               type="number"
               value={form.value}
               onChange={(e) => setForm({ ...form, value: e.target.value })}
@@ -264,38 +292,44 @@ export default function SellerCoupons() {
             />
             {form.type === 'GIFT' && (
               <Typography variant="caption" color="text.secondary">
-                El comprador puede gastar este monto en tu tienda. Si gasta menos, le devuelves el saldo en efectivo.
+                {tr('seller.coupons.dialog.giftHint')}
               </Typography>
             )}
             <TextField
-              label="Pedido mínimo (Bs, opcional)"
+              label={tr('seller.coupons.dialog.minSpendLabel')}
               type="number"
               value={form.minSpend}
               onChange={(e) => setForm({ ...form, minSpend: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Límite de usos (opcional)"
+              label={tr('seller.coupons.dialog.maxUsesLabel')}
               type="number"
               value={form.maxUses}
               onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
               fullWidth
             />
-            <TextField label="Vence (opcional)" type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} fullWidth />
+            <TextField
+              label={tr('seller.coupons.dialog.endDateLabel')}
+              type="date"
+              value={form.endDate}
+              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+              fullWidth
+            />
             <Autocomplete
               multiple
               options={myProducts}
-              getOptionLabel={(p) => `${p.name} — ${p.price} Bs`}
+              getOptionLabel={(p) => tr('seller.coupons.dialog.productOptionLabel', { name: p.name, price: p.price })}
               value={myProducts.filter((p) => form.productIds.includes(p.id))}
               onChange={(_, v) => setForm({ ...form, productIds: v.map((p) => p.id) })}
-              renderInput={(params) => <TextField {...params} label="Productos a los que aplica (vacío = todos)" />}
+              renderInput={(params) => <TextField {...params} label={tr('seller.coupons.dialog.productsLabel')} />}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <GhostButton type="button" onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <GhostButton type="button" onClick={() => setOpen(false)}>{tr('seller.coupons.dialog.cancel')}</GhostButton>
           <PrimaryButton type="button" onClick={save} disabled={saving || !form.code || !form.value}>
-            {saving ? <CircularProgress size={18} color="inherit" /> : 'Guardar'}
+            {saving ? <CircularProgress size={18} color="inherit" /> : tr('seller.coupons.dialog.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

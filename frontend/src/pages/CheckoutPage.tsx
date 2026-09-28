@@ -16,6 +16,7 @@ import {
   Radio,
   Chip,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { useCartStore } from '../stores/cartStore';
 import { useMoney } from '../hooks/useMoney';
@@ -33,6 +34,7 @@ interface ShippingQuote {
 }
 
 export default function CheckoutPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const money = useMoney();
   const { cart, fetchCart } = useCartStore();
@@ -68,7 +70,7 @@ export default function CheckoutPage() {
   const checkShipping = async () => {
     if (fulfillmentType === 'PICKUP') {
       if (!pickupAddress.trim()) {
-        setError('Indica la dirección de retiro');
+        setError(t('checkout.errors.pickupAddressRequired'));
         return;
       }
       setQuotes([]);
@@ -77,7 +79,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!selectedAddr) {
-      setError('Selecciona una dirección de envío');
+      setError(t('checkout.errors.shippingAddressRequired'));
       return;
     }
     setCheckingShipping(true);
@@ -108,7 +110,7 @@ export default function CheckoutPage() {
         notes,
         couponCode: couponCode || undefined,
       });
-      toast.success('Compra realizada. Paga con el QR del vendedor.');
+      toast.success(t('checkout.orderSuccessToast'));
       const firstOrder = data.data[0];
       navigate(`/checkout/confirmacion/${firstOrder.id}`, { state: { orders: data.data } });
     } catch (err) {
@@ -133,8 +135,8 @@ export default function CheckoutPage() {
     return (
       <Container maxWidth="md" sx={{ py: 10 }}>
         <EmptyState
-          message="Tu carrito está vacío"
-          action={<PrimaryButton to="/productos">Explorar productos</PrimaryButton>}
+          message={t('cart.emptyMessage')}
+          action={<PrimaryButton to="/productos">{t('cart.exploreProducts')}</PrimaryButton>}
         />
       </Container>
     );
@@ -145,7 +147,7 @@ export default function CheckoutPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Typography variant="h5" fontWeight={700} mb={3}>
-        Checkout
+        {t('checkout.title')}
       </Typography>
 
       {error && (
@@ -158,7 +160,7 @@ export default function CheckoutPage() {
         <Grid item xs={12} md={7}>
           <Paper sx={{ p: 3, mb: 2 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Tipo de entrega
+              {t('checkout.deliveryType')}
             </Typography>
             <RadioGroup
               row
@@ -169,26 +171,26 @@ export default function CheckoutPage() {
                 setQuotes([]);
               }}
             >
-              <FormControlLabel value="SHIPPING" control={<Radio />} label="Envío a domicilio" />
-              <FormControlLabel value="PICKUP" control={<Radio />} label="🏬 Retiro en tienda (gratis)" />
+              <FormControlLabel value="SHIPPING" control={<Radio />} label={t('checkout.homeDelivery')} />
+              <FormControlLabel value="PICKUP" control={<Radio />} label={t('checkout.storePickupFree')} />
             </RadioGroup>
           </Paper>
 
           <Paper sx={{ p: 3, mb: 2 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              {fulfillmentType === 'PICKUP' ? 'Dirección de retiro' : 'Dirección de envío'}
+              {fulfillmentType === 'PICKUP' ? t('checkout.pickupAddress') : t('checkout.shippingAddress')}
             </Typography>
             {fulfillmentType === 'PICKUP' ? (
               <TextField
                 fullWidth
                 value={pickupAddress}
                 onChange={(e) => setPickupAddress(e.target.value)}
-                placeholder="Ej: Av. 16 de Julio 1523, tienda LaCase, La Paz"
-                helperText="Indica dónde retirarás el pedido (punto de venta de la tienda)."
+                placeholder={t('checkout.pickupAddressPlaceholder')}
+                helperText={t('checkout.pickupAddressHelper')}
               />
             ) : addresses.length === 0 ? (
               <Alert severity="warning">
-                No tienes direcciones guardadas. Agrégalas en <a href="/cuenta/direcciones">Mis direcciones</a>.
+                {t('checkout.noAddressesPrefix')} <a href="/cuenta/direcciones">{t('checkout.myAddressesLink')}</a>.
               </Alert>
             ) : (
               <RadioGroup value={selectedAddress} onChange={(e) => setSelectedAddress(Number(e.target.value))}>
@@ -204,23 +206,23 @@ export default function CheckoutPage() {
             )}
             <Box mt={2}>
               <SecondaryButton onClick={checkShipping} disabled={(fulfillmentType === 'SHIPPING' && !selectedAddr) || checkingShipping}>
-                {checkingShipping ? <CircularProgress size={20} /> : fulfillmentType === 'PICKUP' ? 'Continuar sin envío' : 'Calcular envío'}
+                {checkingShipping ? <CircularProgress size={20} /> : fulfillmentType === 'PICKUP' ? t('checkout.continueWithoutShipping') : t('checkout.calculateShipping')}
               </SecondaryButton>
             </Box>
           </Paper>
 
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Notas para el vendedor (opcional)
+              {t('checkout.sellerNotes')}
             </Typography>
-            <TextField fullWidth multiline rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Ej: llamar antes de entregar" />
+            <TextField fullWidth multiline rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t('checkout.sellerNotesPlaceholder')} />
           </Paper>
         </Grid>
 
         <Grid item xs={12} md={5}>
           <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Resumen de la compra
+              {t('checkout.orderSummary')}
             </Typography>
 
             {quotes.length > 0 ? (
@@ -231,15 +233,15 @@ export default function CheckoutPage() {
                       {q.sellerName}
                     </Typography>
                     <Box display="flex" justifyContent="space-between" fontSize="body2">
-                      <Typography color="text.secondary">Subtotal</Typography>
+                      <Typography color="text.secondary">{t('checkout.subtotal')}</Typography>
                       <Typography>{money(q.subtotal)}</Typography>
                     </Box>
                     <Box display="flex" justifyContent="space-between" fontSize="body2">
-                      <Typography color="text.secondary">Envío</Typography>
+                      <Typography color="text.secondary">{t('checkout.shipping')}</Typography>
                       <Typography>{money(q.shippingCost)}</Typography>
                     </Box>
                     <Box display="flex" justifyContent="space-between" fontWeight={700}>
-                      <Typography>Total tienda</Typography>
+                      <Typography>{t('checkout.storeTotal')}</Typography>
                       <Typography>{money(q.total)}</Typography>
                     </Box>
                   </Box>
@@ -248,7 +250,7 @@ export default function CheckoutPage() {
                 {/* Cupón de descuento */}
                 <Box mb={2}>
                   <TextField
-                    label="Código de descuento"
+                    label={t('checkout.couponLabel')}
                     size="small"
                     fullWidth
                     value={couponCode}
@@ -257,16 +259,15 @@ export default function CheckoutPage() {
                       setCouponInfo(null);
                       setCouponError('');
                     }}
-                    placeholder="Ej: BIENVENIDO10"
+                    placeholder={t('checkout.couponPlaceholder')}
                   />
                   {couponInfo && (
                     <Alert severity="success" sx={{ mt: 1 }}>
-                      {couponInfo.type === 'PERCENTAGE' && `${couponInfo.value}% de descuento aplicado`}
-                      {couponInfo.type === 'FIXED' && `${money(couponInfo.value)} de descuento aplicado`}
+                      {couponInfo.type === 'PERCENTAGE' && t('checkout.couponAppliedPercentage', { value: couponInfo.value })}
+                      {couponInfo.type === 'FIXED' && t('checkout.couponAppliedFixed', { amount: money(couponInfo.value) })}
                       {couponInfo.type === 'GIFT' && (
                         <>
-                          Cupón de regalo de {money(couponInfo.value)}. Si gastas menos, la tienda te devuelve el
-                          saldo en efectivo.
+                          {t('checkout.couponAppliedGift', { amount: money(couponInfo.value) })}
                         </>
                       )}
                     </Alert>
@@ -279,53 +280,52 @@ export default function CheckoutPage() {
                   {couponCode && !couponInfo && !couponError && (
                     <Box mt={1}>
                       <GhostButton size="small" onClick={applyCoupon}>
-                        Aplicar cupón
+                        {t('checkout.applyCoupon')}
                       </GhostButton>
                     </Box>
                   )}
                 </Box>
                 <Box display="flex" justifyContent="space-between" mb={2}>
-                  <Typography variant="h6">Total</Typography>
+                  <Typography variant="h6">{t('checkout.total')}</Typography>
                   <Typography variant="h6" className="price-color">
                     {money(total)}
                   </Typography>
                 </Box>
                 <Alert severity="info" sx={{ mb: 2 }}>
-                  El pago se realiza por <strong>QR del vendedor</strong>. Al confirmar verás el QR y deberás subir el
-                  comprobante de la transferencia.
+                  {t('checkout.paymentQrInfoPrefix')} <strong>{t('checkout.paymentQrInfoStrong')}</strong>{t('checkout.paymentQrInfoSuffix')}
                 </Alert>
                 <PrimaryButton size="large" fullWidth onClick={submitOrder} disabled={submitting || !checkedShipping || (fulfillmentType === 'SHIPPING' && quotes.length === 0)}>
-                  {submitting ? <CircularProgress size={22} color="inherit" /> : 'Confirmar compra'}
+                  {submitting ? <CircularProgress size={22} color="inherit" /> : t('checkout.confirmPurchase')}
                 </PrimaryButton>
               </>
             ) : fulfillmentType === 'PICKUP' && checkedShipping ? (
               <>
                 <Box display="flex" justifyContent="space-between" mb={1} fontSize="body2">
-                  <Typography color="text.secondary">Subtotal</Typography>
+                  <Typography color="text.secondary">{t('checkout.subtotal')}</Typography>
                   <Typography>{money(cart.subtotal)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" mb={1} fontSize="body2">
-                  <Typography color="text.secondary">Envío</Typography>
-                  <Chip label="Gratis (retiro en tienda)" size="small" color="success" variant="outlined" />
+                  <Typography color="text.secondary">{t('checkout.shipping')}</Typography>
+                  <Chip label={t('checkout.freePickup')} size="small" color="success" variant="outlined" />
                 </Box>
                 <Divider sx={{ my: 2 }} />
                 <Box display="flex" justifyContent="space-between" mb={2}>
-                  <Typography variant="h6">Total</Typography>
+                  <Typography variant="h6">{t('checkout.total')}</Typography>
                   <Typography variant="h6" className="price-color">
                     {money(cart.subtotal)}
                   </Typography>
                 </Box>
                 <Alert severity="info" sx={{ mb: 2 }}>
-                  Retiras el pedido en la dirección que indicaste. El pago se realiza por <strong>QR del vendedor</strong>.
+                  {t('checkout.pickupPaymentInfoPrefix')} <strong>{t('checkout.paymentQrInfoStrong')}</strong>.
                 </Alert>
                 <PrimaryButton size="large" fullWidth onClick={submitOrder} disabled={submitting || !checkedShipping}>
-                  {submitting ? <CircularProgress size={22} color="inherit" /> : 'Confirmar compra'}
+                  {submitting ? <CircularProgress size={22} color="inherit" /> : t('checkout.confirmPurchase')}
                 </PrimaryButton>
               </>
             ) : (
               <Box textAlign="center" py={3}>
                 <Typography color="text.secondary">
-                  Calcula el envío o elige retiro en tienda para ver el detalle
+                  {t('checkout.calculateShippingPrompt')}
                 </Typography>
               </Box>
             )}

@@ -8,6 +8,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import MenuItem from '@mui/material/MenuItem';
 import {
   getConoTheme, listConoEntries, createConoEntry, uploadConoImage, listConoMatches, createConoMatch,
@@ -20,14 +21,15 @@ import { ConoMatchCard } from '../../components/cono/ConoMatchCard';
 import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
 import { MotionCard } from '../../components/motion/MotionCard';
 
-const WINDOWS = [
-  { key: '', label: 'Histórico' },
-  { key: 'daily', label: 'Hoy' },
-  { key: 'weekly', label: 'Semanal' },
-  { key: 'monthly', label: 'Mensual' },
+const WINDOW_KEYS = [
+  { key: '', labelKey: 'cono.themeDetail.windowHistoric' },
+  { key: 'daily', labelKey: 'cono.themeDetail.windowDaily' },
+  { key: 'weekly', labelKey: 'cono.themeDetail.windowWeekly' },
+  { key: 'monthly', labelKey: 'cono.themeDetail.windowMonthly' },
 ] as const;
 
 export default function ConoThemeDetailPage() {
+  const { t } = useTranslation();
   const { slug = '' } = useParams();
   const navigate = useNavigate();
   const tokens = useUnifiedTokens();
@@ -67,11 +69,11 @@ export default function ConoThemeDetailPage() {
 
   const submitMatch = async () => {
     if (!theme || !matchForm.entryAId || !matchForm.entryBId) {
-      toast.error('Elige las dos entradas que se enfrentan.');
+      toast.error(t('cono.themeDetail.chooseTwoEntries'));
       return;
     }
     if (matchForm.entryAId === matchForm.entryBId) {
-      toast.error('Elige dos entradas distintas.');
+      toast.error(t('cono.themeDetail.chooseDistinctEntries'));
       return;
     }
     setSavingMatch(true);
@@ -84,7 +86,7 @@ export default function ConoThemeDetailPage() {
       });
       setMatchOpen(false);
       loadMatches(theme);
-      toast.success('Enfrentamiento creado.');
+      toast.success(t('cono.themeDetail.matchCreated'));
     } catch (e) {
       toast.error(getErrorMessage(e));
     } finally {
@@ -99,7 +101,7 @@ export default function ConoThemeDetailPage() {
 
   const submitEntry = async () => {
     if (!theme || !file || !label.trim()) {
-      toast.error('Elige una imagen y escribe un nombre/título.');
+      toast.error(t('cono.themeDetail.chooseImageAndTitle'));
       return;
     }
     setSaving(true);
@@ -110,7 +112,7 @@ export default function ConoThemeDetailPage() {
       setLabel('');
       setFile(null);
       loadEntries(theme);
-      toast.success('¡Entrada publicada!');
+      toast.success(t('cono.themeDetail.entryPublished'));
     } catch (e) {
       toast.error(getErrorMessage(e));
     } finally {
@@ -119,7 +121,7 @@ export default function ConoThemeDetailPage() {
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>;
-  if (!theme) return <Alert severity="error">Tema no encontrado.</Alert>;
+  if (!theme) return <Alert severity="error">{t('cono.themeDetail.themeNotFound')}</Alert>;
 
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', p: 2 }}>
@@ -130,17 +132,17 @@ export default function ConoThemeDetailPage() {
         <>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
             <Tabs value={rangeWindow} onChange={(_, v) => setRangeWindow(v)}>
-              {WINDOWS.map((w) => <Tab key={w.key} label={w.label} value={w.key} />)}
+              {WINDOW_KEYS.map((w) => <Tab key={w.key} label={t(w.labelKey)} value={w.key} />)}
             </Tabs>
             {user && (
               <Button variant="contained" startIcon={<AddPhotoAlternateIcon />} onClick={() => setUploadOpen(true)}>
-                Subir meme
+                {t('cono.themeDetail.uploadMeme')}
               </Button>
             )}
           </Box>
 
           {entries.length === 0 ? (
-            <Alert severity="info">Todavía no hay entradas {rangeWindow && 'en este período'}.</Alert>
+            <Alert severity="info">{rangeWindow ? t('cono.themeDetail.noEntriesInPeriod') : t('cono.themeDetail.noEntries')}</Alert>
           ) : (
             <StaggerContainer>
               <Grid container spacing={2}>
@@ -177,17 +179,17 @@ export default function ConoThemeDetailPage() {
           {user && theme && (
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
               <Button variant="outlined" startIcon={<AddPhotoAlternateIcon />} onClick={() => setUploadOpen(true)}>
-                Proponer competidor
+                {t('cono.themeDetail.proposeCompetitor')}
               </Button>
               {isCreator && entries.length >= 2 && (
                 <Button variant="outlined" color="secondary" onClick={() => setMatchOpen(true)}>
-                  Armar enfrentamiento
+                  {t('cono.themeDetail.buildMatch')}
                 </Button>
               )}
             </Stack>
           )}
           {matches.length === 0 ? (
-            <Alert severity="info">Todavía no hay enfrentamientos armados en este torneo.</Alert>
+            <Alert severity="info">{t('cono.themeDetail.noMatches')}</Alert>
           ) : (
             <StaggerContainer>
               <Stack spacing={2}>
@@ -203,50 +205,50 @@ export default function ConoThemeDetailPage() {
       )}
 
       <Dialog open={uploadOpen} onClose={() => setUploadOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{theme.type === 'MEME' ? 'Subir meme' : 'Proponer competidor'}</DialogTitle>
+        <DialogTitle>{theme.type === 'MEME' ? t('cono.themeDetail.uploadMeme') : t('cono.themeDetail.proposeCompetitor')}</DialogTitle>
         <DialogContent>
           <TextField
-            fullWidth margin="dense" label={theme.type === 'MEME' ? 'Título del meme' : 'Nombre del competidor'}
+            fullWidth margin="dense" label={theme.type === 'MEME' ? t('cono.themeDetail.memeTitleLabel') : t('cono.themeDetail.competitorNameLabel')}
             value={label} onChange={(e) => setLabel(e.target.value)}
           />
           <Button component="label" variant="outlined" sx={{ mt: 1 }} startIcon={<AddPhotoAlternateIcon />}>
-            {file ? file.name : 'Elegir imagen'}
+            {file ? file.name : t('cono.themeDetail.chooseImage')}
             <input type="file" hidden accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
           </Button>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setUploadOpen(false)}>{t('cono.themeDetail.cancel')}</Button>
           <Button variant="contained" onClick={submitEntry} disabled={saving}>
-            {saving ? <CircularProgress size={18} /> : 'Publicar'}
+            {saving ? <CircularProgress size={18} /> : t('cono.themeDetail.publish')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={matchOpen} onClose={() => setMatchOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Armar enfrentamiento</DialogTitle>
+        <DialogTitle>{t('cono.themeDetail.buildMatch')}</DialogTitle>
         <DialogContent>
           <TextField
-            select fullWidth margin="dense" label="Competidor A"
+            select fullWidth margin="dense" label={t('cono.themeDetail.competitorALabel')}
             value={matchForm.entryAId} onChange={(e) => setMatchForm({ ...matchForm, entryAId: e.target.value })}
           >
             {entries.map((e) => <MenuItem key={e.id} value={e.id}>{e.label}</MenuItem>)}
           </TextField>
           <TextField
-            select fullWidth margin="dense" label="Competidor B"
+            select fullWidth margin="dense" label={t('cono.themeDetail.competitorBLabel')}
             value={matchForm.entryBId} onChange={(e) => setMatchForm({ ...matchForm, entryBId: e.target.value })}
           >
             {entries.map((e) => <MenuItem key={e.id} value={e.id}>{e.label}</MenuItem>)}
           </TextField>
           <TextField
-            type="date" fullWidth margin="dense" label="Fecha de votación"
+            type="date" fullWidth margin="dense" label={t('cono.themeDetail.votingDateLabel')}
             InputLabelProps={{ shrink: true }}
             value={matchForm.votingDate} onChange={(e) => setMatchForm({ ...matchForm, votingDate: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setMatchOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setMatchOpen(false)}>{t('cono.themeDetail.cancel')}</Button>
           <Button variant="contained" onClick={submitMatch} disabled={savingMatch}>
-            {savingMatch ? <CircularProgress size={18} /> : 'Crear'}
+            {savingMatch ? <CircularProgress size={18} /> : t('cono.home.create')}
           </Button>
         </DialogActions>
       </Dialog>

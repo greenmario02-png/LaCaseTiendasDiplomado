@@ -4,9 +4,11 @@ import { PencilLine, Trophy, Medal, Star, TrendingUp, MessageCircle, Coins } fro
 import { useForumPalette } from '../../theme/forumTheme';
 import { useAuthStore } from '../../stores/authStore';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getTrending, getTopUsers } from '../../services/forum.api';
 
 export default function ForumSidebarRight() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const forumPalette = useForumPalette();
@@ -30,13 +32,13 @@ export default function ForumSidebarRight() {
           sx={{ bgcolor: forumPalette.accent, '&:hover': { bgcolor: forumPalette.accentHover }, mb: 1.5, fontWeight: 700 }}
           onClick={() => navigate('/foro')}
         >
-          Hacer una pregunta
+          {t('forum.sidebarRight.askQuestion')}
         </Button>
       )}
 
       <Box sx={{ bgcolor: forumPalette.bgCard, borderRadius: '10px', border: `1px solid ${forumPalette.border}`, p: 1.5, mb: 1.5 }}>
         <Typography variant="subtitle2" fontWeight={700} sx={{ color: forumPalette.textPrimary, mb: 1, display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Trophy size={16} strokeWidth={2.2} color={forumPalette.karmaGold} /> Top colaboradores
+          <Trophy size={16} strokeWidth={2.2} color={forumPalette.karmaGold} /> {t('forum.sidebarRight.topContributors')}
         </Typography>
         <List dense disablePadding>
           {topUsers.slice(0, 5).map((u, i) => (
@@ -60,10 +62,10 @@ export default function ForumSidebarRight() {
 
       <Box sx={{ bgcolor: forumPalette.bgCard, borderRadius: '10px', border: `1px solid ${forumPalette.border}`, p: 1.5 }}>
         <Typography variant="subtitle2" fontWeight={700} sx={{ color: forumPalette.textPrimary, mb: 1, display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <TrendingUp size={16} strokeWidth={2.2} color={forumPalette.accent} /> Tendencia (24h)
+          <TrendingUp size={16} strokeWidth={2.2} color={forumPalette.accent} /> {t('forum.sidebarRight.trending24h')}
         </Typography>
         {trending.length === 0 ? (
-          <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>Sin datos aún</Typography>
+          <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>{t('forum.sidebarRight.noDataYet')}</Typography>
         ) : (
           trending.slice(0, 8).map((t) => (
             <Chip key={t.tag} label={`#${t.tag}`} size="small" sx={{ mr: 0.5, mb: 0.5, bgcolor: forumPalette.bgInput, color: forumPalette.accent, fontSize: '0.7rem' }} />
@@ -72,7 +74,7 @@ export default function ForumSidebarRight() {
         <Divider sx={{ my: 1.2 }} />
         <Typography variant="caption" sx={{ color: forumPalette.textMuted, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
           <MessageCircle size={13} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>El foro funciona con tu cuenta de LaCase Multi Tiendas. Tu karma se puede canjear por monedas <Coins size={12} strokeWidth={2.4} style={{ verticalAlign: '-2px' }} />.</span>
+          <span>{t('forum.sidebarRight.footerNotePrefix')} <Coins size={12} strokeWidth={2.4} style={{ verticalAlign: '-2px' }} />.</span>
         </Typography>
       </Box>
     </Box>

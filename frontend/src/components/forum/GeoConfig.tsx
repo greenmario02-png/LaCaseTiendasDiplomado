@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import SaveIcon from '@mui/icons-material/Save';
+import { useTranslation } from 'react-i18next';
 import { listCities, resolveGeo } from '../../services/forum.api';
 import type { ForumCity } from '../../services/forum.api';
 import { getErrorMessage } from '../../services/api';
@@ -20,6 +21,7 @@ interface Props {
 /** Configuración de zona del foro: selector de ciudad (agrupado por departamento) + radio + GPS.
  *  Componente compartido entre ForumProfilePage y el selector del navbar del foro (09-spec G5). */
 export function GeoConfig({ compact = false, onSaved }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { geo, cities, updateGeo } = useForumStore();
   const [allCities, setAllCities] = useState<ForumCity[]>([]);
@@ -56,7 +58,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
     setLocating(true);
     setError('');
     if (!('geolocation' in navigator)) {
-      setError('Tu navegador no soporta geolocalización.');
+      setError(t('forum.geoConfig.geolocationNotSupported'));
       setLocating(false);
       return;
     }
@@ -75,7 +77,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
         }
       },
       () => {
-        setError('No pudimos obtener tu ubicación. Elige tu ciudad manualmente.');
+        setError(t('forum.geoConfig.locationFailed'));
         setLocating(false);
       },
       { timeout: 10000 },
@@ -84,7 +86,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
 
   const save = async () => {
     if (!cityId) {
-      setError('Elige tu ciudad.');
+      setError(t('forum.geoConfig.chooseCity'));
       return;
     }
     setSaving(true);
@@ -105,7 +107,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
 
       <Box sx={{ mt: 2 }}>
         <Typography variant="caption" sx={{ color: forumPalette.textSecondary }}>
-          Radio de la zona: <strong>{radioKm} km</strong>
+          {t('forum.geoConfig.radiusLabel')} <strong>{t('forum.geoConfig.radiusValue', { km: radioKm })}</strong>
         </Typography>
         <Slider
           value={radioKm}
@@ -120,7 +122,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
       </Box>
 
       {geo?.cityVerified && (
-        <Chip icon={<MapPin size={13} strokeWidth={2.2} />} label="Verificada por GPS" size="small" sx={{ bgcolor: 'rgba(76,175,80,0.15)', color: '#4CAF50', fontWeight: 700, mb: 1 }} />
+        <Chip icon={<MapPin size={13} strokeWidth={2.2} />} label={t('forum.geoConfig.verifiedByGps')} size="small" sx={{ bgcolor: 'rgba(76,175,80,0.15)', color: '#4CAF50', fontWeight: 700, mb: 1 }} />
       )}
 
       {error && <Alert severity="error" sx={{ mb: 1, fontSize: '0.85rem' }}>{error}</Alert>}
@@ -128,18 +130,18 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
         <Button variant="outlined" startIcon={<MyLocationIcon />} onClick={useGps} disabled={locating || saving}
           sx={{ color: forumPalette.accent, borderColor: forumPalette.accent, textTransform: 'none' }}>
-          {locating ? 'Buscando...' : 'Usar mi ubicación'}
+          {locating ? t('forum.geoConfig.searching') : t('forum.geoConfig.useMyLocation')}
         </Button>
         <Button variant="contained" startIcon={saving ? <CircularProgress size={14} color="inherit" /> : <SaveIcon />}
           onClick={save} disabled={saving || !cityId}
           sx={{ bgcolor: forumPalette.accent, '&:hover': { bgcolor: forumPalette.accentHover }, textTransform: 'none' }}>
-          {saving ? 'Guardando...' : 'Guardar'}
+          {saving ? t('forum.geoConfig.saving') : t('forum.geoConfig.save')}
         </Button>
       </Box>
 
       {!compact && selected && (
         <Typography variant="caption" sx={{ color: forumPalette.textMuted, display: 'block', mt: 1 }}>
-          Ciudad: <strong>{selected.name}</strong> ({selected.department}) · radio estimado {selected.radiusKm} km
+          {t('forum.geoConfig.citySummary', { name: selected.name, department: selected.department, radius: selected.radiusKm })}
         </Typography>
       )}
     </Box>
@@ -151,6 +153,7 @@ function StackGeo({ cityId, grouped, onChange }: {
   grouped: Record<string, ForumCity[]>;
   onChange: (id: number | null) => void;
 }) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const options = Object.entries(grouped).flatMap(([department, cities]) =>
     cities.map((c) => ({ ...c, _department: department })),
@@ -166,7 +169,7 @@ function StackGeo({ cityId, grouped, onChange }: {
       getOptionLabel={(o) => `${o.name} (${o.department})`}
       isOptionEqualToValue={(a, b) => a.id === b.id}
       renderInput={(params) => (
-        <TextField {...params} label="Ciudad" placeholder="Elige tu ciudad (ej: Oruro)"
+        <TextField {...params} label={t('forum.geoConfig.cityFieldLabel')} placeholder={t('forum.geoConfig.cityFieldPlaceholder')}
           sx={{ '& fieldset': { borderColor: forumPalette.border } }} />
       )}
     />

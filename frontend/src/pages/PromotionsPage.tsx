@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Container, Typography, Grid, Chip, Box } from '@mui/material';
 import { api } from '../services/api';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
@@ -11,6 +12,7 @@ import ProductCard from '../components/ui/ProductCard';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
 
 export default function PromotionsPage() {
+  const { t: tr } = useTranslation();
   const money = useMoney();
   const t = useUnifiedTokens();
   const [promotions, setPromotions] = useState<any[]>([]);
@@ -28,10 +30,10 @@ export default function PromotionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="Promociones activas" subtitle="Aprovecha los mejores descuentos" icon={<LocalOfferIcon />} />
+      <PageHeader title={tr('promotions.title')} subtitle={tr('promotions.subtitle')} icon={<LocalOfferIcon />} />
       {promotions.length === 0 && (
         <SurfaceCard>
-          <EmptyState message="No hay promociones activas en este momento." />
+          <EmptyState message={tr('promotions.empty')} />
         </SurfaceCard>
       )}
 
@@ -41,14 +43,14 @@ export default function PromotionsPage() {
         <SurfaceCard sx={{ mb: 3 }}>
           <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap">
             <Chip
-              label={promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}% OFF` : `${money(promo.discountValue)} OFF`}
+              label={promo.discountType === 'PERCENTAGE' ? tr('promotions.discountPercent', { value: promo.discountValue }) : tr('promotions.discountAmount', { value: money(promo.discountValue) })}
               color="primary"
             />
             <Typography variant="h6" fontWeight={700} color={t.onSurface}>
               {promo.title}
             </Typography>
             <Typography variant="body2" color={t.onSurfaceVariant}>
-              Hasta el {new Date(promo.endDate).toLocaleDateString('es-BO')}
+              {tr('promotions.until', { date: new Date(promo.endDate).toLocaleDateString('es-BO') })}
             </Typography>
           </Box>
           {promo.description && (

@@ -1,6 +1,7 @@
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { useTranslation } from 'react-i18next';
 import { useUnifiedTokens } from '../../theme';
 import { PriceDisplay } from './PriceDisplay';
 
@@ -23,6 +24,7 @@ interface ProductCardProps {
 
 /** Tarjeta de producto del rediseño Unified: imagen, precio Bs, tienda, stock, agregar al carrito. */
 export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps) {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const out = product.stock <= 0;
   const body = (
@@ -47,10 +49,10 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           <PriceDisplay price={product.price} salePrice={product.salePrice} />
         </Box>
         {out ? (
-          <Chip label="Sin stock" size="small" color="error" sx={{ mt: 1 }} />
+          <Chip label={t('product.card.outOfStock')} size="small" color="error" sx={{ mt: 1 }} />
         ) : (
           <Typography variant="caption" color="success.main" sx={{ mt: 1, display: 'block' }}>
-            {product.stock} disponibles
+            {t('product.card.available', { count: product.stock })}
           </Typography>
         )}
       </CardContent>
@@ -68,7 +70,7 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
           startIcon={out ? <ShoppingCartIcon /> : <AddShoppingCartIcon />}
           sx={{ minHeight: 40, borderRadius: '8px', textTransform: 'none' }}
         >
-          {out ? 'Sin stock' : 'Agregar al carrito'}
+          {out ? t('product.card.outOfStock') : t('product.card.addToCart')}
         </Button>
       </Box>
     </Card>

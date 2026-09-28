@@ -4,6 +4,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
   Typography, Alert, InputAdornment,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { redeemKarma } from '../../services/forum.api';
 import { getErrorMessage } from '../../services/api';
 
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function RedeemKarmaDialog({ open, available, onClose, onRedeemed }: Props) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState<number>(100);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,38 +39,37 @@ export function RedeemKarmaDialog({ open, available, onClose, onRedeemed }: Prop
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ color: '#F0F0F0', display: 'flex', alignItems: 'center', gap: 1 }}><Coins size={18} strokeWidth={2.2} color='#FFD700' /> Canjear karma por monedas</DialogTitle>
+      <DialogTitle sx={{ color: '#F0F0F0', display: 'flex', alignItems: 'center', gap: 1 }}><Coins size={18} strokeWidth={2.2} color='#FFD700' /> {t('forum.redeemKarmaDialog.title')}</DialogTitle>
       <DialogContent>
         <Alert severity="info" sx={{ mb: 2, fontSize: '0.85rem' }}>
-          Tasa: 100 karma = 10 monedas. El karma histórico y tu etiqueta no bajan; solo se
-          descuenta del "disponible".
+          {t('forum.redeemKarmaDialog.rateNotice')}
         </Alert>
         <TextField
           fullWidth
           type="number"
-          label="Karma a canjear"
+          label={t('forum.redeemKarmaDialog.amountLabel')}
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           inputProps={{ min: 100, step: 100 }}
-          InputProps={{ endAdornment: <InputAdornment position="end">karma</InputAdornment> }}
-          helperText={`Disponible: ${available} karma`}
+          InputProps={{ endAdornment: <InputAdornment position="end">{t('forum.redeemKarmaDialog.karmaUnit')}</InputAdornment> }}
+          helperText={t('forum.redeemKarmaDialog.availableHelper', { available })}
         />
         <Typography variant="body2" sx={{ color: '#FFD700', mt: 1.5 }}>
-          Recibirás: <Coins size={14} strokeWidth={2.4} color='#FFD700' style={{ verticalAlign: '-2px' }} /> {coins} monedas
+          {t('forum.redeemKarmaDialog.willReceive')} <Coins size={14} strokeWidth={2.4} color='#FFD700' style={{ verticalAlign: '-2px' }} /> {t('forum.redeemKarmaDialog.coinsCount', { count: coins })}
         </Typography>
         {error && (
           <Alert severity="error" sx={{ mt: 1.5, fontSize: '0.85rem' }}>{error}</Alert>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} sx={{ color: '#AAAAAA' }}>Cancelar</Button>
+        <Button onClick={onClose} sx={{ color: '#AAAAAA' }}>{t('forum.redeemKarmaDialog.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSubmit}
           disabled={loading || amount < 100 || amount % 100 !== 0 || amount > available}
           sx={{ bgcolor: '#FF6B35', '&:hover': { bgcolor: '#FF8C5A' } }}
         >
-          {loading ? 'Canjeando...' : 'Canjear'}
+          {loading ? t('forum.redeemKarmaDialog.redeeming') : t('forum.redeemKarmaDialog.redeem')}
         </Button>
       </DialogActions>
     </Dialog>

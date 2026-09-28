@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Avatar,
   Box,
@@ -67,19 +68,20 @@ function iconColor(type: string): string {
   return 'text.secondary';
 }
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diff / 60000);
-  if (min < 1) return 'ahora';
-  if (min < 60) return `hace ${min} min`;
+  if (min < 1) return t('notifications.time.now');
+  if (min < 60) return t('notifications.time.minutes', { count: min });
   const h = Math.floor(min / 60);
-  if (h < 24) return `hace ${h} h`;
+  if (h < 24) return t('notifications.time.hours', { count: h });
   const d = Math.floor(h / 24);
-  if (d < 30) return `hace ${d} d`;
+  if (d < 30) return t('notifications.time.days', { count: d });
   return new Date(iso).toLocaleDateString('es-ES');
 }
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
@@ -145,18 +147,18 @@ export default function NotificationsPage() {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
         <Box>
           <Typography variant="h5" fontWeight={700}>
-            Centro de Notificaciones
+            {t('notifications.centerTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {total} notificaciones · {unread} sin leer
+            {t('notifications.countSummary', { total, unread })}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1}>
           <Button size="small" variant={onlyUnread ? 'contained' : 'outlined'} onClick={() => setOnlyUnread((v) => !v)}>
-            {onlyUnread ? 'Mostrar todas' : 'Solo sin leer'}
+            {onlyUnread ? t('notifications.showAll') : t('notifications.onlyUnread')}
           </Button>
           <Button size="small" variant="text" onClick={markAll} disabled={unread === 0}>
-            Marcar todas leídas
+            {t('notifications.markAllRead')}
           </Button>
         </Stack>
       </Stack>
@@ -164,7 +166,7 @@ export default function NotificationsPage() {
       {loading && <LoadingState />}
       {!loading && error && <ErrorState message={error} onRetry={() => load()} />}
       {!loading && !error && notifications.length === 0 && (
-        <EmptyState message={onlyUnread ? 'No tienes notificaciones sin leer 🎉' : 'No tienes notificaciones todavía'} />
+        <EmptyState message={onlyUnread ? t('notifications.emptyUnread') : t('notifications.emptyAll')} />
       )}
       {!loading && !error && notifications.length > 0 && (
         <>
@@ -188,7 +190,7 @@ export default function NotificationsPage() {
                           <Typography variant="caption" color="text.secondary" display="block">
                             {n.message}
                           </Typography>
-                          <Chip label={timeAgo(n.createdAt)} size="small" variant="outlined" sx={{ mt: 0.5, height: 20, fontSize: 11 }} />
+                          <Chip label={timeAgo(n.createdAt, t)} size="small" variant="outlined" sx={{ mt: 0.5, height: 20, fontSize: 11 }} />
                         </>
                       }
                     />

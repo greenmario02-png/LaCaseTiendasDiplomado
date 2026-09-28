@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { BadgeCheck, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -51,27 +53,28 @@ interface Auction {
   paymentDeadline?: number | null;
 }
 
-function formatTimeLeft(ms: number): string {
-  if (ms <= 0) return 'Terminada';
+function formatTimeLeft(ms: number, tr: TFunction): string {
+  if (ms <= 0) return tr('auctions.time.ended');
   const totalSec = Math.floor(ms / 1000);
   const d = Math.floor(totalSec / 86400);
   const h = Math.floor((totalSec % 86400) / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
-  if (d > 0) return `${d}d ${h}h ${m}m`;
-  if (h > 0) return `${h}h ${m}m ${s}s`;
-  if (m > 0) return `${m}m ${s}s`;
-  return `${s}s`;
+  if (d > 0) return tr('auctions.time.dhm', { d, h, m });
+  if (h > 0) return tr('auctions.time.hms', { h, m, s });
+  if (m > 0) return tr('auctions.time.ms', { m, s });
+  return tr('auctions.time.s', { s });
 }
 
 /** Nivel lúdico según la actividad del usuario en la subasta */
-function levelLabel(a: Auction): { label: string; color: 'success' | 'primary' | 'error' | 'warning' } {
-  if (a.isHighestBidder) return { label: 'Vas ganando', color: 'success' };
-  if (a.timeLeftMs < 3600000) return { label: '¡Última hora!', color: 'error' };
-  return { label: 'Competís', color: 'primary' };
+function levelLabel(a: Auction, tr: TFunction): { label: string; color: 'success' | 'primary' | 'error' | 'warning' } {
+  if (a.isHighestBidder) return { label: tr('auctions.watchlist.level.winning'), color: 'success' };
+  if (a.timeLeftMs < 3600000) return { label: tr('auctions.watchlist.level.lastHour'), color: 'error' };
+  return { label: tr('auctions.watchlist.level.competing'), color: 'primary' };
 }
 
 export default function AuctionWatchlistPage() {
+  const { t: tr } = useTranslation();
   const money = useMoney();
   const [tab, setTab] = useState(0);
   const [active, setActive] = useState<Auction[]>([]);
@@ -104,7 +107,7 @@ export default function AuctionWatchlistPage() {
     try {
       await api.post(`/auctions/${auctionId}/watch`);
       setWatchlist((prev) => prev.filter((a) => a.id !== auctionId));
-      toast.success('Quitado del watchlist');
+      toast.success(tr('auctions.detail.toasts.watchRemoved'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -119,7 +122,7 @@ export default function AuctionWatchlistPage() {
       ) : (
         <Grid container spacing={2}>
           {items.map((a) => {
-            const lvl = levelLabel(a);
+            const lvl = levelLabel(a, tr);
             const urgency = Math.max(0, Math.min(1, a.timeLeftMs / (12 * 3600000)));
             return (
               <Grid item xs={6} sm={4} md={3} key={a.id}>
@@ -157,7 +160,7 @@ export default function AuctionWatchlistPage() {
                       <Box my={1} display="flex" alignItems="center" gap={1}>
                         <TimerIcon fontSize="small" color={a.timeLeftMs < 3600000 ? 'error' : 'action'} />
                         <Typography variant="caption" fontWeight={600} color={a.timeLeftMs < 3600000 ? 'error' : 'text.primary'}>
-                          {formatTimeLeft(a.timeLeftMs)}
+                          {formatTimeLeft(a.timeLeftMs, tr)}
                         </Typography>
                       </Box>
                       {interactive && (
@@ -167,17 +170,17 @@ export default function AuctionWatchlistPage() {
                         </>
                       )}
                       {!interactive && a.isSold && a.winner && (
-                        <Chip label={`Ganó: ${a.winner.firstName}`} size="small" color="success" />
+                        <Chip label={tr('auctions.watchlist.wonBy', { firstName: a.winner.firstName })} size="small" color="success" />
                       )}
                       {!interactive && !a.isSold && (
-                        <Chip label={formatTimeLeft(a.timeLeftMs)} size="small" color={a.timeLeftMs < 3600000 ? 'error' : 'primary'} />
+                        <Chip label={formatTimeLeft(a.timeLeftMs, tr)} size="small" color={a.timeLeftMs < 3600000 ? 'error' : 'primary'} />
                       )}
                     </CardContent>
                   </CardActionArea>
                   {interactive && (
                     <Box p={1} pt={0}>
-                      <Tooltip title="Quitar del watchlist">
-                        <Chip size="small" label="Quitar" onClick={() => removeFromWatch(a.id)} variant="outlined" />
+                      <Tooltip title={tr('auctions.detail.watch.remove')}>
+                        <Chip size="small" label={tr('auctions.watchlist.remove')} onClick={() => removeFromWatch(a.id)} variant="outlined" />
                       </Tooltip>
                     </Box>
                   )}
@@ -199,39 +202,38 @@ export default function AuctionWatchlistPage() {
       <Box display="flex" alignItems="center" gap={1} mb={3}>
         <GavelIcon color="primary" />
         <Typography variant="h5" fontWeight={700}>
-          Mis subastas
+          {tr('auctions.watchlist.title')}
         </Typography>
         {totalActive > 0 && (
-          <Chip icon={<LocalFireDepartmentIcon />} color="error" size="small" label={`${totalActive} activas en juego`} sx={{ ml: 1 }} />
+          <Chip icon={<LocalFireDepartmentIcon />} color="error" size="small" label={tr('auctions.watchlist.activeInPlay', { count: totalActive })} sx={{ ml: 1 }} />
         )}
       </Box>
 
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
-        <Tab icon={<BoltIcon fontSize="small" />} iconPosition="start" label={`⚡ Activas (${totalActive})`} />
-        <Tab icon={<BookmarkIcon fontSize="small" />} iconPosition="start" label={`Seguidas (${watchlist.length})`} />
-        <Tab icon={<EmojiEventsIcon fontSize="small" />} iconPosition="start" label={`Ganadas (${won.length})`} />
+        <Tab icon={<BoltIcon fontSize="small" />} iconPosition="start" label={tr('auctions.watchlist.tabs.active', { count: totalActive })} />
+        <Tab icon={<BookmarkIcon fontSize="small" />} iconPosition="start" label={tr('auctions.watchlist.tabs.followed', { count: watchlist.length })} />
+        <Tab icon={<EmojiEventsIcon fontSize="small" />} iconPosition="start" label={tr('auctions.watchlist.tabs.won', { count: won.length })} />
       </Tabs>
 
       {tab === 0 &&
         renderGrid(
           active,
-          'No estás pujando en ninguna subasta activa. Explora las subastas y participa: la adrenalina de ganar con una buena oferta te espera. ⚡',
+          tr('auctions.watchlist.empty.active'),
           true
         )}
-      {tab === 1 && renderGrid(watchlist, 'No sigues ninguna subasta. Usa el ícono de marcador en una subasta para seguirla.')}
+      {tab === 1 && renderGrid(watchlist, tr('auctions.watchlist.empty.followed'))}
       {tab === 2 && (
         <>
           {won.some((a) => a.orderId && !a.isPaid) && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              ¡Felicidades! Ganaste una o más subastas. <b>Tienes 48 horas para pagar</b> antes de que vuelvan a
-              subasta. Toca "Pagar" en cada tarjeta.
+              {tr('auctions.watchlist.paymentWarning')}
             </Alert>
           )}
           <Grid container spacing={2}>
             {won.length === 0 ? (
               <Grid item xs={12}>
                 <Paper sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography color="text.secondary">Aún no ganaste ninguna subasta.</Typography>
+                  <Typography color="text.secondary">{tr('auctions.watchlist.empty.won')}</Typography>
                 </Paper>
               </Grid>
             ) : (
@@ -247,26 +249,23 @@ export default function AuctionWatchlistPage() {
                           {a.title}
                         </Typography>
                         <Typography color="text.secondary" gutterBottom>
-                          Ganada por{' '}
-                          <b>
-                            {Number(a.currentPrice).toLocaleString('es-BO', { maximumFractionDigits: 0 })} Bs
-                          </b>
+                          {tr('auctions.watchlist.wonFor', { price: Number(a.currentPrice).toLocaleString('es-BO', { maximumFractionDigits: 0 }) })}
                         </Typography>
                         {needsPayment ? (
                           <>
-                            <Chip label="⏳ Pendiente de pago" color="warning" size="small" sx={{ mb: 1 }} />
+                            <Chip label={tr('auctions.watchlist.pendingPayment')} color="warning" size="small" sx={{ mb: 1 }} />
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                              ⏱️ Te quedan <b>{deadlineHours}h</b> para pagar
+                              {tr('auctions.watchlist.timeToPay', { hours: deadlineHours })}
                             </Typography>
                           </>
                         ) : (
-                          <Chip label="Pagada" color="success" size="small" />
+                          <Chip label={tr('auctions.watchlist.paid')} color="success" size="small" />
                         )}
                       </CardContent>
                       {needsPayment && (
                         <CardActions>
                           <PrimaryButton color="warning" fullWidth to={`/cuenta/pedidos/${a.orderId}`}>
-                            Pagar ahora
+                            {tr('auctions.watchlist.payNow')}
                           </PrimaryButton>
                         </CardActions>
                       )}

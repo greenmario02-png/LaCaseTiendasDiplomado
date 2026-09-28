@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Star } from 'lucide-react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Container,
   Grid,
@@ -87,6 +88,7 @@ type SearchMode = 'productos' | 'marcas' | 'vendedores' | 'categorias';
 const MAX_PRICE_BS = 30000;
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
   const money = useMoney();
   const selectedCurrency = useCurrencyStore((s) => s.selected);
   const user = useAuthStore((s) => s.user);
@@ -326,7 +328,7 @@ export default function ProductsPage() {
   const filterContent = (
     <Box p={2} width={{ xs: 300, md: 260 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Filtros</Typography>
+        <Typography variant="h6">{t('product.filters.title')}</Typography>
         <IconButton onClick={() => setDrawerOpen(false)} sx={{ display: { md: 'none' } }}>
           <CloseIcon />
         </IconButton>
@@ -334,7 +336,7 @@ export default function ProductsPage() {
 
       {/* PRECIO */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Precio ({moneyFormat})
+        {t('product.filters.priceWithFormat', { format: moneyFormat })}
       </Typography>
       <Slider
         value={priceRange}
@@ -352,7 +354,7 @@ export default function ProductsPage() {
 
       {/* CATEGORÍAS */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Categorías
+        {t('product.filters.categories')}
       </Typography>
       <Box sx={{ maxHeight: 220, overflow: 'auto', mb: 2 }}>
         <FormGroup>
@@ -393,13 +395,13 @@ export default function ProductsPage() {
 
       {/* CONDICIÓN */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Condición
+        {t('product.filters.condition')}
       </Typography>
       <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
         {[
-          { label: 'Nuevo', value: 'NEW' },
-          { label: 'Usado', value: 'USED' },
-          { label: 'Reacondicionado', value: 'REFURBISHED' },
+          { label: t('product.condition.new'), value: 'NEW' },
+          { label: t('product.condition.used'), value: 'USED' },
+          { label: t('product.condition.refurbished'), value: 'REFURBISHED' },
         ].map((c) => (
           <Chip
             key={c.value}
@@ -414,7 +416,7 @@ export default function ProductsPage() {
 
       {/* DEPARTAMENTO */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Departamento
+        {t('product.filters.department')}
       </Typography>
       <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
         {departments.map((d) => (
@@ -431,13 +433,13 @@ export default function ProductsPage() {
 
       {/* REGIÓN / KILÓMETROS */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Región / Ciudad
+        {t('product.filters.regionCity')}
       </Typography>
       <Box display="flex" gap={0.5} mb={2}>
         <TextField
           size="small"
           fullWidth
-          placeholder="Ciudad (ej: La Paz, Tarija...)"
+          placeholder={t('product.filters.cityPlaceholder')}
           value={filters.location ?? ''}
           onChange={(e) => setFilter('location', e.target.value || undefined, true)}
         />
@@ -445,7 +447,7 @@ export default function ProductsPage() {
 
       {/* TIPO DE ENTREGA */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Tipo de entrega
+        {t('product.filters.deliveryType')}
       </Typography>
       <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
         {deliveryTypes.map((dt) => (
@@ -462,7 +464,7 @@ export default function ProductsPage() {
 
       {/* MARCA */}
       <Typography variant="subtitle2" fontWeight={700} mb={1}>
-        Marca
+        {t('product.filters.brand')}
       </Typography>
       <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
         {brands.slice(0, 20).map((b) => (
@@ -480,17 +482,17 @@ export default function ProductsPage() {
       {/* PERMUTA */}
       <FormControlLabel
         control={<Checkbox size="small" checked={filters.acceptsTrade ?? false} onChange={(e) => setFilter('acceptsTrade', e.target.checked)} />}
-        label={<Typography variant="body2">Acepta permuta</Typography>}
+        label={<Typography variant="body2">{t('product.filters.acceptsTrade')}</Typography>}
       />
 
       <Box mt={2} display="flex" gap={1}>
         <Button variant="contained" fullWidth onClick={applyPrice}>
-          Aplicar filtros
+          {t('product.filters.apply')}
         </Button>
       </Box>
       {activeFilterCount > 0 && (
         <Button variant="text" fullWidth sx={{ mt: 1 }} onClick={clearAll}>
-          Limpiar filtros ({activeFilterCount})
+          {t('product.filters.clear', { count: activeFilterCount })}
         </Button>
       )}
     </Box>
@@ -503,10 +505,10 @@ export default function ProductsPage() {
       {/* ===== BUSCADOR SUPERIOR ===== */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Tabs value={searchMode} onChange={(_, v) => { setSearchMode(v); setSellerResults([]); }} sx={{ mb: 1 }}>
-          <Tab value="productos" label="Productos" />
-          <Tab value="marcas" label="Marcas" />
-          <Tab value="vendedores" label="Vendedores" />
-          <Tab value="categorias" label="Categorías" />
+          <Tab value="productos" label={t('product.search.tabs.products')} />
+          <Tab value="marcas" label={t('product.search.tabs.brands')} />
+          <Tab value="vendedores" label={t('product.search.tabs.sellers')} />
+          <Tab value="categorias" label={t('product.search.tabs.categories')} />
         </Tabs>
         <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
           <TextField
@@ -515,10 +517,10 @@ export default function ProductsPage() {
             value={quickTerm}
             placeholder={
               searchMode === 'productos'
-                ? 'Buscar productos... (ej: RTX, celular, juego)'
+                ? t('product.search.placeholders.products')
                 : searchMode === 'marcas'
-                ? 'Buscar marca... (ej: Samsung, Sony, Logitech)'
-                : 'Buscar vendedor o ciudad... (ej: La Paz, "Tech Store")'
+                ? t('product.search.placeholders.brands')
+                : t('product.search.placeholders.sellers')
             }
             onChange={(e) => {
               setQuickTerm(e.target.value);
@@ -542,7 +544,7 @@ export default function ProductsPage() {
           />
           {searchMode !== 'vendedores' && (
             <Button variant="contained" onClick={() => handleQuickSearch(quickTerm)}>
-              Buscar
+              {t('product.search.searchButton')}
             </Button>
           )}
         </Box>
@@ -560,7 +562,7 @@ export default function ProductsPage() {
                     </Avatar>
                     <ListItemText
                       primary={s.storeName}
-                      secondary={`${s.locationCity}, ${s.locationState}${s.storeCategory ? ' · ' + s.storeCategory : ''} · ⭐ ${s.rating}`}
+                      secondary={t('product.search.sellerSecondary', { city: s.locationCity, state: s.locationState, category: s.storeCategory ? ' · ' + s.storeCategory : '', rating: s.rating })}
                       primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
                     />
                   </ListItemButton>
@@ -569,7 +571,7 @@ export default function ProductsPage() {
             )}
             {!searchingSellers && sellerResults.length === 0 && quickTerm.length >= 2 && (
               <Typography variant="caption" color="text.secondary">
-                Sin vendedores que coincidan con "{quickTerm}"
+                {t('product.search.noSellersMatch', { term: quickTerm })}
               </Typography>
             )}
           </Box>
@@ -579,7 +581,7 @@ export default function ProductsPage() {
         {searchMode === 'categorias' && (
           <Box mt={1}>
             <Typography variant="body2" fontWeight={600} mb={1}>
-              Explora por categoría o subcategoría:
+              {t('product.search.exploreByCategory')}
             </Typography>
             <Box display="flex" flexDirection="column" gap={0.5}>
               {categories.map((cat) => (
@@ -616,10 +618,10 @@ export default function ProductsPage() {
         <Paper sx={{ p: 1, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
           <StorefrontIcon color="primary" />
           <Typography variant="body2" fontWeight={600}>
-            Tienda seleccionada:
+            {t('product.search.selectedStore')}
           </Typography>
           <Button size="small" onClick={() => { const p = new URLSearchParams(searchParams); p.delete('sellerId'); setSearchParams(p); }}>
-            Quitar filtro de tienda
+            {t('product.search.removeStoreFilter')}
           </Button>
         </Paper>
       )}
@@ -627,10 +629,10 @@ export default function ProductsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Box>
           <Typography variant="h5" fontWeight={700}>
-            {filters.search ? `Resultados para "${filters.search}"` : 'Todos los productos'}
+            {filters.search ? t('product.list.resultsFor', { term: filters.search }) : t('product.list.allProducts')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {total} productos de todas las tiendas
+            {t('product.list.totalFromAllStores', { count: total })}
           </Typography>
         </Box>
         <Box display="flex" alignItems="center" gap={1}>
@@ -644,10 +646,10 @@ export default function ProductsPage() {
             onChange={(e) => setFilter('sort', e.target.value || undefined)}
             style={{ padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
           >
-            <option value="">Más recientes</option>
-            <option value="price_asc">Menor precio</option>
-            <option value="price_desc">Mayor precio</option>
-            <option value="best_sellers">Más vendidos</option>
+            <option value="">{t('product.list.sort.newest')}</option>
+            <option value="price_asc">{t('product.list.sort.priceAsc')}</option>
+            <option value="price_desc">{t('product.list.sort.priceDesc')}</option>
+            <option value="best_sellers">{t('product.list.sort.bestSellers')}</option>
           </select>
         </Box>
       </Box>
@@ -662,14 +664,14 @@ export default function ProductsPage() {
           {loading ? (
             <ProductGridSkeleton count={12} />
           ) : products.length === 0 ? (
-            <EmptyState message="No se encontraron productos con esos filtros" />
+            <EmptyState message={t('product.list.emptyFiltered')} />
           ) : (
             <InfiniteScrollGrid
               hasMore={hasMore}
               loading={loadingMore}
               fetchNext={loadMore}
               total={total}
-              emptyMessage="No se encontraron productos con esos filtros"
+              emptyMessage={t('product.list.emptyFiltered')}
             >
               <Grid container spacing={2}>
                 {products.map((p) => (

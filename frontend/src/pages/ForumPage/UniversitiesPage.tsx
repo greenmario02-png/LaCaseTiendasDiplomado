@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Alert } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { listUniversities } from '../../services/forum.api';
 import type { University } from '../../services/forum.api';
 import { useUnifiedTokens } from '../../theme';
 import { useForumStore } from '../../stores/forumStore';
 
 export function UniversitiesPage() {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const navigate = useNavigate();
   const { setCategory } = useForumStore();
@@ -31,11 +33,10 @@ export function UniversitiesPage() {
   return (
     <Box>
       <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <SchoolIcon sx={{ fontSize: 20, color: tokens.primary }} /> Universidades
+        <SchoolIcon sx={{ fontSize: 20, color: tokens.primary }} /> {t('forum.universities.title')}
       </Typography>
       <Alert severity="info" sx={{ mb: 2, fontSize: '0.85rem' }}>
-        Cada subforo es exclusivo de la comunidad universitaria de su ciudad — solo lo ven quienes
-        estén en esa ciudad, o ya tengan actividad previa ahí.
+        {t('forum.universities.description')}
       </Alert>
 
       {Object.entries(grouped).map(([dept, unis]) => (
@@ -57,7 +58,7 @@ export function UniversitiesPage() {
                       disabled={!slug}
                       onClick={() => { if (slug) { setCategory(slug); navigate('/foro'); } }}
                     >
-                      Entrar al subforo
+                      {t('forum.universities.enterSubforum')}
                     </Button>
                   </CardContent>
                 </Card>

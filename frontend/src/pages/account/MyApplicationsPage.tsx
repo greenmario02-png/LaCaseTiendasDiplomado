@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Chip, Container, Typography } from '@mui/material';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -17,13 +18,22 @@ import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerLi
 
 type AppStatus = 'RECEIVED' | 'VIEWED' | 'SHORTLISTED' | 'REJECTED' | 'HIRED' | 'WITHDRAWN';
 
-const STATUS: Record<AppStatus, { label: string; color: 'default' | 'info' | 'success' | 'error' }> = {
-  RECEIVED: { label: 'Recibida', color: 'default' },
-  VIEWED: { label: 'Vista por la tienda', color: 'info' },
-  SHORTLISTED: { label: 'Preseleccionado/a', color: 'info' },
-  REJECTED: { label: 'No seleccionado/a', color: 'error' },
-  HIRED: { label: '¡Contratado/a!', color: 'success' },
-  WITHDRAWN: { label: 'Retirada', color: 'default' },
+const STATUS_COLOR: Record<AppStatus, 'default' | 'info' | 'success' | 'error'> = {
+  RECEIVED: 'default',
+  VIEWED: 'info',
+  SHORTLISTED: 'info',
+  REJECTED: 'error',
+  HIRED: 'success',
+  WITHDRAWN: 'default',
+};
+
+const STATUS_KEY: Record<AppStatus, string> = {
+  RECEIVED: 'account.applications.statusReceived',
+  VIEWED: 'account.applications.statusViewed',
+  SHORTLISTED: 'account.applications.statusShortlisted',
+  REJECTED: 'account.applications.statusRejected',
+  HIRED: 'account.applications.statusHired',
+  WITHDRAWN: 'account.applications.statusWithdrawn',
 };
 
 const CLOSED: AppStatus[] = ['HIRED', 'REJECTED', 'WITHDRAWN'];
@@ -50,6 +60,7 @@ interface Application {
 }
 
 export default function MyApplicationsPage() {
+  const { t: tr } = useTranslation();
   const t = useUnifiedTokens();
   const salaryLabel = useSalaryLabel();
   const [items, setItems] = useState<Application[]>([]);
@@ -73,12 +84,12 @@ export default function MyApplicationsPage() {
   }, [load]);
 
   const withdraw = async (a: Application) => {
-    if (!window.confirm(`¿Quieres retirar tu postulación a "${a.job.title}"?`)) return;
+    if (!window.confirm(tr('account.applications.withdrawConfirm', { title: a.job.title }))) return;
     setBusyId(a.id);
     try {
       await api.delete(`/jobs/${a.jobId}/apply`);
       setItems((prev) => prev.map((x) => (x.id === a.id ? { ...x, status: 'WITHDRAWN' } : x)));
-      toast.success('Postulación retirada');
+      toast.success(tr('account.applications.withdrawSuccess'));
     } catch (e) {
       toast.error(getErrorMessage(e));
     } finally {
@@ -100,7 +111,7 @@ export default function MyApplicationsPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      <PageHeader title="Mis postulaciones" subtitle="Sigue el estado de tus postulaciones a empleos" icon={<AssignmentIndIcon />} />
+      <PageHeader title={tr('account.applications.title')} subtitle={tr('account.applications.subtitle')} icon={<AssignmentIndIcon />} />
 
       {loading ? (
         <LoadingState />
@@ -108,14 +119,15 @@ export default function MyApplicationsPage() {
         <ErrorState message={error} onRetry={load} />
       ) : items.length === 0 ? (
         <EmptyState
-          message="Todavía no te postulaste a ningún empleo."
-          action={<PrimaryButton type="button" to="/empleos">Ver empleos</PrimaryButton>}
+          message={tr('account.applications.emptyMessage')}
+          action={<PrimaryButton type="button" to="/empleos">{tr('account.applications.viewJobs')}</PrimaryButton>}
         />
       ) : (
         <StaggerContainer>
           <Box display="flex" flexDirection="column" gap={2}>
             {items.map((a) => {
-              const st = STATUS[a.status] ?? STATUS.RECEIVED;
+              const statusColor = STATUS_COLOR[a.status] ?? STATUS_COLOR.RECEIVED;
+              const statusLabel = tr(STATUS_KEY[a.status] ?? STATUS_KEY.RECEIVED);
               const closed = jobClosed(a.job);
               return (
                 <StaggerItem key={a.id}>
@@ -123,7 +135,7 @@ export default function MyApplicationsPage() {
                     <SurfaceCard sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                       <Box display="flex" justifyContent="space-between" alignItems="flex-start" gap={1} flexWrap="wrap">
                         <Typography variant="h6" fontWeight={800} color={t.onSurface}>{a.job.title}</Typography>
-                        <Chip size="small" label={st.label} color={st.color} variant={st.color === 'default' ? 'outlined' : 'filled'} />
+                        <Chip size="small" label={statusLabel} color={statusColor} variant={statusColor === 'default' ? 'outlined' : 'filled'} />
                       </Box>
                       <Box display="flex" alignItems="center" gap={0.5} color={t.onSurfaceVariant} flexWrap="wrap">
                         <StorefrontIcon fontSize="small" />
@@ -138,37 +150,37 @@ export default function MyApplicationsPage() {
                       </Box>
                       <Typography fontWeight={800} color={t.primary}>{salaryLabel(a.job as unknown as Job)}</Typography>
                       <Typography variant="caption" color={t.onSurfaceVariant}>
-                        Te postulaste el {new Date(a.createdAt).toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        {tr('account.applications.appliedOn', { date: new Date(a.createdAt).toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' }) })}
                       </Typography>
                       {a.hasCv && (
                         <Typography variant="body2" color={t.onSurfaceVariant}>
-                          CV adjunto{a.cvName ? `: ${a.cvName}` : ''}
+                          {a.cvName ? tr('account.applications.cvAttachedWithName', { name: a.cvName }) : tr('account.applications.cvAttached')}
                         </Typography>
                       )}
                       {a.storeNote && (
                         <Box sx={{ p: 1.5, borderRadius: '8px', bgcolor: `${t.primary}14` }}>
-                          <Typography variant="caption" fontWeight={700} color={t.onSurfaceVariant}>Mensaje de la tienda</Typography>
+                          <Typography variant="caption" fontWeight={700} color={t.onSurfaceVariant}>{tr('account.applications.storeMessage')}</Typography>
                           <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{a.storeNote}</Typography>
                         </Box>
                       )}
                       {closed && (
                         <Box display="flex" alignItems="center" gap={0.5} color="warning.main">
                           <WarningAmberIcon fontSize="small" />
-                          <Typography variant="body2">Este empleo ya venció o se cerró.</Typography>
+                          <Typography variant="body2">{tr('account.applications.closedNotice')}</Typography>
                         </Box>
                       )}
                       <Box display="flex" gap={1} justifyContent="flex-end" flexWrap="wrap" mt={0.5}>
                         {a.hasCv && (
                           <GhostButton type="button" onClick={() => void downloadCv(a)}>
-                            Descargar CV
+                            {tr('account.applications.downloadCv')}
                           </GhostButton>
                         )}
                         {!CLOSED.includes(a.status) && (
                           <GhostButton type="button" color="error" disabled={busyId === a.id} onClick={() => withdraw(a)}>
-                            Retirar
+                            {tr('account.applications.withdraw')}
                           </GhostButton>
                         )}
-                        <GhostButton type="button" to="/empleos">Ver empleo</GhostButton>
+                        <GhostButton type="button" to="/empleos">{tr('account.applications.viewJob')}</GhostButton>
                       </Box>
                     </SurfaceCard>
                   </FadeIn>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Home, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useForumStore } from '../../stores/forumStore';
 import { listCities } from '../../services/forum.api';
 import NewPostModal from '../../components/forum/NewPostModal';
@@ -11,14 +12,15 @@ import { PrimaryButton, SecondaryButton } from '../../components/redesign/Button
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 import { useForumPalette } from '../../theme/forumTheme';
 
-const MODES = [
-  { key: 'RECIENTE', label: 'Reciente' },
-  { key: 'POPULAR', label: 'Popular' },
-  { key: 'SIN_RESPUESTA', label: 'Sin respuesta' },
-  { key: 'MI_CIUDAD', label: 'Mi ciudad' },
+const MODE_KEYS = [
+  { key: 'RECIENTE', labelKey: 'forum.feed.modeRecent' },
+  { key: 'POPULAR', labelKey: 'forum.feed.modePopular' },
+  { key: 'SIN_RESPUESTA', labelKey: 'forum.feed.modeUnanswered' },
+  { key: 'MI_CIUDAD', labelKey: 'forum.feed.modeMyCity' },
 ];
 
 export function ForumFeedPage() {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { posts, loading, error, activeMode, activeCategory, geo, fetchPosts, loadMorePosts, setMode, setCategory, votePost } =
     useForumStore();
@@ -49,28 +51,30 @@ export function ForumFeedPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo?.cityId, geo?.city]);
 
+  const modes = MODE_KEYS.map((m) => ({ key: m.key, label: t(m.labelKey) }));
+
   return (
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, flexWrap: 'wrap', gap: 1 }}>
         <Typography variant="h6" fontWeight={800} sx={{ color: forumPalette.textPrimary, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Home size={22} strokeWidth={2.4} color={forumPalette.accent} />
-          LaCASE — ¿alguien sabe?
+          {t('forum.feed.headerTitle')}
         </Typography>
         <PrimaryButton startIcon={<AddIcon />} onClick={() => setOpenNew(true)}>
-          Hacer una pregunta
+          {t('forum.feed.askQuestion')}
         </PrimaryButton>
       </Box>
 
       {/* Filtro de modo */}
-      <FilterBar options={MODES} active={activeMode} onChange={(v) => setMode(v)} />
+      <FilterBar options={modes} active={activeMode} onChange={(v) => setMode(v)} />
 
       {/* Subforos (etiquetas) de la ciudad activa */}
       {geo?.city && cityCategories.length > 0 && (
         <Box sx={{ mb: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
             <Typography variant="caption" sx={{ color: forumPalette.textMuted, fontWeight: 700 }}>
-              Subforos de {geo.city}:
+              {t('forum.feed.citySubforums', { city: geo.city })}
             </Typography>
             {cityCategories.map(({ category }) => {
               const active = activeCategory === category.slug;
@@ -94,7 +98,7 @@ export function ForumFeedPage() {
               <Chip
                 size="small"
                 icon={<X size={13} strokeWidth={2.4} />}
-                label="Ver todo"
+                label={t('forum.feed.viewAll')}
                 clickable
                 onClick={() => setCategory('')}
                 sx={{ color: forumPalette.accent, fontWeight: 600 }}
@@ -112,7 +116,7 @@ export function ForumFeedPage() {
       ) : error ? (
         <EmptyState message={error} />
       ) : posts.length === 0 ? (
-        <EmptyState message="No hay preguntas aún. ¡Sé el primero en preguntar!" />
+        <EmptyState message={t('forum.feed.emptyPosts')} />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {posts.map((post) => (
@@ -125,10 +129,10 @@ export function ForumFeedPage() {
                 city: post.city,
                 category: {
                   icon: post.category?.icon ?? '💬',
-                  name: post.category?.name ?? 'General',
+                  name: post.category?.name ?? t('forum.feed.defaultCategory'),
                   color: post.category?.color ?? '#FF6B35',
                 },
-                author: { forumUsername: post.author?.forumUsername ?? 'usuario' },
+                author: { forumUsername: post.author?.forumUsername ?? t('forum.feed.defaultUsername') },
                 status: (post.status as 'OPEN' | 'RESOLVED' | 'CLOSED') ?? 'OPEN',
                 replyCount: post.replyCount,
                 positives: post.score ?? 0,
@@ -149,7 +153,7 @@ export function ForumFeedPage() {
       {posts.length > 0 && (
         <Box sx={{ textAlign: 'center', py: 2 }}>
           <SecondaryButton onClick={loadMorePosts} disabled={loading}>
-            {loading ? 'Cargando...' : 'Cargar más'}
+            {loading ? t('forum.feed.loading') : t('forum.feed.loadMore')}
           </SecondaryButton>
         </Box>
       )}

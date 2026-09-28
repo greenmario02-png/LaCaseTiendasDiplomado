@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Link } from 'react-router-dom';
 import {
   Container,
@@ -46,27 +48,27 @@ interface Auction {
   buyNowPrice?: string | null;
 }
 
-function formatTimeLeft(ms: number): string {
-  if (ms <= 0) return 'Terminada';
+function formatTimeLeft(ms: number, tr: TFunction): string {
+  if (ms <= 0) return tr('auctions.time.ended');
   const totalSec = Math.floor(ms / 1000);
   const d = Math.floor(totalSec / 86400);
   const h = Math.floor((totalSec % 86400) / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h ${m}m`;
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (d > 0) return tr('auctions.time.dhm', { d, h, m });
+  if (h > 0) return tr('auctions.time.hm', { h, m });
+  return tr('auctions.time.m', { m });
 }
 
-const SORTS = [
-  { value: 'interest', label: 'Para ti (interés + ofertas)' },
-  { value: 'price_asc', label: 'Precio más bajo' },
-  { value: 'price_desc', label: 'Precio más alto' },
-  { value: 'ending_soon', label: 'Terminan pronto' },
-  { value: 'most_bids', label: 'Más pujas' },
-  { value: 'newest', label: '🆕 Más recientes' },
-];
-
 export default function AuctionsPage() {
+  const { t: tr } = useTranslation();
+  const SORTS = [
+    { value: 'interest', label: tr('auctions.sorts.interest') },
+    { value: 'price_asc', label: tr('auctions.sorts.priceAsc') },
+    { value: 'price_desc', label: tr('auctions.sorts.priceDesc') },
+    { value: 'ending_soon', label: tr('auctions.sorts.endingSoon') },
+    { value: 'most_bids', label: tr('auctions.sorts.mostBids') },
+    { value: 'newest', label: tr('auctions.sorts.newest') },
+  ];
   const money = useMoney();
   const t = useUnifiedTokens();
   const [auctions, setAuctions] = useState<Auction[]>([]);
@@ -106,14 +108,14 @@ export default function AuctionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <PageHeader title="Subastas" subtitle="Puja por productos únicos y llévate las mejores ofertas" icon={<GavelIcon />} />
+      <PageHeader title={tr('auctions.title')} subtitle={tr('auctions.subtitle')} icon={<GavelIcon />} />
 
       {/* Buscador y filtros */}
       <SurfaceCard sx={{ p: 2, mb: 3 }}>
         <Stack spacing={2}>
           <TextField
             fullWidth
-            placeholder="Buscar subastas... (ej: Game Boy, collar, ryzen)"
+            placeholder={tr('auctions.search.placeholder')}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
@@ -121,9 +123,9 @@ export default function AuctionsPage() {
           />
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
             <FormControl size="small" sx={{ minWidth: 220 }}>
-              <InputLabel>Categoría</InputLabel>
-              <Select value={categoryId} label="Categoría" onChange={(e) => { setCategoryId(e.target.value); setPage(1); }}>
-                <MenuItem value="">Todas</MenuItem>
+              <InputLabel>{tr('auctions.filters.category')}</InputLabel>
+              <Select value={categoryId} label={tr('auctions.filters.category')} onChange={(e) => { setCategoryId(e.target.value); setPage(1); }}>
+                <MenuItem value="">{tr('auctions.filters.categoryAll')}</MenuItem>
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={String(c.id)}>
                     {c.name}
@@ -132,8 +134,8 @@ export default function AuctionsPage() {
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ minWidth: 260 }}>
-              <InputLabel>Ordenar</InputLabel>
-              <Select value={sort} label="Ordenar" onChange={(e) => { setSort(e.target.value); setPage(1); }}>
+              <InputLabel>{tr('auctions.filters.sort')}</InputLabel>
+              <Select value={sort} label={tr('auctions.filters.sort')} onChange={(e) => { setSort(e.target.value); setPage(1); }}>
                 {SORTS.map((s) => (
                   <MenuItem key={s.value} value={s.value}>
                     {s.label}
@@ -143,7 +145,7 @@ export default function AuctionsPage() {
             </FormControl>
             <FormControlLabel
               control={<Checkbox checked={hasBids} onChange={(e) => { setHasBids(e.target.checked); setPage(1); }} />}
-              label="Con ofertas"
+              label={tr('auctions.filters.hasBids')}
             />
           </Stack>
         </Stack>
@@ -153,7 +155,7 @@ export default function AuctionsPage() {
         <Box display="flex" alignItems="center" gap={1} mb={2}>
           <WhatshotIcon sx={{ color: t.error }} />
           <Typography variant="body2" color={t.onSurfaceVariant}>
-            Ordenadas según tu interés y las mejores ofertas (precios más bajos y activas primero).
+            {tr('auctions.interestNote')}
           </Typography>
         </Box>
       )}
@@ -162,7 +164,7 @@ export default function AuctionsPage() {
         <ProductGridSkeleton count={8} />
       ) : auctions.length === 0 ? (
         <SurfaceCard>
-          <EmptyState message={`No se encontraron subastas${search ? ` para "${search}"` : ''}. Prueba con otros términos o quita los filtros.`} />
+          <EmptyState message={search ? tr('auctions.emptyWithSearch', { search }) : tr('auctions.empty')} />
         </SurfaceCard>
       ) : (
         <>
@@ -190,7 +192,7 @@ export default function AuctionsPage() {
                     {isHot && (
                       <Chip
                         icon={<WhatshotIcon />}
-                        label="Últimas horas"
+                        label={tr('auctions.badges.lastHours')}
                         size="small"
                         color="error"
                         sx={{ position: 'absolute', top: 8, left: 8, zIndex: 2 }}
@@ -199,7 +201,7 @@ export default function AuctionsPage() {
                     {hasBuyNow && (
                       <Chip
                         icon={<LocalOfferIcon />}
-                        label="Comprar ya"
+                        label={tr('auctions.badges.buyNow')}
                         size="small"
                         color="primary"
                         sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}
@@ -242,14 +244,14 @@ export default function AuctionsPage() {
                           <Typography fontWeight={800} color={t.primary}>
                             {money(Number(a.currentPrice))}
                           </Typography>
-                          <Chip label={`${a.bidsCount} pujas`} size="small" variant="outlined" />
+                          <Chip label={tr('auctions.card.bids', { count: a.bidsCount })} size="small" variant="outlined" />
                         </Box>
                         <Box display="flex" justifyContent="space-between" mt={1}>
                           <Typography variant="caption" color={t.onSurfaceVariant}>
                             {a.seller?.storeName}
                           </Typography>
                           <Typography variant="caption" color={isHot ? t.error : t.onSurfaceVariant} fontWeight={600}>
-                            ⏱ {formatTimeLeft(a.timeLeftMs)}
+                            ⏱ {formatTimeLeft(a.timeLeftMs, tr)}
                           </Typography>
                         </Box>
                       </CardContent>

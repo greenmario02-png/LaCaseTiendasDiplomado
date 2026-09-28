@@ -32,6 +32,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_COLOR: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
   PENDING: 'warning',
@@ -40,14 +41,14 @@ const STATUS_COLOR: Record<string, 'default' | 'warning' | 'info' | 'success' | 
   REJECTED: 'error',
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: 'Pendiente',
-  APPROVED: 'Aprobado',
-  PAID: 'Pagado',
-  REJECTED: 'Rechazado',
-};
-
 export default function SellerPayouts() {
+  const { t } = useTranslation();
+  const STATUS_LABEL: Record<string, string> = {
+    PENDING: t('seller.payouts.status.pending'),
+    APPROVED: t('seller.payouts.status.approved'),
+    PAID: t('seller.payouts.status.paid'),
+    REJECTED: t('seller.payouts.status.rejected'),
+  };
   const money = useMoney();
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -84,7 +85,7 @@ export default function SellerPayouts() {
     setSavingAccount(true);
     try {
       await api.put('/seller/payouts/account', account);
-      toast.success('Cuenta de cobro guardada');
+      toast.success(t('seller.payouts.accountSaved'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -97,7 +98,7 @@ export default function SellerPayouts() {
     setRequesting(true);
     try {
       await api.post('/seller/payouts/request', { amount: Number(amount), note });
-      toast.success('Retiro solicitado. El administrador lo revisará.');
+      toast.success(t('seller.payouts.requestSubmitted'));
       setOpen(false);
       setAmount('');
       setNote('');
@@ -116,13 +117,14 @@ export default function SellerPayouts() {
       <Box display="flex" alignItems="center" gap={1} mb={3}>
         <PaymentsIcon color="primary" />
         <Typography variant="h5" fontWeight={700}>
-          Mis pagos
+          {t('seller.payouts.title')}
         </Typography>
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        🔒 El dinero de tus ventas queda <strong>retenido (escrow)</strong> hasta que el comprador recibe el producto y
-        el pago se verifica. Después de la entrega, el saldo se libera y puedes retirarlo a tu cuenta BNB, banco o QR.
+        🔒 {t('seller.payouts.escrowInfoBefore')}
+        <strong>{t('seller.payouts.escrowInfoStrong')}</strong>
+        {t('seller.payouts.escrowInfoAfter')}
       </Alert>
 
       {/* Balance */}
@@ -133,7 +135,7 @@ export default function SellerPayouts() {
               <Box display="flex" alignItems="center" gap={1} color="success.main">
                 <SavingsIcon />
                 <Typography variant="body2" color="text.secondary">
-                  Balance disponible
+                  {t('seller.payouts.balanceAvailable')}
                 </Typography>
               </Box>
               <Typography variant="h5" fontWeight={700} className="price-color" mt={0.5}>
@@ -141,7 +143,7 @@ export default function SellerPayouts() {
               </Typography>
               <Box sx={{ mt: 1 }}>
                 <PrimaryButton size="small" disabled={!summary?.available} onClick={() => setOpen(true)}>
-                  Retirar
+                  {t('seller.payouts.withdraw')}
                 </PrimaryButton>
               </Box>
             </CardContent>
@@ -153,14 +155,14 @@ export default function SellerPayouts() {
               <Box display="flex" alignItems="center" gap={1} color="info.main">
                 <AccountBalanceWalletIcon />
                 <Typography variant="body2" color="text.secondary">
-                  Escrow liberado
+                  {t('seller.payouts.escrowReleased')}
                 </Typography>
               </Box>
               <Typography variant="h5" fontWeight={700} mt={0.5}>
                 {money(summary?.liberated ?? 0)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Ventas entregadas y pagadas
+                {t('seller.payouts.deliveredAndPaid')}
               </Typography>
             </CardContent>
           </Card>
@@ -171,14 +173,14 @@ export default function SellerPayouts() {
               <Box display="flex" alignItems="center" gap={1} color="warning.main">
                 <QrCodeIcon />
                 <Typography variant="body2" color="text.secondary">
-                  En proceso
+                  {t('seller.payouts.inProgress')}
                 </Typography>
               </Box>
               <Typography variant="h5" fontWeight={700} mt={0.5}>
                 {money(summary?.pending ?? 0)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Retiros pendientes/aprobados
+                {t('seller.payouts.pendingApprovedWithdrawals')}
               </Typography>
             </CardContent>
           </Card>
@@ -188,22 +190,28 @@ export default function SellerPayouts() {
       {/* Cuenta de cobro */}
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={2}>
-          Cuenta de cobro
+          {t('seller.payouts.accountSection.title')}
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} md={3}>
-            <TextField select label="Método" value={account.method} onChange={(e) => setAccount({ ...account, method: e.target.value })} fullWidth>
-              <MenuItem value="BNB">BNB (Billetera móvil)</MenuItem>
-              <MenuItem value="BANK">Transferencia bancaria</MenuItem>
-              <MenuItem value="QR">QR / Alias</MenuItem>
+            <TextField select label={t('seller.payouts.accountSection.methodLabel')} value={account.method} onChange={(e) => setAccount({ ...account, method: e.target.value })} fullWidth>
+              <MenuItem value="BNB">{t('seller.payouts.accountSection.methodBnb')}</MenuItem>
+              <MenuItem value="BANK">{t('seller.payouts.accountSection.methodBank')}</MenuItem>
+              <MenuItem value="QR">{t('seller.payouts.accountSection.methodQr')}</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12} md={3}>
-            <TextField label="Titular" value={account.accountHolder} onChange={(e) => setAccount({ ...account, accountHolder: e.target.value })} fullWidth />
+            <TextField label={t('seller.payouts.accountSection.holderLabel')} value={account.accountHolder} onChange={(e) => setAccount({ ...account, accountHolder: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12} md={3}>
             <TextField
-              label={account.method === 'BNB' ? 'Número de celular BNB' : account.method === 'BANK' ? 'Número de cuenta' : 'Alias / QR'}
+              label={
+                account.method === 'BNB'
+                  ? t('seller.payouts.accountSection.numberLabelBnb')
+                  : account.method === 'BANK'
+                    ? t('seller.payouts.accountSection.numberLabelBank')
+                    : t('seller.payouts.accountSection.numberLabelQr')
+              }
               value={account.accountNumber}
               onChange={(e) => setAccount({ ...account, accountNumber: e.target.value })}
               fullWidth
@@ -211,18 +219,18 @@ export default function SellerPayouts() {
           </Grid>
           {account.method === 'BANK' && (
             <Grid item xs={12} md={3}>
-              <TextField label="Banco" value={account.bankName} onChange={(e) => setAccount({ ...account, bankName: e.target.value })} fullWidth />
+              <TextField label={t('seller.payouts.accountSection.bankLabel')} value={account.bankName} onChange={(e) => setAccount({ ...account, bankName: e.target.value })} fullWidth />
             </Grid>
           )}
           {account.method === 'BNB' && (
             <Grid item xs={12} md={3}>
-              <TextField label="Cédula de identidad" value={account.phoneQr} onChange={(e) => setAccount({ ...account, phoneQr: e.target.value })} fullWidth />
+              <TextField label={t('seller.payouts.accountSection.idLabel')} value={account.phoneQr} onChange={(e) => setAccount({ ...account, phoneQr: e.target.value })} fullWidth />
             </Grid>
           )}
         </Grid>
         <Box sx={{ mt: 2 }}>
           <SecondaryButton onClick={saveAccount} disabled={savingAccount}>
-            {savingAccount ? <CircularProgress size={18} /> : 'Guardar cuenta'}
+            {savingAccount ? <CircularProgress size={18} /> : t('seller.payouts.accountSection.saveButton')}
           </SecondaryButton>
         </Box>
       </Paper>
@@ -230,20 +238,20 @@ export default function SellerPayouts() {
       {/* Historial */}
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={2}>
-          Historial de retiros
+          {t('seller.payouts.history.title')}
         </Typography>
         {!summary?.payouts?.length ? (
-          <Typography color="text.secondary">Aún no solicitaste retiros.</Typography>
+          <Typography color="text.secondary">{t('seller.payouts.history.empty')}</Typography>
         ) : (
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ bgcolor: 'action.hover' }}>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Monto</TableCell>
-                  <TableCell>Método</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell>Nota</TableCell>
+                  <TableCell>{t('seller.payouts.history.columnDate')}</TableCell>
+                  <TableCell>{t('seller.payouts.history.columnAmount')}</TableCell>
+                  <TableCell>{t('seller.payouts.history.columnMethod')}</TableCell>
+                  <TableCell>{t('seller.payouts.history.columnStatus')}</TableCell>
+                  <TableCell>{t('seller.payouts.history.columnNote')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -266,18 +274,18 @@ export default function SellerPayouts() {
 
       {/* Dialog de retiro */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Solicitar retiro</DialogTitle>
+        <DialogTitle>{t('seller.payouts.requestDialog.title')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Balance disponible: <strong>{money(summary?.available ?? 0)}</strong>
+            {t('seller.payouts.requestDialog.availableBalance')} <strong>{money(summary?.available ?? 0)}</strong>
           </Typography>
-          <TextField label="Monto a retirar (Bs)" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} fullWidth autoFocus />
-          <TextField label="Nota (opcional)" value={note} onChange={(e) => setNote(e.target.value)} fullWidth multiline rows={2} sx={{ mt: 2 }} />
+          <TextField label={t('seller.payouts.requestDialog.amountLabel')} type="number" value={amount} onChange={(e) => setAmount(e.target.value)} fullWidth autoFocus />
+          <TextField label={t('seller.payouts.requestDialog.noteLabel')} value={note} onChange={(e) => setNote(e.target.value)} fullWidth multiline rows={2} sx={{ mt: 2 }} />
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setOpen(false)}>{t('seller.payouts.requestDialog.cancel')}</GhostButton>
           <PrimaryButton onClick={requestPayout} disabled={requesting || !amount || Number(amount) <= 0}>
-            {requesting ? <CircularProgress size={18} /> : 'Solicitar'}
+            {requesting ? <CircularProgress size={18} /> : t('seller.payouts.requestDialog.submit')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

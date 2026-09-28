@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin, BadgeCheck } from 'lucide-react';
 import { Box, Typography, Paper, TextField, Grid, Alert, CircularProgress, MenuItem, Chip, Avatar, IconButton } from '@mui/material';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
@@ -13,6 +14,7 @@ import LocationPicker, { LocationPoint } from '../../components/ui/LocationPicke
 import toast from 'react-hot-toast';
 
 export default function SellerSettings() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -42,14 +44,14 @@ export default function SellerSettings() {
   const [verif, setVerif] = useState({ isVerified: false, isVerificationRequested: false, nit: '', note: '', sending: false });
   const requestVerification = async () => {
     if (!verif.nit.trim()) {
-      toast.error('El NIT es obligatorio para solicitar la verificación');
+      toast.error(t('seller.settings.errors.nitRequired'));
       return;
     }
     setVerif((v) => ({ ...v, sending: true }));
     try {
       const { data } = await api.post('/seller/verification/request', { nit: verif.nit, note: verif.note });
       setVerif((v) => ({ ...v, isVerificationRequested: true, sending: false }));
-      toast.success(data.data.message || 'Solicitud enviada');
+      toast.success(data.data.message || t('seller.settings.toasts.requestSent'));
     } catch (err) {
       setVerif((v) => ({ ...v, sending: false }));
       toast.error(getErrorMessage(err));
@@ -69,7 +71,7 @@ export default function SellerSettings() {
       const url = data.data?.url ?? data.data?.fileUrl ?? data.data?.path;
       if (url) {
         setForm((f) => ({ ...f, profileImage: url }));
-        toast.success('Foto de perfil lista — guarda los cambios');
+        toast.success(t('seller.settings.toasts.profileImageReady'));
       }
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -122,7 +124,7 @@ export default function SellerSettings() {
     setLoading(true);
     try {
       await api.put('/seller/profile', form);
-      toast.success('Configuración guardada');
+      toast.success(t('seller.settings.toasts.settingsSaved'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -133,7 +135,7 @@ export default function SellerSettings() {
   return (
     <Box maxWidth="md">
       <Typography variant="h6" fontWeight={700} mb={2}>
-        Configuración de tu tienda
+        {t('seller.settings.title')}
       </Typography>
 
       <Paper sx={{ p: 3 }}>
@@ -167,30 +169,30 @@ export default function SellerSettings() {
               />
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Foto de perfil de la tienda
+              {t('seller.settings.profilePhotoLabel')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <TextField label="Nombre de la tienda" value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} fullWidth />
+            <TextField label={t('seller.settings.storeNameLabel')} value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12}>
-            <TextField label="Descripción" value={form.storeDescription} onChange={(e) => setForm({ ...form, storeDescription: e.target.value })} fullWidth multiline rows={3} />
+            <TextField label={t('seller.settings.descriptionLabel')} value={form.storeDescription} onChange={(e) => setForm({ ...form, storeDescription: e.target.value })} fullWidth multiline rows={3} />
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Bio del dueño / tienda"
+              label={t('seller.settings.bioLabel')}
               value={form.bio}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
               fullWidth
               multiline
               rows={2}
-              placeholder="Cuenta la historia de tu tienda o lo que vendes..."
+              placeholder={t('seller.settings.bioPlaceholder')}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               select
-              label="Categoría de productos"
+              label={t('seller.settings.categoryLabel')}
               value={form.storeCategory}
               onChange={(e) => setForm({ ...form, storeCategory: e.target.value })}
               fullWidth
@@ -205,7 +207,7 @@ export default function SellerSettings() {
           <Grid item xs={12} sm={6}>
             <TextField
               select
-              label="País"
+              label={t('seller.settings.countryLabel')}
               value={form.country}
               onChange={(e) => setForm({ ...form, country: e.target.value, locationState: '' })}
               fullWidth
@@ -218,24 +220,24 @@ export default function SellerSettings() {
             </TextField>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Logo (URL)" value={form.storeLogo} onChange={(e) => setForm({ ...form, storeLogo: e.target.value })} fullWidth />
+            <TextField label={t('seller.settings.logoLabel')} value={form.storeLogo} onChange={(e) => setForm({ ...form, storeLogo: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label="Banner (URL)" value={form.storeBanner} onChange={(e) => setForm({ ...form, storeBanner: e.target.value })} fullWidth />
+            <TextField label={t('seller.settings.bannerLabel')} value={form.storeBanner} onChange={(e) => setForm({ ...form, storeBanner: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField label="Ciudad" value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />
+            <TextField label={t('seller.settings.cityLabel')} value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
               select
-              label="Departamento/Provincia"
+              label={t('seller.settings.stateLabel')}
               value={form.locationState}
               onChange={(e) => setForm({ ...form, locationState: e.target.value })}
               fullWidth
             >
               <MenuItem value="">
-                <em>Seleccionar...</em>
+                <em>{t('seller.settings.selectPlaceholder')}</em>
               </MenuItem>
               {divisions.map((d) => (
                 <MenuItem key={d.name} value={d.name}>
@@ -245,16 +247,16 @@ export default function SellerSettings() {
             </TextField>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField label="Código postal (opcional)" value={form.locationPostalCode} onChange={(e) => setForm({ ...form, locationPostalCode: e.target.value })} fullWidth />
+            <TextField label={t('seller.settings.postalCodeLabel')} value={form.locationPostalCode} onChange={(e) => setForm({ ...form, locationPostalCode: e.target.value })} fullWidth />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight={700} mb={1}>
-              Ubicación en el mapa
+              {t('seller.settings.mapLocationTitle')}
             </Typography>
             <LocationPicker
               value={
                 form.latitude && form.longitude
-                  ? { lat: Number(form.latitude), lng: Number(form.longitude), label: `${form.locationCity || ''} ${form.locationState || ''}`.trim() || 'Tienda' }
+                  ? { lat: Number(form.latitude), lng: Number(form.longitude), label: `${form.locationCity || ''} ${form.locationState || ''}`.trim() || t('seller.settings.defaultLocationLabel') }
                   : null
               }
               onChange={(p) => {
@@ -267,62 +269,62 @@ export default function SellerSettings() {
               countryHint={COUNTRIES.find((c) => c.code === form.country)?.name}
             />
             <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
-              Busca tu ciudad, haz clic en el mapa o en un resultado para marcar el punto exacto. Esta ubicación se mostrará a tus clientes.
+              {t('seller.settings.mapHelperText')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight={700} mt={2} mb={1}>
-              🌐 Redes sociales y contacto
+              {t('seller.settings.socialTitle')}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField label="Instagram (URL)" value={form.instagramUrl} onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })} fullWidth placeholder="https://instagram.com/tutienda" />
+                <TextField label={t('seller.settings.instagramLabel')} value={form.instagramUrl} onChange={(e) => setForm({ ...form, instagramUrl: e.target.value })} fullWidth placeholder="https://instagram.com/tutienda" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Facebook (URL)" value={form.facebookUrl} onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })} fullWidth placeholder="https://facebook.com/tutienda" />
+                <TextField label={t('seller.settings.facebookLabel')} value={form.facebookUrl} onChange={(e) => setForm({ ...form, facebookUrl: e.target.value })} fullWidth placeholder="https://facebook.com/tutienda" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="TikTok (URL)" value={form.tiktokUrl} onChange={(e) => setForm({ ...form, tiktokUrl: e.target.value })} fullWidth placeholder="https://tiktok.com/@tutienda" />
+                <TextField label={t('seller.settings.tiktokLabel')} value={form.tiktokUrl} onChange={(e) => setForm({ ...form, tiktokUrl: e.target.value })} fullWidth placeholder="https://tiktok.com/@tutienda" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="YouTube (URL)" value={form.youtubeUrl} onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })} fullWidth placeholder="https://youtube.com/@tutienda" />
+                <TextField label={t('seller.settings.youtubeLabel')} value={form.youtubeUrl} onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })} fullWidth placeholder="https://youtube.com/@tutienda" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="WhatsApp (número)"
+                  label={t('seller.settings.whatsappLabel')}
                   value={form.whatsappPhone}
                   onChange={(e) => setForm({ ...form, whatsappPhone: e.target.value })}
                   fullWidth
-                  placeholder="59170000000 (con código de país, sin +)"
+                  placeholder={t('seller.settings.whatsappPlaceholder')}
                 />
               </Grid>
             </Grid>
             <Typography variant="caption" color="text.secondary">
-              Son opcionales. Solo se muestran en tu perfil público si los completas.
+              {t('seller.settings.socialHelperText')}
             </Typography>
           </Grid>
           <Grid item xs={12}>
             <Alert severity="info" sx={{ mb: 1 }}>
-              Tu ubicación se usa para calcular el costo de envío hacia el comprador.
+              {t('seller.settings.shippingLocationInfo')}
             </Alert>
-            <TextField label="QR de pago (URL de imagen)" value={form.paymentQrUrl} onChange={(e) => setForm({ ...form, paymentQrUrl: e.target.value })} fullWidth placeholder="https://img.example.com/mi-qr.png" />
+            <TextField label={t('seller.settings.paymentQrLabel')} value={form.paymentQrUrl} onChange={(e) => setForm({ ...form, paymentQrUrl: e.target.value })} fullWidth placeholder="https://img.example.com/mi-qr.png" />
             <Typography variant="caption" color="text.secondary">
-              Sube una imagen con tu alias/QR de Mercado Pago o CBU. Se mostrará al comprador al finalizar la compra.
+              {t('seller.settings.paymentQrHelperText')}
             </Typography>
             <TextField
-              label="Envío gratis desde (Bs)"
+              label={t('seller.settings.freeShippingLabel')}
               type="number"
               value={form.freeShippingThreshold}
               onChange={(e) => setForm({ ...form, freeShippingThreshold: e.target.value })}
               fullWidth
-              placeholder="Ej: 500"
-              helperText="Si el comprador supera este monto, el envío es gratis. Dejalo vacío para no ofrecer envío gratis."
+              placeholder={t('seller.settings.freeShippingPlaceholder')}
+              helperText={t('seller.settings.freeShippingHelperText')}
             />
           </Grid>
         </Grid>
         <Box mt={3}>
           <PrimaryButton onClick={save} disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : 'Guardar'}
+            {loading ? <CircularProgress size={20} /> : t('seller.settings.saveButton')}
           </PrimaryButton>
         </Box>
       </Paper>
@@ -332,34 +334,33 @@ export default function SellerSettings() {
         <Box display="flex" alignItems="center" gap={1} mb={1}>
           <VerifiedIcon color={verif.isVerified ? 'success' : 'disabled'} />
           <Typography variant="h6" fontWeight={700}>
-            Sello de vendedor verificado
+            {t('seller.settings.verifiedSealTitle')}
           </Typography>
-          {verif.isVerified && <Chip size="small" color="success" label="Verificado" />}
+          {verif.isVerified && <Chip size="small" color="success" label={t('seller.settings.verifiedChip')} />}
         </Box>
         <Box display="flex" alignItems="center" gap={1} mb={1}>
           <LocationOnIcon color={(user as any).locationVerified ? 'success' : 'disabled'} />
           <Typography variant="subtitle2" fontWeight={600}>
-            Ubicación de la tienda
+            {t('seller.settings.storeLocationLabel')}
           </Typography>
           {(user as any).locationVerified ? (
-            <Chip size="small" color="success" label="Verificada por el admin" />
+            <Chip size="small" color="success" label={t('seller.settings.locationVerifiedChip')} />
           ) : (
-            <Chip size="small" variant="outlined" label="Pendiente de verificación" />
+            <Chip size="small" variant="outlined" label={t('seller.settings.locationPendingChip')} />
           )}
         </Box>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          El administrador comprueba la existencia física de tu tienda (coincidencia con NIT y documentación) para
-          verificar tu ubicación en el mapa. Las tiendas con ubicación verificada inspiran más confianza.
+          {t('seller.settings.verificationDescription')}
         </Typography>
         {verif.isVerified ? (
           <Alert severity="success" sx={{ mb: 2 }}>
-            Tu tienda está verificada. Muestras el logo junto a tu nombre, lo que genera más confianza en los compradores.
+            {t('seller.settings.verifiedSuccessAlert')}
           </Alert>
         ) : (
           <Alert severity={verif.isVerificationRequested ? 'info' : 'warning'} sx={{ mb: 2 }}>
             {verif.isVerificationRequested
-              ? 'Tu solicitud de verificación está en revisión por el administrador. Como en Couchsurfing o Twitter, se verifica la existencia física de tu tienda (NIT y documentación) antes de otorgar el sello.'
-              : 'Obtiene el sello de vendedor verificado (como la cuenta azul de Twitter): presenta tu NIT y el administrador verificará físicamente tu tienda. Las tiendas verificadas generan más confianza y más ventas.'}
+              ? t('seller.settings.pendingReviewAlert')
+              : t('seller.settings.requestVerificationAlert')}
           </Alert>
         )}
 
@@ -367,24 +368,24 @@ export default function SellerSettings() {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <TextField
-                label="NIT (Número de Identificación Tributaria)"
+                label={t('seller.settings.nitLabel')}
                 value={verif.nit}
                 onChange={(e) => setVerif({ ...verif, nit: e.target.value })}
                 fullWidth
-                placeholder="Ej: 10203040123"
+                placeholder={t('seller.settings.nitPlaceholder')}
                 disabled={verif.isVerificationRequested}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
-                label="Nota para el administrador (documentos, dirección del local, etc.)"
+                label={t('seller.settings.noteLabel')}
                 value={verif.note}
                 onChange={(e) => setVerif({ ...verif, note: e.target.value })}
                 fullWidth
                 multiline
                 rows={2}
                 disabled={verif.isVerificationRequested}
-                placeholder="Ej: Mi tienda está en Calle 5, zona Central. Adjunto mi NIT y matrícula de comercio."
+                placeholder={t('seller.settings.notePlaceholder')}
               />
             </Grid>
             <Grid item xs={12}>
@@ -395,10 +396,10 @@ export default function SellerSettings() {
                 onClick={requestVerification}
               >
                 {verif.isVerificationRequested
-                  ? 'Solicitud enviada — en revisión'
+                  ? t('seller.settings.requestSentButton')
                   : verif.sending
-                    ? 'Enviando...'
-                    : 'Solicitar verificación'}
+                    ? t('seller.settings.sendingButton')
+                    : t('seller.settings.requestVerificationButton')}
               </PrimaryButton>
             </Grid>
           </Grid>

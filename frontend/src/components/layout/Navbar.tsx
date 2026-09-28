@@ -27,6 +27,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ForumIcon from '@mui/icons-material/Forum';
 import { styled, alpha } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { useCartStore } from '../../stores/cartStore';
@@ -34,6 +35,7 @@ import { useCurrencyStore } from '../../stores/currencyStore';
 import { api } from '../../services/api';
 import NotificationBell from './NotificationBell';
 import CurrencyRates from '../ui/CurrencyRates';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const SearchBox = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -66,6 +68,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
@@ -127,7 +130,7 @@ export default function Navbar() {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Buscar productos, marcas, vendedores..."
+              placeholder={t('nav.search.placeholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -135,6 +138,7 @@ export default function Navbar() {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <LanguageSwitcher />
           <CurrencyRates />
           {currencies.length > 0 && (
             <select
@@ -149,7 +153,7 @@ export default function Navbar() {
                 fontSize: '0.85rem',
                 cursor: 'pointer',
               }}
-              aria-label="Seleccionar moneda"
+              aria-label={t('nav.currency.selectAriaLabel')}
             >
               {currencies.map((c) => (
                 <option key={c.code} value={c.code} style={{ color: '#000' }}>
@@ -158,31 +162,31 @@ export default function Navbar() {
               ))}
             </select>
           )}
-          <Tooltip title={darkMode ? 'Modo claro' : 'Modo oscuro'}>
+          <Tooltip title={darkMode ? t('nav.theme.light') : t('nav.theme.dark')}>
             <IconButton color="inherit" onClick={toggle}>
               {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Empleos">
-            <IconButton color="inherit" onClick={() => navigate('/empleos')} aria-label="Empleos">
+          <Tooltip title={t('nav.jobs.tooltip')}>
+            <IconButton color="inherit" onClick={() => navigate('/empleos')} aria-label={t('nav.jobs.tooltip')}>
               <WorkIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Foro LaCASE">
+          <Tooltip title={t('nav.forum.tooltip')}>
             <IconButton color="inherit" onClick={() => navigate('/foro')}>
               <ForumIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Rinconcito Boliviano">
-            <IconButton color="inherit" onClick={() => navigate('/cono')} aria-label="Rinconcito Boliviano">
+          <Tooltip title={t('nav.cono.tooltip')}>
+            <IconButton color="inherit" onClick={() => navigate('/cono')} aria-label={t('nav.cono.tooltip')}>
               <EmojiEventsIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Carrito">
+          <Tooltip title={t('nav.cart.tooltip')}>
             <IconButton color="inherit" onClick={() => navigate('/carrito')}>
               <Badge badgeContent={itemCount} color="secondary">
                 <ShoppingCartIcon />
@@ -193,14 +197,14 @@ export default function Navbar() {
           {user && (
             <>
               <NotificationBell />
-              <Tooltip title="Mensajes">
+              <Tooltip title={t('nav.messages.tooltip')}>
                 <IconButton color="inherit" onClick={() => navigate('/mensajes')}>
                   <Badge badgeContent={unreadChat} color="error">
                     <ChatIcon />
                   </Badge>
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Mis subastas">
+              <Tooltip title={t('nav.auctions.tooltip')}>
                 <IconButton color="inherit" onClick={() => navigate('/subastas/mis')}>
                   <Badge color="secondary">
                     <GavelIcon />
@@ -219,19 +223,19 @@ export default function Navbar() {
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta'); }}>
-                  <AccountCircleIcon sx={{ mr: 1 }} /> Mi cuenta
+                  <AccountCircleIcon sx={{ mr: 1 }} /> {t('nav.menu.myAccount')}
                 </MenuItem>
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta/postulaciones'); }}>
-                  <AssignmentIndIcon sx={{ mr: 1 }} /> Mis postulaciones
+                  <AssignmentIndIcon sx={{ mr: 1 }} /> {t('nav.menu.myApplications')}
                 </MenuItem>
                 {(user.role === 'SELLER' || user.role === 'ADMIN') && (
                   <MenuItem onClick={() => { handleClose(); navigate('/seller'); }}>
-                    <StorefrontIcon sx={{ mr: 1 }} /> Mi tienda
+                    <StorefrontIcon sx={{ mr: 1 }} /> {t('nav.menu.myStore')}
                   </MenuItem>
                 )}
                 {user.role === 'ADMIN' && (
                   <MenuItem onClick={() => { handleClose(); navigate('/admin'); }}>
-                    <AdminPanelSettingsIcon sx={{ mr: 1 }} /> Panel admin
+                    <AdminPanelSettingsIcon sx={{ mr: 1 }} /> {t('nav.menu.adminPanel')}
                   </MenuItem>
                 )}
                 <Divider />
@@ -242,7 +246,7 @@ export default function Navbar() {
                     navigate('/');
                   }}
                 >
-                  Cerrar sesión
+                  {t('nav.menu.logout')}
                 </MenuItem>
               </Menu>
             </>

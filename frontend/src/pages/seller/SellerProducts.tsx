@@ -34,6 +34,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PrintIcon from '@mui/icons-material/Print';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '../../services/api';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
@@ -47,6 +48,7 @@ import { EmptyState } from '../../components/redesign/States';
 import { useUnifiedTokens } from '../../theme';
 
 export default function SellerProducts() {
+  const { t } = useTranslation();
   const money = useMoney();
   const tk = useUnifiedTokens();
   const navigate = useNavigate();
@@ -77,10 +79,10 @@ export default function SellerProducts() {
   }, [page]);
 
   const remove = async (id: number) => {
-    if (!confirm('¿Eliminar este producto?')) return;
+    if (!confirm(t('seller.products.confirmDelete'))) return;
     try {
       await api.delete(`/seller/products/${id}`);
-      toast.success('Producto eliminado');
+      toast.success(t('seller.products.toast.deleted'));
       load(page);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -124,7 +126,7 @@ export default function SellerProducts() {
       const { data } = await api.post('/seller/products/copy', { productId: id });
       setCopyOpen(false);
       setCopyQuery('');
-      toast.success('Producto copiado. Completa imagen y precio para publicarlo.');
+      toast.success(t('seller.products.toast.copied'));
       navigate('/seller/productos/nuevo', { state: { copyData: data.data } });
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -136,24 +138,24 @@ export default function SellerProducts() {
   return (
     <Box>
       <PageHeader
-        title={`Mis productos (${meta?.total ?? 0})`}
+        title={t('seller.products.title', { count: meta?.total ?? 0 })}
         icon={<Inventory2Icon />}
         actions={
           <>
             <GhostButton type="button" startIcon={<QrCodeScannerIcon />} onClick={() => setReaderOpen(true)}>
-              Escanear
+              {t('seller.products.actions.scan')}
             </GhostButton>
             <GhostButton type="button" startIcon={<ContentCopyIcon />} onClick={() => setCopyOpen(true)}>
-              Copiar producto
+              {t('seller.products.actions.copyProduct')}
             </GhostButton>
             <GhostButton to="/seller/etiquetas" startIcon={<PrintIcon />}>
-              Etiquetas
+              {t('seller.products.actions.labels')}
             </GhostButton>
             <GhostButton to="/seller/productos/varios" startIcon={<LibraryAddIcon />}>
-              Agregar varios
+              {t('seller.products.actions.addMultiple')}
             </GhostButton>
             <PrimaryButton to="/seller/productos/nuevo" startIcon={<AddIcon />}>
-              Nuevo producto
+              {t('seller.products.actions.newProduct')}
             </PrimaryButton>
           </>
         }
@@ -164,12 +166,12 @@ export default function SellerProducts() {
         <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: tk.surface, '& th': { color: tk.onSurfaceVariant, fontWeight: 700 } }}>
-              <TableCell>Producto</TableCell>
-              <TableCell>Categoría</TableCell>
-              <TableCell align="right">Precio</TableCell>
-              <TableCell align="center">Stock</TableCell>
-              <TableCell align="center">Estado</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell>{t('seller.products.table.product')}</TableCell>
+              <TableCell>{t('seller.products.table.category')}</TableCell>
+              <TableCell align="right">{t('seller.products.table.price')}</TableCell>
+              <TableCell align="center">{t('seller.products.table.stock')}</TableCell>
+              <TableCell align="center">{t('seller.products.table.status')}</TableCell>
+              <TableCell align="center">{t('seller.products.table.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -192,11 +194,11 @@ export default function SellerProducts() {
                 </TableCell>
                 <TableCell align="center">
                   {p.isApproved ? (
-                    <Chip label="Aprobado" size="small" color="success" />
+                    <Chip label={t('seller.products.status.approved')} size="small" color="success" />
                   ) : p.isActive ? (
-                    <Chip label="Pendiente" size="small" color="warning" />
+                    <Chip label={t('seller.products.status.pending')} size="small" color="warning" />
                   ) : (
-                    <Chip label="Eliminado" size="small" color="default" />
+                    <Chip label={t('seller.products.status.deleted')} size="small" color="default" />
                   )}
                 </TableCell>
                 <TableCell align="center">
@@ -205,7 +207,7 @@ export default function SellerProducts() {
                   </IconButton>
                   {!isEmployee && (
                     <>
-                      <IconButton color="info" onClick={() => openHistory(p.id, p.name)} title="Historial">
+                      <IconButton color="info" onClick={() => openHistory(p.id, p.name)} title={t('seller.products.history.tooltip')}>
                         <HistoryIcon fontSize="small" />
                       </IconButton>
                       <IconButton color="error" onClick={() => remove(p.id)}>
@@ -219,7 +221,7 @@ export default function SellerProducts() {
           </TableBody>
         </Table>
       </TableContainer>
-      {products.length === 0 && <EmptyState message="Todavía no cargaste productos" />}
+      {products.length === 0 && <EmptyState message={t('seller.products.emptyState')} />}
       </SurfaceCard>
 
       {meta?.totalPages > 1 && (
@@ -229,7 +231,7 @@ export default function SellerProducts() {
       )}
 
       <Dialog open={historyOpen} onClose={() => setHistoryOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Historial — {historyFor}</DialogTitle>
+        <DialogTitle>{t('seller.products.history.title', { name: historyFor })}</DialogTitle>
         <DialogContent>
           {historyLoading ? (
             <Box textAlign="center" py={4}>
@@ -237,17 +239,17 @@ export default function SellerProducts() {
             </Box>
           ) : history.length === 0 ? (
             <Typography color="text.secondary" textAlign="center" py={3}>
-              Sin actividad registrada todavía.
+              {t('seller.products.history.empty')}
             </Typography>
           ) : (
             <TableContainer>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Acción</TableCell>
-                    <TableCell>Autor</TableCell>
-                    <TableCell>Nota</TableCell>
-                    <TableCell>Fecha</TableCell>
+                    <TableCell>{t('seller.products.history.action')}</TableCell>
+                    <TableCell>{t('seller.products.history.author')}</TableCell>
+                    <TableCell>{t('seller.products.history.note')}</TableCell>
+                    <TableCell>{t('seller.products.history.date')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -281,22 +283,21 @@ export default function SellerProducts() {
           )}
         </DialogContent>
         <DialogActions>
-          <GhostButton type="button" onClick={() => setHistoryOpen(false)}>Cerrar</GhostButton>
+          <GhostButton type="button" onClick={() => setHistoryOpen(false)}>{t('seller.products.history.close')}</GhostButton>
         </DialogActions>
       </Dialog>
 
       <BarcodeReader open={readerOpen} onClose={() => setReaderOpen(false)} />
 
       <Dialog open={copyOpen} onClose={() => setCopyOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Copiar producto</DialogTitle>
+        <DialogTitle>{t('seller.products.copyDialog.title')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Busca un producto en la multitienda para copiar sus datos (nombre, descripción, categoría y
-            características). Después tendrás que poner tu propia imagen y precio.
+            {t('seller.products.copyDialog.description')}
           </Typography>
           <TextField
-            label="Buscar producto por nombre o código"
-            placeholder="Ej: ryzen 5 5600g"
+            label={t('seller.products.copyDialog.searchLabel')}
+            placeholder={t('seller.products.copyDialog.searchPlaceholder')}
             fullWidth
             size="small"
             autoFocus
@@ -311,7 +312,7 @@ export default function SellerProducts() {
             )}
             {!copyLoading && copyQuery.trim().length >= 2 && copyResults.length === 0 && (
               <Typography variant="body2" color="text.secondary" align="center" py={3}>
-                No se encontró ningún producto.
+                {t('seller.products.copyDialog.noResults')}
               </Typography>
             )}
             {!copyLoading && copyResults.length > 0 && (
@@ -325,7 +326,7 @@ export default function SellerProducts() {
                       disabled={copyingId !== null}
                       onClick={() => doCopy(p.id)}
                     >
-                      Copiar
+                      {t('seller.products.copyDialog.copyButton')}
                     </PrimaryButton>
                   }>
                     <ListItemButton component={Link} to={`/producto/${p.id}`} target="_blank" sx={{ borderRadius: 1 }}>
@@ -336,7 +337,7 @@ export default function SellerProducts() {
                       </ListItemAvatar>
                       <ListItemText
                         primary={p.name}
-                        secondary={`${p.sku ?? 'Sin SKU'} · ${p.category?.name ?? ''} · ${money(p.price)}`}
+                        secondary={`${p.sku ?? t('seller.products.copyDialog.noSku')} · ${p.category?.name ?? ''} · ${money(p.price)}`}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -345,13 +346,13 @@ export default function SellerProducts() {
             )}
             {!copyLoading && copyQuery.trim().length < 2 && (
               <Typography variant="body2" color="text.secondary" align="center" py={3}>
-                Escribe al menos 2 caracteres para buscar.
+                {t('seller.products.copyDialog.minChars')}
               </Typography>
             )}
           </Box>
         </DialogContent>
         <DialogActions>
-          <GhostButton type="button" onClick={() => setCopyOpen(false)}>Cancelar</GhostButton>
+          <GhostButton type="button" onClick={() => setCopyOpen(false)}>{t('seller.products.copyDialog.cancel')}</GhostButton>
         </DialogActions>
       </Dialog>
     </Box>

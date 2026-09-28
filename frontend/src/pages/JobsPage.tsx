@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SendIcon from '@mui/icons-material/Send';
@@ -38,16 +39,16 @@ interface MyApplication {
   createdAt: string;
 }
 
-const APP_STATUS: Record<string, { label: string; color: 'default' | 'info' | 'success' | 'error' }> = {
-  RECEIVED: { label: 'Recibida', color: 'default' },
-  VIEWED: { label: 'Vista por la tienda', color: 'info' },
-  SHORTLISTED: { label: 'Preseleccionado/a', color: 'info' },
-  REJECTED: { label: 'No seleccionado/a', color: 'error' },
-  HIRED: { label: '¡Contratado/a!', color: 'success' },
-  WITHDRAWN: { label: 'Retirada', color: 'default' },
-};
-
 export default function JobsPage() {
+  const { t: tr } = useTranslation();
+  const APP_STATUS: Record<string, { label: string; color: 'default' | 'info' | 'success' | 'error' }> = {
+    RECEIVED: { label: tr('jobs.appStatus.received'), color: 'default' },
+    VIEWED: { label: tr('jobs.appStatus.viewed'), color: 'info' },
+    SHORTLISTED: { label: tr('jobs.appStatus.shortlisted'), color: 'info' },
+    REJECTED: { label: tr('jobs.appStatus.rejected'), color: 'error' },
+    HIRED: { label: tr('jobs.appStatus.hired'), color: 'success' },
+    WITHDRAWN: { label: tr('jobs.appStatus.withdrawn'), color: 'default' },
+  };
   const t = useUnifiedTokens();
   const salaryLabel = useSalaryLabel();
   const coords = useLocationStore((s) => s.coords);
@@ -167,11 +168,11 @@ export default function JobsPage() {
     e.target.value = '';
     if (!f) return;
     if (!/\.(pdf|doc|docx)$/i.test(f.name)) {
-      setErrors((x) => ({ ...x, cv: 'El CV debe ser PDF, DOC o DOCX' }));
+      setErrors((x) => ({ ...x, cv: tr('jobs.errors.cvType') }));
       return;
     }
     if (f.size > 5 * 1024 * 1024) {
-      setErrors((x) => ({ ...x, cv: 'El CV no puede superar 5 MB' }));
+      setErrors((x) => ({ ...x, cv: tr('jobs.errors.cvSize') }));
       return;
     }
     setErrors((x) => {
@@ -185,14 +186,14 @@ export default function JobsPage() {
     e.preventDefault();
     if (!selected) return;
     const errs: Record<string, string> = {};
-    if (form.message.trim().length < 10) errs.message = 'El mensaje debe tener al menos 10 caracteres';
-    if (form.contactPhone.trim().length < 6) errs.contactPhone = 'El teléfono debe tener al menos 6 caracteres';
-    if (form.expectedSalary !== '' && !(Number(form.expectedSalary) >= 0)) errs.expectedSalary = 'Ingresa un monto válido';
+    if (form.message.trim().length < 10) errs.message = tr('jobs.errors.messageMinLength');
+    if (form.contactPhone.trim().length < 6) errs.contactPhone = tr('jobs.errors.phoneMinLength');
+    if (form.expectedSalary !== '' && !(Number(form.expectedSalary) >= 0)) errs.expectedSalary = tr('jobs.errors.invalidAmount');
     if (form.resumeUrl.trim()) {
       try {
         new URL(form.resumeUrl.trim());
       } catch {
-        errs.resumeUrl = 'Ingresa un enlace válido (https://...)';
+        errs.resumeUrl = tr('jobs.errors.invalidUrl');
       }
     }
     if (errors.cv && !cvFile) errs.cv = errors.cv;
@@ -215,11 +216,11 @@ export default function JobsPage() {
       }
       setMyApp(r.data.data ?? { id: '', status: 'RECEIVED', createdAt: new Date().toISOString() });
       setApplyOpen(false);
-      toast.success('¡Postulación enviada!');
+      toast.success(tr('jobs.toasts.applicationSent'));
     } catch (err) {
       const status = (err as { response?: { status?: number } }).response?.status;
       setApplyError(
-        status === 403 ? 'No puedes postularte a un empleo de tu propia tienda.' : getErrorMessage(err),
+        status === 403 ? tr('jobs.errors.ownStore') : getErrorMessage(err),
       );
     } finally {
       setSubmitting(false);
@@ -227,12 +228,12 @@ export default function JobsPage() {
   };
 
   const withdraw = async () => {
-    if (!selected || !window.confirm('¿Quieres retirar tu postulación?')) return;
+    if (!selected || !window.confirm(tr('jobs.confirmWithdraw'))) return;
     setWithdrawing(true);
     try {
       await api.delete(`/jobs/${selected.id}/apply`);
       setMyApp((m) => (m ? { ...m, status: 'WITHDRAWN' } : m));
-      toast.success('Postulación retirada');
+      toast.success(tr('jobs.toasts.applicationWithdrawn'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -245,8 +246,8 @@ export default function JobsPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <PageHeader
-        title="Empleos"
-        subtitle="Ofertas de trabajo de tiendas de tu zona"
+        title={tr('jobs.title')}
+        subtitle={tr('jobs.subtitle')}
         icon={<WorkIcon />}
         actions={<NearMeButton />}
       />
@@ -255,7 +256,7 @@ export default function JobsPage() {
         <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
           <TextField
             size="small"
-            placeholder="Buscar empleo"
+            placeholder={tr('jobs.search.placeholder')}
             value={qInput}
             onChange={(e) => setQInput(e.target.value)}
             sx={{ flex: '2 1 200px' }}
@@ -263,7 +264,7 @@ export default function JobsPage() {
           />
           <TextField
             size="small"
-            placeholder="Ciudad"
+            placeholder={tr('jobs.search.city')}
             value={cityInput}
             onChange={(e) => setCityInput(e.target.value)}
             sx={{ flex: '1 1 140px' }}
@@ -271,7 +272,7 @@ export default function JobsPage() {
           <TextField
             select
             size="small"
-            label="Pago"
+            label={tr('jobs.filters.pay')}
             value={payPeriod}
             onChange={(e) => {
               setPayPeriod(e.target.value);
@@ -279,16 +280,16 @@ export default function JobsPage() {
             }}
             sx={{ flex: '1 1 140px' }}
           >
-            <MenuItem value="">Todos</MenuItem>
-            <MenuItem value="DAILY">Por día</MenuItem>
-            <MenuItem value="WEEKLY">Por semana</MenuItem>
-            <MenuItem value="MONTHLY">Por mes</MenuItem>
+            <MenuItem value="">{tr('jobs.filters.payAll')}</MenuItem>
+            <MenuItem value="DAILY">{tr('jobs.filters.payDaily')}</MenuItem>
+            <MenuItem value="WEEKLY">{tr('jobs.filters.payWeekly')}</MenuItem>
+            <MenuItem value="MONTHLY">{tr('jobs.filters.payMonthly')}</MenuItem>
           </TextField>
         </Box>
 
         <Box display="flex" gap={1} sx={{ overflowX: 'auto', pb: 1, mb: 2 }}>
           <Chip
-            label="Todas"
+            label={tr('jobs.filters.categoryAll')}
             clickable
             onClick={() => pickCategory('')}
             color={categoryId === '' ? 'primary' : 'default'}
@@ -314,7 +315,7 @@ export default function JobsPage() {
       ) : error ? (
         <ErrorState message={error} onRetry={() => setReload((n) => n + 1)} />
       ) : jobs.length === 0 ? (
-        <EmptyState message="No encontramos empleos con esos filtros." />
+        <EmptyState message={tr('jobs.empty')} />
       ) : (
         <>
           <StaggerContainer>
@@ -349,22 +350,22 @@ export default function JobsPage() {
                   {selected.distanceKm != null ? ` · a ${selected.distanceKm.toFixed(1)} km` : ''}
                 </Typography>
                 {selected.store?.isVerified && (
-                  <Chip size="small" icon={<VerifiedIcon />} label="Verificada" color="primary" variant="outlined" sx={{ ml: 0.5 }} />
+                  <Chip size="small" icon={<VerifiedIcon />} label={tr('jobs.detail.verified')} color="primary" variant="outlined" sx={{ ml: 0.5 }} />
                 )}
               </Box>
               <Typography fontWeight={800} color={t.primary} mb={0.5}>
                 {salaryLabel(selected)}
               </Typography>
               <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
-                <Chip size="small" label={selected.vacancies === 1 ? '1 vacante' : `${selected.vacancies} vacantes`} />
-                {selected.schedule && <Chip size="small" variant="outlined" label={`Horario: ${selected.schedule}`} />}
+                <Chip size="small" label={selected.vacancies === 1 ? tr('jobs.detail.vacancyOne') : tr('jobs.detail.vacanciesCount', { count: selected.vacancies })} />
+                {selected.schedule && <Chip size="small" variant="outlined" label={tr('jobs.detail.schedule', { schedule: selected.schedule })} />}
                 <Chip size="small" variant="outlined" label={timeAgo(selected.publishedAt)} />
               </Box>
-              <Typography variant="subtitle2" fontWeight={700}>Descripción</Typography>
+              <Typography variant="subtitle2" fontWeight={700}>{tr('jobs.detail.description')}</Typography>
               <Typography variant="body2" sx={{ whiteSpace: 'pre-line', mb: 2 }}>{selected.description}</Typography>
               {selected.requirements && (
                 <>
-                  <Typography variant="subtitle2" fontWeight={700}>Requisitos</Typography>
+                  <Typography variant="subtitle2" fontWeight={700}>{tr('jobs.detail.requirements')}</Typography>
                   <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>{selected.requirements}</Typography>
                 </>
               )}
@@ -372,34 +373,34 @@ export default function JobsPage() {
             <DialogActions sx={{ px: 3, pb: 2, flexWrap: 'wrap', gap: 1 }}>
               {myApp && myApp.status !== 'WITHDRAWN' && (
                 <Chip
-                  label={`Tu postulación: ${APP_STATUS[myApp.status]?.label ?? myApp.status}`}
+                  label={tr('jobs.detail.yourApplication', { status: APP_STATUS[myApp.status]?.label ?? myApp.status })}
                   color={APP_STATUS[myApp.status]?.color ?? 'default'}
                   variant={APP_STATUS[myApp.status]?.color === 'default' ? 'outlined' : 'filled'}
                 />
               )}
               {myApp && !['HIRED', 'REJECTED', 'WITHDRAWN'].includes(myApp.status) && (
                 <GhostButton type="button" color="error" disabled={withdrawing} onClick={withdraw}>
-                  Retirar postulación
+                  {tr('jobs.detail.withdrawApplication')}
                 </GhostButton>
               )}
               {(!myApp || myApp.status === 'WITHDRAWN') && (
                 <PrimaryButton type="button" startIcon={<SendIcon />} onClick={openApply}>
-                  Postularme
+                  {tr('jobs.detail.applyButton')}
                 </PrimaryButton>
               )}
               {selected.store && (
                 <GhostButton type="button" to={`/vendedor/${selected.store.id}`}>
-                  Ver tienda
+                  {tr('jobs.detail.viewStore')}
                 </GhostButton>
               )}
-              <GhostButton type="button" onClick={() => setSelected(null)}>Cerrar</GhostButton>
+              <GhostButton type="button" onClick={() => setSelected(null)}>{tr('jobs.detail.close')}</GhostButton>
               {phone && (
                 <PrimaryButton
                   type="button"
                   startIcon={<WhatsAppIcon />}
                   onClick={() => window.open(`https://wa.me/${phone}`, '_blank', 'noopener,noreferrer')}
                 >
-                  Contactar por WhatsApp
+                  {tr('jobs.detail.contactWhatsApp')}
                 </PrimaryButton>
               )}
             </DialogActions>
@@ -409,21 +410,21 @@ export default function JobsPage() {
 
       <Dialog open={applyOpen} onClose={() => !submitting && setApplyOpen(false)} fullWidth maxWidth="sm">
         <Box component="form" onSubmit={submitApply} noValidate>
-          <DialogTitle sx={{ fontWeight: 800 }}>Postularme a {selected?.title}</DialogTitle>
+          <DialogTitle sx={{ fontWeight: 800 }}>{tr('jobs.applyDialog.title', { title: selected?.title })}</DialogTitle>
           <DialogContent>
             <Box display="flex" flexDirection="column" gap={2} pt={1}>
               <TextField
-                label="Mensaje para la tienda"
+                label={tr('jobs.applyDialog.messageLabel')}
                 multiline
                 minRows={3}
                 value={form.message}
                 onChange={(e) => setField('message', e.target.value)}
                 error={!!errors.message}
-                helperText={errors.message || 'Contales por qué te interesa (mínimo 10 caracteres)'}
+                helperText={errors.message || tr('jobs.applyDialog.messageHelp')}
                 required
               />
               <TextField
-                label="Teléfono de contacto"
+                label={tr('jobs.applyDialog.phoneLabel')}
                 value={form.contactPhone}
                 onChange={(e) => setField('contactPhone', e.target.value)}
                 error={!!errors.contactPhone}
@@ -431,7 +432,7 @@ export default function JobsPage() {
                 required
               />
               <TextField
-                label="Sueldo pretendido en Bs (opcional)"
+                label={tr('jobs.applyDialog.salaryLabel')}
                 type="number"
                 value={form.expectedSalary}
                 onChange={(e) => setField('expectedSalary', e.target.value)}
@@ -440,7 +441,7 @@ export default function JobsPage() {
                 inputProps={{ min: 0 }}
               />
               <TextField
-                label="Enlace a tu CV (opcional)"
+                label={tr('jobs.applyDialog.resumeLabel')}
                 placeholder="https://..."
                 value={form.resumeUrl}
                 onChange={(e) => setField('resumeUrl', e.target.value)}
@@ -450,7 +451,7 @@ export default function JobsPage() {
               <Box>
                 <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                   <Button component="label" variant="text" disabled={submitting} sx={{ textTransform: 'none', fontWeight: 600, minHeight: 44 }}>
-                    Adjuntar CV (PDF, DOC o DOCX, máx. 5 MB)
+                    {tr('jobs.applyDialog.attachCv')}
                     <input
                       type="file"
                       hidden
@@ -468,8 +469,8 @@ export default function JobsPage() {
             </Box>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <GhostButton type="button" disabled={submitting} onClick={() => setApplyOpen(false)}>Cancelar</GhostButton>
-            <PrimaryButton type="submit" disabled={submitting}>{submitting ? 'Enviando...' : 'Enviar postulación'}</PrimaryButton>
+            <GhostButton type="button" disabled={submitting} onClick={() => setApplyOpen(false)}>{tr('jobs.applyDialog.cancel')}</GhostButton>
+            <PrimaryButton type="submit" disabled={submitting}>{submitting ? tr('jobs.applyDialog.sending') : tr('jobs.applyDialog.submit')}</PrimaryButton>
           </DialogActions>
         </Box>
       </Dialog>

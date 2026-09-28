@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Container,
   Grid,
@@ -71,6 +72,7 @@ const toCardProduct = (p: any) => ({
 });
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const money = useMoney();
   const navigate = useNavigate();
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -203,7 +205,7 @@ export default function HomePage() {
                   {s.productName}
                 </Typography>
                 <Typography variant="body2" component="span" sx={{ opacity: 0.9 }}>
-                  en {s.storeName} · {s.city} · {money(s.amount)}
+                  {t('home.ticker.soldIn', { store: s.storeName, city: s.city, amount: money(s.amount) })}
                 </Typography>
               </Box>
             ))}
@@ -220,21 +222,20 @@ export default function HomePage() {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={7}>
               <Typography variant="h4" gutterBottom>
-                Todas las tiendas, un solo lugar
+                {t('home.hero.title')}
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                Compara precios entre cientos de vendedores, encuentra el mejor precio y calcula el envío según la
-                ubicación de cada tienda.
+                {t('home.hero.subtitle')}
               </Typography>
               <Box display="flex" gap={1}>
                 <PrimaryButton to="/productos">
-                  Explorar productos
+                  {t('home.hero.exploreProducts')}
                 </PrimaryButton>
                 <SecondaryButton to="/subastas" startIcon={<GavelIcon />}>
-                  Subastas
+                  {t('home.hero.auctions')}
                 </SecondaryButton>
                 <GhostButton to="/registro-vendedor">
-                  Abre tu tienda
+                  {t('home.hero.openYourStore')}
                 </GhostButton>
               </Box>
             </Grid>
@@ -242,7 +243,7 @@ export default function HomePage() {
               <Box className="image-container" sx={{ borderRadius: 2, p: 4, textAlign: 'center' }}>
                 <StorefrontIcon sx={{ fontSize: 80, color: 'primary.main' }} />
                 <Typography variant="body2" color="text.secondary" mt={1}>
-                  {categories.length} categorías · {featured.length}+ productos destacados
+                  {t('home.hero.categoriesAndFeatured', { categories: categories.length, featured: featured.length })}
                 </Typography>
               </Box>
             </Grid>
@@ -254,10 +255,10 @@ export default function HomePage() {
         <Container maxWidth="lg" sx={{ pt: 3 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h5" fontWeight={700}>
-              Empleos
+              {t('home.jobs.title')}
             </Typography>
             <Typography component={Link} to="/empleos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-              Ver todos los empleos
+              {t('home.jobs.viewAll')}
             </Typography>
           </Box>
           <Grid container spacing={2}>
@@ -277,12 +278,12 @@ export default function HomePage() {
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="h5" fontWeight={700}>
-                  {userCity ? `Productos cerca de ti (${userCity})` : 'Productos cerca de ti'}
+                  {userCity ? t('home.nearYou.titleWithCity', { city: userCity }) : t('home.nearYou.title')}
                 </Typography>
                 <NearMeButton />
               </Box>
               <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-                Ver todo →
+                {t('home.common.viewAll')}
               </Typography>
             </Box>
             <Grid container spacing={2} mb={4}>
@@ -305,7 +306,7 @@ export default function HomePage() {
                     <CardActionArea component={Link} to={b.link || '/productos'}>
                       <Box sx={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {b.imageDesktop && (
-                          <img src={b.imageDesktop} alt={b.title || 'Banner'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                          <img src={b.imageDesktop} alt={b.title || t('home.banners.fallbackAlt')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                         )}
                       </Box>
                     </CardActionArea>
@@ -319,10 +320,10 @@ export default function HomePage() {
         {/* CATEGORÍAS — slider */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5" fontWeight={700}>
-            Categorías
+            {t('home.categories.title')}
           </Typography>
           <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-            Ver todo →
+            {t('home.common.viewAll')}
           </Typography>
         </Box>
         <Box mb={4} sx={{ overflow: 'hidden' }}>
@@ -365,7 +366,7 @@ export default function HomePage() {
                               {cat.name}
                             </Typography>
                             <Typography variant="caption" color="rgba(255,255,255,0.85)">
-                              {cat.productCount} productos
+                              {t('home.categories.productCount', { count: cat.productCount })}
                             </Typography>
                           </Box>
                         </>
@@ -382,7 +383,7 @@ export default function HomePage() {
                             {cat.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {cat.productCount} productos
+                            {t('home.categories.productCount', { count: cat.productCount })}
                           </Typography>
                         </Box>
                       )}
@@ -405,10 +406,10 @@ export default function HomePage() {
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                   <Typography variant="h5" fontWeight={700}>
                     {cat.icon ? `${cat.icon} ` : ''}
-                    {cat.name ?? 'Categoría'}
+                    {cat.name ?? t('home.categories.fallbackName')}
                   </Typography>
                   <Typography component={Link} to={`/categoria/${cat.slug ?? ''}`} variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-                    Ver todo →
+                    {t('home.common.viewAll')}
                   </Typography>
                 </Box>
                 <Box sx={{ '& .swiper-slide': { width: { xs: 260, md: 300 } } }}>
@@ -437,12 +438,12 @@ export default function HomePage() {
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="h5" fontWeight={700}>
-                  Ofertas relámpago
+                  {t('home.promotions.title')}
                 </Typography>
-                <Chip label="por tiempo limitado" size="small" color="error" />
+                <Chip label={t('home.promotions.limitedTime')} size="small" color="error" />
               </Box>
               <Typography component={Link} to="/promociones" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-                Ver todas →
+                {t('home.promotions.viewAllFeminine')}
               </Typography>
             </Box>
             <Box mb={4} sx={{ '& .swiper-slide': { width: { xs: 280, md: 340 } } }}>
@@ -483,7 +484,7 @@ export default function HomePage() {
                               sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <Chip
-                              label={`${promo.discountType === 'PERCENTAGE' ? promo.discountValue + '%' : money(promo.discountValue)} OFF`}
+                              label={t('home.promotions.offLabel', { value: promo.discountType === 'PERCENTAGE' ? promo.discountValue + '%' : money(promo.discountValue) })}
                               color="error"
                               size="small"
                               sx={{ position: 'absolute', top: 8, left: 8 }}
@@ -502,7 +503,7 @@ export default function HomePage() {
                           </Typography>
                           {promo.seller?.storeName && (
                             <Typography variant="caption" color="text.disabled">
-                              🏪 {promo.seller.storeName}
+                              {t('home.promotions.storeLabel', { store: promo.seller.storeName })}
                             </Typography>
                           )}
                         </Box>
@@ -520,15 +521,15 @@ export default function HomePage() {
           <>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Typography variant="h5" fontWeight={700}>
-                Para ti 👋
+                {t('home.forYou.title')}
               </Typography>
               <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-                Ver todo →
+                {t('home.common.viewAll')}
               </Typography>
             </Box>
             {recommendReason && (
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                {recommendReason === 'historial' ? 'Según tus búsquedas y productos que viste' : 'Productos populares para empezar'}
+                {recommendReason === 'historial' ? t('home.forYou.reasonHistory') : t('home.forYou.reasonPopular')}
               </Typography>
             )}
             <Grid container spacing={2} mb={4}>
@@ -559,11 +560,11 @@ export default function HomePage() {
               <Box display="flex" alignItems="center" gap={1}>
                 <GavelIcon />
                 <Typography variant="h6" fontWeight={700}>
-                  Subastas activas — termina pronto
+                  {t('home.auctions.title')}
                 </Typography>
               </Box>
               <Typography component={Link} to="/subastas" variant="body2" sx={{ color: 'inherit', textDecoration: 'underline' }}>
-                Ver todas →
+                {t('home.promotions.viewAllFeminine')}
               </Typography>
             </Box>
             <Grid container spacing={2}>
@@ -601,12 +602,12 @@ export default function HomePage() {
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h5" fontWeight={700}>
-              Destacados
+              {t('home.featured.title')}
             </Typography>
-            <Chip icon={<LocalFireDepartmentIcon />} label="Más vistos" size="small" color="warning" />
+            <Chip icon={<LocalFireDepartmentIcon />} label={t('home.featured.mostViewed')} size="small" color="warning" />
           </Box>
           <Typography component={Link} to="/productos" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
-            Ver todos →
+            {t('home.featured.viewAll')}
           </Typography>
         </Box>
         {(trending.length > 0 ? trending : featured).length > 0 ? (
@@ -618,7 +619,7 @@ export default function HomePage() {
             ))}
           </Grid>
         ) : (
-          <EmptyState message="No hay productos destacados aún" />
+          <EmptyState message={t('home.featured.empty')} />
         )}
       </Container>
     </Box>
