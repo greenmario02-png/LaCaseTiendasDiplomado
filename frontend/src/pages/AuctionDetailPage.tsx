@@ -260,7 +260,7 @@ export default function AuctionDetailPage() {
             <Chip label={`Inicial: ${money(auction.startingPrice)}`} variant="outlined" />
             <Chip label={`${auction.bidsCount} ofertas`} variant="outlined" />
             {auction.buyNowPrice && !isExpired && (
-              <Chip label={`Buy It Now: ${money(auction.buyNowPrice)}`} color="secondary" icon={<LocalOfferIcon />} />
+              <Chip label={`Comprar ahora: ${money(auction.buyNowPrice)}`} color="secondary" icon={<LocalOfferIcon />} />
             )}
             {auction.reservePrice && (
               <Chip
@@ -340,7 +340,7 @@ export default function AuctionDetailPage() {
                 </PrimaryButton>
                 {auction.buyNowPrice && (
                   <SecondaryButton onClick={doBuyNow} disabled={bidding}>
-                    <LocalOfferIcon sx={{ mr: 0.5 }} /> Buy It Now
+                    <LocalOfferIcon sx={{ mr: 0.5 }} /> Comprar ahora
                   </SecondaryButton>
                 )}
               </Box>
