@@ -293,7 +293,7 @@ const CARRERAS = [
     posts: [
       { title: '¿Vale la pena especializarse en IA o conviene ir por desarrollo web?', body: 'Estoy en tercer año y no sé si enfocarme en machine learning o quedarme con desarrollo web/backend, que parece tener más pega inmediata acá en Bolivia. ¿Qué opinan los que ya están trabajando?' },
       { title: 'Freelance vs. práctica en empresa: ¿qué les sirvió más para conseguir trabajo?', body: 'Tengo la opción de hacer freelance por proyectos sueltos o buscar una práctica formal en una empresa. ¿Cuál les abrió más puertas después de salir de la carrera?' },
-      { title: '¿Qué lenguaje conviene aprender primero si querés trabajar en Bolivia?', body: 'Veo ofertas pidiendo de todo: JavaScript, Python, Java, PHP. ¿Cuál se pide más en el mercado local realmente?' },
+      { title: '¿Qué lenguaje conviene aprender primero si quieres trabajar en Bolivia?', body: 'Veo ofertas pidiendo de todo: JavaScript, Python, Java, PHP. ¿Cuál se pide más en el mercado local realmente?' },
     ],
   },
   {
@@ -309,7 +309,7 @@ const CARRERAS = [
     suffix: 'administracion-de-empresas',
     name: 'Administración de Empresas',
     posts: [
-      { title: '¿Emprender apenas salís de la carrera o primero trabajar en relación de dependencia?', body: 'Tengo una idea de negocio pero no sé si lanzarla ya o esperar a tener más experiencia trabajando para alguien más primero. ¿Qué opinan?' },
+      { title: '¿Emprender apenas sales de la carrera o primero trabajar en relación de dependencia?', body: 'Tengo una idea de negocio pero no sé si lanzarla ya o esperar a tener más experiencia trabajando para alguien más primero. ¿Qué opinan?' },
       { title: 'Recomiéndenme certificaciones que realmente sirvan (Excel avanzado, SAP, etc.)', body: 'Quiero reforzar mi perfil con certificaciones cortas antes de salir. ¿Cuáles les han servido de verdad para conseguir trabajo?' },
       { title: '¿Qué tan real es que piden "2 años de experiencia" para el primer empleo?', body: 'Todas las ofertas piden experiencia previa. ¿Cómo hicieron para entrar a su primer trabajo formal sin tenerla?' },
     ],
@@ -528,12 +528,12 @@ const FORUM_RULES = [
 ];
 
 const LACASE_FAQS = [
-  { question: '¿Cómo compro un producto en LaCase Multitiendas?', answer: 'Busca el producto, revisa la ficha y el vendedor, agrégalo al carrito y sigue los pasos de pago. Podés coordinar el envío o el retiro directamente con la tienda desde el chat de la compra.' },
+  { question: '¿Cómo compro un producto en LaCase Multitiendas?', answer: 'Busca el producto, revisa la ficha y el vendedor, agrégalo al carrito y sigue los pasos de pago. Puedes coordinar el envío o el retiro directamente con la tienda desde el chat de la compra.' },
   { question: '¿Cómo abro mi tienda como vendedor?', answer: 'Regístrate eligiendo el rol de vendedor, completa los datos de tu tienda (nombre, ciudad y logo) y espera la aprobación del equipo de LaCase antes de publicar tus primeros productos.' },
-  { question: '¿Qué pasa si el producto no llega como se describía?', answer: 'Podés abrir una solicitud de devolución desde el detalle de tu pedido. El equipo de LaCase revisa el caso junto con el vendedor para resolverlo.' },
+  { question: '¿Qué pasa si el producto no llega como se describía?', answer: 'Puedes abrir una solicitud de devolución desde el detalle de tu pedido. El equipo de LaCase revisa el caso junto con el vendedor para resolverlo.' },
   { question: '¿Cómo se paga en LaCase Multitiendas?', answer: 'Los medios de pago disponibles se muestran en el checkout (QR, transferencia u otros habilitados por cada vendedor). LaCase no almacena datos de tarjetas.' },
   { question: '¿LaCase Multitiendas cobra comisión a los vendedores?', answer: 'Sí, se aplica una comisión por venta concretada, visible para el vendedor desde su panel antes de publicar cada producto.' },
-  { question: '¿Puedo tener más de una tienda con la misma cuenta?', answer: 'No, cada cuenta de vendedor administra una sola tienda. Si necesitas separar rubros, podés usar categorías y etiquetas dentro de la misma tienda.' },
+  { question: '¿Puedo tener más de una tienda con la misma cuenta?', answer: 'No, cada cuenta de vendedor administra una sola tienda. Si necesitas separar rubros, puedes usar categorías y etiquetas dentro de la misma tienda.' },
 ];
 
 async function seedAyudaYReglas() {
@@ -551,6 +551,27 @@ async function seedAyudaYReglas() {
     }
   }
   console.log('[seed-content] Reglas del foro y preguntas frecuentes de LaCase listas.');
+}
+
+/**
+ * Corrige texto en voseo que haya quedado sembrado por una corrida anterior a estas
+ * correcciones (los posts de universidades no se actualizan solos porque solo se crean
+ * una vez por categoría). Es un no-op si el texto ya está corregido.
+ */
+async function corregirTextosPrevios() {
+  const fixes: Array<{ old: string; new: string }> = [
+    {
+      old: '¿Qué lenguaje conviene aprender primero si querés trabajar en Bolivia?',
+      new: '¿Qué lenguaje conviene aprender primero si quieres trabajar en Bolivia?',
+    },
+    {
+      old: '¿Emprender apenas salís de la carrera o primero trabajar en relación de dependencia?',
+      new: '¿Emprender apenas sales de la carrera o primero trabajar en relación de dependencia?',
+    },
+  ];
+  for (const f of fixes) {
+    await prisma.forumPost.updateMany({ where: { title: f.old }, data: { title: f.new } });
+  }
 }
 
 async function main() {
@@ -609,6 +630,7 @@ async function main() {
 
   console.log('[seed-content] Sembrando carreras universitarias con publicaciones...');
   await seedUniversityCareers(allProfileIds);
+  await corregirTextosPrevios();
 
   console.log('[seed-content] Sembrando Rinconcito Boliviano (memes + torneos)...');
   await seedRinconcitoBoliviano(allProfileIds);
