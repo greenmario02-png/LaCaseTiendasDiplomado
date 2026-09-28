@@ -42,11 +42,11 @@ export default function LoginPage() {
   return (
     <AuthCard
       title="Iniciar sesión"
-      subtitle="Ingresá para comprar, vender y participar en el foro"
+      subtitle="Ingresa para comprar, vender y participar en el foro"
       footer={
         <>
-          ¿No tenés cuenta? <Link to="/register">Registrate</Link> · ¿Querés vender?{' '}
-          <Link to="/registro-vendedor">Abrí tu tienda</Link>
+          ¿No tienes cuenta? <Link to="/register">Regístrate</Link> · ¿Quieres vender?{' '}
+          <Link to="/registro-vendedor">Abre tu tienda</Link>
         </>
       }
     >

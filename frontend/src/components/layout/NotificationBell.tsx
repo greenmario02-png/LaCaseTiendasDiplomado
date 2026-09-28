@@ -192,7 +192,7 @@ export default function NotificationBell() {
           <Box textAlign="center" py={4}>
             <NotificationsIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
             <Typography variant="body2" color="text.secondary">
-              No tenés notificaciones
+              No tienes notificaciones
             </Typography>
           </Box>
         )}

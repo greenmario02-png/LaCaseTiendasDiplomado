@@ -153,7 +153,7 @@ export default function AuctionDetailPage() {
     }
     const amount = Number(bidAmount);
     if (!amount) {
-      toast.error('Ingresá un monto');
+      toast.error('Ingresa un monto');
       return;
     }
     setBidding(true);
@@ -313,7 +313,7 @@ export default function AuctionDetailPage() {
               </Alert>
             )
           ) : isSeller ? (
-            <Alert severity="info">Esta es tu subasta. No podés ofertar ni comprarla.</Alert>
+            <Alert severity="info">Esta es tu subasta. No puedes ofertar ni comprarla.</Alert>
           ) : (
             <Paper sx={{ p: 2 }}>
               {iAmWinning && <Alert severity="success" sx={{ mb: 2 }}>Vas ganando con {money(auction.currentPrice)}</Alert>}
@@ -345,7 +345,7 @@ export default function AuctionDetailPage() {
                 )}
               </Box>
               <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                Tu oferta actúa como <strong>proxy bidding</strong>: pagás solo lo necesario para ganar, hasta el monto que indicás.
+                Tu oferta actúa como <strong>proxy bidding</strong>: pagas solo lo necesario para ganar, hasta el monto que indicas.
               </Typography>
             </Paper>
           )}
@@ -369,7 +369,7 @@ export default function AuctionDetailPage() {
                 <Box flex={1}>
                   <Typography variant="body2" fontWeight={600}>
                     {b.bidder.storeName || `${b.bidder.firstName} ${b.bidder.lastName}`}
-                    {b.bidder.id === user?.id && ' (vos)'}
+                    {b.bidder.id === user?.id && ' (tú)'}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {new Date(b.createdAt).toLocaleTimeString('es-BO')}

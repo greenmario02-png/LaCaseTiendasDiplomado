@@ -8,6 +8,7 @@ import * as FS from '../services/forum.service';
 import { karmaService } from '../services/karma.service';
 import * as giphyService from '../services/giphy.service';
 import { haversineKm, nearestCity } from '../services/geo.service';
+import { uploadBuffer } from '../utils/storage';
 
 // ─── Perfil ───────────────────────────────────────────────────────
 
@@ -148,7 +149,9 @@ export async function deletePost(req: AuthRequest, res: Response) {
 
 export async function uploadPostImages(req: AuthRequest, res: Response) {
   const files = (req.files as Express.Multer.File[] | undefined) ?? [];
-  const urls = files.map((f) => `/uploads/forum/posts/${req.params.id}/${f.filename}`);
+  const urls = await Promise.all(
+    files.map((f) => uploadBuffer(f.buffer, `forum/posts/${req.params.id}`, f.originalname, f.mimetype))
+  );
   const post = await FS.attachPostImages(req.user!.id, Number(req.params.id), urls);
   return ok(res, { post, urls });
 }
@@ -202,7 +205,9 @@ export async function deleteReply(req: AuthRequest, res: Response) {
 
 export async function uploadReplyImages(req: AuthRequest, res: Response) {
   const files = (req.files as Express.Multer.File[] | undefined) ?? [];
-  const urls = files.map((f) => `/uploads/forum/replies/${req.params.id}/${f.filename}`);
+  const urls = await Promise.all(
+    files.map((f) => uploadBuffer(f.buffer, `forum/replies/${req.params.id}`, f.originalname, f.mimetype))
+  );
   const reply = await FS.attachReplyImages(req.user!.id, Number(req.params.id), urls);
   return ok(res, { reply, urls });
 }

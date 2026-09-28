@@ -224,7 +224,7 @@ export default function OrderDetailPage() {
             🏬 Retiro en tienda
           </Typography>
           <Typography variant="body2" color="text.primary">
-            {order.pickupAddress || 'Retirá el pedido en la tienda del vendedor.'}
+            {order.pickupAddress || 'Retira el pedido en la tienda del vendedor.'}
           </Typography>
         </SurfaceCard>
       )}

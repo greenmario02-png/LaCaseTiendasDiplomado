@@ -61,7 +61,7 @@ export default function SellerPrivileged() {
         </Typography>
       </Box>
       <Typography variant="body2" color="text.secondary" mb={3}>
-        Estos compradores ven tus productos nuevos antes que el público general y pueden reservarlos. Vos decidís quiénes son privilegiados.
+        Estos compradores ven tus productos nuevos antes que el público general y pueden reservarlos. Tú decides quiénes son privilegiados.
       </Typography>
 
       <Typography variant="h6" fontWeight={700} mb={1}>
@@ -105,7 +105,7 @@ export default function SellerPrivileged() {
       {buyers.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
           <Alert severity="info" sx={{ maxWidth: 480, mx: 'auto' }}>
-            Aún no tenés compradores privilegiados. Cuando apruebes solicitudes, esos compradores verán tus productos nuevos con acceso anticipado.
+            Aún no tienes compradores privilegiados. Cuando apruebes solicitudes, esos compradores verán tus productos nuevos con acceso anticipado.
           </Alert>
         </Paper>
       ) : (

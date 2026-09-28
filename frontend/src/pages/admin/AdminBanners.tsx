@@ -131,7 +131,7 @@ export default function AdminBanners() {
   // Derivar tablet/mobile de la imagen desktop (recortes automáticos a las dimensiones)
   const deriveFromDesktop = () => {
     if (!form.imageDesktop) {
-      toast.error('Primero subí la imagen principal (desktop)');
+      toast.error('Primero sube la imagen principal (desktop)');
       return;
     }
     // Reutilizamos la misma imagen para tablet/mobile si no las tienen
@@ -140,7 +140,7 @@ export default function AdminBanners() {
       imageTablet: f.imageTablet || f.imageDesktop,
       imageMobile: f.imageMobile || f.imageDesktop,
     }));
-    toast.success('Imágenes derivadas de la principal. Usá "Recortar" para ajustarlas.');
+    toast.success('Imágenes derivadas de la principal. Usa "Recortar" para ajustarlas.');
   };
 
   const save = async () => {
@@ -256,7 +256,7 @@ export default function AdminBanners() {
                 Imagen principal (Desktop) — obligatoria
               </Typography>
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                Tamaño recomendado: <strong>1920 × 400 px</strong>. Usá el editor para recortar a medida.
+                Tamaño recomendado: <strong>1920 × 400 px</strong>. Usa el editor para recortar a medida.
               </Typography>
               <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
                 <Avatar variant="rounded" sx={{ width: 120, height: 50 }}>

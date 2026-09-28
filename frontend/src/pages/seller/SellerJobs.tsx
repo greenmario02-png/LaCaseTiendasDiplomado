@@ -134,10 +134,10 @@ function fmtDate(iso: string | null): string {
 
 function validate(f: FormState): Record<string, string> {
   const e: Record<string, string> = {};
-  if (f.categoryId === '') e.categoryId = 'Elegí una categoría';
+  if (f.categoryId === '') e.categoryId = 'Elige una categoría';
   if (f.title.trim().length < 5) e.title = 'El título debe tener al menos 5 caracteres';
   if (f.description.trim().length < 20) e.description = 'La descripción debe tener al menos 20 caracteres';
-  if (!f.city.trim()) e.city = 'Indicá la ciudad';
+  if (!f.city.trim()) e.city = 'Indica la ciudad';
   const vac = Number(f.vacancies);
   if (!Number.isInteger(vac) || vac < 1) e.vacancies = 'Mínimo 1 vacante';
   const min = f.salaryMin === '' ? null : Number(f.salaryMin);
@@ -570,7 +570,7 @@ export default function SellerJobs() {
     <Box>
       <PageHeader
         title="Empleos"
-        subtitle="Publicá ofertas de trabajo para tu tienda"
+        subtitle="Publica ofertas de trabajo para tu tienda"
         icon={<WorkOutlineIcon />}
         actions={
           <PrimaryButton type="button" startIcon={postDisabled ? <LockOutlinedIcon /> : <AddIcon />} onClick={openCreate} disabled={postDisabled}>
@@ -589,7 +589,7 @@ export default function SellerJobs() {
             </GhostButton>
           }
         >
-          Solo las tiendas verificadas pueden publicar empleos. Completá la verificación de tu tienda en{' '}
+          Solo las tiendas verificadas pueden publicar empleos. Completa la verificación de tu tienda en{' '}
           <Link to="/seller/configuracion">Configuración</Link>.
         </Alert>
       )}
@@ -667,7 +667,7 @@ export default function SellerJobs() {
                     {j.status === 'REJECTED' && j.rejectionReason && (
                       <FadeIn>
                         <Alert severity="error" sx={{ mt: 1.5 }}>
-                          Motivo del rechazo: {j.rejectionReason}. Podés editarlo y volver a enviarlo.
+                          Motivo del rechazo: {j.rejectionReason}. Puedes editarlo y volver a enviarlo.
                         </Alert>
                       </FadeIn>
                     )}

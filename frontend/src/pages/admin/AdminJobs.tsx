@@ -215,7 +215,7 @@ export default function AdminJobs() {
 
   return (
     <Box>
-      <PageHeader title="Empleos" subtitle="Moderá las ofertas de trabajo de las tiendas" icon={<WorkOutlineIcon />} />
+      <PageHeader title="Empleos" subtitle="Modera las ofertas de trabajo de las tiendas" icon={<WorkOutlineIcon />} />
 
       <Tabs value={tab} onChange={(_, v) => { setTab(v); setExpanded(null); }} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
         {TABS.map((x) => (

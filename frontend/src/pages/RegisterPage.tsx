@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(form);
-      toast.success('Registro exitoso. Ahora iniciá sesión.');
+      toast.success('Registro exitoso. Ahora inicia sesión.');
       navigate('/login');
     } catch (err) {
       setError(getErrorMessage(err));
@@ -39,7 +39,7 @@ export default function RegisterPage() {
       subtitle="Es gratis y toma menos de un minuto"
       footer={
         <>
-          ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link> · ¿Querés vender? <Link to="/registro-vendedor">Abrí tu tienda</Link>
+          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link> · ¿Quieres vender? <Link to="/registro-vendedor">Abre tu tienda</Link>
         </>
       }
     >
@@ -58,7 +58,7 @@ export default function RegisterPage() {
             label="Código de invitación (opcional)"
             value={form.referralCode}
             onChange={handleChange('referralCode')}
-            helperText="¿Te invitó un amigo? Escribí su código y quien te invitó gana 50 monedas del proyecto."
+            helperText="¿Te invitó un amigo? Escribe su código y quien te invitó gana 50 monedas del proyecto."
           />
         <PrimaryButton type="submit" size="large" fullWidth disabled={loading}>
           {loading ? <CircularProgress size={22} color="inherit" /> : 'Registrarme'}

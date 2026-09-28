@@ -43,7 +43,7 @@ describe('HomePage', () => {
     vi.clearAllMocks();
   });
 
-  it('renderiza el hero con los botones redesign (Explorar productos / Subastas / Abrí tu tienda)', async () => {
+  it('renderiza el hero con los botones redesign (Explorar productos / Subastas / Abre tu tienda)', async () => {
     render(
       <MemoryRouter>
         <HomePage />
@@ -53,7 +53,7 @@ describe('HomePage', () => {
     expect(await screen.findByText('Todas las tiendas, un solo lugar')).toBeInTheDocument();
     expect(screen.getByText('Explorar productos')).toBeInTheDocument();
     expect(screen.getByText('Subastas')).toBeInTheDocument();
-    expect(screen.getByText('Abrí tu tienda')).toBeInTheDocument();
+    expect(screen.getByText('Abre tu tienda')).toBeInTheDocument();
   });
 
   it('muestra el EmptyState cuando no hay destacados', async () => {

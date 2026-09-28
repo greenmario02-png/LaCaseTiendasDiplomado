@@ -62,11 +62,11 @@ export default function ReturnsPage() {
         </Alert>
       )}
       <Typography variant="body2" color="text.secondary" mb={2}>
-        Solo podés solicitar una devolución después de recibir la compra con el pago verificado.
+        Solo puedes solicitar una devolución después de recibir la compra con el pago verificado.
       </Typography>
 
       {returns.length === 0 ? (
-        <Alert severity="info">No tenés solicitudes de devolución.</Alert>
+        <Alert severity="info">No tienes solicitudes de devolución.</Alert>
       ) : (
         <Stack spacing={2}>
           {returns.map((r) => (

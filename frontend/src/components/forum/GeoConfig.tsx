@@ -75,7 +75,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
         }
       },
       () => {
-        setError('No pudimos obtener tu ubicación. Elegí tu ciudad manualmente.');
+        setError('No pudimos obtener tu ubicación. Elige tu ciudad manualmente.');
         setLocating(false);
       },
       { timeout: 10000 },
@@ -84,7 +84,7 @@ export function GeoConfig({ compact = false, onSaved }: Props) {
 
   const save = async () => {
     if (!cityId) {
-      setError('Elegí tu ciudad.');
+      setError('Elige tu ciudad.');
       return;
     }
     setSaving(true);
@@ -166,7 +166,7 @@ function StackGeo({ cityId, grouped, onChange }: {
       getOptionLabel={(o) => `${o.name} (${o.department})`}
       isOptionEqualToValue={(a, b) => a.id === b.id}
       renderInput={(params) => (
-        <TextField {...params} label="Ciudad" placeholder="Elegí tu ciudad (ej: Oruro)"
+        <TextField {...params} label="Ciudad" placeholder="Elige tu ciudad (ej: Oruro)"
           sx={{ '& fieldset': { borderColor: forumPalette.border } }} />
       )}
     />

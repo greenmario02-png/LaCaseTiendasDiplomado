@@ -187,12 +187,12 @@ export default function JobsPage() {
     const errs: Record<string, string> = {};
     if (form.message.trim().length < 10) errs.message = 'El mensaje debe tener al menos 10 caracteres';
     if (form.contactPhone.trim().length < 6) errs.contactPhone = 'El teléfono debe tener al menos 6 caracteres';
-    if (form.expectedSalary !== '' && !(Number(form.expectedSalary) >= 0)) errs.expectedSalary = 'Ingresá un monto válido';
+    if (form.expectedSalary !== '' && !(Number(form.expectedSalary) >= 0)) errs.expectedSalary = 'Ingresa un monto válido';
     if (form.resumeUrl.trim()) {
       try {
         new URL(form.resumeUrl.trim());
       } catch {
-        errs.resumeUrl = 'Ingresá un enlace válido (https://...)';
+        errs.resumeUrl = 'Ingresa un enlace válido (https://...)';
       }
     }
     if (errors.cv && !cvFile) errs.cv = errors.cv;
@@ -219,7 +219,7 @@ export default function JobsPage() {
     } catch (err) {
       const status = (err as { response?: { status?: number } }).response?.status;
       setApplyError(
-        status === 403 ? 'No podés postularte a un empleo de tu propia tienda.' : getErrorMessage(err),
+        status === 403 ? 'No puedes postularte a un empleo de tu propia tienda.' : getErrorMessage(err),
       );
     } finally {
       setSubmitting(false);
@@ -227,7 +227,7 @@ export default function JobsPage() {
   };
 
   const withdraw = async () => {
-    if (!selected || !window.confirm('¿Querés retirar tu postulación?')) return;
+    if (!selected || !window.confirm('¿Quieres retirar tu postulación?')) return;
     setWithdrawing(true);
     try {
       await api.delete(`/jobs/${selected.id}/apply`);

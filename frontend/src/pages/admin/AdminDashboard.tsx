@@ -196,7 +196,7 @@ export default function AdminDashboard() {
                   Copias masivas detectadas
                 </Typography>
                 <Typography variant="body2" sx={{ color: vision.text.secondary }}>
-                  Se detectaron muchas copias de productos en los últimos 30 días. Podés pausar las tiendas sospechosas.
+                  Se detectaron muchas copias de productos en los últimos 30 días. Puedes pausar las tiendas sospechosas.
                 </Typography>
               </Box>
               <Box>

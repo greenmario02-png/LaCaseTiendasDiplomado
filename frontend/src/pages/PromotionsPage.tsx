@@ -28,7 +28,7 @@ export default function PromotionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <PageHeader title="Promociones activas" subtitle="Aprovechá los mejores descuentos" icon={<LocalOfferIcon />} />
+      <PageHeader title="Promociones activas" subtitle="Aprovecha los mejores descuentos" icon={<LocalOfferIcon />} />
       {promotions.length === 0 && (
         <SurfaceCard>
           <EmptyState message="No hay promociones activas en este momento." />

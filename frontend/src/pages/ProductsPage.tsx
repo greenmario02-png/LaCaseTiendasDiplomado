@@ -579,7 +579,7 @@ export default function ProductsPage() {
         {searchMode === 'categorias' && (
           <Box mt={1}>
             <Typography variant="body2" fontWeight={600} mb={1}>
-              Explorá por categoría o subcategoría:
+              Explora por categoría o subcategoría:
             </Typography>
             <Box display="flex" flexDirection="column" gap={0.5}>
               {categories.map((cat) => (

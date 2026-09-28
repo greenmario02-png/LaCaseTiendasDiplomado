@@ -99,7 +99,7 @@ export default function CommentsSection({ targetType, targetId }: Props) {
             size="small"
             multiline
             maxRows={4}
-            placeholder="Escribí un comentario…"
+            placeholder="Escribe un comentario…"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             inputProps={{ maxLength: 500 }}

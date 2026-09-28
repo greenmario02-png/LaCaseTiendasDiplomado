@@ -555,9 +555,6 @@ const PRODUCT_TEMPLATES: Record<string, Array<{ name: string; price: [number, nu
   'Alimento': [
     { name: 'Alimento Balanceado Perro 15kg', price: [320, 460] },
   ],
-  'Accesorios': [
-    { name: 'Correa y Arnés para Mascota', price: [85, 130] },
-  ],
   'Juguetes para mascotas': [
     { name: 'Juguete Interactivo para Gato', price: [55, 100] },
   ],
@@ -709,6 +706,7 @@ const PRODUCT_TEMPLATES: Record<string, Array<{ name: string; price: [number, nu
   'Accesorios para mascotas': [
     { name: 'Collar con Placa', price: [60, 110], attrs: { Tipo: 'Collar' } },
     { name: 'Cama para Mascotas Grande', price: [180, 300], attrs: { Tipo: 'Cama' } },
+    { name: 'Correa y Arnés para Mascota', price: [85, 130], attrs: { Tipo: 'Correa' } },
   ],
   'Juguetes para mascotas': [
     { name: 'Juguete Masticable de Goma', price: [45, 85] },

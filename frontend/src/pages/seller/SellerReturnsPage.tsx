@@ -85,7 +85,7 @@ export default function SellerReturnsPage() {
       )}
 
       {returns.length === 0 ? (
-        <Alert severity="info">No tenés solicitudes de devolución.</Alert>
+        <Alert severity="info">No tienes solicitudes de devolución.</Alert>
       ) : (
         <Stack spacing={2}>
           {returns.map((r) => (

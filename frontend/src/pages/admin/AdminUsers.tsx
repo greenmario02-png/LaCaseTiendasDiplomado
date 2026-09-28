@@ -79,7 +79,7 @@ export default function AdminUsers() {
 
   const createUser = async () => {
     if (!form.email || !form.password || !form.firstName || !form.lastName) {
-      toast.error('Completá email, contraseña, nombre y apellido');
+      toast.error('Completa email, contraseña, nombre y apellido');
       return;
     }
     setCreating(true);
@@ -249,7 +249,7 @@ export default function AdminUsers() {
                 <TextField
                   {...params}
                   label="Buscar usuario por email o nombre"
-                  placeholder="Escribí al menos 2 letras..."
+                  placeholder="Escribe al menos 2 letras..."
                   fullWidth
                 />
               )}
@@ -260,7 +260,7 @@ export default function AdminUsers() {
               )}
             />
             <Typography variant="caption" color="text.secondary">
-              Buscá un usuario ya registrado para invitarlo a la plataforma con el rol que elijas.
+              Busca un usuario ya registrado para invitarlo a la plataforma con el rol que elijas.
             </Typography>
           </Box>
           <TextField

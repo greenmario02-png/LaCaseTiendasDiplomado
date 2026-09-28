@@ -122,7 +122,7 @@ export default function SellerPayouts() {
 
       <Alert severity="info" sx={{ mb: 3 }}>
         🔒 El dinero de tus ventas queda <strong>retenido (escrow)</strong> hasta que el comprador recibe el producto y
-        el pago se verifica. Después de la entrega, el saldo se libera y podés retirarlo a tu cuenta BNB, banco o QR.
+        el pago se verifica. Después de la entrega, el saldo se libera y puedes retirarlo a tu cuenta BNB, banco o QR.
       </Alert>
 
       {/* Balance */}

@@ -215,10 +215,10 @@ export default function FloatingChat() {
       {conversations.length === 0 ? (
         <Box p={3} textAlign="center">
           <Typography color="text.secondary" variant="body2">
-            No tenés conversaciones todavía.
+            No tienes conversaciones todavía.
           </Typography>
           <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-            Iniciá una desde la ficha de un producto o de una tienda.
+            Inicia una desde la ficha de un producto o de una tienda.
           </Typography>
         </Box>
       ) : (
@@ -306,7 +306,7 @@ export default function FloatingChat() {
         <Box flex={1} overflow="auto" p={1.5} sx={{ bgcolor: 'background.default' }}>
           {messages.length === 0 && (
             <Typography color="text.secondary" textAlign="center" mt={3} variant="body2">
-              Sin mensajes todavía. Escribí para consultar.
+              Sin mensajes todavía. Escribe para consultar.
             </Typography>
           )}
           {messages.map((m) => {
@@ -350,7 +350,7 @@ export default function FloatingChat() {
           <TextField
             fullWidth
             size="small"
-            placeholder="Escribí un mensaje..."
+            placeholder="Escribe un mensaje..."
             value={text}
             onChange={(e) => {
               setText(e.target.value);

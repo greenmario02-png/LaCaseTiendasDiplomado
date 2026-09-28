@@ -131,7 +131,7 @@ const FIELDS: {
   },
 ];
 
-async function main() {
+export async function seedProfessional() {
   console.log('[seed-professional] Creando áreas profesionales y preguntas...');
   // sortOrder alto a propósito: estas categorías son gateadas (requieren verificación) y
   // NUNCA deben terminar primeras en un listado genérico ordenado por sortOrder — varios
@@ -237,11 +237,13 @@ async function main() {
   console.log('[seed-professional] Listo.');
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (require.main === module) {
+  seedProfessional()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

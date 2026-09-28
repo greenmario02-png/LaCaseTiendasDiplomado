@@ -51,7 +51,7 @@ export default function SellerAuctions() {
       {auctions.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography color="text.secondary">
-            No creaste subastas aún. Al publicar un producto activá la opción "Publicar como subasta".
+            No creaste subastas aún. Al publicar un producto activa la opción "Publicar como subasta".
           </Typography>
           <Box sx={{ mt: 2 }}>
             <PrimaryButton to="/seller/productos/nuevo">

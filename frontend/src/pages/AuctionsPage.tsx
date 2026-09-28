@@ -58,7 +58,7 @@ function formatTimeLeft(ms: number): string {
 }
 
 const SORTS = [
-  { value: 'interest', label: 'Para vos (interés + ofertas)' },
+  { value: 'interest', label: 'Para ti (interés + ofertas)' },
   { value: 'price_asc', label: 'Precio más bajo' },
   { value: 'price_desc', label: 'Precio más alto' },
   { value: 'ending_soon', label: 'Terminan pronto' },
@@ -106,7 +106,7 @@ export default function AuctionsPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <PageHeader title="Subastas" subtitle="Pujá por productos únicos y llevate las mejores ofertas" icon={<GavelIcon />} />
+      <PageHeader title="Subastas" subtitle="Puja por productos únicos y llévate las mejores ofertas" icon={<GavelIcon />} />
 
       {/* Buscador y filtros */}
       <SurfaceCard sx={{ p: 2, mb: 3 }}>
@@ -162,7 +162,7 @@ export default function AuctionsPage() {
         <ProductGridSkeleton count={8} />
       ) : auctions.length === 0 ? (
         <SurfaceCard>
-          <EmptyState message={`No se encontraron subastas${search ? ` para "${search}"` : ''}. Probá con otros términos o quitá los filtros.`} />
+          <EmptyState message={`No se encontraron subastas${search ? ` para "${search}"` : ''}. Prueba con otros términos o quita los filtros.`} />
         </SurfaceCard>
       ) : (
         <>

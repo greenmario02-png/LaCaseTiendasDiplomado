@@ -163,7 +163,7 @@ export default function AdminRbac() {
         return;
       }
       if (!roleForm.name.trim()) {
-        toast.error('Escribí el nombre del rol');
+        toast.error('Escribe el nombre del rol');
         return;
       }
       const payload = { ...roleForm, description: roleForm.description?.trim() || undefined };
@@ -206,7 +206,7 @@ export default function AdminRbac() {
         return;
       }
       if (!permForm.name.trim()) {
-        toast.error('Escribí el nombre del permiso');
+        toast.error('Escribe el nombre del permiso');
         return;
       }
       const payload = { ...permForm, module: permForm.module || 'core' };
@@ -520,7 +520,7 @@ export default function AdminRbac() {
               Asignar permisos y menús a un rol
             </Typography>
             <TextField select label="Rol" value={selRoleId} onChange={(e) => setSelRoleId(Number(e.target.value))} size="small" sx={{ mb: 2, minWidth: 260 }}>
-              <MenuItem value="">Seleccioná un rol…</MenuItem>
+              <MenuItem value="">Selecciona un rol…</MenuItem>
               {roles.map((r) => (
                 <MenuItem key={r.id} value={r.id}>
                   {r.name} ({r.code})

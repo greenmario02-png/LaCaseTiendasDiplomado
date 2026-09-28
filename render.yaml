@@ -27,3 +27,9 @@ services:
         value: "8"
       - key: CURRENCY_REFRESH_MAX_MINUTES
         value: "14"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: lacase-uploads

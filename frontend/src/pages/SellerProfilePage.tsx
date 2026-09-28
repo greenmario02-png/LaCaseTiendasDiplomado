@@ -589,7 +589,7 @@ export default function SellerProfilePage() {
               ¿Cómo fue tu experiencia con esta tienda?
             </Typography>
             <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-              Votá cada par según tu experiencia. El conteo muestra cuántas personas eligieron cada etiqueta.
+              Vota cada par según tu experiencia. El conteo muestra cuántas personas eligieron cada etiqueta.
             </Typography>
             <Box display="flex" flexWrap="wrap" gap={1}>
               {REVIEW_TAG_PAIRS.map((pair) => {

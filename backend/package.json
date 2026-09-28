@@ -12,6 +12,7 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:prod": "tsx prisma/seed-prod.ts",
+    "db:seed:content": "tsx prisma/seed-content.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
+    "@supabase/supabase-js": "^2.45.0",
     "@types/node-cron": "^3.0.11",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

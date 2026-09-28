@@ -141,7 +141,7 @@ export default function SellerTeam() {
         </PrimaryButton>
       </Box>
       <Typography variant="body2" color="text.secondary" mb={3}>
-        Invitá a personas de confianza para que te ayuden a gestionar la tienda. Los administradores gestionan todo; los empleados
+        Invita a personas de confianza para que te ayuden a gestionar la tienda. Los administradores gestionan todo; los empleados
         solo pueden subir productos y ver pedidos (sin precios ni cobros).
       </Typography>
 
@@ -171,7 +171,7 @@ export default function SellerTeam() {
             {members.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  Todavía no tenés empleados. Invitá a alguien para que te ayude a gestionar la tienda.
+                  Todavía no tienes empleados. Invita a alguien para que te ayude a gestionar la tienda.
                 </TableCell>
               </TableRow>
             )}
@@ -219,7 +219,7 @@ export default function SellerTeam() {
               onInputChange={(_, v) => setSearch(v)}
               onChange={(_, v) => setSelected(v)}
               filterOptions={(x) => x}
-              noOptionsText={search.trim().length < 2 ? 'Escribí al menos 2 letras' : 'Sin resultados'}
+              noOptionsText={search.trim().length < 2 ? 'Escribe al menos 2 letras' : 'Sin resultados'}
               renderInput={(params) => (
                 <TextField {...params} label="Buscar usuario por email o nombre" placeholder="juan@mail.com" />
               )}

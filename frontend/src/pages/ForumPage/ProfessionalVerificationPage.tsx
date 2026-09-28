@@ -53,7 +53,7 @@ export default function ProfessionalVerificationPage() {
   const submit = async () => {
     if (!activeField) return;
     if (Object.keys(answers).length < questions.length) {
-      toast.error('Respondé todas las preguntas antes de enviar.');
+      toast.error('Responde todas las preguntas antes de enviar.');
       return;
     }
     setSubmitting(true);
@@ -79,8 +79,8 @@ export default function ProfessionalVerificationPage() {
         <ScienceIcon sx={{ fontSize: 20, color: tokens.primary }} /> Comunidades profesionales
       </Typography>
       <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 2 }}>
-        Respondé un cuestionario básico de tu área para poder publicar en Ciencia, Debates, Noticias y
-        Preguntas de esa comunidad. Podés seguir leyendo esas secciones sin verificarte.
+        Responde un cuestionario básico de tu área para poder publicar en Ciencia, Debates, Noticias y
+        Preguntas de esa comunidad. Puedes seguir leyendo esas secciones sin verificarte.
       </Typography>
 
       <Stack spacing={1.5}>
@@ -113,8 +113,8 @@ export default function ProfessionalVerificationPage() {
           {result ? (
             <Alert severity={result.status === 'PASSED' ? 'success' : 'error'} sx={{ mt: 1 }}>
               {result.status === 'PASSED'
-                ? `¡Aprobaste! ${result.score}/${result.totalQuestions} correctas. Ya podés publicar en esta comunidad.`
-                : `No aprobaste (${result.score}/${result.totalQuestions} correctas). Podés reintentar más tarde.`}
+                ? `¡Aprobaste! ${result.score}/${result.totalQuestions} correctas. Ya puedes publicar en esta comunidad.`
+                : `No aprobaste (${result.score}/${result.totalQuestions} correctas). Puedes reintentar más tarde.`}
             </Alert>
           ) : questions.length === 0 ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={24} /></Box>

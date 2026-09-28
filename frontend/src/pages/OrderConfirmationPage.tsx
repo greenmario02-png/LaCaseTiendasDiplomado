@@ -29,7 +29,7 @@ export default function OrderConfirmationPage() {
 
   const uploadProof = async (orderId: number) => {
     if (!proofUrl.trim()) {
-      toast.error('Ingresá la URL del comprobante');
+      toast.error('Ingresa la URL del comprobante');
       return;
     }
     setUploading(true);
@@ -52,7 +52,7 @@ export default function OrderConfirmationPage() {
           ¡Compra confirmada!
         </Typography>
         <Typography color="text.secondary">
-          Se generaron {orders.length} orden(es), una por cada tienda. Ahora realizá el pago por QR.
+          Se generaron {orders.length} orden(es), una por cada tienda. Ahora realiza el pago por QR.
         </Typography>
       </Box>
 
@@ -93,7 +93,7 @@ export default function OrderConfirmationPage() {
           ) : (
             <Box>
               <Alert severity="info" sx={{ mb: 2 }}>
-                Escaneá el QR del vendedor y realizá la transferencia. Luego subí el comprobante.
+                Escanea el QR del vendedor y realiza la transferencia. Luego sube el comprobante.
               </Alert>
               <Box sx={{ textAlign: 'center', py: 2 }}>
                 <Box className="image-container" sx={{ width: 160, height: 160, borderRadius: 2, mx: 'auto' }}>

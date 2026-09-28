@@ -164,7 +164,7 @@ export default function NotificationsPage() {
       {loading && <LoadingState />}
       {!loading && error && <ErrorState message={error} onRetry={() => load()} />}
       {!loading && !error && notifications.length === 0 && (
-        <EmptyState message={onlyUnread ? 'No tenés notificaciones sin leer 🎉' : 'No tenés notificaciones todavía'} />
+        <EmptyState message={onlyUnread ? 'No tienes notificaciones sin leer 🎉' : 'No tienes notificaciones todavía'} />
       )}
       {!loading && !error && notifications.length > 0 && (
         <>

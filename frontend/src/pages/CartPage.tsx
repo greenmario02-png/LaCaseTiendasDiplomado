@@ -138,7 +138,7 @@ export default function CartPage() {
                       QR de pago de {group.seller.storeName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Escaneá este QR para pagar el total de esta tienda. El comprobante lo confirmás en el checkout.
+                      Escanea este QR para pagar el total de esta tienda. El comprobante lo confirmas en el checkout.
                     </Typography>
                   </Box>
                 </Box>
@@ -169,7 +169,7 @@ export default function CartPage() {
             </Box>
             {!user && (
               <Alert severity="info" sx={{ mb: 2 }}>
-                <Link to="/login">Iniciá sesión</Link> para finalizar la compra
+                <Link to="/login">Inicia sesión</Link> para finalizar la compra
               </Alert>
             )}
             <PrimaryButton

@@ -112,15 +112,15 @@ export default function SellerGifts() {
 
   const save = async () => {
     if (!form.title.trim()) return toast.error('El título es obligatorio');
-    if (form.productIds.length === 0) return toast.error('Elegí al menos un producto de regalo');
+    if (form.productIds.length === 0) return toast.error('Elige al menos un producto de regalo');
     if (form.triggerType === 'UNITS' && (!form.triggerProductId || !form.triggerQuantity)) {
-      return toast.error('Para el tipo "por cantidad" indicá el producto y la cantidad');
+      return toast.error('Para el tipo "por cantidad" indica el producto y la cantidad');
     }
     if (form.triggerType === 'AMOUNT' && !form.triggerAmount) {
-      return toast.error('Para el tipo "por monto" indicá el monto mínimo');
+      return toast.error('Para el tipo "por monto" indica el monto mínimo');
     }
     if (form.triggerType === 'PRODUCT' && !form.triggerProductId) {
-      return toast.error('Para el tipo "por producto" indicá el producto');
+      return toast.error('Para el tipo "por producto" indica el producto');
     }
 
     const payload = {
@@ -191,9 +191,9 @@ export default function SellerGifts() {
         </PrimaryButton>
       </Box>
       <Alert severity="info" sx={{ mb: 3 }}>
-        Ofrecé regalos a tus clientes con lógica de ticket de regalo: al comprar una cantidad de un producto, al
+        Ofrece regalos a tus clientes con lógica de ticket de regalo: al comprar una cantidad de un producto, al
         superar un monto o al comprar un producto específico, el cliente recibe un producto de tu tienda de regalo.
-        También podés dejar que elija entre varios regalos.
+        También puedes dejar que elija entre varios regalos.
       </Alert>
 
       {promos.length === 0 ? (
@@ -240,7 +240,7 @@ export default function SellerGifts() {
         <DialogTitle>{editing ? 'Editar promo de regalo' : 'Nueva promo de regalo'}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Título" fullWidth value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Comprá 2 y llevate 1 de regalo" />
+            <TextField label="Título" fullWidth value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Compra 2 y llévate 1 de regalo" />
             <TextField label="Descripción (opcional)" fullWidth multiline rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             <TextField
               select
@@ -297,7 +297,7 @@ export default function SellerGifts() {
 
             <TextField
               select
-              label="Productos de regalo (elegí uno o más)"
+              label="Productos de regalo (elige uno o más)"
               fullWidth
               SelectProps={{ multiple: true }}
               value={form.productIds}

@@ -123,11 +123,11 @@ export default function AdminPromotions() {
 
   const save = async () => {
     if (!form.title.trim()) {
-      toast.error('Escribí el nombre de la promoción');
+      toast.error('Escribe el nombre de la promoción');
       return;
     }
     if (selectedProducts.length === 0) {
-      toast.error('Agregá al menos un producto');
+      toast.error('Agrega al menos un producto');
       return;
     }
     try {
@@ -312,7 +312,7 @@ export default function AdminPromotions() {
 
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="body2">
-                  Elegí la <strong>tienda</strong> y buscá el <strong>producto</strong> por nombre o código (SKU). Podés
+                  Elige la <strong>tienda</strong> y busca el <strong>producto</strong> por nombre o código (SKU). Puedes
                   agregar varios.
                 </Typography>
               </Alert>
@@ -330,7 +330,7 @@ export default function AdminPromotions() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="1. Elegí la tienda"
+                      label="1. Elige la tienda"
                       placeholder="Buscar tienda..."
                       InputProps={{
                         ...params.InputProps,
@@ -350,7 +350,7 @@ export default function AdminPromotions() {
                   value={searchTerm}
                   onChange={(e) => searchProducts(e.target.value)}
                   disabled={!selectedSeller}
-                  placeholder={selectedSeller ? 'Ej: RTX 4090, o el SKU' : 'Primero elegí la tienda'}
+                  placeholder={selectedSeller ? 'Ej: RTX 4090, o el SKU' : 'Primero elige la tienda'}
                   InputProps={{
                     startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />,
                   }}

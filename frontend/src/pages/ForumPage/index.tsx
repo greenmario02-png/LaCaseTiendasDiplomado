@@ -48,7 +48,7 @@ export default function ForumPage() {
             ) : (
               geoLoaded && (
                 <Alert severity="info" icon={<MapPin size={16} strokeWidth={2.2} />} sx={{ flex: 1, fontSize: '0.85rem', bgcolor: `${t.primary}14`, color: t.onSurface }}>
-                  Configurá tu ciudad para ver los foros de tu zona.
+                  Configura tu ciudad para ver los foros de tu zona.
                   <Button size="small" onClick={() => setCityOpen(true)}
                     sx={{ ml: 1, color: forumPalette.accent, textTransform: 'none' }}>
                     Configurar

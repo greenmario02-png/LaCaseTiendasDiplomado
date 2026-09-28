@@ -108,7 +108,7 @@ export default function AdminCategories() {
 
   const validateCategory = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!form.name.trim() || form.name.trim().length < 2) errs.name = 'Escribí el nombre de la categoría (mín. 2 letras)';
+    if (!form.name.trim() || form.name.trim().length < 2) errs.name = 'Escribe el nombre de la categoría (mín. 2 letras)';
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -172,8 +172,8 @@ export default function AdminCategories() {
 
   const validateAttr = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!attrForm.name.trim()) errs.name = 'Escribí el nombre del atributo';
-    if (attrForm.type === 'SELECT' && !attrForm.options.trim()) errs.options = 'Escribí al menos una opción';
+    if (!attrForm.name.trim()) errs.name = 'Escribe el nombre del atributo';
+    if (attrForm.type === 'SELECT' && !attrForm.options.trim()) errs.options = 'Escribe al menos una opción';
     setAttrErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -232,11 +232,11 @@ export default function AdminCategories() {
 
   const saveTemplate = async () => {
     if (!tplForm.name.trim()) {
-      toast.error('Escribí el nombre del producto conocido');
+      toast.error('Escribe el nombre del producto conocido');
       return;
     }
     if (!tplForm.categoryId) {
-      toast.error('Elegí la categoría');
+      toast.error('Elige la categoría');
       return;
     }
     const attributes = tplForm.attributes
@@ -296,7 +296,7 @@ export default function AdminCategories() {
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Categorías</strong>: agrupá tus productos (ej: Ropa, Bar, Juguetes). La <strong>imagen</strong> se usa
+          <strong>Categorías</strong>: agrupa tus productos (ej: Ropa, Bar, Juguetes). La <strong>imagen</strong> se usa
           para el carrusel de la portada. El <strong>ícono</strong> es el dibujito que acompaña a la categoría.
         </Typography>
         <Typography variant="body2" sx={{ mt: 0.5 }}>
@@ -404,7 +404,7 @@ export default function AdminCategories() {
           Productos conocidos por categoría
         </Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Definí los productos típicos de cada categoría (ej: «Cuaderno» en Libros y Papelería, «Chompa» en Ropa) con sus
+          Define los productos típicos de cada categoría (ej: «Cuaderno» en Libros y Papelería, «Chompa» en Ropa) con sus
           atributos/etiquetas. Al crear un producto, el vendedor elige el producto conocido de la categoría y los atributos se precargan.
         </Typography>
         <Box display="flex" gap={1} mb={2} flexWrap="wrap" alignItems="center">
@@ -473,7 +473,7 @@ export default function AdminCategories() {
                 <TableRow>
                   <TableCell colSpan={5} align="center">
                     <Typography variant="body2" color="text.secondary">
-                      No hay productos conocidos. Creá uno para precargar atributos en los productos.
+                      No hay productos conocidos. Crea uno para precargar atributos en los productos.
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -512,7 +512,7 @@ export default function AdminCategories() {
                   </MenuItem>
                 ))}
               </TextField>
-              <FormHelperText>Dejá "principal" si esta categoría es de primer nivel.</FormHelperText>
+              <FormHelperText>Deja "principal" si esta categoría es de primer nivel.</FormHelperText>
             </Box>
 
             <Box>
@@ -521,11 +521,11 @@ export default function AdminCategories() {
               </Typography>
               <TextField
                 select
-                label="Elegí un ícono"
+                label="Elige un ícono"
                 value={form.icon}
                 onChange={(e) => setForm({ ...form, icon: e.target.value })}
                 fullWidth
-                helperText="Se muestra junto al nombre. Podés elegir de la lista."
+                helperText="Se muestra junto al nombre. Puedes elegir de la lista."
               >
                 <MenuItem value="">Sin ícono</MenuItem>
                 {CATEGORY_ICONS.map((ic) => {
@@ -547,7 +547,7 @@ export default function AdminCategories() {
                 Imagen de portada
               </Typography>
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                Tamaño recomendado: <strong>800 × 600 px</strong> (cuadrado 1:1 ideal para el carrusel). Usá el editor para recortar.
+                Tamaño recomendado: <strong>800 × 600 px</strong> (cuadrado 1:1 ideal para el carrusel). Usa el editor para recortar.
               </Typography>
               <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
                 <Avatar variant="rounded" sx={{ width: 56, height: 56 }}>
@@ -640,7 +640,7 @@ export default function AdminCategories() {
                 value={attrForm.categoryId}
                 onChange={(e) => setAttrForm({ ...attrForm, categoryId: e.target.value })}
                 fullWidth
-                helperText="Elegí la categoría donde se usa este atributo."
+                helperText="Elige la categoría donde se usa este atributo."
               >
                 <MenuItem value="">Todas las categorías</MenuItem>
                 {categories.map((c) => (
@@ -711,7 +711,7 @@ export default function AdminCategories() {
                 fullWidth
                 helperText="La categoría donde se ofrece este tipo de producto."
               >
-                <MenuItem value="">Seleccioná una categoría</MenuItem>
+                <MenuItem value="">Selecciona una categoría</MenuItem>
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
                     {c.name}
@@ -737,7 +737,7 @@ export default function AdminCategories() {
               </Box>
               {tplForm.attributes.length === 0 && (
                 <Typography variant="caption" color="text.secondary">
-                  Todavía no agregaste atributos. Usá «Agregar atributo» para sumar los que debe tener este producto.
+                  Todavía no agregaste atributos. Usa «Agregar atributo» para sumar los que debe tener este producto.
                 </Typography>
               )}
               <Stack spacing={1}>
@@ -755,7 +755,7 @@ export default function AdminCategories() {
                       size="small"
                       sx={{ flex: 1 }}
                     >
-                      <MenuItem value="">Seleccioná…</MenuItem>
+                      <MenuItem value="">Selecciona…</MenuItem>
                       {attrs.map((a) => (
                         <MenuItem key={a.id} value={a.id}>
                           {a.name}

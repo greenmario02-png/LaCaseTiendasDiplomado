@@ -215,16 +215,16 @@ export default function AuctionWatchlistPage() {
       {tab === 0 &&
         renderGrid(
           active,
-          'No estás pujando en ninguna subasta activa. Explorá las subastas y participá: la adrenalina de ganar con una buena oferta te espera. ⚡',
+          'No estás pujando en ninguna subasta activa. Explora las subastas y participa: la adrenalina de ganar con una buena oferta te espera. ⚡',
           true
         )}
-      {tab === 1 && renderGrid(watchlist, 'No seguís ninguna subasta. Usá el ícono de marcador en una subasta para seguirla.')}
+      {tab === 1 && renderGrid(watchlist, 'No sigues ninguna subasta. Usa el ícono de marcador en una subasta para seguirla.')}
       {tab === 2 && (
         <>
           {won.some((a) => a.orderId && !a.isPaid) && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              ¡Felicidades! Ganaste una o más subastas. <b>Tenés 48 horas para pagar</b> antes de que vuelvan a
-              subasta. Tocá "Pagar" en cada tarjeta.
+              ¡Felicidades! Ganaste una o más subastas. <b>Tienes 48 horas para pagar</b> antes de que vuelvan a
+              subasta. Toca "Pagar" en cada tarjeta.
             </Alert>
           )}
           <Grid container spacing={2}>

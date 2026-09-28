@@ -468,7 +468,7 @@ export default function AdminForumPage() {
               </Box>
             </Box>
             <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-              Definí las ciudades y qué categorías (foros) están activas por defecto en cada una.
+              Define las ciudades y qué categorías (foros) están activas por defecto en cada una.
             </Typography>
             {cities.length === 0 ? (
               <Alert severity="info">Todavía no hay ciudades configuradas.</Alert>
@@ -605,7 +605,7 @@ export default function AdminForumPage() {
               donde tiene su perfil de foro).
             </Typography>
             {moderators.length === 0 ? (
-              <Alert severity="info">No hay moderadores de foro. Asigná el rol «Moderador de foro» desde «Roles y permisos».</Alert>
+              <Alert severity="info">No hay moderadores de foro. Asigna el rol «Moderador de foro» desde «Roles y permisos».</Alert>
             ) : (
               <Stack spacing={1}>
                 {moderators.map((m) => (
@@ -654,7 +654,7 @@ export default function AdminForumPage() {
         <DialogTitle>Foros por defecto — {cityCatsOpen?.name}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-            Seleccioná las categorías que estarán activas por defecto en esta ciudad.
+            Selecciona las categorías que estarán activas por defecto en esta ciudad.
           </Typography>
           <Stack spacing={0.5}>
             {allCategories.map((cat) => (
