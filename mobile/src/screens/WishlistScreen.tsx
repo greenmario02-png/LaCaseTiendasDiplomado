@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { ProductCard } from '../components/redesign/ProductCard';
@@ -9,6 +10,7 @@ import { Heart } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function WishlistScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [items, setItems] = useState<any[]>([]);
@@ -45,12 +47,12 @@ export default function WishlistScreen({ navigation }: any) {
     <View style={styles.flex}>
       <View style={styles.titleRow}>
         <Heart size={20} color={colors.error} fill={colors.error} />
-        <Text style={styles.title}>Mis favoritos</Text>
+        <Text style={styles.title}>{t('mobile.wishlist.title')}</Text>
       </View>
       {products.length === 0 ? (
         <View style={styles.center}>
-          <EmptyState message="No tenés favoritos todavía" />
-          <NeoButton title="Explorar productos" variant="ghost" onPress={() => navigation.navigate('Products')} />
+          <EmptyState message={t('mobile.wishlist.emptyMessage')} />
+          <NeoButton title={t('mobile.wishlist.exploreButton')} variant="ghost" onPress={() => navigation.navigate('Products')} />
         </View>
       ) : (
         <FlatList

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, FlatList, RefreshControl, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { BadgeCheck, MapPin, AlertTriangle } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, openApplicationCv } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { NeoButton } from '../components/redesign/NeoButton';
@@ -10,14 +11,18 @@ import { formatSalary } from '../components/redesign/JobCard';
 
 export type ApplicationStatus = 'RECEIVED' | 'VIEWED' | 'SHORTLISTED' | 'REJECTED' | 'HIRED' | 'WITHDRAWN';
 
-export const APPLICATION_LABEL: Record<ApplicationStatus, string> = {
-  RECEIVED: 'Recibida',
-  VIEWED: 'Vista por la tienda',
-  SHORTLISTED: 'Preseleccionado/a',
-  REJECTED: 'No seleccionado/a',
-  HIRED: '¡Contratado/a!',
-  WITHDRAWN: 'Retirada',
+const APPLICATION_LABEL_KEYS: Record<ApplicationStatus, string> = {
+  RECEIVED: 'mobile.myApplications.status.received',
+  VIEWED: 'mobile.myApplications.status.viewed',
+  SHORTLISTED: 'mobile.myApplications.status.shortlisted',
+  REJECTED: 'mobile.myApplications.status.rejected',
+  HIRED: 'mobile.myApplications.status.hired',
+  WITHDRAWN: 'mobile.myApplications.status.withdrawn',
 };
+
+/** Traduce el estado de una postulación; requiere el `t` de useTranslation del componente que llama. */
+export const applicationLabel = (s: ApplicationStatus, t: (key: string) => string): string =>
+  t(APPLICATION_LABEL_KEYS[s] ?? s);
 
 export const statusColor = (s: ApplicationStatus, colors: any): string => {
   switch (s) {
@@ -59,6 +64,7 @@ interface Application {
 }
 
 export default function MyApplicationsScreen() {
+  const { t } = useTranslation();
   const { colors, raised } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [items, setItems] = useState<Application[]>([]);
@@ -87,17 +93,17 @@ export default function MyApplicationsScreen() {
   );
 
   const withdraw = (a: Application) => {
-    Alert.alert('Retirar postulación', `¿Querés retirar tu postulación a "${a.job.title}"?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.myApplications.withdrawConfirmTitle'), t('mobile.myApplications.withdrawConfirmMessage', { title: a.job.title }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Retirar',
+        text: t('mobile.common.withdraw'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/jobs/${a.jobId}/apply`);
             load('initial');
           } catch (e) {
-            Alert.alert('No se pudo retirar', getErrorMessage(e));
+            Alert.alert(t('mobile.myApplications.withdrawFailedTitle'), getErrorMessage(e));
           }
         },
       },
@@ -118,7 +124,7 @@ export default function MyApplicationsScreen() {
             {a.job.title}
           </Text>
           <View style={[styles.chip, { borderColor: color }]}>
-            <Text style={[styles.chipText, { color }]}>{APPLICATION_LABEL[a.status] ?? a.status}</Text>
+            <Text style={[styles.chipText, { color }]}>{applicationLabel(a.status, t)}</Text>
           </View>
         </View>
         {a.job.store ? (
@@ -136,17 +142,17 @@ export default function MyApplicationsScreen() {
           ) : null}
           <Text style={styles.salary}>{formatSalary(a.job as any)}</Text>
         </View>
-        <Text style={styles.meta}>Postulaste el {new Date(a.createdAt).toLocaleDateString('es-BO')}</Text>
+        <Text style={styles.meta}>{t('mobile.myApplications.appliedOn', { date: new Date(a.createdAt).toLocaleDateString('es-BO') })}</Text>
         {a.hasCv ? (
           <NeoButton
-            title={`Ver mi CV${a.cvName ? ` (${a.cvName})` : ''}`}
+            title={a.cvName ? t('mobile.myApplications.viewCvNamed', { name: a.cvName }) : t('mobile.myApplications.viewCv')}
             variant="ghost"
-            onPress={() => openApplicationCv(a.id).catch((e) => Alert.alert('No se pudo abrir el CV', getErrorMessage(e)))}
+            onPress={() => openApplicationCv(a.id).catch((e) => Alert.alert(t('mobile.myApplications.cvOpenFailedTitle'), getErrorMessage(e)))}
           />
         ) : null}
         {a.storeNote ? (
           <View style={styles.note}>
-            <Text style={styles.noteLabel}>Mensaje de la tienda</Text>
+            <Text style={styles.noteLabel}>{t('mobile.myApplications.storeNoteLabel')}</Text>
             <Text style={styles.noteText}>{a.storeNote}</Text>
           </View>
         ) : null}
@@ -154,12 +160,12 @@ export default function MyApplicationsScreen() {
           <View style={styles.row}>
             <AlertTriangle size={14} color={colors.warning} />
             <Text style={[styles.meta, { color: colors.warning }]}>
-              {expired ? 'Este empleo venció' : 'Este empleo ya no está disponible'}
+              {expired ? t('mobile.myApplications.jobExpired') : t('mobile.myApplications.jobUnavailable')}
             </Text>
           </View>
         ) : null}
         {canWithdraw(a.status) ? (
-          <NeoButton title="Retirar" variant="ghost" onPress={() => withdraw(a)} />
+          <NeoButton title={t('mobile.common.withdraw')} variant="ghost" onPress={() => withdraw(a)} />
         ) : null}
       </View>
     );
@@ -172,7 +178,7 @@ export default function MyApplicationsScreen() {
       keyExtractor={(a) => String(a.id)}
       renderItem={renderItem}
       contentContainerStyle={styles.list}
-      ListEmptyComponent={<EmptyState message="Todavía no te postulaste a ningún empleo" />}
+      ListEmptyComponent={<EmptyState message={t('mobile.myApplications.empty')} />}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

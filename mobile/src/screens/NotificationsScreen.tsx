@@ -23,6 +23,7 @@ import {
   MessageSquareText,
 } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useNotificationsStore, AppNotification } from '../stores/notificationsStore';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -53,18 +54,19 @@ function metaFor(type: string) {
   return TYPE_META[type] ?? { Icon: Bell, tone: 'primary' as Tone };
 }
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: (key: string, opts?: any) => string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return 'ahora';
-  if (m < 60) return `hace ${m} min`;
+  if (m < 1) return t('mobile.notifications.timeAgo.now');
+  if (m < 60) return t('mobile.notifications.timeAgo.minutes', { count: m });
   const h = Math.floor(m / 60);
-  if (h < 24) return `hace ${h} h`;
+  if (h < 24) return t('mobile.notifications.timeAgo.hours', { count: h });
   const d = Math.floor(h / 24);
-  return d === 1 ? 'ayer' : `hace ${d} d`;
+  return d === 1 ? t('mobile.notifications.timeAgo.yesterday') : t('mobile.notifications.timeAgo.days', { count: d });
 }
 
 function NotificationRow({ item, onPress }: { item: AppNotification; onPress: () => void }) {
+  const { t } = useTranslation();
   const { colors, raised, pressed } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { Icon, tone } = metaFor(item.type);
@@ -87,7 +89,7 @@ function NotificationRow({ item, onPress }: { item: AppNotification; onPress: ()
               {item.message}
             </Text>
           )}
-          <Text style={styles.rowTime}>{timeAgo(item.createdAt)}</Text>
+          <Text style={styles.rowTime}>{timeAgo(item.createdAt, t)}</Text>
         </View>
         <ArrowRight size={16} color={colors.textSecondary} />
       </View>
@@ -96,6 +98,7 @@ function NotificationRow({ item, onPress }: { item: AppNotification; onPress: ()
 }
 
 export default function NotificationsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
@@ -130,15 +133,15 @@ export default function NotificationsScreen({ navigation }: any) {
       <View style={styles.header}>
         <Bell size={22} color={colors.primary} />
         <View style={styles.headerText}>
-          <Text style={styles.title}>Notificaciones</Text>
+          <Text style={styles.title}>{t('mobile.notifications.title')}</Text>
           <Text style={styles.subtitle}>
-            {unread > 0 ? `${unread} sin leer` : 'Estás al día'}
+            {unread > 0 ? t('mobile.notifications.unreadCount', { count: unread }) : t('mobile.notifications.allRead')}
           </Text>
         </View>
         {unread > 0 && (
           <TouchableOpacity style={styles.readAllBtn} onPress={markAllRead}>
             <CheckCheck size={16} color={colors.primary} />
-            <Text style={styles.readAllText}>Leer todas</Text>
+            <Text style={styles.readAllText}>{t('mobile.notifications.markAllRead')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -154,7 +157,7 @@ export default function NotificationsScreen({ navigation }: any) {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />}
-          ListEmptyComponent={<EmptyState message="Sin notificaciones. Cuando recibas mensajes, pedidos o respuestas del foro, aparecerán acá." />}
+          ListEmptyComponent={<EmptyState message={t('mobile.notifications.empty')} />}
           renderItem={({ item }) => <NotificationRow item={item} onPress={() => openItem(item)} />}
         />
       )}

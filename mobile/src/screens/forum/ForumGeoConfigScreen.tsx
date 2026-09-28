@@ -2,6 +2,7 @@ import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 import * as Location from 'expo-location';
+import { useTranslation } from 'react-i18next';
 import { listCities, resolveGeo, ForumCity } from '../../services/forum.api';
 import { getErrorMessage } from '../../services/api';
 import { useForumStore } from '../../stores/forumStore';
@@ -12,6 +13,7 @@ import { MapPin } from 'lucide-react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function ForumGeoConfigScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const geo = useForumStore((s) => s.geo);
@@ -36,7 +38,7 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
         const current = geo?.cityId ? all.find((c) => c.id === geo.cityId) : null;
         if (current) setSelectedDept(current.department);
       })
-      .catch(() => Alert.alert('Error', 'No se pudieron cargar las ciudades.'))
+      .catch(() => Alert.alert(t('mobile.common.error'), t('mobile.forumGeoConfig.loadCitiesErrorMessage')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -47,14 +49,14 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
 
   const useGps = async () => {
     if (!user) {
-      Alert.alert('Iniciá sesión', 'Necesitás sesión para guardar tu zona.');
+      Alert.alert(t('mobile.forumGeoConfig.loginRequiredTitle'), t('mobile.forumGeoConfig.loginRequiredMessage'));
       return;
     }
     setLocating(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permiso denegado', 'Elegí tu ciudad manualmente.');
+        Alert.alert(t('mobile.forumGeoConfig.permissionDeniedTitle'), t('mobile.forumGeoConfig.permissionDeniedMessage'));
         return;
       }
       const pos = await Location.getCurrentPositionAsync({});
@@ -63,7 +65,7 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
       const city = cities.find((c) => c.id === res.cityId);
       if (city) setSelectedDept(city.department);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLocating(false);
     }
@@ -71,7 +73,7 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
 
   const save = async () => {
     if (!cityId) {
-      Alert.alert('Elegí una ciudad', 'Seleccioná tu ciudad para continuar.');
+      Alert.alert(t('mobile.forumGeoConfig.chooseCityTitle'), t('mobile.forumGeoConfig.chooseCityMessage'));
       return;
     }
     setSaving(true);
@@ -79,7 +81,7 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
       await updateGeo({ cityId, radioKm });
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -98,21 +100,20 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
       <View style={styles.card}>
         <View style={styles.titleRow}>
           <MapPin size={18} color={colors.forumAccent} />
-          <Text style={styles.title}>Tu zona del foro</Text>
+          <Text style={styles.title}>{t('mobile.forumGeoConfig.title')}</Text>
         </View>
         <Text style={styles.muted}>
-          Elegí tu departamento y ciudad para ver los foros de tu zona (estilo Facebook
-          Marketplace). Podés usar el GPS para detectarla automáticamente.
+          {t('mobile.forumGeoConfig.introText')}
         </Text>
         <NeoButton
-          title={locating ? 'Ubicando...' : 'Usar mi ubicación GPS'}
+          title={locating ? t('mobile.forumGeoConfig.locating') : t('mobile.forumGeoConfig.useGpsButton')}
           onPress={useGps}
           disabled={locating}
         />
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Departamento</Text>
+        <Text style={styles.sectionTitle}>{t('mobile.forumGeoConfig.departmentLabel')}</Text>
         <View style={styles.chipsRow}>
           {departments.map((d) => (
             <Pressable
@@ -133,7 +134,7 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Ciudad</Text>
+        <Text style={styles.sectionTitle}>{t('mobile.forumGeoConfig.cityLabel')}</Text>
         <View style={styles.chipsRow}>
           {visibleCities.map((c) => (
             <Pressable
@@ -151,10 +152,10 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>
-          Radio de zona: {radioKm} km
+          {t('mobile.forumGeoConfig.radiusLabel', { km: radioKm })}
         </Text>
         <Text style={styles.muted}>
-          Ajustá el rango para que los foros cercanos también aparezcan (5–200 km).
+          {t('mobile.forumGeoConfig.radiusHelpText')}
         </Text>
         <Slider
           style={{ height: 40 }}
@@ -168,13 +169,13 @@ export default function ForumGeoConfigScreen({ navigation }: any) {
           thumbTintColor={colors.forumAccent}
         />
         <View style={styles.radioRow}>
-          <Text style={styles.muted}>5 km</Text>
-          <Text style={styles.muted}>200 km</Text>
+          <Text style={styles.muted}>{t('mobile.forumGeoConfig.minRadiusLabel')}</Text>
+          <Text style={styles.muted}>{t('mobile.forumGeoConfig.maxRadiusLabel')}</Text>
         </View>
       </View>
 
       <NeoButton
-        title={saving ? 'Guardando...' : 'Guardar zona'}
+        title={saving ? t('mobile.common.saving') : t('mobile.forumGeoConfig.saveButton')}
         onPress={save}
         disabled={saving || !cityId}
       />

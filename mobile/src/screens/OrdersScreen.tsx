@@ -1,6 +1,7 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { Package, ChevronRight } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -12,16 +13,26 @@ function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
 }
 
-const STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  PENDING: { label: 'Pendiente', color: themeColors.warning },
-  PROOF_SUBMITTED: { label: 'Comprobante enviado', color: themeColors.info },
-  CONFIRMED: { label: 'Confirmado', color: themeColors.primary },
-  SHIPPED: { label: 'Enviado', color: themeColors.info },
-  DELIVERED: { label: 'Entregado', color: themeColors.success },
-  CANCELLED: { label: 'Cancelado', color: themeColors.error },
+const STATUS_COLOR: Record<string, string> = {
+  PENDING: themeColors.warning,
+  PROOF_SUBMITTED: themeColors.info,
+  CONFIRMED: themeColors.primary,
+  SHIPPED: themeColors.info,
+  DELIVERED: themeColors.success,
+  CANCELLED: themeColors.error,
+};
+
+const STATUS_KEY: Record<string, string> = {
+  PENDING: 'pending',
+  PROOF_SUBMITTED: 'proofSubmitted',
+  CONFIRMED: 'confirmed',
+  SHIPPED: 'shipped',
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled',
 };
 
 export default function OrdersScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [orders, setOrders] = useState<any[]>([]);
@@ -33,7 +44,7 @@ export default function OrdersScreen({ navigation }: any) {
       const { data } = await api.get('/orders/buyer', { params: { limit: 100 } });
       setOrders(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -48,18 +59,18 @@ export default function OrdersScreen({ navigation }: any) {
   );
 
   const confirmDelivery = async (id: number) => {
-    Alert.alert('Confirmar recepción', '¿Confirmás que recibiste este pedido?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.orders.confirmReceipt'), t('mobile.orders.confirmReceiptMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Confirmar',
+        text: t('mobile.common.confirm'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.post(`/orders/${id}/confirm-delivery`);
-            Alert.alert('Listo', 'Pedido confirmado como recibido.');
+            Alert.alert(t('mobile.orders.confirmReceiptSuccessTitle'), t('mobile.orders.confirmReceiptSuccessMessage'));
             load();
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -67,7 +78,9 @@ export default function OrdersScreen({ navigation }: any) {
   };
 
   const renderItem = ({ item }: { item: any }) => {
-    const st = STATUS_LABEL[item.status] ?? { label: item.status, color: colors.textSecondary };
+    const statusKey = STATUS_KEY[item.status];
+    const label = statusKey ? t(`mobile.orders.status.${statusKey}`) : item.status;
+    const color = STATUS_COLOR[item.status] ?? colors.textSecondary;
     const canConfirm = item.status === 'SHIPPED' && item.fulfillmentType !== 'PICKUP';
     return (
       <TouchableOpacity
@@ -78,22 +91,22 @@ export default function OrdersScreen({ navigation }: any) {
         <View style={styles.cardTop}>
           <View style={styles.idRow}>
             <Package size={16} color={colors.primary} />
-            <Text style={styles.id}>Pedido #{item.id}</Text>
+            <Text style={styles.id}>{t('mobile.orders.orderNumber', { id: item.id })}</Text>
           </View>
-          <Text style={[styles.status, { color: st.color }]}>{st.label}</Text>
+          <Text style={[styles.status, { color }]}>{label}</Text>
         </View>
-        <Text style={styles.store}>{item.seller?.storeName ?? 'Tienda'}</Text>
+        <Text style={styles.store}>{item.seller?.storeName ?? t('mobile.orders.storeFallback')}</Text>
         <Text style={styles.meta}>
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-BO') : ''}
-          {item.items?.length ? ` · ${item.items.length} producto(s)` : ''}
-          {item.fulfillmentType === 'PICKUP' ? ' · Retiro en tienda' : ''}
+          {item.items?.length ? t('mobile.orders.productsCount', { count: item.items.length }) : ''}
+          {item.fulfillmentType === 'PICKUP' ? t('mobile.orders.pickupSuffix') : ''}
         </Text>
         <View style={styles.cardBottom}>
           <Text style={styles.total}>{money(item.total)}</Text>
           {canConfirm && (
             <View style={{ minWidth: 150 }}>
               <NeoButton
-                title="Confirmar recepción"
+                title={t('mobile.orders.confirmReceipt')}
                 variant="secondary"
                 onPress={() => confirmDelivery(item.id)}
                 style={{ minHeight: 34, paddingHorizontal: 10 }}
@@ -109,13 +122,13 @@ export default function OrdersScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis pedidos ({orders.length})</Text>
+        <Text style={styles.title}>{t('mobile.orders.title', { count: orders.length })}</Text>
       </View>
       {loading ? (
         <LoadingState />
       ) : orders.length === 0 ? (
         <View style={{ alignItems: 'center', marginTop: 60 }}>
-          <EmptyState message="Aún no tenés pedidos" />
+          <EmptyState message={t('mobile.orders.emptyOrders')} />
         </View>
       ) : (
         <FlatList

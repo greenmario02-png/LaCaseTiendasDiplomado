@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { uploadImage } from '../services/upload';
 import ImagePickerButton from '../components/ImagePickerButton';
@@ -9,6 +10,7 @@ import { NeoButton } from '../components/redesign/NeoButton';
 import { LoadingState } from '../components/redesign/States';
 
 export default function SellerProductFormScreen({ navigation, route }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const editingId = route.params?.id ?? null;
@@ -55,7 +57,7 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
           const img = p.images?.find((i: any) => i.isPrimary)?.url || p.images?.[0]?.url;
           if (img) setImageUrl(img);
         })
-        .catch((e) => Alert.alert('Error', getErrorMessage(e)))
+        .catch((e) => Alert.alert(t('mobile.common.error'), getErrorMessage(e)))
         .finally(() => setLoading(false));
     }
   }, [editingId]);
@@ -66,16 +68,16 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
       const url = await uploadImage(uri, '/seller/upload');
       setImageUrl(url);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setUploading(false);
     }
   };
 
   const save = async () => {
-    if (!form.name.trim()) return Alert.alert('Falta información', 'El nombre del producto es obligatorio.');
-    if (!form.categoryId) return Alert.alert('Falta información', 'Elegí la categoría del producto.');
-    if (!form.price.trim() || Number(form.price) <= 0) return Alert.alert('Falta información', 'El precio debe ser mayor a 0.');
+    if (!form.name.trim()) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.sellerProductForm.nameRequiredMessage'));
+    if (!form.categoryId) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.sellerProductForm.categoryRequiredMessage'));
+    if (!form.price.trim() || Number(form.price) <= 0) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.sellerProductForm.priceInvalidMessage'));
 
     setSaving(true);
     try {
@@ -94,14 +96,14 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
 
       if (editingId) {
         await api.put(`/seller/products/${editingId}`, payload);
-        Alert.alert('Listo', 'Producto actualizado correctamente.');
+        Alert.alert(t('mobile.common.doneTitle'), t('mobile.sellerProductForm.updateSuccessMessage'));
       } else {
         await api.post('/seller/products', payload);
-        Alert.alert('Listo', 'Producto creado. Espera la moderación del admin.');
+        Alert.alert(t('mobile.common.doneTitle'), t('mobile.sellerProductForm.createSuccessMessage'));
       }
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -113,15 +115,15 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
 
   return (
     <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{editingId ? 'Editar producto' : 'Nuevo producto'}</Text>
+      <Text style={styles.title}>{editingId ? t('mobile.sellerProductForm.titleEdit') : t('mobile.sellerProductForm.titleNew')}</Text>
 
-      <Text style={styles.label}>Foto principal</Text>
-      <ImagePickerButton label="Cambiar foto" currentUri={imageUrl} onPicked={onPickedImage} square uploading={uploading} />
+      <Text style={styles.label}>{t('mobile.sellerProductForm.photoLabel')}</Text>
+      <ImagePickerButton label={t('mobile.sellerProductForm.changePhotoLabel')} currentUri={imageUrl} onPicked={onPickedImage} square uploading={uploading} />
 
-      <Text style={styles.label}>Nombre *</Text>
-      <NeoInput style={styles.input} value={form.name} onChangeText={(v) => set('name', v)} placeholder="Ej: Teclado Mecánico RGB" />
+      <Text style={styles.label}>{t('mobile.sellerProductForm.nameLabel')}</Text>
+      <NeoInput style={styles.input} value={form.name} onChangeText={(v) => set('name', v)} placeholder={t('mobile.sellerProductForm.namePlaceholder')} />
 
-      <Text style={styles.label}>Categoría *</Text>
+      <Text style={styles.label}>{t('mobile.sellerProductForm.categoryLabel')}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {categories.map((c) => {
@@ -138,16 +140,16 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
           })}
         </View>
       </ScrollView>
-      {!form.categoryId && <Text style={styles.hint}>Elegí una categoría de la lista.</Text>}
+      {!form.categoryId && <Text style={styles.hint}>{t('mobile.sellerProductForm.categoryHint')}</Text>}
 
-      <Text style={styles.label}>Condición</Text>
+      <Text style={styles.label}>{t('mobile.sellerProductForm.conditionLabel')}</Text>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {['NEW', 'USED', 'REFURBISHED'].map((c) => {
           const active = form.condition === c;
           return (
             <TouchableOpacity key={c} style={[styles.chip, active && styles.chipActive]} onPress={() => set('condition', c)}>
               <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {c === 'NEW' ? 'Nuevo' : c === 'USED' ? 'Usado' : 'Reacondicionado'}
+                {c === 'NEW' ? t('mobile.sellerProductForm.conditionNew') : c === 'USED' ? t('mobile.sellerProductForm.conditionUsed') : t('mobile.sellerProductForm.conditionRefurbished')}
               </Text>
             </TouchableOpacity>
           );
@@ -156,40 +158,40 @@ export default function SellerProductFormScreen({ navigation, route }: any) {
 
       <View style={styles.row}>
         <View style={styles.col}>
-          <Text style={styles.label}>Precio (Bs) *</Text>
+          <Text style={styles.label}>{t('mobile.sellerProductForm.priceLabel')}</Text>
           <NeoInput style={styles.input} value={form.price} onChangeText={(v) => set('price', v)} keyboardType="numeric" placeholder="0" />
         </View>
         <View style={styles.col}>
-          <Text style={styles.label}>Precio original (Bs)</Text>
+          <Text style={styles.label}>{t('mobile.sellerProductForm.originalPriceLabel')}</Text>
           <NeoInput style={styles.input} value={form.originalPrice} onChangeText={(v) => set('originalPrice', v)} keyboardType="numeric" placeholder="0" />
         </View>
       </View>
 
       <View style={styles.row}>
         <View style={styles.col}>
-          <Text style={styles.label}>Stock</Text>
+          <Text style={styles.label}>{t('mobile.sellerProductForm.stockLabel')}</Text>
           <NeoInput style={styles.input} value={form.stock} onChangeText={(v) => set('stock', v)} keyboardType="numeric" placeholder="0" />
         </View>
         <View style={styles.col}>
-          <Text style={styles.label}>SKU (opcional)</Text>
-          <NeoInput style={styles.input} value={form.sku} onChangeText={(v) => set('sku', v)} placeholder="Ej: PRO-0001" />
+          <Text style={styles.label}>{t('mobile.sellerProductForm.skuLabel')}</Text>
+          <NeoInput style={styles.input} value={form.sku} onChangeText={(v) => set('sku', v)} placeholder={t('mobile.sellerProductForm.skuPlaceholder')} />
         </View>
       </View>
 
-      <Text style={styles.label}>Descripción</Text>
+      <Text style={styles.label}>{t('mobile.sellerProductForm.descriptionLabel')}</Text>
       <NeoInput
         style={styles.textarea}
         value={form.description}
         onChangeText={(v) => set('description', v)}
-        placeholder="Descripción del producto..."
+        placeholder={t('mobile.sellerProductForm.descriptionPlaceholder')}
         multiline
       />
 
-      <Text style={styles.label}>Garantía</Text>
-      <NeoInput style={styles.input} value={form.warrantyInfo} onChangeText={(v) => set('warrantyInfo', v)} placeholder="Ej: 12 meses" />
+      <Text style={styles.label}>{t('mobile.sellerProductForm.warrantyLabel')}</Text>
+      <NeoInput style={styles.input} value={form.warrantyInfo} onChangeText={(v) => set('warrantyInfo', v)} placeholder={t('mobile.sellerProductForm.warrantyPlaceholder')} />
 
-      <NeoButton title={editingId ? 'Guardar cambios' : 'Crear producto'} onPress={save} disabled={saving} style={styles.save} />
-      <NeoButton title="Cancelar" variant="ghost" onPress={() => navigation.goBack()} />
+      <NeoButton title={editingId ? t('mobile.sellerProductForm.saveChangesButton') : t('mobile.sellerProductForm.createButton')} onPress={save} disabled={saving} style={styles.save} />
+      <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => navigation.goBack()} />
     </ScrollView>
   );
 }

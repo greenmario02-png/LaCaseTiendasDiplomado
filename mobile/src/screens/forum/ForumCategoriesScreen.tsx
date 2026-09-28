@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { listCategories, getCitiesStats } from '../../services/forum.api';
 import { useForumStore } from '../../stores/forumStore';
 import { getErrorMessage } from '../../services/api';
@@ -9,6 +10,7 @@ import { EmptyState } from '../../components/redesign/States';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function ForumCategoriesScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -26,7 +28,7 @@ export default function ForumCategoriesScreen({ navigation }: any) {
         setCategories(cats);
         setCities(citiesData);
       } catch (e) {
-        Alert.alert('Error', getErrorMessage(e));
+        Alert.alert(t('mobile.common.error'), getErrorMessage(e));
       }
     })();
   }, []);
@@ -43,7 +45,7 @@ export default function ForumCategoriesScreen({ navigation }: any) {
         if (item.type === 'header') {
           return (
             <>
-              <Text style={styles.sectionTitle}>Subforos</Text>
+              <Text style={styles.sectionTitle}>{t('mobile.forumCategories.subforosTitle')}</Text>
               <View style={styles.catsRow}>
                 {categories.map((c) => (
                   <Pressable
@@ -59,7 +61,7 @@ export default function ForumCategoriesScreen({ navigation }: any) {
                   </Pressable>
                 ))}
               </View>
-              <Text style={styles.sectionTitle}>Ciudades</Text>
+              <Text style={styles.sectionTitle}>{t('mobile.forumCategories.ciudadesTitle')}</Text>
               <View style={styles.citiesRow}>
                 {cities.map((c) => (
                   <Pressable
@@ -84,7 +86,7 @@ export default function ForumCategoriesScreen({ navigation }: any) {
         }
         return null;
       }}
-      ListEmptyComponent={<EmptyState message="Sin categorías aún" />}
+      ListEmptyComponent={<EmptyState message={t('mobile.forumCategories.emptyMessage')} />}
     />
   );
 }

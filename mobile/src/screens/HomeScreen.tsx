@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Modal, TextInput } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Store, ArrowLeftRight, Calculator, Zap, Bell, Briefcase } from 'lucide-react-native';
 import { JobCard, type Job } from '../components/redesign/JobCard';
 import { api, resolveImageUrl } from '../services/api';
@@ -20,6 +21,7 @@ const MONEDAS = [
 ];
 
 export default function HomeScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [banners, setBanners] = useState<any[]>([]);
@@ -102,7 +104,7 @@ export default function HomeScreen({ navigation }: any) {
           <View>
           <View style={styles.heroRow}>
             <Store size={24} color={colors.primary} />
-            <Text style={styles.hero}>LaCase Multi Tiendas</Text>
+            <Text style={styles.hero}>{t('mobile.home.title')}</Text>
             <TouchableOpacity style={styles.bellBtn} onPress={() => navigation.navigate('Notifications')}>
               <Bell size={22} color={colors.primary} />
               {unread > 0 && (
@@ -124,9 +126,9 @@ export default function HomeScreen({ navigation }: any) {
               <View style={styles.ratesHeader}>
                 <View style={styles.ratesTitleRow}>
                   <ArrowLeftRight size={16} color={colors.primary} />
-                  <Text style={styles.ratesTitle}>Cotizaciones</Text>
+                  <Text style={styles.ratesTitle}>{t('mobile.home.quotesTitle')}</Text>
                 </View>
-                <NeoButton title="Calculadora" variant="secondary" onPress={() => setCalcOpen(true)} />
+                <NeoButton title={t('mobile.home.calculatorButton')} variant="secondary" onPress={() => setCalcOpen(true)} />
               </View>
               <View style={styles.ratesRow}>
                 {(['usd', 'eur', 'jpy', 'usdt'] as const).map((code) => (
@@ -137,12 +139,12 @@ export default function HomeScreen({ navigation }: any) {
                 ))}
               </View>
               <Text style={styles.ratesSource} numberOfLines={2}>
-                Fuentes: {rates.source?.usd} · {rates.source?.eur} · {rates.source?.usdt}
+                {t('mobile.home.sourcesLabel', { usd: rates.source?.usd, eur: rates.source?.eur, usdt: rates.source?.usdt })}
               </Text>
             </View>
           )}
 
-          <Text style={styles.sectionTitle}>Categorías</Text>
+          <Text style={styles.sectionTitle}>{t('mobile.home.categoriesTitle')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 10 }}>
             {categories.map((cat) => (
               <TouchableOpacity
@@ -151,7 +153,7 @@ export default function HomeScreen({ navigation }: any) {
                 onPress={() => navigation.navigate('Products', { categoryId: cat.id, categoryName: cat.name })}
               >
                 <Text style={styles.catName}>{cat.name}</Text>
-                <Text style={styles.catCount}>{cat.productCount} prod.</Text>
+                <Text style={styles.catCount}>{t('mobile.home.categoryProductCount', { count: cat.productCount })}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -161,9 +163,9 @@ export default function HomeScreen({ navigation }: any) {
               <View style={styles.promoHeader}>
                 <View style={styles.promoTitleRow}>
                   <Zap size={16} color={colors.warning} />
-                  <Text style={styles.sectionTitleNoMargin}>Ofertas relámpago</Text>
+                  <Text style={styles.sectionTitleNoMargin}>{t('mobile.home.flashOffersTitle')}</Text>
                 </View>
-                <Text style={styles.promoSubtitle}>por tiempo limitado</Text>
+                <Text style={styles.promoSubtitle}>{t('mobile.home.flashOffersSubtitle')}</Text>
               </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 12 }}>
                 {promotions.map((promo: any) => {
@@ -181,7 +183,7 @@ export default function HomeScreen({ navigation }: any) {
                       {img && <Image source={{ uri: img }} style={styles.promoImg} resizeMode="cover" />}
                       <View style={styles.promoBody}>
                         <View style={styles.offBadge}>
-                          <Text style={styles.offText}>{off} OFF</Text>
+                          <Text style={styles.offText}>{t('mobile.home.offBadge', { amount: off })}</Text>
                         </View>
                         <Text style={styles.promoTitle} numberOfLines={1}>{promo.title}</Text>
                         {prod && <Text style={styles.promoProduct} numberOfLines={1}>{prod.name}</Text>}
@@ -199,10 +201,10 @@ export default function HomeScreen({ navigation }: any) {
               <View style={styles.promoHeader}>
                 <View style={styles.promoTitleRow}>
                   <Briefcase size={16} color={colors.primary} />
-                  <Text style={styles.sectionTitleNoMargin}>Empleos</Text>
+                  <Text style={styles.sectionTitleNoMargin}>{t('mobile.home.jobsTitle')}</Text>
                 </View>
                 <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
-                  <Text style={styles.seeAll}>Ver todos</Text>
+                  <Text style={styles.seeAll}>{t('mobile.home.seeAll')}</Text>
                 </TouchableOpacity>
               </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 14, gap: 12 }}>
@@ -213,7 +215,7 @@ export default function HomeScreen({ navigation }: any) {
             </View>
           )}
 
-          <Text style={styles.sectionTitle}>Destacados</Text>
+          <Text style={styles.sectionTitle}>{t('mobile.home.featuredTitle')}</Text>
         </View>
       }
       renderItem={({ item }) => (
@@ -230,7 +232,7 @@ export default function HomeScreen({ navigation }: any) {
           />
         </View>
       )}
-      ListEmptyComponent={<Text style={styles.empty}>No hay productos destacados</Text>}
+      ListEmptyComponent={<Text style={styles.empty}>{t('mobile.home.emptyFeatured')}</Text>}
     />
 
     <Modal visible={calcOpen} animationType="slide" transparent onRequestClose={() => setCalcOpen(false)}>
@@ -238,11 +240,11 @@ export default function HomeScreen({ navigation }: any) {
         <View style={styles.modalCard}>
           <View style={styles.modalTitleRow}>
             <Calculator size={20} color={colors.primary} />
-            <Text style={styles.modalTitle}>Calculadora de divisas</Text>
+            <Text style={styles.modalTitle}>{t('mobile.home.currencyCalculatorTitle')}</Text>
           </View>
-          <Text style={styles.modalSubtitle}>Convertí entre Bs, USD, EUR, JPY y USDT.</Text>
+          <Text style={styles.modalSubtitle}>{t('mobile.home.currencyCalculatorSubtitle')}</Text>
 
-          <Text style={styles.calcLabel}>Cantidad</Text>
+          <Text style={styles.calcLabel}>{t('mobile.home.amountLabel')}</Text>
           <TextInput
             style={styles.calcInput}
             value={calcAmount}
@@ -251,7 +253,7 @@ export default function HomeScreen({ navigation }: any) {
             placeholder="100"
           />
 
-          <Text style={styles.calcLabel}>Desde</Text>
+          <Text style={styles.calcLabel}>{t('mobile.home.fromLabel')}</Text>
           <View style={styles.calcFromRow}>
             {MONEDAS.map((m) => (
               <TouchableOpacity
@@ -276,10 +278,10 @@ export default function HomeScreen({ navigation }: any) {
           </View>
 
           <Text style={styles.calcSource} numberOfLines={2}>
-            Fuentes: {rates?.source?.usd} · {rates?.source?.eur} · {rates?.source?.usdt}
+            {t('mobile.home.sourcesLabel', { usd: rates?.source?.usd, eur: rates?.source?.eur, usdt: rates?.source?.usdt })}
           </Text>
 
-          <NeoButton title="Cerrar" onPress={() => setCalcOpen(false)} />
+          <NeoButton title={t('mobile.common.close')} onPress={() => setCalcOpen(false)} />
         </View>
       </View>
     </Modal>

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator, 
 import * as Clipboard from 'expo-clipboard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useRbacStore } from '../stores/rbacStore';
@@ -10,18 +11,19 @@ import { CoinChip } from '../components/redesign/CoinChip';
 import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MapPin, MessageSquareWarning, Briefcase } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
 function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: 'Pendiente',
-  PROOF_SUBMITTED: 'Comprobante enviado',
-  CONFIRMED: 'Confirmado',
-  SHIPPED: 'Enviado',
-  DELIVERED: 'Entregado',
-  CANCELLED: 'Cancelado',
+const STATUS_LABEL_KEYS: Record<string, string> = {
+  PENDING: 'pending',
+  PROOF_SUBMITTED: 'proofSubmitted',
+  CONFIRMED: 'confirmed',
+  SHIPPED: 'shipped',
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled',
 };
 
 function MenuItem({ icon, label, onPress, badge }: { icon: React.ReactNode; label: string; onPress: () => void; badge?: number }) {
@@ -44,6 +46,7 @@ function MenuItem({ icon, label, onPress, badge }: { icon: React.ReactNode; labe
 
 export default function ProfileScreen({ navigation }: any) {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const insets = useSafeAreaInsets();
@@ -76,9 +79,9 @@ export default function ProfileScreen({ navigation }: any) {
   );
 
   const doLogout = async () => {
-    Alert.alert('Salir', '¿Cerrar sesión?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Salir', style: 'destructive', onPress: () => logout() },
+    Alert.alert(t('mobile.profile.logout'), t('mobile.profile.logoutConfirmMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
+      { text: t('mobile.profile.logout'), style: 'destructive', onPress: () => logout() },
     ]);
   };
 
@@ -106,60 +109,61 @@ export default function ProfileScreen({ navigation }: any) {
               <ShoppingCart size={13} color={colors.primary} />
             )}
             <Text style={styles.role}>
-              {user?.role === 'SELLER' ? 'Vendedor' : user?.role === 'ADMIN' ? 'Administrador' : 'Comprador'}
+              {user?.role === 'SELLER' ? t('mobile.profile.roles.seller') : user?.role === 'ADMIN' ? t('mobile.profile.roles.admin') : t('mobile.profile.roles.customer')}
             </Text>
           </View>
           {user?.isVerified && (
             <View style={styles.badgeItem}>
               <BadgeCheck size={13} color={colors.success} />
-              <Text style={styles.verified}>Verificado</Text>
+              <Text style={styles.verified}>{t('mobile.profile.verifiedLabel')}</Text>
             </View>
           )}
         </View>
         <View style={styles.coinWrap}>
           <CoinChip amount={user?.gamerCoins ?? 0} />
         </View>
+        <LanguageSwitcher />
       </View>
 
       <View style={styles.menu}>
-        <MenuItem icon={<Bell size={17} color={colors.primary} />} label="Notificaciones" onPress={() => navigation.navigate('Notifications')} badge={unread} />
-        <MenuItem icon={<ClipboardList size={17} color={colors.primary} />} label="Mis pedidos" onPress={() => navigation.navigate('Orders')} />
-        <MenuItem icon={<Heart size={17} color={colors.error} />} label="Mis favoritos" onPress={() => navigation.navigate('Wishlist')} />
-        <MenuItem icon={<Package size={17} color={colors.primary} />} label="Mis direcciones" onPress={() => navigation.navigate('Addresses')} />
-        <MenuItem icon={<Pencil size={17} color={colors.textSecondary} />} label="Editar perfil" onPress={() => navigation.navigate('EditProfile')} />
-        <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label="Empleos" onPress={() => navigation.navigate('Jobs')} />
-        <MenuItem icon={<ClipboardList size={17} color={colors.primary} />} label="Mis postulaciones" onPress={() => navigation.navigate('MyApplications')} />
-        <MenuItem icon={<Gift size={17} color={colors.warning} />} label="Invitá amigos y ganá 50 monedas" onPress={() => setInviteOpen(true)} />
+        <MenuItem icon={<Bell size={17} color={colors.primary} />} label={t('mobile.profile.notifications')} onPress={() => navigation.navigate('Notifications')} badge={unread} />
+        <MenuItem icon={<ClipboardList size={17} color={colors.primary} />} label={t('mobile.profile.myOrders')} onPress={() => navigation.navigate('Orders')} />
+        <MenuItem icon={<Heart size={17} color={colors.error} />} label={t('mobile.profile.myWishlist')} onPress={() => navigation.navigate('Wishlist')} />
+        <MenuItem icon={<Package size={17} color={colors.primary} />} label={t('mobile.profile.myAddresses')} onPress={() => navigation.navigate('Addresses')} />
+        <MenuItem icon={<Pencil size={17} color={colors.textSecondary} />} label={t('mobile.profile.editProfile')} onPress={() => navigation.navigate('EditProfile')} />
+        <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label={t('mobile.profile.jobs')} onPress={() => navigation.navigate('Jobs')} />
+        <MenuItem icon={<ClipboardList size={17} color={colors.primary} />} label={t('mobile.profile.myApplications')} onPress={() => navigation.navigate('MyApplications')} />
+        <MenuItem icon={<Gift size={17} color={colors.warning} />} label={t('mobile.profile.inviteFriends')} onPress={() => setInviteOpen(true)} />
         {(user?.role === 'SELLER' || hasPermission('seller.products.manage')) && (
           <>
-            <MenuItem icon={<Store size={17} color={colors.primary} />} label="Mi tienda" onPress={() => navigation.navigate('SellerDashboard')} />
-            <MenuItem icon={<Package size={17} color={colors.primary} />} label="Mis productos" onPress={() => navigation.navigate('SellerProducts')} />
-            <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label="Mis empleos" onPress={() => navigation.navigate('SellerJobs')} />
-            <MenuItem icon={<Upload size={17} color={colors.primary} />} label="Carga masiva de productos" onPress={() => navigation.navigate('SellerBulkProducts')} />
-            <MenuItem icon={<Users size={17} color={colors.primary} />} label="Equipo de tienda" onPress={() => navigation.navigate('SellerTeam')} />
-            <MenuItem icon={<Ticket size={17} color={colors.primary} />} label="Mis cupones" onPress={() => navigation.navigate('SellerCoupons')} />
-            <MenuItem icon={<Flame size={17} color={colors.warning} />} label="Mis promociones" onPress={() => navigation.navigate('SellerPromotions')} />
-            <MenuItem icon={<Wallet size={17} color={colors.success} />} label="Mis pagos" onPress={() => navigation.navigate('SellerPayouts')} />
-            <MenuItem icon={<Wrench size={17} color={colors.textSecondary} />} label="Editar tienda" onPress={() => navigation.navigate('EditStore')} />
+            <MenuItem icon={<Store size={17} color={colors.primary} />} label={t('mobile.profile.myStore')} onPress={() => navigation.navigate('SellerDashboard')} />
+            <MenuItem icon={<Package size={17} color={colors.primary} />} label={t('mobile.profile.myProducts')} onPress={() => navigation.navigate('SellerProducts')} />
+            <MenuItem icon={<Briefcase size={17} color={colors.primary} />} label={t('mobile.profile.myJobs')} onPress={() => navigation.navigate('SellerJobs')} />
+            <MenuItem icon={<Upload size={17} color={colors.primary} />} label={t('mobile.profile.bulkUpload')} onPress={() => navigation.navigate('SellerBulkProducts')} />
+            <MenuItem icon={<Users size={17} color={colors.primary} />} label={t('mobile.profile.storeTeam')} onPress={() => navigation.navigate('SellerTeam')} />
+            <MenuItem icon={<Ticket size={17} color={colors.primary} />} label={t('mobile.profile.myCoupons')} onPress={() => navigation.navigate('SellerCoupons')} />
+            <MenuItem icon={<Flame size={17} color={colors.warning} />} label={t('mobile.profile.myPromotions')} onPress={() => navigation.navigate('SellerPromotions')} />
+            <MenuItem icon={<Wallet size={17} color={colors.success} />} label={t('mobile.profile.myPayouts')} onPress={() => navigation.navigate('SellerPayouts')} />
+            <MenuItem icon={<Wrench size={17} color={colors.textSecondary} />} label={t('mobile.profile.editStore')} onPress={() => navigation.navigate('EditStore')} />
           </>
         )}
         {(user?.role === 'ADMIN' || hasPermission('admin.dashboard')) && (
           <>
-            <MenuItem icon={<ShieldCheck size={17} color={colors.primary} />} label="Panel admin" onPress={() => navigation.navigate('AdminDashboard')} />
-            <MenuItem icon={<Store size={17} color={colors.primary} />} label="Vendedores" onPress={() => navigation.navigate('AdminSellers')} />
-            <MenuItem icon={<MapPin size={17} color={colors.primary} />} label="Verificación de tiendas" onPress={() => navigation.navigate('AdminVerification')} />
-            <MenuItem icon={<Briefcase size={17} color={colors.warning} />} label="Moderar empleos" onPress={() => navigation.navigate('AdminJobs')} />
-            <MenuItem icon={<Users size={17} color={colors.warning} />} label="Postulaciones" onPress={() => navigation.navigate('AdminJobApplications')} />
-            <MenuItem icon={<MessageSquareWarning size={17} color={colors.warning} />} label="Moderación del foro" onPress={() => navigation.navigate('ForumModeration')} />
+            <MenuItem icon={<ShieldCheck size={17} color={colors.primary} />} label={t('mobile.profile.adminPanel')} onPress={() => navigation.navigate('AdminDashboard')} />
+            <MenuItem icon={<Store size={17} color={colors.primary} />} label={t('mobile.profile.sellers')} onPress={() => navigation.navigate('AdminSellers')} />
+            <MenuItem icon={<MapPin size={17} color={colors.primary} />} label={t('mobile.profile.storeVerification')} onPress={() => navigation.navigate('AdminVerification')} />
+            <MenuItem icon={<Briefcase size={17} color={colors.warning} />} label={t('mobile.profile.moderateJobs')} onPress={() => navigation.navigate('AdminJobs')} />
+            <MenuItem icon={<Users size={17} color={colors.warning} />} label={t('mobile.profile.applications')} onPress={() => navigation.navigate('AdminJobApplications')} />
+            <MenuItem icon={<MessageSquareWarning size={17} color={colors.warning} />} label={t('mobile.profile.forumModeration')} onPress={() => navigation.navigate('ForumModeration')} />
           </>
         )}
       </View>
 
-      <Text style={styles.section}>Mis pedidos</Text>
+      <Text style={styles.section}>{t('mobile.profile.myOrders')}</Text>
       {loading ? (
         <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
       ) : orders.length === 0 ? (
-        <Text style={styles.empty}>Aún no tenés pedidos</Text>
+        <Text style={styles.empty}>{t('mobile.profile.noOrders')}</Text>
       ) : (
         <FlatList
           data={orders}
@@ -167,22 +171,26 @@ export default function ProfileScreen({ navigation }: any) {
           contentContainerStyle={{ paddingHorizontal: 12, gap: 8, paddingBottom: 16 }}
           ListFooterComponent={
             <TouchableOpacity style={[styles.logout, { marginBottom: insets.bottom + 12 }]} onPress={doLogout}>
-              <Text style={styles.logoutText}>Cerrar sesión</Text>
+              <Text style={styles.logoutText}>{t('mobile.profile.logout')}</Text>
             </TouchableOpacity>
           }
-          renderItem={({ item }) => (
-            <View style={styles.order}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.orderId}>Pedido #{item.id}</Text>
-                <Text style={styles.orderStatus}>{STATUS_LABEL[item.status] ?? item.status}</Text>
-                <Text style={styles.orderMeta}>
-                  {item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-BO') : ''}
-                  {item.items?.length ? ` · ${item.items.length} producto(s)` : ''}
-                </Text>
+          renderItem={({ item }) => {
+            const statusKey = STATUS_LABEL_KEYS[item.status];
+            const statusText = statusKey ? t(`mobile.profile.status.${statusKey}`) : item.status;
+            return (
+              <View style={styles.order}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.orderId}>{t('mobile.profile.orderNumber', { id: item.id })}</Text>
+                  <Text style={styles.orderStatus}>{statusText}</Text>
+                  <Text style={styles.orderMeta}>
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-BO') : ''}
+                    {item.items?.length ? t('mobile.profile.productsCount', { count: item.items.length }) : ''}
+                  </Text>
+                </View>
+                <Text style={styles.orderTotal}>{money(item.total)}</Text>
               </View>
-              <Text style={styles.orderTotal}>{money(item.total)}</Text>
-            </View>
-          )}
+            );
+          }}
         />
       )}
       <Modal visible={inviteOpen} transparent animationType="slide" onRequestClose={() => setInviteOpen(false)}>
@@ -190,14 +198,14 @@ export default function ProfileScreen({ navigation }: any) {
           <View style={styles.modalCard}>
             <View style={styles.modalTitleRow}>
               <Gift size={18} color={colors.warning} />
-              <Text style={styles.modalTitle}>Invitá amigos y ganá</Text>
+              <Text style={styles.modalTitle}>{t('mobile.profile.inviteModalTitle')}</Text>
             </View>
             <Text style={styles.modalSubtitle}>
-              Compartí tu código: cuando alguien se registre con él, ganás 50 monedas del proyecto.
-              {invite?.referredCount ? `\nYa invitaste a ${invite?.referredCount} persona(s).` : ''}
+              {t('mobile.profile.inviteModalSubtitle')}
+              {invite?.referredCount ? t('mobile.profile.inviteAlreadyInvited', { count: invite?.referredCount }) : ''}
             </Text>
             <View style={styles.inviteBox}>
-              <Text style={styles.inviteCode}>{invite?.inviteCode ?? 'Cargando...'}</Text>
+              <Text style={styles.inviteCode}>{invite?.inviteCode ?? t('mobile.common.loading')}</Text>
               <Text style={styles.inviteLink}>{invite?.inviteUrl ?? ''}</Text>
             </View>
             <TouchableOpacity
@@ -205,25 +213,25 @@ export default function ProfileScreen({ navigation }: any) {
               onPress={async () => {
                 try {
                   await Clipboard.setStringAsync(invite?.inviteCode ?? '');
-                  Alert.alert('Listo', 'Código de invitación copiado.');
+                  Alert.alert(t('mobile.common.done'), t('mobile.profile.inviteCodeCopiedMessage'));
                 } catch {}
               }}
             >
-              <Text style={styles.copyBtnText}>Copiar código</Text>
+              <Text style={styles.copyBtnText}>{t('mobile.profile.copyCodeButton')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.copyBtn}
               onPress={async () => {
                 try {
                   await Clipboard.setStringAsync(`${invite?.inviteUrl ?? ''}`);
-                  Alert.alert('Listo', 'Link de invitación copiado.');
+                  Alert.alert(t('mobile.common.done'), t('mobile.profile.inviteLinkCopiedMessage'));
                 } catch {}
               }}
             >
-              <Text style={styles.copyBtnText}>Copiar link</Text>
+              <Text style={styles.copyBtnText}>{t('mobile.profile.copyLinkButton')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeBtn} onPress={() => setInviteOpen(false)}>
-              <Text style={styles.closeBtnText}>Cerrar</Text>
+              <Text style={styles.closeBtnText}>{t('mobile.common.close')}</Text>
             </TouchableOpacity>
           </View>
         </View>

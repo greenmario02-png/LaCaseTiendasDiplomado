@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { LoadingState, EmptyState } from '../components/redesign/States';
@@ -11,6 +12,7 @@ const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { max
 export default function SellerScreen({ route, navigation }: any) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
   const { id } = route.params;
   const [seller, setSeller] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function SellerScreen({ route, navigation }: any) {
   if (!seller) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>Tienda no encontrada</Text>
+        <Text style={styles.error}>{t('mobile.seller.notFound')}</Text>
       </View>
     );
   }
@@ -62,26 +64,26 @@ export default function SellerScreen({ route, navigation }: any) {
         {seller.isVerified ? (
           <View style={styles.metaItem}>
             <BadgeCheck size={12} color={colors.success} />
-            <Text style={styles.verified}>Verificado</Text>
+            <Text style={styles.verified}>{t('mobile.seller.verified')}</Text>
           </View>
         ) : null}
       </View>
       <View style={styles.statsRow}>
-        <View style={styles.stat}><Text style={styles.statValue}>{avg ? avg.toFixed(1) : '—'}</Text><Text style={styles.statLabel}>Rating</Text></View>
-        <View style={styles.stat}><Text style={styles.statValue}>{reviews.length}</Text><Text style={styles.statLabel}>Reseñas</Text></View>
-        <View style={styles.stat}><Text style={styles.statValue}>{products.length}</Text><Text style={styles.statLabel}>Productos</Text></View>
-        <View style={styles.stat}><Text style={styles.statValue}>{seller.totalSales ?? 0}</Text><Text style={styles.statLabel}>Ventas</Text></View>
+        <View style={styles.stat}><Text style={styles.statValue}>{avg ? avg.toFixed(1) : '—'}</Text><Text style={styles.statLabel}>{t('mobile.seller.ratingLabel')}</Text></View>
+        <View style={styles.stat}><Text style={styles.statValue}>{reviews.length}</Text><Text style={styles.statLabel}>{t('mobile.seller.reviewsLabel')}</Text></View>
+        <View style={styles.stat}><Text style={styles.statValue}>{products.length}</Text><Text style={styles.statLabel}>{t('mobile.seller.productsLabel')}</Text></View>
+        <View style={styles.stat}><Text style={styles.statValue}>{seller.totalSales ?? 0}</Text><Text style={styles.statLabel}>{t('mobile.seller.salesLabel')}</Text></View>
       </View>
       {seller.storeDescription ? <Text style={styles.desc}>{seller.storeDescription}</Text> : null}
       {seller.whatsappPhone ? (
         <View style={styles.waRow}>
           <MessageCircle size={13} color={colors.success} />
-          <Text style={styles.wa}>WhatsApp: {seller.whatsappPhone}</Text>
+          <Text style={styles.wa}>{t('mobile.seller.whatsappLabel', { phone: seller.whatsappPhone })}</Text>
         </View>
       ) : null}
       {reviews.length > 0 && (
         <View style={styles.reviewBox}>
-          <Text style={styles.reviewTitle}>Reseñas recientes</Text>
+          <Text style={styles.reviewTitle}>{t('mobile.seller.recentReviews')}</Text>
           {reviews.slice(0, 3).map((r: any) => (
             <View key={r.id} style={styles.reviewCard}>
               <View style={styles.reviewStarsRow}>
@@ -94,7 +96,7 @@ export default function SellerScreen({ route, navigation }: any) {
           ))}
         </View>
       )}
-      <Text style={styles.section}>Productos de la tienda</Text>
+      <Text style={styles.section}>{t('mobile.seller.storeProducts')}</Text>
     </View>
   );
 
@@ -121,7 +123,7 @@ export default function SellerScreen({ route, navigation }: any) {
           />
         </View>
       )}
-      ListEmptyComponent={<EmptyState message="No hay productos" />}
+      ListEmptyComponent={<EmptyState message={t('mobile.seller.noProducts')} />}
     />
   );
 }

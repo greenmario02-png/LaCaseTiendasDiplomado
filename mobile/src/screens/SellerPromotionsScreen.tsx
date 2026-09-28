@@ -1,6 +1,7 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { CheckSquare, Square } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -9,6 +10,7 @@ import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
 export default function SellerPromotionsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [promos, setPromos] = useState<any[]>([]);
@@ -24,7 +26,7 @@ export default function SellerPromotionsScreen({ navigation }: any) {
       const { data } = await api.get('/seller/promotions');
       setPromos(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -52,10 +54,10 @@ export default function SellerPromotionsScreen({ navigation }: any) {
     setSelectedProductIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const create = async () => {
-    if (!form.title.trim()) return Alert.alert('Falta información', 'El título es obligatorio.');
-    if (!form.discountValue.trim() || Number(form.discountValue) <= 0) return Alert.alert('Falta información', 'El descuento debe ser mayor a 0.');
-    if (selectedProductIds.length === 0) return Alert.alert('Falta información', 'Elegí al menos un producto.');
-    if (!form.startDate.trim() || !form.endDate.trim()) return Alert.alert('Falta información', 'Las fechas son obligatorias.');
+    if (!form.title.trim()) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerPromotions.titleRequired'));
+    if (!form.discountValue.trim() || Number(form.discountValue) <= 0) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerPromotions.discountRequired'));
+    if (selectedProductIds.length === 0) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerPromotions.selectProductRequired'));
+    if (!form.startDate.trim() || !form.endDate.trim()) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerPromotions.datesRequired'));
 
     setSaving(true);
     try {
@@ -68,28 +70,28 @@ export default function SellerPromotionsScreen({ navigation }: any) {
         endDate: new Date(form.endDate).toISOString(),
         productIds: selectedProductIds,
       });
-      Alert.alert('Listo', 'Promoción creada correctamente.');
+      Alert.alert(t('mobile.common.success'), t('mobile.sellerPromotions.createSuccessMessage'));
       setModalOpen(false);
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
   };
 
   const deactivate = (p: any) => {
-    Alert.alert('Desactivar promoción', `¿Desactivar «${p.title}»?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerPromotions.deactivateTitle'), t('mobile.sellerPromotions.deactivateConfirm', { title: p.title }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Desactivar',
+        text: t('mobile.common.deactivate'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/seller/promotions/${p.id}`);
             load();
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -103,18 +105,23 @@ export default function SellerPromotionsScreen({ navigation }: any) {
         <View style={styles.body}>
           <View style={styles.row}>
             <Text style={styles.name} numberOfLines={1}>{item.title}</Text>
-            <Text style={[styles.status, { color: active ? colors.success : colors.textSecondary }]}>{active ? 'Activa' : 'Finalizada'}</Text>
+            <Text style={[styles.status, { color: active ? colors.success : colors.textSecondary }]}>{active ? t('mobile.sellerPromotions.statusActive') : t('mobile.sellerPromotions.statusFinished')}</Text>
           </View>
           <Text style={styles.meta}>
-            {item.discountType === 'PERCENTAGE' ? `${item.discountValue}% OFF` : `${item.discountValue} Bs OFF`} ·{' '}
-            {item.startDate ? new Date(item.startDate).toLocaleDateString('es-BO') : ''} → {item.endDate ? new Date(item.endDate).toLocaleDateString('es-BO') : ''}
+            {t('mobile.sellerPromotions.discountMeta', {
+              discount: item.discountType === 'PERCENTAGE'
+                ? t('mobile.sellerPromotions.discountPercentOff', { value: item.discountValue })
+                : t('mobile.sellerPromotions.discountFixedOff', { value: item.discountValue }),
+              startDate: item.startDate ? new Date(item.startDate).toLocaleDateString('es-BO') : '',
+              endDate: item.endDate ? new Date(item.endDate).toLocaleDateString('es-BO') : '',
+            })}
           </Text>
-          <Text style={styles.meta}>{item.products?.length ?? 0} producto(s)</Text>
+          <Text style={styles.meta}>{t('mobile.sellerPromotions.productsCount', { count: item.products?.length ?? 0 })}</Text>
         </View>
         {active && (
           <View style={styles.actions}>
             <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.error }]} onPress={() => deactivate(item)}>
-              <Text style={[styles.miniBtnText, { color: colors.error }]}>Desactivar</Text>
+              <Text style={[styles.miniBtnText, { color: colors.error }]}>{t('mobile.common.deactivate')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -125,15 +132,15 @@ export default function SellerPromotionsScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis promociones</Text>
+        <Text style={styles.title}>{t('mobile.sellerPromotions.title')}</Text>
         <View style={styles.addWrap}>
-          <NeoButton title="Nueva promoción" onPress={openNew} />
+          <NeoButton title={t('mobile.sellerPromotions.newPromotionButton')} onPress={openNew} />
         </View>
       </View>
       {loading ? (
         <LoadingState />
       ) : promos.length === 0 ? (
-        <EmptyState message="No hay promociones. Creá una para atraer más ventas." />
+        <EmptyState message={t('mobile.sellerPromotions.emptyMessage')} />
       ) : (
         <FlatList
           data={promos}
@@ -147,38 +154,38 @@ export default function SellerPromotionsScreen({ navigation }: any) {
         <View style={styles.modalBackdrop}>
           <ScrollView style={{ maxHeight: '92%' }} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
             <View style={styles.modal}>
-              <Text style={styles.modalTitle}>Nueva promoción</Text>
-              <Text style={styles.label}>Título *</Text>
-              <NeoInput style={styles.input} value={form.title} onChangeText={(v) => set('title', v)} placeholder="Ej: Hot Sale de Hardware" />
-              <Text style={styles.label}>Descripción</Text>
-              <NeoInput style={styles.input} value={form.description} onChangeText={(v) => set('description', v)} placeholder="Detalle de la promoción..." />
-              <Text style={styles.label}>Tipo de descuento</Text>
+              <Text style={styles.modalTitle}>{t('mobile.sellerPromotions.modalTitle')}</Text>
+              <Text style={styles.label}>{t('mobile.sellerPromotions.titleLabel')}</Text>
+              <NeoInput style={styles.input} value={form.title} onChangeText={(v) => set('title', v)} placeholder={t('mobile.sellerPromotions.titlePlaceholder')} />
+              <Text style={styles.label}>{t('mobile.common.description')}</Text>
+              <NeoInput style={styles.input} value={form.description} onChangeText={(v) => set('description', v)} placeholder={t('mobile.sellerPromotions.descriptionPlaceholder')} />
+              <Text style={styles.label}>{t('mobile.sellerPromotions.discountTypeLabel')}</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                {['PERCENTAGE', 'FIXED'].map((t) => {
-                  const active = form.discountType === t;
+                {['PERCENTAGE', 'FIXED'].map((ty) => {
+                  const active = form.discountType === ty;
                   return (
-                    <TouchableOpacity key={t} style={[styles.chip, active && styles.chipActive]} onPress={() => set('discountType', t)}>
-                      <Text style={[styles.chipText, active && styles.chipTextActive]}>{t === 'PERCENTAGE' ? 'Porcentaje (%)' : 'Monto fijo (Bs)'}</Text>
+                    <TouchableOpacity key={ty} style={[styles.chip, active && styles.chipActive]} onPress={() => set('discountType', ty)}>
+                      <Text style={[styles.chipText, active && styles.chipTextActive]}>{ty === 'PERCENTAGE' ? t('mobile.common.percentageOption') : t('mobile.common.fixedAmountOption')}</Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
-              <Text style={styles.label}>Descuento *</Text>
+              <Text style={styles.label}>{t('mobile.sellerPromotions.discountLabel')}</Text>
               <NeoInput style={styles.input} value={form.discountValue} onChangeText={(v) => set('discountValue', v)} keyboardType="numeric" placeholder={form.discountType === 'PERCENTAGE' ? '10' : '50'} />
               <View style={styles.row2}>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Inicio (YYYY-MM-DD) *</Text>
+                  <Text style={styles.label}>{t('mobile.sellerPromotions.startDateLabel')}</Text>
                   <NeoInput style={styles.input} value={form.startDate} onChangeText={(v) => set('startDate', v)} placeholder="2026-08-10" />
                 </View>
                 <View style={styles.col}>
-                  <Text style={styles.label}>Fin (YYYY-MM-DD) *</Text>
+                  <Text style={styles.label}>{t('mobile.sellerPromotions.endDateLabel')}</Text>
                   <NeoInput style={styles.input} value={form.endDate} onChangeText={(v) => set('endDate', v)} placeholder="2026-08-17" />
                 </View>
               </View>
 
-              <Text style={styles.label}>Productos incluidos ({selectedProductIds.length})</Text>
+              <Text style={styles.label}>{t('mobile.sellerPromotions.productsIncludedLabel', { count: selectedProductIds.length })}</Text>
               {products.length === 0 ? (
-                <Text style={styles.hint}>Cargando productos de tu tienda...</Text>
+                <Text style={styles.hint}>{t('mobile.sellerPromotions.loadingProductsMessage')}</Text>
               ) : (
                 <View style={styles.productList}>
                   {products.slice(0, 10).map((p) => {
@@ -201,8 +208,8 @@ export default function SellerPromotionsScreen({ navigation }: any) {
                 </View>
               )}
 
-              <NeoButton title="Crear promoción" onPress={create} disabled={saving} style={styles.save} />
-              <NeoButton title="Cancelar" variant="ghost" onPress={() => setModalOpen(false)} />
+              <NeoButton title={t('mobile.sellerPromotions.createButton')} onPress={create} disabled={saving} style={styles.save} />
+              <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setModalOpen(false)} />
             </View>
           </ScrollView>
         </View>

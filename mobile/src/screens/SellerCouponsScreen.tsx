@@ -1,15 +1,16 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
-const TYPE_LABEL: Record<string, string> = { PERCENTAGE: '%', FIXED: 'Bs', GIFT: 'Regalo' };
-
 export default function SellerCouponsScreen({ navigation }: any) {
+  const { t } = useTranslation();
+  const TYPE_LABEL: Record<string, string> = { PERCENTAGE: '%', FIXED: 'Bs', GIFT: t('mobile.sellerCoupons.typeGift') };
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [coupons, setCoupons] = useState<any[]>([]);
@@ -23,7 +24,7 @@ export default function SellerCouponsScreen({ navigation }: any) {
       const { data } = await api.get('/seller/coupons');
       setCoupons(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -39,8 +40,8 @@ export default function SellerCouponsScreen({ navigation }: any) {
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const create = async () => {
-    if (!form.code.trim()) return Alert.alert('Falta información', 'El código es obligatorio.');
-    if (!form.value.trim() || Number(form.value) <= 0) return Alert.alert('Falta información', 'El valor debe ser mayor a 0.');
+    if (!form.code.trim()) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerCoupons.codeRequired'));
+    if (!form.value.trim() || Number(form.value) <= 0) return Alert.alert(t('mobile.common.missingInfo'), t('mobile.sellerCoupons.valueRequired'));
     setSaving(true);
     try {
       await api.post('/seller/coupons', {
@@ -51,12 +52,12 @@ export default function SellerCouponsScreen({ navigation }: any) {
         minSpend: form.minSpend.trim() ? Number(form.minSpend) : undefined,
         maxUses: form.maxUses.trim() ? Number(form.maxUses) : undefined,
       });
-      Alert.alert('Listo', 'Cupón creado correctamente.');
+      Alert.alert(t('mobile.common.success'), t('mobile.sellerCoupons.createSuccessMessage'));
       setModalOpen(false);
       setForm({ code: '', description: '', type: 'PERCENTAGE', value: '', minSpend: '', maxUses: '' });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -67,22 +68,22 @@ export default function SellerCouponsScreen({ navigation }: any) {
       await api.put(`/seller/coupons/${c.id}`, { isActive: !c.isActive });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
   const remove = (c: any) => {
-    Alert.alert('Eliminar cupón', `¿Eliminar «${c.code}»?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerCoupons.deleteTitle'), t('mobile.sellerCoupons.deleteConfirm', { code: c.code }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Eliminar',
+        text: t('mobile.common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/seller/coupons/${c.id}`);
             load();
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -95,20 +96,26 @@ export default function SellerCouponsScreen({ navigation }: any) {
         <View style={styles.row}>
           <Text style={styles.code}>{item.code}</Text>
           <Text style={[styles.status, { color: item.isActive ? colors.success : colors.textSecondary }]}>
-            {item.isActive ? 'Activo' : 'Inactivo'}
+            {item.isActive ? t('mobile.common.active') : t('mobile.common.inactive')}
           </Text>
         </View>
         {item.description ? <Text style={styles.desc} numberOfLines={1}>{item.description}</Text> : null}
         <Text style={styles.meta}>
-          {TYPE_LABEL[item.type] ?? ''} {item.value} · Mínimo {item.minSpend ? `${item.minSpend} Bs` : '—'} · Usos {item.usesCount}/{item.maxUses ?? '∞'}
+          {t('mobile.sellerCoupons.metaLine', {
+            typeLabel: TYPE_LABEL[item.type] ?? '',
+            value: item.value,
+            minSpend: item.minSpend ? `${item.minSpend} Bs` : '—',
+            used: item.usesCount,
+            max: item.maxUses ?? '∞',
+          })}
         </Text>
       </View>
       <View style={styles.actions}>
         <TouchableOpacity style={styles.miniBtn} onPress={() => toggle(item)}>
-          <Text style={styles.miniBtnText}>{item.isActive ? 'Desactivar' : 'Activar'}</Text>
+          <Text style={styles.miniBtnText}>{item.isActive ? t('mobile.common.deactivate') : t('mobile.common.activate')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.error }]} onPress={() => remove(item)}>
-          <Text style={[styles.miniBtnText, { color: colors.error }]}>Eliminar</Text>
+          <Text style={[styles.miniBtnText, { color: colors.error }]}>{t('mobile.common.delete')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -117,15 +124,15 @@ export default function SellerCouponsScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis cupones</Text>
+        <Text style={styles.title}>{t('mobile.sellerCoupons.title')}</Text>
         <View style={styles.addWrap}>
-          <NeoButton title="Nuevo cupón" onPress={() => setModalOpen(true)} />
+          <NeoButton title={t('mobile.sellerCoupons.newCouponButton')} onPress={() => setModalOpen(true)} />
         </View>
       </View>
       {loading ? (
         <LoadingState />
       ) : coupons.length === 0 ? (
-        <EmptyState message="No hay cupones. Creá uno para ofrecer descuentos." />
+        <EmptyState message={t('mobile.sellerCoupons.emptyMessage')} />
       ) : (
         <FlatList
           data={coupons}
@@ -138,36 +145,36 @@ export default function SellerCouponsScreen({ navigation }: any) {
       <Modal visible={modalOpen} transparent animationType="fade" onRequestClose={() => setModalOpen(false)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Nuevo cupón</Text>
-            <Text style={styles.label}>Código *</Text>
-            <NeoInput style={styles.input} value={form.code} onChangeText={(v) => set('code', v)} placeholder="Ej: DESCUENTO10" />
-            <Text style={styles.label}>Descripción</Text>
-            <NeoInput style={styles.input} value={form.description} onChangeText={(v) => set('description', v)} placeholder="Ej: 10% en tu primera compra" />
-            <Text style={styles.label}>Tipo</Text>
+            <Text style={styles.modalTitle}>{t('mobile.sellerCoupons.modalTitle')}</Text>
+            <Text style={styles.label}>{t('mobile.sellerCoupons.codeLabel')}</Text>
+            <NeoInput style={styles.input} value={form.code} onChangeText={(v) => set('code', v)} placeholder={t('mobile.sellerCoupons.codePlaceholder')} />
+            <Text style={styles.label}>{t('mobile.common.description')}</Text>
+            <NeoInput style={styles.input} value={form.description} onChangeText={(v) => set('description', v)} placeholder={t('mobile.sellerCoupons.descriptionPlaceholder')} />
+            <Text style={styles.label}>{t('mobile.sellerCoupons.typeLabel')}</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              {['PERCENTAGE', 'FIXED'].map((t) => {
-                const active = form.type === t;
+              {['PERCENTAGE', 'FIXED'].map((ty) => {
+                const active = form.type === ty;
                 return (
-                  <TouchableOpacity key={t} style={[styles.chip, active && styles.chipActive]} onPress={() => set('type', t)}>
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{t === 'PERCENTAGE' ? 'Porcentaje (%)' : 'Monto fijo (Bs)'}</Text>
+                  <TouchableOpacity key={ty} style={[styles.chip, active && styles.chipActive]} onPress={() => set('type', ty)}>
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{ty === 'PERCENTAGE' ? t('mobile.common.percentageOption') : t('mobile.common.fixedAmountOption')}</Text>
                   </TouchableOpacity>
                 );
               })}
             </View>
-            <Text style={styles.label}>Valor *</Text>
+            <Text style={styles.label}>{t('mobile.sellerCoupons.valueLabel')}</Text>
             <NeoInput style={styles.input} value={form.value} onChangeText={(v) => set('value', v)} keyboardType="numeric" placeholder={form.type === 'PERCENTAGE' ? '10' : '50'} />
             <View style={styles.row2}>
               <View style={styles.col}>
-                <Text style={styles.label}>Pedido mínimo (Bs)</Text>
+                <Text style={styles.label}>{t('mobile.sellerCoupons.minSpendLabel')}</Text>
                 <NeoInput style={styles.input} value={form.minSpend} onChangeText={(v) => set('minSpend', v)} keyboardType="numeric" placeholder="0" />
               </View>
               <View style={styles.col}>
-                <Text style={styles.label}>Límite de usos</Text>
+                <Text style={styles.label}>{t('mobile.sellerCoupons.maxUsesLabel')}</Text>
                 <NeoInput style={styles.input} value={form.maxUses} onChangeText={(v) => set('maxUses', v)} keyboardType="numeric" placeholder="1" />
               </View>
             </View>
-            <NeoButton title="Crear cupón" onPress={create} disabled={saving} style={styles.save} />
-            <NeoButton title="Cancelar" variant="ghost" onPress={() => setModalOpen(false)} />
+            <NeoButton title={t('mobile.sellerCoupons.createButton')} onPress={create} disabled={saving} style={styles.save} />
+            <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setModalOpen(false)} />
           </View>
         </View>
       </Modal>

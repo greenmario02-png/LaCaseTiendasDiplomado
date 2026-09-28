@@ -4,6 +4,7 @@ import {
   Alert, RefreshControl, ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { Truck, Store, CreditCard, MapPin } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -15,6 +16,7 @@ function money(v: string | number): string {
 }
 
 export default function CheckoutScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [cart, setCart] = useState<any>(null);
@@ -41,7 +43,7 @@ export default function CheckoutScreen({ navigation }: any) {
         if (def) setSelectedAddressId(def.id);
       }
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -61,14 +63,14 @@ export default function CheckoutScreen({ navigation }: any) {
       const payload: any = { fulfillmentType, notes: notes.trim() || undefined };
       if (fulfillmentType === 'SHIPPING') {
         if (!selectedAddressId) {
-          Alert.alert('Falta dirección', 'Elegí una dirección de envío.');
+          Alert.alert(t('mobile.checkout.missingAddressTitle'), t('mobile.checkout.missingAddressMessage'));
           setPlacing(false);
           return;
         }
         payload.shippingAddressId = selectedAddressId;
       } else {
         if (!pickupAddress.trim()) {
-          Alert.alert('Falta dirección de retiro', 'Indicá la dirección de la tienda donde retirás.');
+          Alert.alert(t('mobile.checkout.missingPickupAddressTitle'), t('mobile.checkout.missingPickupAddressMessage'));
           setPlacing(false);
           return;
         }
@@ -77,15 +79,15 @@ export default function CheckoutScreen({ navigation }: any) {
       if (couponCode.trim()) payload.couponCode = couponCode.trim();
       const res = await api.post('/orders', payload);
       const orders = res.data.data ?? [];
-      Alert.alert('¡Pedido creado!', `Se crearon ${orders.length} orden(es).`, [
-        { text: 'Ver mis pedidos', onPress: () => navigation.navigate('Orders') },
-        { text: 'OK' },
+      Alert.alert(t('mobile.checkout.orderCreatedTitle'), t('mobile.checkout.orderCreatedMessage', { count: orders.length }), [
+        { text: t('mobile.checkout.viewMyOrders'), onPress: () => navigation.navigate('Orders') },
+        { text: t('mobile.common.ok') },
       ]);
       setCouponCode('');
       setNotes('');
       setFulfillmentType('SHIPPING');
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setPlacing(false);
     }
@@ -103,9 +105,9 @@ export default function CheckoutScreen({ navigation }: any) {
   if (items.length === 0) {
     return (
       <View style={styles.center}>
-        <EmptyState message="Tu carrito está vacío" />
+        <EmptyState message={t('mobile.checkout.emptyCart')} />
         <View style={{ minWidth: 160, marginTop: 8 }}>
-          <NeoButton title="Ir a comprar" variant="secondary" onPress={() => navigation.navigate('Home')} />
+          <NeoButton title={t('mobile.checkout.goShopping')} variant="secondary" onPress={() => navigation.navigate('Home')} />
         </View>
       </View>
     );
@@ -114,7 +116,7 @@ export default function CheckoutScreen({ navigation }: any) {
   return (
     <ScrollView style={styles.flex} contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />}>
       {/* Items del carrito */}
-      <Text style={styles.sectionTitle}>Resumen del pedido</Text>
+      <Text style={styles.sectionTitle}>{t('mobile.checkout.sectionOrderSummary')}</Text>
       <View style={styles.card}>
         {items.map((it: any) => (
           <View key={it.id} style={styles.itemRow}>
@@ -128,13 +130,13 @@ export default function CheckoutScreen({ navigation }: any) {
         ))}
         <View style={styles.divider} />
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Subtotal</Text>
+          <Text style={styles.totalLabel}>{t('mobile.checkout.subtotal')}</Text>
           <Text style={styles.totalValue}>{money(cart?.subtotal ?? 0)}</Text>
         </View>
       </View>
 
       {/* Tipo de entrega */}
-      <Text style={styles.sectionTitle}>Tipo de entrega</Text>
+      <Text style={styles.sectionTitle}>{t('mobile.checkout.sectionDeliveryType')}</Text>
       <View style={styles.card}>
         <View style={styles.typeRow}>
           <TouchableOpacity
@@ -142,21 +144,21 @@ export default function CheckoutScreen({ navigation }: any) {
             onPress={() => setFulfillmentType('SHIPPING')}
           >
             <Truck size={15} color={fulfillmentType === 'SHIPPING' ? '#fff' : colors.textSecondary} />
-            <Text style={[styles.typeBtnText, fulfillmentType === 'SHIPPING' && styles.typeBtnTextActive]}>Envío</Text>
+            <Text style={[styles.typeBtnText, fulfillmentType === 'SHIPPING' && styles.typeBtnTextActive]}>{t('mobile.checkout.shipping')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.typeBtn, fulfillmentType === 'PICKUP' && styles.typeBtnActive]}
             onPress={() => setFulfillmentType('PICKUP')}
           >
             <Store size={15} color={fulfillmentType === 'PICKUP' ? '#fff' : colors.textSecondary} />
-            <Text style={[styles.typeBtnText, fulfillmentType === 'PICKUP' && styles.typeBtnTextActive]}>Retiro en tienda</Text>
+            <Text style={[styles.typeBtnText, fulfillmentType === 'PICKUP' && styles.typeBtnTextActive]}>{t('mobile.checkout.pickupInStore')}</Text>
           </TouchableOpacity>
         </View>
 
         {fulfillmentType === 'SHIPPING' ? (
           addresses.length === 0 ? (
             <TouchableOpacity onPress={() => navigation.navigate('Addresses')}>
-              <Text style={styles.link}>No tenés direcciones — agregar una</Text>
+              <Text style={styles.link}>{t('mobile.checkout.noAddresses')}</Text>
             </TouchableOpacity>
           ) : (
             addresses.map((a: any) => (
@@ -168,7 +170,7 @@ export default function CheckoutScreen({ navigation }: any) {
                 <MapPin size={14} color={selectedAddressId === a.id ? colors.primary : colors.textSecondary} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.addrLine1}>
-                    {a.street ?? 'Dirección'} {a.number ? ` ${a.number}` : ''} {a.isDefault ? '(predeterminada)' : ''}
+                    {a.street ?? t('mobile.checkout.addressFallback')} {a.number ? ` ${a.number}` : ''} {a.isDefault ? t('mobile.checkout.defaultLabel') : ''}
                   </Text>
                   <Text style={styles.addrLine2}>{[a.city, a.state].filter(Boolean).join(', ')}</Text>
                 </View>
@@ -180,20 +182,20 @@ export default function CheckoutScreen({ navigation }: any) {
             style={styles.input}
             value={pickupAddress}
             onChangeText={setPickupAddress}
-            placeholder="Dirección de la tienda para retirar (ej: Av. 16 de Julio 1523)"
+            placeholder={t('mobile.checkout.pickupPlaceholder')}
             placeholderTextColor={colors.textSecondary}
           />
         )}
       </View>
 
       {/* Cupón y notas */}
-      <Text style={styles.sectionTitle}>Cupón y notas</Text>
+      <Text style={styles.sectionTitle}>{t('mobile.checkout.sectionCouponNotes')}</Text>
       <View style={styles.card}>
         <TextInput
           style={styles.input}
           value={couponCode}
           onChangeText={setCouponCode}
-          placeholder="Código de cupón (opcional)"
+          placeholder={t('mobile.checkout.couponPlaceholder')}
           placeholderTextColor={colors.textSecondary}
           autoCapitalize="characters"
         />
@@ -201,23 +203,23 @@ export default function CheckoutScreen({ navigation }: any) {
           style={[styles.input, styles.notesInput]}
           value={notes}
           onChangeText={setNotes}
-          placeholder="Notas para el vendedor (opcional)"
+          placeholder={t('mobile.checkout.notesPlaceholder')}
           placeholderTextColor={colors.textSecondary}
           multiline
         />
       </View>
 
       {/* Pago */}
-      <Text style={styles.sectionTitle}>Método de pago</Text>
+      <Text style={styles.sectionTitle}>{t('mobile.checkout.sectionPaymentMethod')}</Text>
       <View style={styles.card}>
         <View style={styles.payRow}>
           <CreditCard size={15} color={colors.primary} />
-          <Text style={styles.payText}>Comprobante manual (BNB/QR disponible próximamente)</Text>
+          <Text style={styles.payText}>{t('mobile.checkout.paymentInfo')}</Text>
         </View>
       </View>
 
       <View style={{ marginTop: 16 }}>
-        <NeoButton title={placing ? 'Creando pedido...' : 'Confirmar pedido'} onPress={placeOrder} disabled={placing} />
+        <NeoButton title={placing ? t('mobile.checkout.creatingOrder') : t('mobile.checkout.confirmOrder')} onPress={placeOrder} disabled={placing} />
       </View>
     </ScrollView>
   );

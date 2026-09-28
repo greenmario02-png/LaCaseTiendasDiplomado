@@ -1,6 +1,7 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
@@ -11,15 +12,16 @@ function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
 }
 
-function estado(p: any): { label: string; color: string } {
-  if (p.isActive === false) return { label: 'Eliminado', color: themeColors.error };
-  if (!p.isApproved) return { label: 'Pendiente', color: themeColors.warning };
-  return { label: 'Aprobado', color: themeColors.success };
+function estado(p: any, t: (key: string) => string): { label: string; color: string } {
+  if (p.isActive === false) return { label: t('mobile.sellerProducts.statusDeleted'), color: themeColors.error };
+  if (!p.isApproved) return { label: t('mobile.sellerProducts.statusPending'), color: themeColors.warning };
+  return { label: t('mobile.sellerProducts.statusApproved'), color: themeColors.success };
 }
 
 export default function SellerProductsScreen({ navigation }: any) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
 
   const [products, setProducts] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -35,7 +37,7 @@ export default function SellerProductsScreen({ navigation }: any) {
       setTotal(data.meta?.total ?? items.length);
       setPage(p);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -56,17 +58,17 @@ export default function SellerProductsScreen({ navigation }: any) {
   };
 
   const remove = (p: any) => {
-    Alert.alert('Eliminar producto', `¿Eliminar «${p.name}»?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.sellerProducts.deleteConfirmTitle'), t('mobile.sellerProducts.deleteConfirmMessage', { name: p.name }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Eliminar',
+        text: t('mobile.common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
             await api.delete(`/seller/products/${p.id}`);
             load(1);
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
           }
         },
       },
@@ -78,12 +80,12 @@ export default function SellerProductsScreen({ navigation }: any) {
       await api.post(`/seller/products/${p.id}/reactivate`);
       load(1);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
   const renderItem = ({ item }: { item: any }) => {
-    const st = estado(item);
+    const st = estado(item, t);
     const img = item.images?.find((i: any) => i.isPrimary)?.url || item.images?.[0]?.url;
     return (
       <View style={styles.card}>
@@ -91,28 +93,28 @@ export default function SellerProductsScreen({ navigation }: any) {
           <Image source={{ uri: resolveImageUrl(img) }} style={styles.thumb} resizeMode="cover" />
         ) : (
           <View style={[styles.thumb, styles.thumbEmpty]}>
-            <Text style={styles.thumbEmptyText}>Sin img</Text>
+            <Text style={styles.thumbEmptyText}>{t('mobile.sellerProducts.noImage')}</Text>
           </View>
         )}
         <View style={styles.body}>
           <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-          <Text style={styles.sku}>{item.sku ?? 'Sin SKU'} · {item.category?.name ?? '—'}</Text>
+          <Text style={styles.sku}>{item.sku ?? t('mobile.sellerProducts.noSku')} · {item.category?.name ?? '—'}</Text>
           <View style={styles.row}>
             <Text style={styles.price}>{money(item.price)}</Text>
             <Text style={[styles.badge, { color: st.color, backgroundColor: st.color + '22' }]}>{st.label}</Text>
           </View>
-          <Text style={styles.stock}>Stock: {item.stock}</Text>
+          <Text style={styles.stock}>{t('mobile.sellerProducts.stockLabel', { stock: item.stock })}</Text>
           <View style={styles.actions}>
             <TouchableOpacity style={styles.miniBtn} onPress={() => navigation.navigate('SellerProductForm', { id: item.id })}>
-              <Text style={styles.miniBtnText}>Editar</Text>
+              <Text style={styles.miniBtnText}>{t('mobile.common.edit')}</Text>
             </TouchableOpacity>
             {item.isActive === false ? (
               <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.success }]} onPress={() => reactivate(item)}>
-                <Text style={[styles.miniBtnText, { color: colors.success }]}>Reactivar</Text>
+                <Text style={[styles.miniBtnText, { color: colors.success }]}>{t('mobile.sellerProducts.reactivateButton')}</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.error }]} onPress={() => remove(item)}>
-                <Text style={[styles.miniBtnText, { color: colors.error }]}>Eliminar</Text>
+                <Text style={[styles.miniBtnText, { color: colors.error }]}>{t('mobile.common.delete')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -124,15 +126,15 @@ export default function SellerProductsScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mis productos ({total})</Text>
+        <Text style={styles.title}>{t('mobile.sellerProducts.titleWithCount', { count: total })}</Text>
         <View style={styles.addWrap}>
-          <NeoButton title="＋ Nuevo producto" onPress={() => navigation.navigate('SellerProductForm')} />
+          <NeoButton title={t('mobile.sellerProducts.newProductButton')} onPress={() => navigation.navigate('SellerProductForm')} />
         </View>
       </View>
       {loading ? (
         <LoadingState />
       ) : products.length === 0 ? (
-        <EmptyState message="Todavía no tenés productos." />
+        <EmptyState message={t('mobile.sellerProducts.emptyProducts')} />
       ) : (
         <FlatList
           data={products}

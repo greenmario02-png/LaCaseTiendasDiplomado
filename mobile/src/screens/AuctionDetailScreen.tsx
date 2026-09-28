@@ -1,6 +1,7 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Timer, CheckCircle2, Lock, Trophy, Flame } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { NeoInput } from '../components/redesign/NeoInput';
@@ -13,8 +14,8 @@ function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
 }
 
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return 'Terminó';
+function formatCountdown(ms: number, t: (key: string) => string): string {
+  if (ms <= 0) return t('mobile.auctionDetail.ended');
   const s = Math.floor(ms / 1000);
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
@@ -24,6 +25,7 @@ function formatCountdown(ms: number): string {
 }
 
 export default function AuctionDetailScreen({ route }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
@@ -44,14 +46,14 @@ export default function AuctionDetailScreen({ route }: any) {
 
   useEffect(() => {
     load();
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
   }, [id]);
 
   const placeBid = async () => {
     const amount = Number(bid);
     if (!amount || amount <= 0) {
-      Alert.alert('Error', 'Ingresá un monto válido');
+      Alert.alert(t('mobile.common.error'), t('mobile.auctionDetail.invalidBid'));
       return;
     }
     setBidding(true);
@@ -59,26 +61,29 @@ export default function AuctionDetailScreen({ route }: any) {
       const { data } = await api.post(`/auctions/${id}/bid`, { bidAmount: amount });
       setAuction(data.data.auction ?? data.data);
       setBid('');
-      Alert.alert('¡Oferta enviada!', `Precio actual: ${money(data.data.auction?.currentPrice ?? data.data.currentPrice)}`);
+      Alert.alert(
+        t('mobile.auctionDetail.bidSentTitle'),
+        t('mobile.auctionDetail.bidSentMessage', { price: money(data.data.auction?.currentPrice ?? data.data.currentPrice) })
+      );
     } catch (err) {
-      Alert.alert('Error', getErrorMessage(err));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(err));
     } finally {
       setBidding(false);
     }
   };
 
   const buyNow = async () => {
-    Alert.alert('Comprar ahora', `¿Comprar por ${money(auction.buyNowPrice)}?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.auctionDetail.buyNowConfirmTitle'), t('mobile.auctionDetail.buyNowConfirmMessage', { price: money(auction.buyNowPrice) }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Comprar',
+        text: t('mobile.auctionDetail.buyNowConfirmButton'),
         onPress: async () => {
           try {
             await api.post(`/auctions/${id}/buy-now`);
-            Alert.alert('¡Comprado!', 'Ganaste la subasta con la compra directa');
+            Alert.alert(t('mobile.auctionDetail.purchasedTitle'), t('mobile.auctionDetail.purchasedMessage'));
             load();
           } catch (err) {
-            Alert.alert('Error', getErrorMessage(err));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(err));
           }
         },
       },
@@ -91,7 +96,7 @@ export default function AuctionDetailScreen({ route }: any) {
   if (!auction) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>Subasta no encontrada</Text>
+        <Text style={styles.error}>{t('mobile.auctionDetail.notFound')}</Text>
       </View>
     );
   }
@@ -110,9 +115,9 @@ export default function AuctionDetailScreen({ route }: any) {
         <View style={[styles.countdownBox, urgent && styles.countdownUrgent]}>
           <View style={styles.countdownLabelRow}>
             <Timer size={13} color={urgent ? colors.error : colors.warning} />
-            <Text style={[styles.countdownLabel, urgent && { color: colors.error }]}>Termina en</Text>
+            <Text style={[styles.countdownLabel, urgent && { color: colors.error }]}>{t('mobile.auctionDetail.endsIn')}</Text>
           </View>
-          <Text style={[styles.countdown, urgent && styles.countdownUrgentText]}>{formatCountdown(remaining)}</Text>
+          <Text style={[styles.countdown, urgent && styles.countdownUrgentText]}>{formatCountdown(remaining, t)}</Text>
         </View>
 
         {auction.reservePrice != null && (
@@ -123,7 +128,7 @@ export default function AuctionDetailScreen({ route }: any) {
               <Lock size={13} color={colors.textSecondary} />
             )}
             <Text style={[styles.reserveText, reserveMet ? styles.reserveMetText : styles.reserveNotText]}>
-              {reserveMet ? 'Reserva alcanzada' : `Reserva: ${money(auction.reservePrice)}`}
+              {reserveMet ? t('mobile.auctionDetail.reserveMet') : t('mobile.auctionDetail.reserveLabel', { price: money(auction.reservePrice) })}
             </Text>
           </View>
         )}
@@ -131,25 +136,25 @@ export default function AuctionDetailScreen({ route }: any) {
         {isWinning && (
           <View style={styles.winningRow}>
             <Trophy size={14} color={colors.success} />
-            <Text style={styles.winning}>¡Vas ganando!</Text>
+            <Text style={styles.winning}>{t('mobile.auctionDetail.winning')}</Text>
           </View>
         )}
         {!isWinning && auction.hasBids && (
           <View style={styles.losingRow}>
             <Flame size={14} color={colors.warning} />
-            <Text style={styles.losing}>Competís — subí tu oferta</Text>
+            <Text style={styles.losing}>{t('mobile.auctionDetail.losing')}</Text>
           </View>
         )}
 
         <View style={styles.priceRow}>
           <PriceDisplay price={Number(auction.currentPrice)} />
-          <Text style={styles.bids}>{auction.bids?.length ?? 0} ofertas</Text>
+          <Text style={styles.bids}>{t('mobile.auctionDetail.bidsCount', { count: auction.bids?.length ?? 0 })}</Text>
         </View>
 
         {auction.buyNowPrice != null && Number(auction.buyNowPrice) > 0 && (
           <View style={styles.buyNowWrap}>
             <NeoButton
-              title={`Comprar ahora: ${money(auction.buyNowPrice)}`}
+              title={t('mobile.auctionDetail.buyNowButton', { price: money(auction.buyNowPrice) })}
               variant="secondary"
               onPress={buyNow}
               style={styles.buyNowBtn}
@@ -157,30 +162,30 @@ export default function AuctionDetailScreen({ route }: any) {
           </View>
         )}
 
-        <Text style={styles.section}>Hacer una oferta</Text>
+        <Text style={styles.section}>{t('mobile.auctionDetail.placeBidSection')}</Text>
         <View style={styles.bidRow}>
           <NeoInput
             style={styles.bidInput}
-            placeholder="Tu oferta (Bs)"
+            placeholder={t('mobile.auctionDetail.bidPlaceholder')}
             value={bid}
             onChangeText={setBid}
             keyboardType="numeric"
           />
           <NeoButton
-            title={bidding ? 'Enviando...' : 'Ofertar'}
+            title={bidding ? t('mobile.common.sending') : t('mobile.auctionDetail.bidButton')}
             onPress={placeBid}
             disabled={bidding || remaining <= 0}
             style={styles.bidBtn}
           />
         </View>
 
-        <Text style={styles.section}>Historial de ofertas</Text>
+        <Text style={styles.section}>{t('mobile.auctionDetail.bidHistorySection')}</Text>
         {(auction.bids ?? []).length === 0 ? (
-          <EmptyState message="Sin ofertas todavía — ¡sé el primero!" />
+          <EmptyState message={t('mobile.auctionDetail.noBidsYet')} />
         ) : (
           (auction.bids ?? []).map((b: any, idx: number) => (
             <View key={idx} style={styles.bidItem}>
-              <Text style={styles.bidUser}>{b.bidder?.firstName ?? b.bidder?.email ?? 'Oferta'}</Text>
+              <Text style={styles.bidUser}>{b.bidder?.firstName ?? b.bidder?.email ?? t('mobile.auctionDetail.anonymousBidder')}</Text>
               <Text style={styles.bidAmount}>{money(b.bidAmount)}</Text>
               <Text style={styles.bidTime}>{new Date(b.createdAt).toLocaleTimeString()}</Text>
             </View>

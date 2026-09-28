@@ -1,6 +1,7 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Scale, Banknote, Timer } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { api, resolveImageUrl } from '../services/api';
 import { PriceDisplay } from '../components/redesign/PriceDisplay';
 import { CountdownTimer } from '../components/redesign/CountdownTimer';
@@ -8,6 +9,7 @@ import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export default function AuctionsScreen({ navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [auctions, setAuctions] = useState<any[]>([]);
@@ -36,10 +38,10 @@ export default function AuctionsScreen({ navigation }: any) {
       ListHeaderComponent={
         <View style={styles.titleRow}>
           <Scale size={20} color={colors.primary} />
-          <Text style={styles.title}>Subastas activas</Text>
+          <Text style={styles.title}>{t('mobile.auctions.title')}</Text>
         </View>
       }
-      ListEmptyComponent={<EmptyState message="No hay subastas activas" />}
+      ListEmptyComponent={<EmptyState message={t('mobile.auctions.empty')} />}
       renderItem={({ item }) => (
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('AuctionDetail', { id: item.id })}>
           <View style={{ flex: 1 }}>

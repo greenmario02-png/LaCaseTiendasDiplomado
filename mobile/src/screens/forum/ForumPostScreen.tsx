@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import { io, Socket } from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
 import { useForumStore } from '../../stores/forumStore';
 import { useAuthStore } from '../../stores/authStore';
 import { ReplyCard } from '../../components/redesign/ReplyCard';
@@ -31,17 +32,18 @@ import { SOCKET_URL } from '../../config/env';
 import { useAppTheme } from '../../theme/ThemeContext';
 import { MapPin, CheckCircle2, Flag, MessageCircle, ThumbsUp } from 'lucide-react-native';
 
-function formatTimeAgo(dateStr: string): string {
+function formatTimeAgo(dateStr: string, t: (key: string, opts?: any) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `hace ${mins} min`;
+  if (mins < 60) return t('mobile.forumPost.timeAgoMinutes', { count: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `hace ${hours}h`;
+  if (hours < 24) return t('mobile.forumPost.timeAgoHours', { count: hours });
   const days = Math.floor(hours / 24);
-  return `hace ${days}d`;
+  return t('mobile.forumPost.timeAgoDays', { count: days });
 }
 
 export default function ForumPostScreen({ route, navigation }: any) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { id: postId } = route.params;
@@ -57,7 +59,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
       const data = await getPost(postId);
       setPost(data);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -150,7 +152,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
 
   const handleVotePost = async (value: 1 | -1) => {
     if (!user) {
-      Alert.alert('Inicia sesión', 'Necesitas una cuenta para votar.');
+      Alert.alert(t('mobile.forumPost.loginRequiredTitle'), t('mobile.forumPost.loginRequiredVoteMessage'));
       return;
     }
     try {
@@ -159,20 +161,20 @@ export default function ForumPostScreen({ route, navigation }: any) {
         p ? { ...p, score: res.newScore, userVote: res.userVote } : p,
       );
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
   const handleVoteReply = async (replyId: number, value: 1 | -1) => {
     if (!user) {
-      Alert.alert('Inicia sesión', 'Necesitas una cuenta para votar.');
+      Alert.alert(t('mobile.forumPost.loginRequiredTitle'), t('mobile.forumPost.loginRequiredVoteMessage'));
       return;
     }
     try {
       await voteReply(replyId, value);
       await loadPost();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
@@ -181,17 +183,17 @@ export default function ForumPostScreen({ route, navigation }: any) {
       await acceptReply(replyId);
       await loadPost();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     }
   };
 
   const handleSendReply = async () => {
     if (!user) {
-      Alert.alert('Inicia sesión', 'Necesitas una cuenta para responder.');
+      Alert.alert(t('mobile.forumPost.loginRequiredTitle'), t('mobile.forumPost.loginRequiredReplyMessage'));
       return;
     }
     if (body.trim().length < 10) {
-      Alert.alert('Muy corta', 'La respuesta debe tener al menos 10 caracteres.');
+      Alert.alert(t('mobile.forumPost.replyTooShortTitle'), t('mobile.forumPost.replyTooShortMessage'));
       return;
     }
     setSending(true);
@@ -200,7 +202,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
       setBody('');
       await loadPost();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setSending(false);
     }
@@ -208,19 +210,19 @@ export default function ForumPostScreen({ route, navigation }: any) {
 
   const handleReport = () => {
     if (!user) {
-      Alert.alert('Inicia sesión', 'Necesitas una cuenta para reportar.');
+      Alert.alert(t('mobile.forumPost.loginRequiredTitle'), t('mobile.forumPost.loginRequiredReportMessage'));
       return;
     }
-    Alert.alert('Reportar', '¿Reportar esta pregunta?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.forumPost.reportConfirmTitle'), t('mobile.forumPost.reportConfirmMessage'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Reportar como spam',
+        text: t('mobile.forumPost.reportAsSpam'),
         onPress: async () => {
           try {
             await reportPost(postId, { reason: 'SPAM' });
-            Alert.alert('Reportado', 'Gracias por ayudar a moderar.');
+            Alert.alert(t('mobile.forumPost.reportedTitle'), t('mobile.forumPost.reportedMessage'));
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.error'), getErrorMessage(e));
           }
         },
       },
@@ -238,7 +240,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
   if (!post) {
     return (
       <View style={styles.container}>
-        <EmptyState message="No se encontró la pregunta" />
+        <EmptyState message={t('mobile.forumPost.notFoundMessage')} />
       </View>
     );
   }
@@ -258,7 +260,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 12, gap: 12 }}>
         <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Volver al feed</Text>
+          <Text style={styles.back}>{t('mobile.forumPost.backToFeed')}</Text>
         </Pressable>
 
         <View style={styles.card}>
@@ -273,15 +275,15 @@ export default function ForumPostScreen({ route, navigation }: any) {
             {post.status === 'RESOLVED' && (
               <View style={styles.metaItemRow}>
                 <CheckCircle2 size={11} color={colors.karmaUp} />
-                <Text style={styles.resolved}>Resuelta</Text>
+                <Text style={styles.resolved}>{t('mobile.forumPost.resolvedLabel')}</Text>
               </View>
             )}
           </View>
           <Text style={styles.title}>{post.title}</Text>
           <Text style={styles.authorLine}>
-            por <Text style={styles.authorName}>{author.forumUsername}</Text>{' '}
+            {t('mobile.forumPost.byPrefix')} <Text style={styles.authorName}>{author.forumUsername}</Text>{' '}
             <KarmaLevelBadge level={author.tag} inline /> ·{' '}
-            {formatTimeAgo(post.createdAt)} · {post.viewCount ?? 0} vistas
+            {formatTimeAgo(post.createdAt, t)} · {post.viewCount ?? 0} {t('mobile.forumPost.viewsSuffix')}
           </Text>
           <Text style={styles.body}>{post.body}</Text>
           {post.images?.map((img: string) => (
@@ -311,14 +313,14 @@ export default function ForumPostScreen({ route, navigation }: any) {
                     (post.userVote ?? 0) === 1 && { color: '#fff' },
                   ]}
                 >
-                  Positivo {Math.round(post.score ?? 0)}
+                  {t('mobile.forumPost.positiveVotes', { count: Math.round(post.score ?? 0) })}
                 </Text>
               </View>
             </Pressable>
             <Pressable onPress={handleReport} style={styles.reportBtn}>
               <View style={styles.reportBtnRow}>
                 <Flag size={12} color={colors.error} />
-                <Text style={styles.reportText}>Reportar</Text>
+                <Text style={styles.reportText}>{t('mobile.forumPost.reportButton')}</Text>
               </View>
             </Pressable>
           </View>
@@ -328,7 +330,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
           <MessageCircle size={14} color={colors.forumTextSecondary} />
           <Text style={styles.repliesHeader}>
             {post.replyCount ?? 0}{' '}
-            {(post.replyCount ?? 0) === 1 ? 'respuesta' : 'respuestas'}
+            {t((post.replyCount ?? 0) === 1 ? 'mobile.forumPost.replySingular' : 'mobile.forumPost.replyPlural')}
           </Text>
         </View>
 
@@ -356,14 +358,14 @@ export default function ForumPostScreen({ route, navigation }: any) {
         {user ? (
           <View style={styles.replyBox}>
             <NeoInput
-              placeholder="Escribe tu respuesta (mín. 10 caracteres)..."
+              placeholder={t('mobile.forumPost.replyPlaceholder')}
               value={body}
               onChangeText={setBody}
               multiline
               style={styles.input}
             />
             <NeoButton
-              title={sending ? 'Enviando...' : 'Publicar respuesta'}
+              title={sending ? t('mobile.common.sending') : t('mobile.forumPost.publishReply')}
               onPress={handleSendReply}
               disabled={sending}
             />
@@ -374,7 +376,7 @@ export default function ForumPostScreen({ route, navigation }: any) {
             onPress={() => navigation.navigate('Login')}
           >
             <Text style={styles.loginText}>
-              Inicia sesión para responder
+              {t('mobile.forumPost.loginToReplyButton')}
             </Text>
           </Pressable>
         )}
