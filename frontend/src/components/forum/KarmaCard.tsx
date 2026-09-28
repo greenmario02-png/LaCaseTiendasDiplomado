@@ -1,5 +1,6 @@
 import { Box, Typography, LinearProgress, Button } from '@mui/material';
 import RedeemIcon from '@mui/icons-material/Redeem';
+import { useTranslation } from 'react-i18next';
 import { useForumPalette } from '../../theme/forumTheme';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 const MAX_KARMA = 3000; // Leyenda
 
 export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const available = karma - karmaSpent;
   const pct = Math.min(100, (karma / MAX_KARMA) * 100);
@@ -27,7 +29,7 @@ export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography fontWeight={700} sx={{ color: forumPalette.textPrimary }}>
-          🎖️ Karma
+          🎖️ {t('forum.karmaCard.karma')}
         </Typography>
         <Typography fontWeight={700} sx={{ color: forumPalette.karmaGold }}>
           {tag}
@@ -37,7 +39,7 @@ export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
         {karma}
       </Typography>
       <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>
-        Disponible para canjear: {available} (canjeados: {karmaSpent})
+        {t('forum.karmaCard.available', { available, spent: karmaSpent })}
       </Typography>
       <LinearProgress
         variant="determinate"
@@ -46,7 +48,7 @@ export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
           '& .MuiLinearProgress-bar': { bgcolor: forumPalette.karmaGold } }}
       />
       <Typography variant="caption" sx={{ color: forumPalette.textMuted, display: 'block', mt: 0.5 }}>
-        {pct.toFixed(0)}% hacia Leyenda (3000)
+        {t('forum.karmaCard.progressToLegend', { pct: pct.toFixed(0) })}
       </Typography>
       {onRedeem && (
         <Button
@@ -57,7 +59,7 @@ export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
           onClick={onRedeem}
           sx={{ mt: 1.5, bgcolor: forumPalette.accent, '&:hover': { bgcolor: forumPalette.accentHover } }}
         >
-          Canjear karma por monedas
+          {t('forum.karmaCard.redeemButton')}
         </Button>
       )}
     </Box>

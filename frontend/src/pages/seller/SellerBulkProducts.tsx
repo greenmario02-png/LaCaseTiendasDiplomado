@@ -21,6 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { api, getErrorMessage, resolveImageUrl } from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface BulkItem {
   id: string;
@@ -35,6 +36,7 @@ interface BulkItem {
  * garantía, atributos o plantilla) para todos.
  */
 export default function SellerBulkProducts() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const isEmployee = user?.storeRole === 'EMPLOYEE';
@@ -117,7 +119,12 @@ export default function SellerBulkProducts() {
             price: '',
           });
         } catch (err) {
-          toast.error(`No se pudo subir ${file.name}: ${getErrorMessage(err)}`);
+          toast.error(
+            t('seller.bulkProducts.errors.uploadFailed', {
+              fileName: file.name,
+              error: getErrorMessage(err),
+            }),
+          );
         }
       }
       setItems((prev) => [...prev, ...newItems]);
@@ -135,16 +142,16 @@ export default function SellerBulkProducts() {
 
   const publishAll = async () => {
     if (!categoryId) {
-      toast.error('Elige una categoría para los productos.');
+      toast.error(t('seller.bulkProducts.errors.selectCategory'));
       return;
     }
     if (items.length === 0) {
-      toast.error('Sube al menos una foto de producto.');
+      toast.error(t('seller.bulkProducts.errors.uploadAtLeastOne'));
       return;
     }
     const price = basePrice.trim();
     if (!price) {
-      toast.error('Indica un precio (puede ser distinto por producto).');
+      toast.error(t('seller.bulkProducts.errors.enterPrice'));
       return;
     }
     setSubmitting(true);
@@ -162,7 +169,7 @@ export default function SellerBulkProducts() {
         });
       try {
         await api.post('/seller/products', {
-          name: it.name.trim() || `Producto ${i + 1}`,
+          name: it.name.trim() || t('seller.bulkProducts.defaultProductName', { index: i + 1 }),
           categoryId: Number(categoryId),
           description: description.trim() || undefined,
           condition,
@@ -174,43 +181,48 @@ export default function SellerBulkProducts() {
         });
         okCount++;
       } catch (err) {
-        toast.error(`Producto ${i + 1} (${it.name.trim() || 'sin nombre'}): ${getErrorMessage(err)}`);
+        toast.error(
+          t('seller.bulkProducts.errors.productFailed', {
+            index: i + 1,
+            name: it.name.trim() || t('seller.bulkProducts.errors.unnamedProduct'),
+            error: getErrorMessage(err),
+          }),
+        );
       }
     }
     setSubmitting(false);
     if (okCount > 0) {
-      toast.success(`Se publicaron ${okCount} producto(s). Esperan moderación del admin.`);
+      toast.success(t('seller.bulkProducts.success.published', { count: okCount }));
       navigate('/seller/productos');
     } else {
-      toast.error('No se pudo publicar ningún producto.');
+      toast.error(t('seller.bulkProducts.errors.noneCould'));
     }
   };
 
   return (
     <Box maxWidth="md" sx={{ mx: 'auto', py: 2 }}>
       <Typography variant="h5" gutterBottom>
-        Agregar varios productos
+        {t('seller.bulkProducts.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Carga muchas fotos de distintos productos y publica cada uno reutilizando los datos base
-        (categoría, condición, precio, stock y atributos) para todos.
+        {t('seller.bulkProducts.subtitle')}
       </Typography>
 
       {isEmployee && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          Como empleado no puedes editar el precio; usa el precio base que deje el administrador.
+          {t('seller.bulkProducts.employeeWarning')}
         </Alert>
       )}
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Datos base (se reutilizan en todos)
+          {t('seller.bulkProducts.baseData.title')}
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
               select
-              label="Categoría"
+              label={t('seller.bulkProducts.baseData.categoryLabel')}
               value={categoryId}
               onChange={(e) => handleCategoryChange(e.target.value)}
               fullWidth
@@ -218,7 +230,7 @@ export default function SellerBulkProducts() {
                 if (categories.length === 0) loadCategories();
               }}
             >
-              <MenuItem value="">Selecciona una categoría</MenuItem>
+              <MenuItem value="">{t('seller.bulkProducts.baseData.categoryPlaceholder')}</MenuItem>
               {categories.map((c: any) => (
                 <MenuItem key={c.id} value={String(c.id)}>
                   {c.name}
@@ -229,21 +241,23 @@ export default function SellerBulkProducts() {
           <Grid item xs={12} sm={6}>
             <TextField
               select
-              label="Condición"
+              label={t('seller.bulkProducts.baseData.conditionLabel')}
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
               fullWidth
             >
-              <MenuItem value="NEW">Nuevo</MenuItem>
-              <MenuItem value="USED">Usado</MenuItem>
-              <MenuItem value="REFURBISHED">Reacondicionado</MenuItem>
+              <MenuItem value="NEW">{t('seller.bulkProducts.baseData.conditionNew')}</MenuItem>
+              <MenuItem value="USED">{t('seller.bulkProducts.baseData.conditionUsed')}</MenuItem>
+              <MenuItem value="REFURBISHED">
+                {t('seller.bulkProducts.baseData.conditionRefurbished')}
+              </MenuItem>
             </TextField>
           </Grid>
           {templates.length > 0 && (
             <Grid item xs={12}>
               <TextField
                 select
-                label="Plantilla (atributos precargados)"
+                label={t('seller.bulkProducts.baseData.templateLabel')}
                 value={selectedTemplate}
                 onChange={(e) => {
                   setSelectedTemplate(e.target.value);
@@ -251,13 +265,13 @@ export default function SellerBulkProducts() {
                   if (tpl) applyTemplate(tpl);
                 }}
                 fullWidth
-                helperText="Elige una plantilla para precargar los atributos comunes de todos los productos."
+                helperText={t('seller.bulkProducts.baseData.templateHelper')}
               >
-                <MenuItem value="">Sin plantilla</MenuItem>
-                {templates.map((t: any) => (
-                  <MenuItem key={t.id} value={String(t.id)}>
-                    {t.name}
-                    {t.sellerId ? '' : ' · Global'}
+                <MenuItem value="">{t('seller.bulkProducts.baseData.templateNone')}</MenuItem>
+                {templates.map((tpl: any) => (
+                  <MenuItem key={tpl.id} value={String(tpl.id)}>
+                    {tpl.name}
+                    {tpl.sellerId ? '' : t('seller.bulkProducts.baseData.templateGlobalSuffix')}
                   </MenuItem>
                 ))}
               </TextField>
@@ -265,18 +279,22 @@ export default function SellerBulkProducts() {
           )}
           <Grid item xs={12} sm={4}>
             <TextField
-              label="Precio base (Bs)"
+              label={t('seller.bulkProducts.baseData.basePriceLabel')}
               type="number"
               value={basePrice}
               onChange={(e) => setBasePrice(e.target.value)}
               fullWidth
               disabled={isEmployee}
-              helperText={isEmployee ? 'Lo define el administrador' : 'Puede variar por producto'}
+              helperText={
+                isEmployee
+                  ? t('seller.bulkProducts.baseData.basePriceHelperEmployee')
+                  : t('seller.bulkProducts.baseData.basePriceHelperSeller')
+              }
             />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
-              label="Stock base"
+              label={t('seller.bulkProducts.baseData.baseStockLabel')}
               type="number"
               value={baseStock}
               onChange={(e) => setBaseStock(e.target.value)}
@@ -285,16 +303,16 @@ export default function SellerBulkProducts() {
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
-              label="Garantía"
+              label={t('seller.bulkProducts.baseData.warrantyLabel')}
               value={warranty}
               onChange={(e) => setWarranty(e.target.value)}
               fullWidth
-              placeholder="Ej: 12 meses"
+              placeholder={t('seller.bulkProducts.baseData.warrantyPlaceholder')}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Descripción (se aplica a todos, opcional)"
+              label={t('seller.bulkProducts.baseData.descriptionLabel')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
@@ -328,7 +346,7 @@ export default function SellerBulkProducts() {
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Fotos de productos ({items.length})
+          {t('seller.bulkProducts.photos.title', { count: items.length })}
         </Typography>
         <input
           ref={fileInputRef}
@@ -343,7 +361,9 @@ export default function SellerBulkProducts() {
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || items.length >= 50}
         >
-          {uploading ? 'Subiendo…' : 'Cargar fotos (una por producto)'}
+          {uploading
+            ? t('seller.bulkProducts.photos.uploading')
+            : t('seller.bulkProducts.photos.uploadButton')}
         </SecondaryButton>
         {uploading && <CircularProgress size={20} sx={{ ml: 2, verticalAlign: 'middle' }} />}
 
@@ -364,35 +384,35 @@ export default function SellerBulkProducts() {
                     size="small"
                     onClick={() => removeItem(it.id)}
                     sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'background.paper' }}
-                    title="Quitar"
+                    title={t('seller.bulkProducts.photos.removeTitle')}
                   >
                     <CloseIcon fontSize="small" />
                   </IconButton>
                   <img
                     src={resolveImageUrl(it.url)}
-                    alt={`Producto ${i + 1}`}
+                    alt={t('seller.bulkProducts.photos.itemAlt', { index: i + 1 })}
                     style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 4 }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    Producto {i + 1}
+                    {t('seller.bulkProducts.photos.itemLabel', { index: i + 1 })}
                   </Typography>
                   <TextField
-                    label="Nombre"
+                    label={t('seller.bulkProducts.photos.nameLabel')}
                     size="small"
                     fullWidth
                     value={it.name}
                     onChange={(e) => updateItem(it.id, { name: e.target.value })}
-                    placeholder={`Ej: Cuaderno Rayado N° ${i + 1}`}
+                    placeholder={t('seller.bulkProducts.photos.namePlaceholder', { index: i + 1 })}
                     sx={{ mt: 1 }}
                   />
                   <TextField
-                    label="Precio (Bs)"
+                    label={t('seller.bulkProducts.photos.priceLabel')}
                     type="number"
                     size="small"
                     fullWidth
                     value={it.price}
                     onChange={(e) => updateItem(it.id, { price: e.target.value })}
-                    placeholder={basePrice || 'Precio base'}
+                    placeholder={basePrice || t('seller.bulkProducts.photos.pricePlaceholder')}
                     disabled={isEmployee}
                     sx={{ mt: 1 }}
                   />
@@ -411,20 +431,25 @@ export default function SellerBulkProducts() {
         >
           {submitting ? (
             <>
-              <CircularProgress size={18} sx={{ mr: 1 }} /> Publicando…
+              <CircularProgress size={18} sx={{ mr: 1 }} /> {t('seller.bulkProducts.actions.publishing')}
             </>
           ) : (
-            `Publicar ${items.length} producto(s)`
+            t('seller.bulkProducts.actions.publish', { count: items.length })
           )}
         </PrimaryButton>
         <SecondaryButton onClick={() => navigate('/seller/productos')}>
-          Cancelar
+          {t('seller.bulkProducts.actions.cancel')}
         </SecondaryButton>
       </Stack>
 
       {items.length > 0 && (
         <Stack direction="row" spacing={1} sx={{ mt: 2 }} flexWrap="wrap" useFlexGap>
-          <Chip icon={<DeleteIcon />} label="Limpiar fotos" onClick={() => setItems([])} size="small" />
+          <Chip
+            icon={<DeleteIcon />}
+            label={t('seller.bulkProducts.actions.clearPhotos')}
+            onClick={() => setItems([])}
+            size="small"
+          />
         </Stack>
       )}
     </Box>

@@ -1,27 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Package } from 'lucide-react';
 import { Box, Typography, Card, CardContent, Chip, Alert, Grid, CircularProgress, Avatar, Stack, TextField, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { api, getErrorMessage } from '../../services/api';
 import { resolveImageUrl } from '../../services/api';
 
-const STATUS: Record<string, { label: string; color: any }> = {
-  PENDING: { label: 'Pendiente', color: 'warning' },
-  APPROVED: { label: 'Aprobada', color: 'info' },
-  REJECTED: { label: 'Rechazada', color: 'error' },
-  COMPLETED: { label: 'Completada', color: 'success' },
-  CANCELLED: { label: 'Cancelada', color: 'default' },
+const STATUS_META: Record<string, { key: string; color: any }> = {
+  PENDING: { key: 'pending', color: 'warning' },
+  APPROVED: { key: 'approved', color: 'info' },
+  REJECTED: { key: 'rejected', color: 'error' },
+  COMPLETED: { key: 'completed', color: 'success' },
+  CANCELLED: { key: 'cancelled', color: 'default' },
 };
 
-const REASONS: Record<string, string> = {
-  PRODUCTO_DEFECTUOSO: 'Producto defectuoso',
-  PRODUCTO_INCORRECTO: 'Producto incorrecto',
-  NO_COINCIDE_DESCRIPCION: 'No coincide con la descripción',
-  YA_NO_LO_NECESITO: 'Ya no lo necesito',
-  OTRO: 'Otro motivo',
+const REASON_KEYS: Record<string, string> = {
+  PRODUCTO_DEFECTUOSO: 'productoDefectuoso',
+  PRODUCTO_INCORRECTO: 'productoIncorrecto',
+  NO_COINCIDE_DESCRIPCION: 'noCoincideDescripcion',
+  YA_NO_LO_NECESITO: 'yaNoLoNecesito',
+  OTRO: 'otro',
 };
 
 export default function SellerReturnsPage() {
+  const { t } = useTranslation();
   const [returns, setReturns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -76,7 +78,7 @@ export default function SellerReturnsPage() {
   return (
     <Box p={3} maxWidth={1000} mx="auto">
       <Typography variant="h5" fontWeight={800} gutterBottom>
-        Solicitudes de devolución
+        {t('seller.returns.title')}
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -85,7 +87,7 @@ export default function SellerReturnsPage() {
       )}
 
       {returns.length === 0 ? (
-        <Alert severity="info">No tienes solicitudes de devolución.</Alert>
+        <Alert severity="info">{t('seller.returns.empty')}</Alert>
       ) : (
         <Stack spacing={2}>
           {returns.map((r) => (
@@ -102,7 +104,7 @@ export default function SellerReturnsPage() {
                   <Grid item xs={10} md={7}>
                     <Typography fontWeight={700}>{r.orderItem?.product?.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {REASONS[r.reason] ?? r.reason} · Comprador: {r.buyer?.firstName} {r.buyer?.lastName}
+                      {(REASON_KEYS[r.reason] ? t(`seller.returns.reasons.${REASON_KEYS[r.reason]}`) : r.reason)} · {t('seller.returns.buyerLabel')} {r.buyer?.firstName} {r.buyer?.lastName}
                     </Typography>
                     {r.details && (
                       <Typography variant="body2" mt={0.5}>
@@ -110,15 +112,15 @@ export default function SellerReturnsPage() {
                       </Typography>
                     )}
                     <Typography variant="body2" mt={0.5}>
-                      Monto del item: Bs {Number(r.orderItem?.unitPrice ?? 0).toLocaleString('es-BO')}
+                      {t('seller.returns.itemAmount', { amount: Number(r.orderItem?.unitPrice ?? 0).toLocaleString('es-BO') })}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4} sx={{ textAlign: { md: 'right' } }}>
-                    <Chip label={STATUS[r.status]?.label ?? r.status} color={STATUS[r.status]?.color ?? 'default'} size="small" />
+                    <Chip label={STATUS_META[r.status] ? t(`seller.returns.status.${STATUS_META[r.status].key}`) : r.status} color={STATUS_META[r.status]?.color ?? 'default'} size="small" />
                     {r.status === 'PENDING' && (
                       <Box mt={1}>
                         <PrimaryButton size="small" onClick={() => openDialog(r)}>
-                          Responder
+                          {t('seller.returns.respond')}
                         </PrimaryButton>
                       </Box>
                     )}
@@ -131,23 +133,23 @@ export default function SellerReturnsPage() {
       )}
 
       <Dialog open={Boolean(dialog)} onClose={() => setDialog(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>Responder devolución</DialogTitle>
+        <DialogTitle>{t('seller.returns.dialog.title')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2}>
-            Producto: <b>{dialog?.name}</b>
+            {t('seller.returns.dialog.productLabel')} <b>{dialog?.name}</b>
           </Typography>
           <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-            <InputLabel>Decisión</InputLabel>
-            <Select value={decision} label="Decisión" onChange={(e) => setDecision(e.target.value)}>
-              <MenuItem value="APPROVED">Aprobar (reembolsar)</MenuItem>
-              <MenuItem value="REJECTED">Rechazar</MenuItem>
+            <InputLabel>{t('seller.returns.dialog.decisionLabel')}</InputLabel>
+            <Select value={decision} label={t('seller.returns.dialog.decisionLabel')} onChange={(e) => setDecision(e.target.value)}>
+              <MenuItem value="APPROVED">{t('seller.returns.dialog.decisionApprove')}</MenuItem>
+              <MenuItem value="REJECTED">{t('seller.returns.dialog.decisionReject')}</MenuItem>
             </Select>
           </FormControl>
           {decision === 'APPROVED' && (
             <TextField
               fullWidth
               size="small"
-              label="Monto del reembolso (Bs)"
+              label={t('seller.returns.dialog.refundAmountLabel')}
               type="number"
               value={refundAmount}
               onChange={(e) => setRefundAmount(e.target.value)}
@@ -157,7 +159,7 @@ export default function SellerReturnsPage() {
           <TextField
             fullWidth
             size="small"
-            label="Nota al comprador"
+            label={t('seller.returns.dialog.responseNoteLabel')}
             multiline
             rows={2}
             value={responseNote}
@@ -165,9 +167,9 @@ export default function SellerReturnsPage() {
           />
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialog(null)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialog(null)}>{t('seller.returns.dialog.cancel')}</GhostButton>
           <PrimaryButton onClick={save} disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar'}
+            {saving ? t('seller.returns.dialog.saving') : t('seller.returns.dialog.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

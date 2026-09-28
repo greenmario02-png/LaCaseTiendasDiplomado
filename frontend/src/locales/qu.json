@@ -1,0 +1,2067 @@
+{
+  "common": {
+    "loading": "Cargashan...",
+    "error": "Pantasqa kachkan",
+    "retry": "Kutichiy",
+    "empty": "Manaraq imapas kachkanchu",
+    "save": "Waqaychay",
+    "cancel": "Saqiy",
+    "close": "Wisq'ay",
+    "confirm": "Chiqapchay",
+    "delete": "Chinkachiy",
+    "edit": "Allichay",
+    "add": "Yapay",
+    "search": "Maskhay",
+    "seeAll": "Llapanta qhaway",
+    "back": "Kutiy",
+    "next": "Qatiq",
+    "previous": "Ñawpaq",
+    "yes": "Arí",
+    "no": "Mana",
+    "notFound": {
+      "title": "Mana tarisqa p'anqa",
+      "message": "Maskhasqayki p'anqa mana kanchu, utaq huk laduman apasqa kachkan.",
+      "backHome": "Qallariyman kutiy"
+    }
+  },
+  "account": {
+    "profile": {
+      "title": "Kuintaymi",
+      "buyCoins": "Qullqichakunata rantiy",
+      "myOrders": "Rantisqaykuna",
+      "addresses": "Tiyasqaykuna",
+      "wishlist": "Munasqaykuna",
+      "returns": "Kutichisqaykuna",
+      "affiliateProgram": "Qatiqkunapa programan",
+      "notifications": "Willakuykuna",
+      "myAuctions": "Subastasniykuna",
+      "goToMyStore": "Qhatuyman riy",
+      "coinsChipLabel": "qullqichakuna",
+      "coinsTitle": "Proyectopa qullqichan",
+      "coinsInfo": "LaCase Multi Tiendas-pa qullqichan: token hina <b>rantikun</b>, ch'ulla rantikuykunawan (mana kutichisqawan) hinallataq tantanakuypi yanapaspa <b>mihanikun</b>, ranqhanakuna, regalo valekuna hinaspa descuento valekuna rantinapaq <b>llamk'achikun</b>.",
+      "balanceLabel": "Kaqniyki: {{balance}} qullqicha",
+      "noCoinMovements": "Manaraq qullqicha kuyusqayki kanchu.",
+      "inviteTitle": "Amigosniykita invitay, 50 qullqichata mihaniy",
+      "inviteDescription": "Kudigoykita rakiy: pipas chaywan qillqakunqa chayqa, 50 qullqichata mihanki.",
+      "invitedCount": "Ñachá {{count}} runa(kuna)ta invitarqanki.",
+      "copy": "Kupiay",
+      "copyCodeSuccess": "Kudigu portapapel-man kupiasqa",
+      "copyLink": "Enlace-ta kupiay",
+      "copyLinkSuccess": "Invitación enlace kupiasqa",
+      "personalDataTitle": "Sapallayki datukuna",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Qhipa suti",
+      "phoneLabel": "Telefono",
+      "countryLabel": "Mama llaqta",
+      "cityLabel": "Llaqta",
+      "provinceLabel": "Wamani",
+      "postalCodeLabel": "Postal kudigu",
+      "bioLabel": "Kawsay willay",
+      "bioPlaceholder": "Pisichata willay qampamanta utaq qhatuykimanta...",
+      "saveChanges": "Tikrasqakunata waqaychay",
+      "profileUpdated": "Perfil musuqchasqa",
+      "profileImageUpdated": "Perfil rikch'ay musuqchasqa",
+      "invalidCoinAmount": "Allin qullqicha achkata churay.",
+      "boughtCoins": "{{amount}} qullqicha(kuna)ta rantirqanki.",
+      "lastOrdersTitle": "Qhipa rantisqaykuna",
+      "viewAll": "Llapanta qhaway",
+      "noOrdersYet": "Manaraq imatapas rantirqankichu.",
+      "buyCoinsDialogTitle": "Proyectopa qullqichanta rantiy",
+      "buyCoinsDialogDescription": "Token hina qullqichata rantinki, LaCase Multi Tiendas-pi llamk'achinaykipaq (ranqhanakuna, regalo valekuna, descuento valekuna).",
+      "coinsQuantityLabel": "Qullqicha achkan",
+      "cancel": "Saqiy",
+      "buy": "Rantiy"
+    },
+    "applications": {
+      "title": "Mañakusqaykuna",
+      "subtitle": "Llamk'ay mañakusqaykipa kaynin qhaway",
+      "statusReceived": "Chaskisqa",
+      "statusViewed": "Qhatuwan qhawasqa",
+      "statusShortlisted": "Akllasqa kanaykipaq",
+      "statusRejected": "Mana akllasqa",
+      "statusHired": "¡Llamk'aqmi kanki!",
+      "statusWithdrawn": "Hurqusqa",
+      "closedNotice": "Kay llamk'ayqa ña usqharqan utaq wisq'akurqan.",
+      "appliedOn": "{{date}} p'unchaypi mañakurqanki",
+      "cvAttached": "CV k'askasqa",
+      "cvAttachedWithName": "CV k'askasqa: {{name}}",
+      "storeMessage": "Qhatupa qillqan",
+      "downloadCv": "CV-ta uraykuchiy",
+      "withdraw": "Hurquy",
+      "viewJob": "Llamk'ayta qhaway",
+      "viewJobs": "Llamk'aykunata qhaway",
+      "emptyMessage": "Manaraq ni hayk'aq llamk'ayman mañakurqankichu.",
+      "withdrawConfirm": "¿\"{{title}}\" nisqaman mañakusqaykita hurquyta munanki?",
+      "withdrawSuccess": "Mañakusqa hurqusqa"
+    },
+    "myOrders": "Rantisqaykuna",
+    "myOrdersSubtitle": "Rantikuyniykipa kaynin qhaway",
+    "addresses": {
+      "saved": "Tiyasqa waqaychasqa",
+      "deleted": "Tiyasqa chinkachisqa",
+      "title": "Tiyasqaykuna",
+      "subtitle": "Apachiy tiyasqaykita kamachiy",
+      "newAddress": "Musuq tiyasqa",
+      "emptyMessage": "Manam waqaychasqa tiyasqaykikuna kanchu.",
+      "defaultAddress": "Tiyasqa kamachisqa ñawpaqta",
+      "editAddress": "Tiyasqata allichay",
+      "street": "Calle",
+      "number": "Yupay",
+      "floor": "Piso/Dpto",
+      "city": "Llaqta",
+      "state": "Wamani",
+      "postalCode": "CP",
+      "useAsDefault": "Ñawpaq tiyasqa hina llamk'achiy",
+      "cancel": "Saqiy",
+      "save": "Waqaychay"
+    },
+    "wishlist": {
+      "title": "Munasqaykuna",
+      "productCount": "{{count}} ranqhana(kuna)",
+      "emptyMessage": "Manam ranqhanaykikuna munasqapi kanchu"
+    }
+  },
+  "affiliate": {
+    "title": "Qatiqkunapa programan",
+    "referralCode": "Qatiy kudigoyki",
+    "copy": "Kupiay",
+    "copied": "¡Kupiasqaña!",
+    "shareNote": "Amigosniykiwan rakiy. Qillqakuspa rantiptinku, comisiónta mihanki.",
+    "commission": "Comisión",
+    "balanceEarned": "Mihasqa kaqnin",
+    "amountBs": "Bs {{amount}}",
+    "referralStats": "{{referrals}} qatiqkuna · {{orders}} pagasqa rantikuykuna",
+    "myReferrals": "Qatiqniykuna",
+    "empty": "Manaraq qatiqniykikuna kanchu. Kudigoykita rakiy mihanayta qallarinaykipaq.",
+    "table": {
+      "referred": "Qatisqa",
+      "email": "Email",
+      "date": "P'unchay",
+      "commission": "Comisión"
+    },
+    "pendingPurchase": "Rantikuyta suyashan"
+  },
+  "auctions": {
+    "title": "Subastakuna",
+    "subtitle": "Sapaq ranqhanakunapaq mink'akuy, allin ofertakunata apakuy",
+    "search": {
+      "placeholder": "Subastakunata maskhay... (ej: Game Boy, wallqa, ryzen)"
+    },
+    "filters": {
+      "category": "Rikch'aq",
+      "categoryAll": "Llapan",
+      "sort": "Churay",
+      "hasBids": "Ofertayuq"
+    },
+    "sorts": {
+      "interest": "Qampaq (munasqa + ofertakuna)",
+      "priceAsc": "Chanin pisiyaq",
+      "priceDesc": "Chanin hatunyaq",
+      "endingSoon": "Utqhaylla tukukun",
+      "mostBids": "Aswan achka ofertayuq",
+      "newest": "🆕 Musuqniyuq"
+    },
+    "interestNote": "Munasqayki hina hinaspa aswan allin ofertakuna churasqa (pisi chanin hinaspa kawsachkaqkuna ñawpaqta).",
+    "empty": "Mana subastakuna tarikurqachu. Huk simikunawan qhaway utaq filtrokunata hurquy.",
+    "emptyWithSearch": "Mana subastakuna tarikurqachu \"{{search}}\" nisqawan. Huk simikunawan qhaway utaq filtrokunata hurquy.",
+    "badges": {
+      "lastHours": "Qhipa horaskuna",
+      "buyNow": "Kunan rantiy"
+    },
+    "card": {
+      "bids": "{{count}} ofertakuna"
+    },
+    "time": {
+      "ended": "Tukusqa",
+      "dhm": "{{d}}p'. {{h}}h {{m}}m",
+      "hm": "{{h}}h {{m}}m",
+      "m": "{{m}}m",
+      "dhms": "{{d}}p'. {{h}}h {{m}}m {{s}}s",
+      "hms": "{{h}}h {{m}}m {{s}}s",
+      "ms": "{{m}}m {{s}}s",
+      "s": "{{s}}s"
+    },
+    "detail": {
+      "toasts": {
+        "extended": "¡Oferta qhipa minutokunapi! Pacha hatunyachisqa.",
+        "closed": "Subasta wisq'asqa",
+        "enterAmount": "Huk chanin churay",
+        "bidPlaced": "Oferta qillqasqa",
+        "purchaseDone": "Rantikuy ruwasqa",
+        "watchAdded": "Watchlistniykiman yapasqa",
+        "watchRemoved": "Watchlistmanta hurqusqa"
+      },
+      "confirmBuyNow": "¿{{price}}-wan kunanpuni rantiyta munanki?",
+      "notFound": "Subasta mana tarisqa",
+      "breadcrumbHome": "Qallariy",
+      "breadcrumbAuctions": "Subastakuna",
+      "watch": {
+        "remove": "Watchlistmanta hurquy",
+        "add": "Watchlistman yapay"
+      },
+      "chips": {
+        "currentPrice": "Kunan chanin: {{price}}",
+        "startingPrice": "Qallariy: {{price}}",
+        "bidsCount": "{{count}} ofertakuna",
+        "buyNowPrice": "Kunan rantiy: {{price}}",
+        "reserveMet": "Reserva chayasqa ✓",
+        "reserveNotMet": "Reserva mana chayasqachu ({{price}})",
+        "reserveNotMetShort": "Reserva mana chayasqachu"
+      },
+      "finished": "Subasta tukusqa",
+      "sellerLabel": "Ranqhaq:",
+      "wonBy": "{{firstName}} {{lastName}} atipaqmi, {{price}}-wan",
+      "finishedReserveNotMet": "Subasta tukusqa (reserva mana chayasqachu).",
+      "finishedNoWinner": "Subasta tukusqa (mana atipaq).",
+      "isYourAuction": "Kayqa subastaykim. Mana ofertayta nitaq rantiyta atinkichu.",
+      "youAreWinning": "{{price}}-wan atipashanki",
+      "yourBestBid": "Aswan allin oferta­yki: {{price}}",
+      "proxyMax": " (proxy hatun: {{price}})",
+      "nextMinBid": "Qatiq pisi oferta:",
+      "bidButton": "Ofertay",
+      "buyNowButton": "Kunan rantiy",
+      "proxyBiddingNote": "Ofertayki proxy bidding hina llamk'an: atipanaykipaq ancha allinta pagankichu, churasqayki chanin kama.",
+      "bidHistory": "Ofertakunapa qhipan ({{count}})",
+      "noBidsYet": "Manaraq ofertakuna kanchu. ¡Ñawpaqta kay!",
+      "you": "(qan)"
+    },
+    "watchlist": {
+      "title": "Subastasniykuna",
+      "activeInPlay": "{{count}} kawsachkaqkuna pukllayllapi",
+      "tabs": {
+        "active": "⚡ Kawsachkaqkuna ({{count}})",
+        "followed": "Qatisqakuna ({{count}})",
+        "won": "Atipasqakuna ({{count}})"
+      },
+      "empty": {
+        "active": "Manam huk kawsachkaq subastapipas ofertashankichu. Subastakunata qhaway hinaspa yaykuy: allin ofertawan atipaq kusikuyqa suyashasunkin. ⚡",
+        "followed": "Manam subastatapas qatishankichu. Huk subastapi señal-cha ícono-ta llamk'achiy qatinaykipaq.",
+        "won": "Manaraq ni hayk'aq subastatapas atipankichu."
+      },
+      "paymentWarning": "¡Kusikuyta! Huk utaq aswan achka subastakunata atiparqanki. 48 horayki kachkan pagananaykipaq, ñataq subastaman kutinqa. \"Pagay\" nisqata sapa tarjetapi llamk'achiy.",
+      "level": {
+        "winning": "Atipashanki",
+        "lastHour": "¡Qhipa hora!",
+        "competing": "Maqanakushankichik"
+      },
+      "wonBy": "Atiparqan: {{firstName}}",
+      "remove": "Hurquy",
+      "wonFor": "{{price}} Bs-wan atipasqa",
+      "pendingPayment": "⏳ Pago suyashan",
+      "timeToPay": "⏱️ {{hours}}h qhipanki pagananaykipaq",
+      "paid": "Pagasqa",
+      "payNow": "Kunan pagay"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Yaykuy",
+      "subtitle": "Yaykuy rantinaykipaq, ranqhanaykipaq hinaspa tantanakuypi kanaykipaq",
+      "noAccount": "¿Manachu kuintayki kan?",
+      "signUp": "Qillqakuy",
+      "wantToSell": "¿Ranqhayta munankichu?",
+      "openStore": "Qhatuykita kichay",
+      "emailLabel": "Email",
+      "passwordLabel": "Pakasqa simi",
+      "submit": "Yaykuy"
+    },
+    "register": {
+      "title": "Kuinta ruwakuy",
+      "subtitle": "Mana qullqiyuqmi, huk minuto pisillapi",
+      "alreadyHaveAccount": "¿Ñachu kuintayki kan?",
+      "signIn": "Yaykuy",
+      "wantToSell": "¿Ranqhayta munankichu?",
+      "openStore": "Qhatuykita kichay",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Qhipa suti",
+      "emailLabel": "Email",
+      "phoneLabel": "Telefono",
+      "passwordLabel": "Pakasqa simi",
+      "passwordHelper": "Pisi kaqnin 8 rimana",
+      "referralCodeLabel": "Invitación kudigu (mana obligatorio)",
+      "referralCodeHelper": "¿Huk amigo invitarqasunkichu? Kudigonta qillqay, invitasuqniykiqa 50 qullqicha proyectomanta mihanqa.",
+      "submit": "Qillqakuy",
+      "successToast": "Qillqakuy allinta ruwakurqan. Kunanqa yaykuy."
+    },
+    "sellerRegister": {
+      "heroTitle": "Qhatuykita LaCase Multi Tiendas-pi kichay",
+      "heroItems": [
+        "Ima rubro ranqhanatapas rikuchiy",
+        "Suyuykita hinaspa wamaniykita akllay",
+        "Apachiyqa tiyasqaykiman hina yupasqa kanqa",
+        "QR-wan pagokunata chaskiy",
+        "Celularniykiman qayasqayki"
+      ],
+      "formTitle": "Ranqhaqpa qillqakuynin",
+      "formSubtitle": "Mañakusqaykita huk administradorqa qhawanqa. Chaskisqa kaqtinñataq ranqhanakunata rikuchiyta atinki.",
+      "section1Title": "1. Qhatuykipa datukunan",
+      "storeNameLabel": "Qhatuykipa sutin",
+      "storeDescriptionLabel": "Qhatuykipa willayninkuna",
+      "storeDescriptionHelper": "Pisi kaqnin 10 rimana",
+      "storeCategoryLabel": "Ranqhasqayki ranqhanakunapa rikch'aqnin",
+      "section2Title": "2. Tiyasqa",
+      "countryLabel": "Mama llaqta",
+      "divisionHelper": "Qillqayta utaq akllayta atinki",
+      "cityLabel": "Llaqta",
+      "phoneLabel": "Rimanaykipaq celular ({{code}})",
+      "phoneHelper": "Ranqhaqkuna hinaspa rantiqkunaqa kay yupaywan qayasunkiku",
+      "phonePlaceholderBolivia": "Ej: 71234567",
+      "phonePlaceholderOther": "Ej: 1123456789",
+      "section3Title": "3. Yaykuy datukuna",
+      "firstNameLabel": "Suti",
+      "lastNameLabel": "Qhipa suti",
+      "emailLabel": "Email",
+      "passwordLabel": "Pakasqa simi",
+      "passwordHelper": "Pisi kaqnin 8 rimana",
+      "submit": "Mañakuyta apachiy",
+      "alreadyHaveStore": "¿Ñachu qhatuyki kan?",
+      "signIn": "Yaykuy",
+      "successToast": "Mañakuy apachisqa. Administradorpa chaskisqanta suyay.",
+      "reviewFields": "Puka rikch'ayniyuq campokunata qhaway",
+      "errors": {
+        "storeName": "Qhatupa sutin obligatoriom",
+        "storeDescription": "Willayqa pisi kaqnin 10 rimana kanan tiyan",
+        "storeCategory": "Ranqhasqayki ranqhanakunapa rikch'aqninta akllay",
+        "country": "Mama llaqtata akllay",
+        "locationState": "{{division}} nisqata akllay",
+        "locationCity": "Llaqta obligatoriom",
+        "phone": "Rimanapaq celular obligatoriom",
+        "firstName": "Suti obligatoriom",
+        "lastName": "Qhipa suti obligatoriom",
+        "email": "Mana allin email",
+        "password": "Pakasqa simiqa pisi kaqnin 8 rimana kanan tiyan"
+      }
+    }
+  },
+  "cart": {
+    "emptyMessage": "Karritoyki ch'usaqmi",
+    "exploreProducts": "Ranqhanakunata qhaway",
+    "title": "Karrito ({{count}} ítems)",
+    "shippingCalculatedAtCheckout": "Apachiyqa checkout-pi yupasqa kanqa",
+    "noImage": "mana rikch'ay",
+    "variant": "Variante: {{variant}}",
+    "storeSubtotal": "Qhatupa sapa tukuynin: {{amount}}",
+    "qrAlt": "{{storeName}}-pa QR-nin",
+    "qrTitle": "{{storeName}}-pa pago QR-nin",
+    "qrDescription": "Kay QR-ta escaneay kay qhatupa tukuyninta pagananaykipaq. Comprobanteta checkout-pi chiqapchanki.",
+    "summary": "Sut'inchay",
+    "subtotal": "Sapa tukuy",
+    "shipping": "Apachiy",
+    "calculatedAtCheckout": "Checkout-pi yupasqa",
+    "total": "Tukuy",
+    "loginLink": "Yaykuy",
+    "loginToCheckoutSuffix": "rantikuyta tukuchinaykipaq",
+    "checkoutButton": "Rantikuyta tukuchiy"
+  },
+  "chat": {
+    "title": "Qillqakuna",
+    "subtitle": "Rantikuykuna hinaspa ranqhaykuna rakisqa",
+    "buyer": "Rantiq",
+    "seller": "Ranqhaq",
+    "buyerInitial": "R",
+    "sellerInitial": "V",
+    "messagesCount": "{{count}} qillqakuna",
+    "tabs": {
+      "purchases": "Rantikuykuna",
+      "sales": "Ranqhaykuna"
+    },
+    "emptyList": {
+      "purchases": "Manaraq rantikuykuna/tapuykuna kanchu.",
+      "sales": "Manaraq puriq ranqhaykuna kanchu.",
+      "purchasesHint": "Huk ranqhanapa utaq qhatupa p'anqanmanta qallariy.",
+      "salesHint": "Huk rantiq qillqasunki utaq rantisunki chayqa, kaypi rikhurinqa."
+    },
+    "noMessagesYet": "Manaraq qillqakuna kanchu. Ranqhanamanta tapunaykipaq qillqay.",
+    "icebreakersHint": "💬 Rimanakuyta qallarinapaq yuyaychaykuna:",
+    "typing": "Qillqashan...",
+    "inactivityHint": "⏰ Manaraq kutichisqa — yuyaychaykuna ({{region}}):",
+    "messagePlaceholder": "Huk qillqata qillqay...",
+    "selectConversation": "Listamanta huk rimanakuyta akllay qillqakunata rikunaykipaq.",
+    "loginPrompt": "Rimanakuyniykikunata rikunaykipaq yaykuy",
+    "loginButton": "Yaykuy",
+    "menu": {
+      "visitStore": "Qhatuta rikuy",
+      "viewProfile": "Perfilta qhaway",
+      "goToProduct": "Ranqhanaman riy"
+    },
+    "floating": {
+      "noConversations": "Manaraq rimanakuykuna kanchu.",
+      "noMessagesYet": "Manaraq qillqakuna kanchu. Tapunaykipaq qillqay.",
+      "purchaseAndSaleConversations": "Rantikuy hinaspa ranqhay rimanakuykuna",
+      "viewFullPage": "Llapan p'anqata qhaway"
+    }
+  },
+  "checkout": {
+    "errors": {
+      "pickupAddressRequired": "Hurqunapaq tiyasqata churay",
+      "shippingAddressRequired": "Huk apachiy tiyasqata akllay"
+    },
+    "orderSuccessToast": "Rantikuy ruwasqa. Ranqhaqpa QR-nwan pagay.",
+    "title": "Checkout",
+    "deliveryType": "Apachiy rikch'aqnin",
+    "homeDelivery": "Wasiman apachiy",
+    "storePickupFree": "🏬 Qhatupi hurquy (mana qullqiyuq)",
+    "storePickupLabel": "🏬 Qhatupi hurquy",
+    "pickupAddress": "Hurqunapaq tiyasqa",
+    "shippingAddress": "Apachiy tiyasqa",
+    "pickupAddressPlaceholder": "Ej: Av. 16 de Julio 1523, qhatu LaCase, La Paz",
+    "pickupAddressHelper": "Maypi mañakusqaykita hurqunayki kaqta churay (qhatupa ranqhana puntun).",
+    "noAddressesPrefix": "Manam waqaychasqa tiyasqaykikuna kanchu. Yapay kaypi",
+    "myAddressesLink": "Tiyasqaykuna",
+    "continueWithoutShipping": "Mana apachiywan qatiy",
+    "calculateShipping": "Apachiyta yupay",
+    "sellerNotes": "Ranqhaqpaq qillqa (mana obligatorio)",
+    "sellerNotesPlaceholder": "Ej: qayamuy apachiyta ñawpaqta",
+    "orderSummary": "Rantikuypa sut'inchan",
+    "subtotal": "Sapa tukuy",
+    "shipping": "Apachiy",
+    "storeTotal": "Qhatupa tukuynin",
+    "couponLabel": "Descuento kudigu",
+    "couponPlaceholder": "Ej: BIENVENIDO10",
+    "couponAppliedPercentage": "{{value}}% descuento llamk'achisqa",
+    "couponAppliedFixed": "{{amount}} descuento llamk'achisqa",
+    "couponAppliedGift": "{{amount}}-manta regalo kupun. Aswan pisita gastanki chayqa, qhatuqa kaqllan qullqita kutichisunki.",
+    "applyCoupon": "Kuponta llamk'achiy",
+    "total": "Tukuy",
+    "paymentQrInfoPrefix": "Pagoqa kaywan ruwakun:",
+    "paymentQrInfoStrong": "ranqhaqpa QR-nin",
+    "paymentQrInfoSuffix": ". Chiqapchaptiykiqa QR-ta rikunki, hinaspa transferencia comprobanteta churanayki tiyan.",
+    "confirmPurchase": "Rantikuyta chiqapchay",
+    "freePickup": "Mana qullqiyuq (qhatupi hurquy)",
+    "pickupPaymentInfoPrefix": "Mañakusqaykita churasqayki tiyasqapi hurqunki. Pagoqa kaywan ruwakun:",
+    "calculateShippingPrompt": "Apachiyta yupay utaq qhatupi hurquyta akllay detalleta rikunaykipaq"
+  },
+  "cono": {
+    "home": {
+      "title": "Rinconcito Boliviano",
+      "subtitle": "Tantanakuypa rankingkuna, asiywan hinaspa datuwan. Allin utaq mana allin votota churay, utaq huk eliminatoria torneota qatiy.",
+      "tabMemes": "Memes",
+      "tabTournaments": "Torneokuna",
+      "tournamentSingular": "Torneo",
+      "newTheme": "Musuq tema",
+      "emptyThemes": "Manaraq kay rikch'aqpi temakuna kanchu. ¡Ñawpaqta ruway!",
+      "entriesCount": "{{count}} yaykuykuna",
+      "byAuthor": "{{username}}-pa",
+      "newThemeDialogTitle": "Musuq tema — {{type}}",
+      "verificationRequired": "Pisi kaqnin huk chaskisqa profesional chiqapchayniyki kanan tiyan musuq temata ruwanaykipaq.",
+      "verifyMe": "Chiqapchaway",
+      "slugLabel": "Slug (URL)",
+      "titleLabel": "Suti",
+      "descriptionLabel": "Willay (mana obligatorio)",
+      "cancel": "Saqiy",
+      "create": "Ruway",
+      "slugAndTitleRequired": "Slug hinaspa suti obligatoriom."
+    },
+    "themeDetail": {
+      "windowHistoric": "Ñawpa qhipa",
+      "windowDaily": "Kunan p'unchay",
+      "windowWeekly": "Semanamanta",
+      "windowMonthly": "Killamanta",
+      "uploadMeme": "Meme-ta churay",
+      "noEntries": "Manaraq yaykuykuna kanchu.",
+      "noEntriesInPeriod": "Manaraq kay pachapi yaykuykuna kanchu.",
+      "proposeCompetitor": "Maqanakuqta proponey",
+      "buildMatch": "Maqanakuyta ruway",
+      "noMatches": "Manaraq kay torneopi maqanakuykuna ruwasqa kanchu.",
+      "memeTitleLabel": "Memepa sutin",
+      "competitorNameLabel": "Maqanakuqpa sutin",
+      "chooseImage": "Rikch'ayta akllay",
+      "cancel": "Saqiy",
+      "publish": "Rikhurichiy",
+      "competitorALabel": "Maqanakuq A",
+      "competitorBLabel": "Maqanakuq B",
+      "votingDateLabel": "Votación p'unchay",
+      "themeNotFound": "Tema mana tarisqa.",
+      "chooseTwoEntries": "Maqanakuq iskay yaykuykunata akllay.",
+      "chooseDistinctEntries": "Iskay hukniraq yaykuykunata akllay.",
+      "matchCreated": "Maqanakuy ruwasqa.",
+      "chooseImageAndTitle": "Huk rikch'ayta akllay hinaspa huk suti/título-ta qillqay.",
+      "entryPublished": "¡Yaykuy rikhurichisqa!"
+    },
+    "entryDetail": {
+      "entryNotFound": "Yaykuy mana tarisqa.",
+      "byAuthor": "{{username}}-pa",
+      "net": "Neto: {{value}}"
+    },
+    "matchCard": {
+      "round": "Ronda {{round}}",
+      "statusOpen": "Votación kicharisqa",
+      "statusClosed": "Wisq'asqa",
+      "statusPending": "Suyashan",
+      "votes": "{{count}} votokuna",
+      "infoComments": "Willay/comentariokuna",
+      "votingClosed": "Kay maqanakuyqa manañam votación-paq kicharisqachu."
+    }
+  },
+  "footer": {
+    "brandName": "LaCase Multi Tiendas",
+    "description": "Ashka ranqhaqkunapa marketplacen. Llapan qhatukunapa aswan allin chaninninta tariy, huk kikin p'anqallapi, ranqhaqpa tiyasqanman hina apachiy yupasqawan.",
+    "buyHeading": "Rantiy",
+    "allProducts": "Llapan ranqhanakuna",
+    "auctions": "Subastakuna",
+    "promotions": "Promocionkuna",
+    "buildYourPc": "PC-ykita ruway",
+    "sellHeading": "Ranqhay",
+    "openStore": "Qhatuykita kichay",
+    "helpFaq": "Yanapay hinaspa sut'inchasqa tapuykuna",
+    "copyright": "© {{year}} LaCase Multi Tiendas. Llapan derechokuna harkasqa.",
+    "developedBy": "Alvaro Diaz Vallejos ruwasqan"
+  },
+  "forum": {
+    "botReplyBadge": {
+      "label": "Bot LaCASE Multitienda"
+    },
+    "categories": {
+      "title": "Sub-tantanakuykuna",
+      "emptySubforums": "Manaraq sub-tantanakuykuna kanchu.",
+      "postsCount": "{{count}} qillqasqakuna",
+      "citiesTitle": "Llaqtakuna",
+      "emptyCityQuestions": "Manaraq llaqtamanta tapuykuna kanchu."
+    },
+    "cityBar": {
+      "cityVerified": "{{city}} (chiqapchasqa)",
+      "defaultCity": "Llaqtay",
+      "changeCityTooltip": "Llaqtata tikray",
+      "configurePrompt": "Llaqtaykita kamachiy suyuykipa tantanakuykunata rikunaykipaq.",
+      "configureButton": "Kamachiy"
+    },
+    "citySelector": {
+      "dialogTitle": "Tantanakuypa suyuyki",
+      "close": "Wisq'ay"
+    },
+    "comments": {
+      "title": "Comentariokuna ({{count}})",
+      "placeholder": "Huk comentariota qillqay…",
+      "send": "Apachiy",
+      "empty": "Manaraq comentariokuna kanchu.",
+      "agree": "Ñuqapas hina",
+      "isAi": "IA-m kan",
+      "loadMore": "Aswan cargay ({{count}})"
+    },
+    "feed": {
+      "modeRecent": "Musuqniyuq",
+      "modePopular": "Munasqa",
+      "modeUnanswered": "Mana kutichisqa",
+      "modeMyCity": "Llaqtay",
+      "headerTitle": "LaCASE — ¿pipas yachanchu?",
+      "askQuestion": "Huk tapuyta ruway",
+      "citySubforums": "{{city}}-pa sub-tantanakuykuna:",
+      "viewAll": "Llapanta qhaway",
+      "emptyPosts": "Manaraq tapuykuna kanchu. ¡Ñawpaqta tapuy!",
+      "defaultUsername": "usuario",
+      "defaultCategory": "General",
+      "loading": "Cargashan...",
+      "loadMore": "Aswan cargay"
+    },
+    "geoConfig": {
+      "geolocationNotSupported": "Navegadorniykiqa mana geolocalización-ta atinchu.",
+      "locationFailed": "Mana tiyasqaykita tarikurqanikuchu. Llaqtaykita kikillayki akllay.",
+      "chooseCity": "Llaqtaykita akllay.",
+      "radiusLabel": "Suyupa radion:",
+      "radiusValue": "{{km}} km",
+      "verifiedByGps": "GPS-wan chiqapchasqa",
+      "searching": "Maskhashan...",
+      "useMyLocation": "Tiyasqayta llamk'achiy",
+      "saving": "Waqaychashan...",
+      "save": "Waqaychay",
+      "citySummary": "Llaqta: {{name}} ({{department}}) · yupasqa radio {{radius}} km",
+      "cityFieldLabel": "Llaqta",
+      "cityFieldPlaceholder": "Llaqtaykita akllay (ej: Oruro)"
+    },
+    "gifPicker": {
+      "title": "GIF-kunata maskhay",
+      "searchLabel": "GIF-ta maskhay (ej: capibara)",
+      "noResults": "Mana GIF-kuna tarikurqachu.",
+      "cancel": "Saqiy"
+    },
+    "karmaCard": {
+      "karma": "Karma",
+      "available": "Kanapaq: {{available}} (kanchasqa: {{spent}})",
+      "progressToLegend": "{{pct}}% Leyenda-man (3000)",
+      "redeemButton": "Karmata qullqichaman tikray"
+    },
+    "newPostModal": {
+      "title": "Huk tapuyta ruway",
+      "titleLabel": "Suti",
+      "titleHelper": "{{length}}/200 · pisi kaqnin 10",
+      "bodyLabel": "Willay",
+      "subforumLabel": "Sub-tantanakuy",
+      "typeLabel": "Rikch'aq",
+      "cityLabel": "Llaqta",
+      "cityHelper": "Perfilniykipa llaqtan llamk'achisqa; tikrayta atinki.",
+      "tagsLabel": "Etiquetakuna (aswan 5)",
+      "addTag": "Yapay",
+      "addImages": "Rikch'aykunata yapay ({{count}}/4)",
+      "gifCount": "GIF ({{count}})",
+      "removeAllImages": "Llapanta hurquy",
+      "removeGifs": "GIF-kunata hurquy",
+      "botNotice": "Bot LaCASE Multitienda kaqllamanta kanchakuq ranqhanakunapi maskhaspa kutichinqa.",
+      "cancel": "Saqiy",
+      "submit": "Tapuyta rikhurichiy",
+      "titleTooShort": "Sutiqa pisi kaqnin 10 rimana kanan tiyan.",
+      "bodyTooShort": "Willayqa pisi kaqnin 20 rimana kanan tiyan.",
+      "selectCategory": "Huk rikch'aqta akllay."
+    },
+    "postCard": {
+      "byAuthorPrefix": "kaqmanta",
+      "deletedAuthor": "chinkachisqa",
+      "replyCount_one": "{{count}} kutichiy",
+      "replyCount_other": "{{count}} kutichiykuna",
+      "share": "Rakiy",
+      "save": "Waqaychay",
+      "noReplyYet": "Manaraq kutichisqa"
+    },
+    "postDetail": {
+      "loadError": "Mana tapuyta cargayta atirqanikuchu.",
+      "defaultUsername": "usuario",
+      "defaultTag": "Musuq",
+      "backToFeed": "Feed-man kutiy",
+      "resolved": "Kutichisqaña",
+      "byAuthorPrefix": "kaqmanta",
+      "viewsCount": "{{count}} qhawaykuna",
+      "replyCount_one": "{{count}} kutichiy",
+      "replyCount_other": "{{count}} kutichiykuna",
+      "emptyReplies": "Manaraq kutichiykuna kanchu. ¡Ñawpaqta kay!",
+      "replyPlaceholder": "Kutichiyniykita qillqay... (pisi kaqnin 10 rimana)",
+      "loginToReplyPlaceholder": "Kutichinaykipaq yaykuy...",
+      "publishing": "Rikhurichishan...",
+      "publishReply": "Kutichiyta rikhurichiy"
+    },
+    "postVoteBar": {
+      "voteUp": "Allinta votay",
+      "voteDown": "Mana allinta votay"
+    },
+    "professionalVerification": {
+      "title": "Profesional tantanakuykuna",
+      "description": "Suyuykipa yachaymanta huk pisi tapuykunata kutichiy, Ciencia, Debates, Noticias hinaspa Tapuykuna-pi rikhurichinaykipaq chay tantanakuymanta. Chiqapchasqa kanaykita mana suyaspa leeyta atinki.",
+      "verifiedChip": "Chiqapchasqa",
+      "retryQuiz": "Cuestionariota kutichiy",
+      "takeQuiz": "Cuestionariota ruway",
+      "answerAllQuestions": "Llapan tapuykunata kutichiy apachiy ñawpaqta.",
+      "quizTitle": "Cuestionario — {{field}}",
+      "passedMessage": "¡Atipankim! {{score}}/{{total}} allin. Kunanqa kay tantanakuypi rikhurichiyta atinkiña.",
+      "failedMessage": "Mana atipankichu ({{score}}/{{total}} allin). Qhipata kutin ruwayta atinki.",
+      "close": "Wisq'ay",
+      "cancel": "Saqiy",
+      "submitAnswers": "Kutichiykunata apachiy"
+    },
+    "profile": {
+      "notFound": "Tantanakuypa perfilnin mana tarisqa.",
+      "banned": "Harkasqa",
+      "myKarma": "Karmay",
+      "statKarma": "karma",
+      "statQuestions": "tapuykuna",
+      "statReplies": "kutichiykuna",
+      "statStreakDays": "p'unchaykuna qhipa qhipalla",
+      "myLocation": "Tiyasqay",
+      "reputationLine": "Reputación: {{pct}}% allin ({{count}} chaninchaykuna)",
+      "reputationCommentPlaceholder": "¿Allinchu kanki? (mana obligatorio)",
+      "rate": "Chaninchay",
+      "loginToRate": "Chaninchanaykipaq yaykuy",
+      "latestQuestions": "{{username}}-pa qhipa tapuykunan",
+      "emptyPosts": "Manaraq tapuykunata rikhurichirqanchu."
+    },
+    "redeemKarmaDialog": {
+      "title": "Karmata qullqichaman tikray",
+      "rateNotice": "Yupay: 100 karma = 10 qullqicha. Ñawpa karmayki hinaspa etiquetayki mana uraykunchu; \"kanapaq\" nisqallamanta urayanqa.",
+      "amountLabel": "Tikranapaq karma",
+      "karmaUnit": "karma",
+      "availableHelper": "Kanapaq: {{available}} karma",
+      "willReceive": "Chaskinki:",
+      "coinsCount": "{{count}} qullqicha",
+      "cancel": "Saqiy",
+      "redeeming": "Tikrashan...",
+      "redeem": "Tikray"
+    },
+    "replyCard": {
+      "botLabel": "Bot LaCASE Multitienda",
+      "deletedAuthor": "chinkachisqa",
+      "bestAnswer": "Aswan allin kutichiy",
+      "markAsAnswer": "Kutichiy hina señalay"
+    },
+    "sidebarLeft": {
+      "navigation": "Purichiy",
+      "home": "Qallariy",
+      "modeRecent": "Musuqniyuqkuna",
+      "modePopular": "Munasqa",
+      "modeUnanswered": "Mana kutichisqa",
+      "professionalCommunities": "Profesional tantanakuykuna",
+      "universities": "Universidadkuna",
+      "categories": "Rikch'aqkuna",
+      "cities": "Llaqtakuna"
+    },
+    "sidebarRight": {
+      "askQuestion": "Huk tapuyta ruway",
+      "topContributors": "Aswan yanapaqkuna",
+      "trending24h": "Tendencia (24h)",
+      "noDataYet": "Manaraq datukuna kanchu",
+      "footerNotePrefix": "Tantanakuyqa LaCase Multi Tiendas kuintaykiwan llamk'an. Karmayki qullqichaman tikrasqa kanan atin"
+    },
+    "universities": {
+      "title": "Universidadkuna",
+      "description": "Sapa sub-tantanakuyqa llaqtanpa universidad tantanakuyninpaq kikillanmi — chay llaqtapi kaqkunalla utaq ñawpaqtaña chaypi kawsaqkunalla rikunku.",
+      "enterSubforum": "Sub-tantanakuyman yaykuy"
+    }
+  },
+  "home": {
+    "ticker": {
+      "soldIn": "{{store}} · {{city}} · {{amount}}-pi"
+    },
+    "hero": {
+      "title": "Llapan qhatukuna, huk kikin p'anqallapi",
+      "subtitle": "Askha ranqhaqkunapa chaninninkunata tupachiy, aswan allinninta tariy hinaspa sapa qhatupa tiyasqanman hina apachiyta yupay.",
+      "exploreProducts": "Ranqhanakunata qhaway",
+      "auctions": "Subastakuna",
+      "openYourStore": "Qhatuykita kichay",
+      "categoriesAndFeatured": "{{categories}} rikch'aqkuna · {{featured}}+ sumaq ranqhanakuna"
+    },
+    "jobs": {
+      "title": "Llamk'aykuna",
+      "viewAll": "Llapan llamk'aykunata qhaway"
+    },
+    "nearYou": {
+      "title": "Ranqhanakuna qayllaykipi",
+      "titleWithCity": "Ranqhanakuna qayllaykipi ({{city}})"
+    },
+    "common": {
+      "viewAll": "Llapanta qhaway →"
+    },
+    "banners": {
+      "fallbackAlt": "Banner"
+    },
+    "categories": {
+      "title": "Rikch'aqkuna",
+      "productCount": "{{count}} ranqhanakuna",
+      "fallbackName": "Rikch'aq"
+    },
+    "promotions": {
+      "title": "Utqhay descuentokuna",
+      "limitedTime": "pisi pachallapaq",
+      "viewAllFeminine": "Llapanta qhaway →",
+      "offLabel": "{{value}} OFF",
+      "storeLabel": "🏪 {{store}}"
+    },
+    "forYou": {
+      "title": "Qampaq 👋",
+      "reasonHistory": "Maskhasqaykikunaman hina hinaspa rikusqayki ranqhanakunaman hina",
+      "reasonPopular": "Munasqa ranqhanakuna qallarinaykipaq"
+    },
+    "auctions": {
+      "title": "Kawsachkaq subastakuna — utqhaylla tukukun"
+    },
+    "featured": {
+      "title": "Sumaqkuna",
+      "mostViewed": "Aswan rikusqa",
+      "viewAll": "Llapanta qhaway →",
+      "empty": "Manaraq sumaq ranqhanakuna kanchu"
+    }
+  },
+  "jobs": {
+    "title": "Llamk'aykuna",
+    "subtitle": "Suyuykipa qhatukunapa llamk'ay ofertankuna",
+    "appStatus": {
+      "received": "Chaskisqa",
+      "viewed": "Qhatuwan qhawasqa",
+      "shortlisted": "Akllasqa kanaykipaq",
+      "rejected": "Mana akllasqa",
+      "hired": "¡Llamk'aqmi kanki!",
+      "withdrawn": "Hurqusqa"
+    },
+    "errors": {
+      "cvType": "CV-qa PDF, DOC utaq DOCX kanan tiyan",
+      "cvSize": "CV-qa 5 MB-ta mana yalliyta atinchu",
+      "messageMinLength": "Qillqaqa pisi kaqnin 10 rimana kanan tiyan",
+      "phoneMinLength": "Telefono pisi kaqnin 6 rimana kanan tiyan",
+      "invalidAmount": "Allin chanin churay",
+      "invalidUrl": "Allin enlace churay (https://...)",
+      "ownStore": "Mana kikin qhatuykipa llamk'ayninman mañakuyta atinkichu."
+    },
+    "toasts": {
+      "applicationSent": "¡Mañakuy apachisqa!",
+      "applicationWithdrawn": "Mañakuy hurqusqa"
+    },
+    "confirmWithdraw": "¿Mañakusqaykita hurquyta munanki?",
+    "search": {
+      "placeholder": "Llamk'ayta maskhay",
+      "city": "Llaqta"
+    },
+    "filters": {
+      "pay": "Pago",
+      "payAll": "Llapan",
+      "payDaily": "Sapa p'unchay",
+      "payWeekly": "Sapa semana",
+      "payMonthly": "Sapa killa",
+      "categoryAll": "Llapan"
+    },
+    "empty": "Mana llamk'aykuna tarikurqachu chay filtrokunawan.",
+    "detail": {
+      "verified": "Chiqapchasqa",
+      "vacancyOne": "1 kama",
+      "vacanciesCount": "{{count}} kamakuna",
+      "schedule": "Pacha: {{schedule}}",
+      "description": "Willay",
+      "requirements": "Munasqakuna",
+      "yourApplication": "Mañakusqayki: {{status}}",
+      "withdrawApplication": "Mañakuyta hurquy",
+      "applyButton": "Mañakuy",
+      "viewStore": "Qhatuta qhaway",
+      "close": "Wisq'ay",
+      "contactWhatsApp": "WhatsApp-pi rimanakuy"
+    },
+    "applyDialog": {
+      "title": "{{title}}-man mañakuy",
+      "messageLabel": "Qhatupaq qillqa",
+      "messageHelp": "Imaraykutaq munasqaykita willay (pisi kaqnin 10 rimana)",
+      "phoneLabel": "Rimanapaq telefono",
+      "salaryLabel": "Munasqayki sueldo Bs-pi (mana obligatorio)",
+      "resumeLabel": "CV-ykipa enlacen (mana obligatorio)",
+      "attachCv": "CV-ta k'askachiy (PDF, DOC utaq DOCX, aswan 5 MB)",
+      "cancel": "Saqiy",
+      "sending": "Apachishan...",
+      "submit": "Mañakuyta apachiy"
+    }
+  },
+  "nav": {
+    "search": {
+      "placeholder": "Ranqhanakunata, marcakunata, ranqhaqkunata maskhay..."
+    },
+    "currency": {
+      "selectAriaLabel": "Qullqi rikch'aqta akllay"
+    },
+    "theme": {
+      "light": "K'anchay modo",
+      "dark": "Tuta modo"
+    },
+    "jobs": {
+      "tooltip": "Llamk'aykuna"
+    },
+    "forum": {
+      "tooltip": "Tantanakuy LaCASE"
+    },
+    "cono": {
+      "tooltip": "Rinconcito Boliviano"
+    },
+    "cart": {
+      "tooltip": "Karrito"
+    },
+    "messages": {
+      "tooltip": "Qillqakuna"
+    },
+    "auctions": {
+      "tooltip": "Subastasniy"
+    },
+    "menu": {
+      "myAccount": "Kuintay",
+      "myApplications": "Mañakusqaykuna",
+      "myStore": "Qhatuy",
+      "adminPanel": "Panil kamachiq",
+      "logout": "Lluqsiy"
+    }
+  },
+  "notifications": {
+    "centerTitle": "Willakuykunapa Chawpin",
+    "countSummary": "{{total}} willakuykuna · {{unread}} mana leesqa",
+    "showAll": "Llapanta rikuchiy",
+    "onlyUnread": "Mana leesqallanta",
+    "markAllRead": "Llapanta leesqa hina señalay",
+    "emptyUnread": "Manam mana leesqa willakuykuna kanchu 🎉",
+    "emptyAll": "Manam willakuykuna kanchu",
+    "bellTooltip": "Willakuykuna",
+    "bellTitle": "Willakuykuna",
+    "bellEmpty": "Manam willakuykuna kanchu",
+    "time": {
+      "now": "kunan",
+      "minutes": "{{count}} minuto ñawpaqta",
+      "hours": "{{count}} hora ñawpaqta",
+      "days": "{{count}} p'unchay ñawpaqta"
+    }
+  },
+  "orders": {
+    "errors": {
+      "proofUrlRequired": "Comprobantepa URL-nta churay"
+    },
+    "proofSentToast": "Comprobante apachisqa. Ranqhaqqa chiqapchanqa.",
+    "confirmation": {
+      "title": "¡Rantikuy chiqapchasqa!",
+      "subtitle": "{{count}} orden(kuna) rikhurirqan, sapa qhatumanta huk. Kunanqa QR-wan pagay."
+    },
+    "orderNumber": "Orden #{{id}}",
+    "defaultStoreName": "Qhatu",
+    "subtotal": "Sapa tukuy",
+    "shipping": "Apachiy",
+    "total": "Tukuy",
+    "qrPaymentTitle": "QR-wan pago — {{storeName}}",
+    "paymentVerified": "Pago chiqapchasqa",
+    "proofSubmittedWaiting": "Comprobante apachisqa. Ranqhaqpa chiqapchayninta suyashan.",
+    "scanQrInstructions": "Ranqhaqpa QR-nta escaneay hinaspa transferenciata ruway. Chaymanta comprobanteta churay.",
+    "qrAlt": "Pago QR",
+    "proofUrlPlaceholder": "Comprobantepa URL-n (utaq churay Rantisqaykunapi)",
+    "uploadProof": "Comprobanteta churay",
+    "viewMyOrders": "Rantisqaykunata qhaway",
+    "continueShopping": "Rantikuyta qatiy",
+    "status": {
+      "pending": "Suyashan",
+      "confirmed": "Chiqapchasqa",
+      "preparing": "Wakichishan",
+      "shipped": "Apachisqa",
+      "delivered": "Chayachisqa",
+      "cancelled": "Saqisqa"
+    },
+    "paymentStatus": {
+      "pending": "Pago suyashan",
+      "proofSubmitted": "Comprobante apachisqa",
+      "verified": "Pago chiqapchasqa",
+      "rejected": "Pago mana chaskisqa"
+    },
+    "noOrdersYet": "Manaraq rantisqaykikuna kanchu.",
+    "buySomething": "Imallatapas rantiy",
+    "moreItems": "+{{count}} astawan",
+    "viewDetail": "Detalleta qhaway",
+    "proofSentToastShort": "Comprobante apachisqa",
+    "deliveryConfirmedToast": "¡Sulpay! Chayachisqata chiqapchanki. Pagoqa ranqhaqman kacharisqa kachkan",
+    "orderNotFound": "Orden mana tarisqa",
+    "detailSubtitle": "{{date}} · Qhatu: {{storeName}}",
+    "products": "Ranqhanakuna",
+    "itemQuantityAt": "×{{quantity}} {{price}}-pi",
+    "giftLabel": "Regalo",
+    "qrPayment": "QR-wan pago",
+    "paymentVerifiedBySeller": "Ranqhaqwan chiqapchasqa pago.",
+    "proofSubmittedWaitingShort": "Comprobante apachisqa. Chiqapchayta suyashan.",
+    "qrNotAvailable": "QR mana kanchu",
+    "proofUrlPlaceholderLong": "Transferencia comprobantepa URL-n",
+    "didYouReceiveTitle": "¿Mañakusqaykita chaskirqankichu?",
+    "confirmDeliveryDescription": "Chayachiyta chiqapchay rantikuyniykita amachan hinaspa pagota ranqhaqman kacharin. Plataformapa confianza garantían.",
+    "confirmDeliveryButton": "Arí, mañakusqayta chaskirqani nispa chiqapchani ✓",
+    "shipTo": "Apachiy kayman",
+    "pickupAtStoreDefault": "Mañakusqaykita ranqhaqpa qhatunpi hurqunki."
+  },
+  "pcBuilder": {
+    "title": "PC-ykita ruway",
+    "subtitle": "Sapa componentета ima qhatumantapas akllay. Tupasqanku kaqta qhawaspa hinaspa tukuy chaninta yupaspa.",
+    "slots": {
+      "cpu": "Procesador",
+      "motherboard": "Motherboard",
+      "ram": "Memoria RAM",
+      "gpu": "Placa de Video",
+      "storage": "Waqaychana",
+      "psu": "Kallpa Apaq",
+      "case": "Wasicha",
+      "cooler": "Chiriyachiq"
+    },
+    "toasts": {
+      "loginToSave": "Buildniykita waqaychanaykipaq yaykuy",
+      "minComponents": "Pisi kaqnin 3 componentekunata akllay",
+      "buildSaved": "Build waqaychasqa",
+      "allAddedToCart": "Llapan componentekuna karritoman yapasqa"
+    },
+    "defaultBuildName": "PC-y",
+    "notSelected": "Mana akllasqa",
+    "change": "Tikray",
+    "select": "Akllay",
+    "summary": "Sut'inchay",
+    "selectedComponents": "Akllasqa componentekuna: {{count}}/8",
+    "estimatedTotal": "Yupasqa tukuy",
+    "buildNamePlaceholder": "Buildpa sutin (ej: PC Gamer Pro)",
+    "saveBuild": "Buildta waqaychay",
+    "addAllToCart": "Llapanta karritoman yapay",
+    "savedBuilds": "Waqaychasqa buildsniyki",
+    "buildSummary": "{{price}} · {{count}} componentekuna",
+    "selectDialogTitle": "{{slot}}-ta akllay",
+    "searchingProducts": "Ranqhanakunata maskhashan...",
+    "noProductsForSlot": "Manam kay slotpaq ranqhanakuna kanchu.",
+    "outOfStock": "MANA KAQNIN",
+    "stock": "kaqnin {{count}}",
+    "close": "Wisq'ay"
+  },
+  "product": {
+    "condition": {
+      "new": "Musuq",
+      "used": "Llamk'achisqaña",
+      "usedWithScore": "Llamk'achisqaña ({{score}}/10)",
+      "refurbished": "Allichasqa"
+    },
+    "card": {
+      "addToCart": "Karritoman yapay",
+      "outOfStock": "Mana kaqnin",
+      "available": "{{count}} kaqkuna",
+      "addToWishlist": "Munasqaman yapay",
+      "removeFromWishlist": "Munasqamanta hurquy",
+      "homeDelivery": "Wasiman apachiy",
+      "tradeIn": "Chhalay",
+      "lastUnit": "Qhipa unidad",
+      "lastUnits": "Qhipa {{count}} unidadkuna",
+      "sold_one": "{{count}} ranqhasqa",
+      "sold_other": "{{count}} ranqhasqakuna"
+    },
+    "filters": {
+      "title": "Filtrokuna",
+      "priceWithFormat": "Chanin ({{format}})",
+      "categories": "Rikch'aqkuna",
+      "condition": "Kaynin",
+      "department": "Wamani",
+      "regionCity": "Suyu / Llaqta",
+      "cityPlaceholder": "Llaqta (ej: La Paz, Tarija...)",
+      "deliveryType": "Apachiy rikch'aqnin",
+      "brand": "Marca",
+      "acceptsTrade": "Chhalayta chaskin",
+      "apply": "Filtrokunata llamk'achiy",
+      "clear": "Filtrokunata ch'usaqyachiy ({{count}})"
+    },
+    "search": {
+      "tabs": {
+        "products": "Ranqhanakuna",
+        "brands": "Marcakuna",
+        "sellers": "Ranqhaqkuna",
+        "categories": "Rikch'aqkuna"
+      },
+      "placeholders": {
+        "products": "Ranqhanakunata maskhay... (ej: RTX, celular, pukllay)",
+        "brands": "Marcata maskhay... (ej: Samsung, Sony, Logitech)",
+        "sellers": "Ranqhaqta utaq llaqtata maskhay... (ej: La Paz, \"Tech Store\")"
+      },
+      "searchButton": "Maskhay",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "noSellersMatch": "Mana ranqhaqkuna tupanchu \"{{term}}\"-wan",
+      "exploreByCategory": "Rikch'aqmanta utaq sub-rikch'aqmanta qhaway:",
+      "selectedStore": "Akllasqa qhatu:",
+      "removeStoreFilter": "Qhatupa filtronta hurquy"
+    },
+    "list": {
+      "resultsFor": "Tarisqakuna \"{{term}}\"-paq",
+      "allProducts": "Llapan ranqhanakuna",
+      "totalFromAllStores": "{{count}} ranqhanakuna llapan qhatukunamanta",
+      "sort": {
+        "newest": "Musuqniyuqkuna",
+        "priceAsc": "Pisi chanin",
+        "priceDesc": "Hatun chanin",
+        "bestSellers": "Aswan ranqhasqa"
+      },
+      "emptyFiltered": "Mana ranqhanakuna tarikurqachu chay filtrokunawan"
+    },
+    "detail": {
+      "notFound": "Ranqhana mana tarisqa",
+      "backToCatalog": "Catálogoman kutiy",
+      "addedToCart": "Karritoman yapasqa",
+      "reviewPublished": "Rimasqa rikhurichisqa",
+      "breadcrumbHome": "Qallariy",
+      "noImage": "Mana rikch'ay",
+      "outOfStock": "Mana kaqnin",
+      "lastUnit": "Qhipa unidad",
+      "lastUnits": "Qhipa {{count}}",
+      "viewingNow_one": "{{count}} runa kunan kay ranqhanata qhawashan",
+      "viewingNow_other": "{{count}} runakuna kunan kay ranqhanata qhawashanku",
+      "viewedBy_one": "{{count}} runa qhawarqan",
+      "viewedBy_other": "{{count}} runakuna qhawarqanku",
+      "sellerLocationRating": "{{city}}, {{state}} · Rating {{rating}}",
+      "freeShippingOver": "Mana qullqiyuq apachiy {{amount}} yalliq rantikuykunapi",
+      "addToCart": "Karritoman yapay",
+      "contact": "Tapuy",
+      "soldAndShippedBy": "{{store}}-wan ranqhasqa hinaspa apachisqa. Apachiy chaninqa checkout-pi tiyasqaykiman hina yupasqa kanqa.",
+      "specifications": "Sut'inchaykuna",
+      "description": "Willay",
+      "related": "Tinkusqa ranqhanakuna",
+      "verdict": {
+        "highlyRecommended": "Ancha allin nisqa",
+        "recommended": "Allin nisqa",
+        "notRecommended": "Mana allin nisqachu"
+      },
+      "offers": {
+        "title": "Chaninkunata tupachiy — {{count}} qhatukuna kay ranqhanata ranqhanku",
+        "bestPrice": "Aswan allin chaninqa {{price}}-m. Aswan allin qhatuykita akllay.",
+        "bestPriceChip": "Aswan allin chanin",
+        "viewingChip": "Kaytam qhawashanki"
+      },
+      "reviews": {
+        "title": "Rimasqakuna ({{count}})",
+        "viewAll": "Llapan rimasqakunata qhaway",
+        "empty": "Manaraq rimasqakuna kanchu. Ñawpaqta kay.",
+        "count": "{{count}} rimasqa(kuna)",
+        "writePlaceholder": "Rimasqaykita qillqay...",
+        "publish": "Rimasqata rikhurichiy",
+        "loginToReview": "<0>Yaykuy</0> huk rimasqata saqinaykipaq.",
+        "dialogTitle": "Ranqhanapa rimasqakunan ({{count}})",
+        "filters": {
+          "all": "Llapan"
+        },
+        "noneInCategory": "Manam kay rikch'aqpi rimasqakuna kanchu.",
+        "close": "Wisq'ay"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Kawsachkaq promocionkuna",
+    "subtitle": "Aswan allin descuentokunata llamk'achiy",
+    "empty": "Kunanqa manam kawsachkaq promocionkuna kanchu.",
+    "discountPercent": "{{value}}% OFF",
+    "discountAmount": "{{value}} OFF",
+    "until": "{{date}} kama"
+  },
+  "returns": {
+    "title": "Kutichisqaykuna",
+    "requestNote": "Rantikuyta chaskisqayki hinaspa pago chiqapchasqa kaqtinllam kutichiyta mañakuyta atinki.",
+    "empty": "Manam kutichiy mañakuyniykikuna kanchu.",
+    "status": {
+      "pending": "Suyashan",
+      "approved": "Chaskisqa",
+      "rejected": "Mana chaskisqa",
+      "completed": "Tukusqa",
+      "cancelled": "Saqisqa"
+    },
+    "reasons": {
+      "defective": "P'akisqa ranqhana",
+      "incorrect": "Mana chay ranqhana",
+      "notAsDescribed": "Mana willasqawan tupanchu",
+      "noLongerNeeded": "Manañam munanichu",
+      "other": "Huk imayna"
+    },
+    "reasonAndStore": "{{reason}} · Qhatu: {{store}}",
+    "sellerResponse": "Ranqhaqpa kutichiynin: {{response}}",
+    "refund": "Kutichiy: Bs {{amount}}",
+    "cancel": "Saqiy"
+  },
+  "sellerProfile": {
+    "toasts": {
+      "requestSent": "Mañakuy apachisqa"
+    },
+    "veredicto": {
+      "highlyRecommended": "Ancha allin nisqa",
+      "recommended": "Allin nisqa",
+      "notRecommended": "Mana allin nisqachu"
+    },
+    "notFound": "Ranqhaq mana tarisqa",
+    "breadcrumbHome": "Qallariy",
+    "salesCount": "{{count}} ranqhaykuna",
+    "reviewsCount": "{{count}} rimasqakuna",
+    "activeProductsCount": "{{count}} kawsachkaq ranqhanakuna",
+    "monthlySalesCount": "{{count}} ranqhaykuna kay killapi",
+    "freeShippingFrom": "Mana qullqiyuq apachiy {{amount}} Bs-manta",
+    "contact": "Rimanakuy",
+    "privilegedBuyer": "✓ Privilegiado rantiq",
+    "requestPending": "Mañakuy suyashan",
+    "requestPrivilegedAccess": "Privilegiado yaykuyta mañakuy",
+    "whatsappMessage": "Napaykullayki {{storeName}}, qhatuykita LaCase Multi Tiendas-pi rikurqani, huk tapuyta ruwayta munani.",
+    "storeLocation": "Qhatupa tiyasqan",
+    "locationVerified": "Administradorwan chiqapchasqa tiyasqa (qhatu allpapi kasqan chiqapchasqa)",
+    "locationNotSpecified": "Tiyasqa mana willasqa",
+    "privilegedProductsTitle": "Musuq ranqhanakuna — privilegiado rantiqkunallapaq 🔑",
+    "privilegedProductsNote": "Kay ranqhanakunaqa manaraq llapan runakunapaq rikhurichisqachu. Ñawpaqkunapim kanki rikunaykipaq.",
+    "productsOf": "{{storeName}}-pa ranqhanakunan",
+    "noProducts": "Kay qhatuqa manaraq ranqhanakunata rikhurichinchu.",
+    "recentPurchasesTitle": "Qatikuna — qhipa rantikuykuna",
+    "recentPurchasesNote": "Rantisqa qhipata chaninchayqa obligatoriom: kay runakunaqa rantisqankuta chaskirqanku hinaspa kay qhatuta chaninchirqanku.",
+    "purchasedOn": "Rantirqan · {{date}}",
+    "reviewsAndTrust": "Rimasqakuna hinaspa confianza",
+    "viewAllReviews": "Llapan rimasqakunata qhaway",
+    "noReviewsYet": "Manaraq rimasqakuna kanchu. Rimasqakunaqa chayachisqa rantikuy qhipallam rikhurin — tantanakuypi confianzata ruwan.",
+    "ratedByCount": "{{count}} runa(kuna) chaninchirqanku",
+    "sales": {
+      "title": "Ranqhaykuna",
+      "totalSales": "Tukuy ranqhaykuna",
+      "monthSales": "Killapa ranqhaykunan",
+      "monthRevenue": "Killapa mihasqan",
+      "lastSales": "Qhipa ranqhaykuna",
+      "noSalesYet": "Manaraq ranqhaykuna kanchu"
+    },
+    "amountBs": "Bs {{amount}}",
+    "tags": {
+      "howIsItTitle": "¿Imaynatam kay ranqhaqwan llamk'ay?",
+      "noTagsYet": "Manaraq etiquetakuna kanchu. Rantiqkuna experiencianta chaninchaqtinku rikhurinqaku.",
+      "voteTitle": "¿Imaynatam kay qhatuwan experienciayki karqan?",
+      "voteNote": "Sapa par-ta experienciaykiman hina votay. Yupayqa maykuna etiqueta akllasqata rikuchin."
+    },
+    "reviewBy": "{{firstName}} {{lastName}}-pa",
+    "reviewsDialog": {
+      "title": "Ranqhaqpa rimasqakunan ({{count}})",
+      "tabAll": "Llapan",
+      "noneInCategory": "Manam kay rikch'aqpi rimasqakuna kanchu."
+    },
+    "close": "Wisq'ay"
+  },
+  "seller": {
+    "bulkProducts": {
+      "title": "Askha ranqhanakunata yapay",
+      "subtitle": "Askha hukniraq ranqhanakunapa fotokunata churay hinaspa sapa hukta rikhurichiy, base datukunata (rikch'aq, kaynin, chanin, kaqnin hinaspa atributokuna) llapanpaq llamk'achispa.",
+      "employeeWarning": "Yanapaq hina mana chaninta allichayta atinkichu; administradorpa saqisqan base chaninta llamk'achiy.",
+      "defaultProductName": "Ranqhana {{index}}",
+      "baseData": {
+        "title": "Base datukuna (llapanpi llamk'achisqa)",
+        "categoryLabel": "Rikch'aq",
+        "categoryPlaceholder": "Huk rikch'aqta akllay",
+        "conditionLabel": "Kaynin",
+        "conditionNew": "Musuq",
+        "conditionUsed": "Llamk'achisqaña",
+        "conditionRefurbished": "Allichasqa",
+        "templateLabel": "Plantilla (ñawpaqta churasqa atributokuna)",
+        "templateHelper": "Huk plantillata akllay llapan ranqhanakunapa kikin atributokunata ñawpaqta churanaykipaq.",
+        "templateNone": "Mana plantillayuq",
+        "templateGlobalSuffix": " · Global",
+        "basePriceLabel": "Base chanin (Bs)",
+        "basePriceHelperEmployee": "Administradorwan churasqa",
+        "basePriceHelperSeller": "Sapa ranqhanapi hukniraq kanan atin",
+        "baseStockLabel": "Base kaqnin",
+        "warrantyLabel": "Amachay",
+        "warrantyPlaceholder": "Ej: 12 killa",
+        "descriptionLabel": "Willay (llapanpi llamk'achisqa, mana obligatorio)"
+      },
+      "photos": {
+        "title": "Ranqhanakunapa fotonkuna ({{count}})",
+        "uploadButton": "Fotokunata churay (huk sapa ranqhanapaq)",
+        "uploading": "Churashan…",
+        "removeTitle": "Hurquy",
+        "itemAlt": "Ranqhana {{index}}",
+        "itemLabel": "Ranqhana {{index}}",
+        "nameLabel": "Suti",
+        "namePlaceholder": "Ej: Cuaderno Rayado N° {{index}}",
+        "priceLabel": "Chanin (Bs)",
+        "pricePlaceholder": "Base chanin"
+      },
+      "actions": {
+        "publish": "{{count}} ranqhana(kuna)ta rikhurichiy",
+        "publishing": "Rikhurichishan…",
+        "cancel": "Saqiy",
+        "clearPhotos": "Fotokunata ch'usaqyachiy"
+      },
+      "errors": {
+        "selectCategory": "Ranqhanakunapaq huk rikch'aqta akllay.",
+        "uploadAtLeastOne": "Pisi kaqnin huk ranqhanapa fotonta churay.",
+        "enterPrice": "Huk chaninta churay (sapa ranqhanapi hukniraq kanan atin).",
+        "uploadFailed": "Mana churayta atirqanikuchu {{fileName}}: {{error}}",
+        "productFailed": "Ranqhana {{index}} ({{name}}): {{error}}",
+        "unnamedProduct": "mana sutiyuq",
+        "noneCould": "Mana ni hukllatapas rikhurichiyta atirqanikuchu."
+      },
+      "success": {
+        "published": "{{count}} ranqhana(kuna) rikhurichisqa. Administradorpa moderaciónninta suyanku."
+      }
+    },
+    "payouts": {
+      "title": "Pagoykuna",
+      "escrowInfoBefore": "Ranqhaykunaykipa qullqinqa ",
+      "escrowInfoStrong": "harkasqa kachkan (escrow)",
+      "escrowInfoAfter": " rantiq ranqhanata chaskinankama hinaspa pago chiqapchakunankama. Chayachisqa qhipata, qullqiqa kacharisqa kanqa hinaspa BNB kuintaykiman, banco-man utaq QR-man hurquyta atinki.",
+      "balanceAvailable": "Kanapaq kaqnin",
+      "withdraw": "Hurquy",
+      "escrowReleased": "Escrow kacharisqa",
+      "deliveredAndPaid": "Chayachisqa hinaspa pagasqa ranqhaykuna",
+      "inProgress": "Ruwakushan",
+      "pendingApprovedWithdrawals": "Suyashan/chaskisqa hurquykuna",
+      "accountSaved": "Chaskinapaq kuinta waqaychasqa",
+      "requestSubmitted": "Hurquy mañakusqa. Administradorqa qhawanqa.",
+      "status": {
+        "pending": "Suyashan",
+        "approved": "Chaskisqa",
+        "paid": "Pagasqa",
+        "rejected": "Mana chaskisqa"
+      },
+      "accountSection": {
+        "title": "Chaskinapaq kuinta",
+        "methodLabel": "Imayna",
+        "methodBnb": "BNB (Celular billetera)",
+        "methodBank": "Banco transferencia",
+        "methodQr": "QR / Alias",
+        "holderLabel": "Kaqniyuq",
+        "numberLabelBnb": "BNB celular yupay",
+        "numberLabelBank": "Kuintapa yupaynin",
+        "numberLabelQr": "Alias / QR",
+        "bankLabel": "Banco",
+        "idLabel": "Cédula de identidad",
+        "saveButton": "Kuintata waqaychay"
+      },
+      "history": {
+        "title": "Hurquykunapa qhipan",
+        "empty": "Manaraq hurquyta mañakurqankichu.",
+        "columnDate": "P'unchay",
+        "columnAmount": "Chanin",
+        "columnMethod": "Imayna",
+        "columnStatus": "Kaynin",
+        "columnNote": "Qillqa"
+      },
+      "requestDialog": {
+        "title": "Hurquyta mañakuy",
+        "availableBalance": "Kanapaq kaqnin:",
+        "amountLabel": "Hurqunapaq chanin (Bs)",
+        "noteLabel": "Qillqa (mana obligatorio)",
+        "cancel": "Saqiy",
+        "submit": "Mañakuy"
+      }
+    },
+    "privileged": {
+      "title": "Privilegiado rantiqkuna",
+      "subtitle": "Kay rantiqkunaqa musuq ranqhanakunayta llapan runakunamanta ñawpaqta rikunku hinaspa waqaychayta atinku. Qanmi akllanki pikuna privilegiado kanankupaq.",
+      "pendingRequestsTitle": "Suyashan mañakuykuna ({{count}})",
+      "noPendingRequests": "Manam suyashan mañakuykuna kanchu.",
+      "requestMeta": "{{email}} · {{totalSales}} rantikuykuna · {{date}} p'unchaypi mañakurqan",
+      "approveButton": "Chaskiy",
+      "rejectButton": "Mana chaskiy",
+      "approvedToast": "Privilegiado rantiq chaskisqa",
+      "rejectedToast": "Mañakuy mana chaskisqa",
+      "buyersTitle": "Privilegiado rantiqkuna ({{count}})",
+      "noBuyers": "Manaraq privilegiado rantiqniykikuna kanchu. Mañakuykunata chaskiptiyki, chay rantiqkunaqa musuq ranqhanakunaykita ñawpaqta rikunqaku.",
+      "buyerMeta": "{{email}} · {{date}}-manta",
+      "privilegedChip": "Privilegiado"
+    },
+    "jobs": {
+      "title": "Llamk'aykuna",
+      "subtitle": "Qhatuykipaq llamk'ay ofertakunata rikhurichiy",
+      "payPeriod": {
+        "daily": "Sapa p'unchay",
+        "weekly": "Sapa semana",
+        "monthly": "Sapa killa"
+      },
+      "status": {
+        "pending": "Chaskinata suyashan",
+        "approved": "Rikhurichisqa",
+        "rejected": "Mana chaskisqa",
+        "closed": "Wisq'asqa"
+      },
+      "salary": {
+        "range": "{{min}} - {{max}} ({{period}})",
+        "from": "{{min}}-manta ({{period}})",
+        "upTo": "{{max}} kama ({{period}})",
+        "negotiable": "Sueldo rimanakuywan ({{period}})"
+      },
+      "form": {
+        "errors": {
+          "category": "Huk rikch'aqta akllay",
+          "titleMin": "Sutiqa pisi kaqnin 5 rimana kanan tiyan",
+          "descriptionMin": "Willayqa pisi kaqnin 20 rimana kanan tiyan",
+          "city": "Llaqtata churay",
+          "vacanciesMin": "Pisi kaqnin 1 kama",
+          "salaryInvalid": "Mana allin sueldo",
+          "salaryMaxLessThanMin": "Hatun mana pisillamanta pisiyachu kanan"
+        },
+        "category": "Rikch'aq",
+        "title": "Suti",
+        "description": "Willay",
+        "descriptionHint": "Pisi kaqnin 20 rimana",
+        "requirements": "Munasqakuna (mana obligatorio)",
+        "city": "Llaqta",
+        "locationState": "Wamani",
+        "payPeriodLabel": "Pago pacha",
+        "salaryMin": "Pisi sueldo",
+        "salaryMax": "Hatun sueldo",
+        "vacancies": "Kamakuna",
+        "schedule": "Pacha (mana obligatorio)",
+        "contactPhone": "Telefono / WhatsApp (mana obligatorio)"
+      },
+      "appStatus": {
+        "received": "Musuq",
+        "viewed": "Qhawasqa",
+        "shortlisted": "Akllasqa kanaykipaq",
+        "rejected": "Mana chaskisqa",
+        "hired": "Llamk'aqmi"
+      },
+      "actions": {
+        "markViewed": "Qhawasqa señalay",
+        "shortlist": "Akllay",
+        "reject": "Mana chaskiy",
+        "hire": "Llamk'achiy",
+        "create": "Llamk'ayta rikhurichiy",
+        "cancel": "Saqiy",
+        "saveAndSubmit": "Waqaychay hinaspa qhawanapaq apachiy",
+        "submit": "Qhawanapaq apachiy",
+        "closeJob": "Wisq'ay"
+      },
+      "actionVerbs": {
+        "markViewed": "qhawasqa señalanapaq",
+        "shortlist": "akllanapaq",
+        "reject": "mana chaskinapaq",
+        "hire": "llamk'achinapaq"
+      },
+      "filters": {
+        "all": "Llapan",
+        "new": "Musuqkuna",
+        "shortlisted": "Akllasqakuna",
+        "hired": "Llamk'aqkuna",
+        "rejected": "Mana chaskisqakuna"
+      },
+      "vacancyCount_one": "{{count}} kama",
+      "vacancyCount_other": "{{count}} kamakuna",
+      "expiresOn": "Usqhan: {{date}}",
+      "createdOn": "Ruwasqa: {{date}}",
+      "applicantsChip": "Mañakuqkuna ({{count}})",
+      "editTooltip": "Allichay (qhawanapaq kutin)",
+      "editAriaLabel": "Llamk'ayta allichay",
+      "rejectionReason": "Mana chaskisqan: {{reason}}. Allichaspa kutin apachiyta atinki.",
+      "empty": "Manaraq ni hayk'aq llamk'aytapas rikhurichirqankichu.",
+      "verification": {
+        "notVerifiedPrefix": "Chiqapchasqa qhatukunallam llamk'aykunata rikhurichiyta atinku. Qhatuykipa chiqapchaynin tukuchiy kaypi",
+        "settingsLink": "Kamachiy",
+        "goToSettings": "Kamachiyman riy",
+        "notApproved": "Qhatuykiqa chaskisqa hinaspa kawsachkaq kanan tiyan (mana samasqa) llamk'aykunata rikhurichinaykipaq."
+      },
+      "infoBanner": "Musuq utaq allichasqa llamk'aykunaqa administrador chaskinankama suyanku. Chaskisqa kaqtinñataq 30 p'unchaykama rikhurichisqa kanqaku.",
+      "dialog": {
+        "editTitle": "Llamk'ayta allichay",
+        "editWarning": "Tikrasqakunata waqaychaspaqa, llamk'ayqa qhawanapaq kutin, hinaspa mana rikhurichisqachu kanqa chaskisqa kaqtinkama."
+      },
+      "closeDialog": {
+        "title": "Llamk'ayta wisq'ay",
+        "confirm": "¿\"{{title}}\" nisqata wisq'ayta munanki? Mana rikhurinñachu hinaspa mana kutin kichayta atinkichu (musuqta rikhurichinayki tiyan)."
+      },
+      "toasts": {
+        "statusUpdated": "Kaynin musuqchasqa. Candidatoman willasqa.",
+        "updated": "Llamk'ay musuqchasqa. Chaskinata suyashan.",
+        "created": "Llamk'ay apachisqa. Administradorqa utqhayta qhawanqa.",
+        "closed": "Llamk'ay wisq'asqa"
+      },
+      "applicants": {
+        "drawerTitle": "{{title}}-pa mañakuqninkuna",
+        "closeDrawer": "Wisq'ay",
+        "hiredHint_one": "{{hired}}/{{count}} kamamanta llamk'achirqanki. Kamakunata hunt'aptiykiqa, llamk'ayta wisq'ayqa aswan allinmi.",
+        "hiredHint_other": "{{hired}}/{{count}} kamakunamanta llamk'achirqanki. Kamakunata hunt'aptiykiqa, llamk'ayta wisq'ayqa aswan allinmi.",
+        "empty": "Manaraq mañakuqkuna kanchu",
+        "emptyFiltered": "Manam kay kaynipi mañakuqkuna kanchu",
+        "expectedSalary": "Munasqan sueldo:",
+        "viewCv": "CV-ta qhaway",
+        "downloadCv": "CV-ta uraykuchiy",
+        "downloadCvNamed": "CV-ta uraykuchiy ({{name}})",
+        "yourMessage": "Qillqayki: {{note}}",
+        "confirmMessage": "{{firstName}} {{lastName}}-ta {{verb}} rishanki. Huk willakuyta apachisunki.",
+        "noteLabel": "Candidatopaq qillqa (mana obligatorio)",
+        "confirm": "Chiqapchay"
+      }
+    },
+    "auctions": {
+      "title": "Subastasniy ({{count}})",
+      "empty": {
+        "message": "Manaraq subastakunata ruwarqankichu. Huk ranqhanata rikhurichispa, \"Subasta hina rikhurichiy\" nisqata activay.",
+        "cta": "Subastata ruway"
+      },
+      "table": {
+        "title": "Suti",
+        "currentPrice": "Kunan chanin",
+        "bids": "Ofertakuna",
+        "status": "Kaynin",
+        "actions": "Ruwaykuna"
+      },
+      "endDate": "Tukuy: {{date}}",
+      "status": {
+        "wonBy": "Atipasqa: {{name}}",
+        "noWinner": "Mana atipaq",
+        "active": "Kawsachkan"
+      },
+      "actions": {
+        "view": "Qhaway"
+      }
+    },
+    "calendar": {
+      "title": "Qhatuypa calendarion",
+      "subtitle": "Kawsachkaq promocionkuna (puka), subastakunapa tukuyninkuna (kulli) hinaspa sapa p'unchay ranqhaykuna (q'umir) qhatuykimanta."
+    },
+    "productForm": {
+      "title": {
+        "edit": "Ranqhanata allichay",
+        "new": "Musuq ranqhana"
+      },
+      "close": "Wisq'ay",
+      "steps": {
+        "info": "Willakuy",
+        "photos": "Fotokuna",
+        "attributes": "Atributokuna",
+        "preview": "Ñawpaq qhaway"
+      },
+      "fields": {
+        "name": "Ranqhanapa sutin",
+        "category": "Rikch'aq",
+        "knownProduct": "Reqsisqa ranqhana (ñawpaqta churasqa atributokuna)",
+        "condition": "Kaynin",
+        "conditionNew": "Musuq",
+        "conditionUsed": "Llamk'achisqaña",
+        "conditionRefurbished": "Allichasqa",
+        "description": "Willay",
+        "price": "Chanin (Bs)",
+        "priceEmployeeLocked": "Qhatupa administradorllan chaninta tikrayta atin",
+        "originalPrice": "Ñawpaq chanin",
+        "stock": "Kaqnin",
+        "sku": "SKU",
+        "skuPlaceholder": "Ej: PRO-0001",
+        "skuHelper": "Ch'usaqta saqiy, rikch'aqman hina kikillanta rikhurinqa",
+        "warranty": "Amachay",
+        "warrantyPlaceholder": "Ej: Amachay 12 killa"
+      },
+      "knownProduct": {
+        "helperNew": "Manaraq kachkanchu: ruwayta atinki hinaspa qhipata + botónwan atributokunata churay.",
+        "helperChoose": "Rikch'aqmanta huk reqsisqa ranqhanata akllay atributokunata ñawpaqta churanaykipaq, utaq musuqta qillqay.",
+        "createButton": "Reqsisqa ranqhana ruway «{{name}}»",
+        "selectedLabel": "Akllasqa reqsisqa ranqhana: {{name}}"
+      },
+      "actions": {
+        "generate": "Rikhurichiy",
+        "creating": "Ruwashan…",
+        "discard": "Wikch'uy",
+        "cancel": "Saqiy",
+        "back": "Ñawpaq",
+        "next": "Qatiq",
+        "save": "Tikrasqakunata waqaychay",
+        "publish": "Ranqhanata rikhurichiy",
+        "addAttribute": "Atributota yapay",
+        "uploadPhotos": "Fotokunata churay"
+      },
+      "auction": {
+        "toggleLabel": "Subasta hina rikhurichiy",
+        "helper": "Rantiqkunaqa kay ranqhanapaq kunanllapi ofertankuku tukuy p'unchaykama.",
+        "startingPrice": "Qallariy chanin (Bs)",
+        "minIncrement": "Pisi yapay",
+        "maxIncrement": "Hatun yapay",
+        "incrementType": "Yapaypa rikch'aqnin",
+        "incrementDynamic": "Kuyuq (chaninwan wichyan)",
+        "incrementFixed": "Sayasqa",
+        "reservePrice": "Reserva chanin (mana obligatorio)",
+        "reservePriceHelper": "Pisi kaqnin subastapa allinta wisq'akunanpaq",
+        "buyNowPrice": "Kunan rantiy (mana obligatorio)",
+        "buyNowPriceHelper": "Kunallanmanta kay chaninwan rantiy",
+        "antiSniping": "Anti-sniping (minutokuna)",
+        "antiSnipingHelper": "Tukukuypi ofertaptinku pachata hatunyachin (0 = mana llamk'achisqa)",
+        "endDate": "Tukuy p'unchay",
+        "endDateHelper": "Subastapa wisq'akuy p'unchayninta hinaspa horanta akllay."
+      },
+      "photos": {
+        "title": "Ranqhanapa fotonkuna",
+        "primary": "Ñawpaq",
+        "makePrimary": "Ñawpaq hina churay",
+        "count": "{{count}}/8 · Huk utaq askha fotokunata churayta atinki (JPG, PNG, WebP, SVG · aswan 5MB)"
+      },
+      "attributes": {
+        "title": "Sut'inchaykuna ({{count}})",
+        "remove": "{{name}}-ta hurquy",
+        "yes": "Arí",
+        "no": "Mana",
+        "addDialog": {
+          "title": "Atributota yapay",
+          "searchLabel": "Atributota sutinmanta maskhay",
+          "searchPlaceholder": "Ej: Velocidad, Tamaño, Color...",
+          "helper": "Huk atributokunata yapayta atinki huk rikch'aqmanta utaq mana kunan rikch'aqpaq kaqmanta. Ranqhanapa sut'inchan hina waqaychakunqa.",
+          "bulkTitle": "¿Huk atributo pisinchu? Askhata comawan rakispa ruway",
+          "bulkLabel": "Sutikuna comawan rakisqa",
+          "bulkPlaceholder": "Ej: Marca, Color, Tamaño",
+          "bulkHelper": "Global atributokuna hina ruwakunqaku hinaspa chaninninkuta churanapaq wakichisqa kanqaku.",
+          "bulkCreate": "Ruway"
+        }
+      },
+      "preview": {
+        "title": "Ranqhanapa cardnin ñawpaq qhaway",
+        "summaryTitle": "Ranqhanapa sut'inchan",
+        "name": "Suti:",
+        "category": "Rikch'aq:",
+        "condition": "Kaynin:",
+        "price": "Chanin:",
+        "stock": "Kaqnin:",
+        "sku": "SKU:",
+        "photos": "Fotokuna:",
+        "attributes": "Atributokuna:",
+        "warranty": "Amachay:",
+        "footer": "Willakuykuna hunt'asqa kasqanta qhaway. Rikhurichiptiykiqa, ranqhanaqa administradorpa moderaciónninta suyanqa.",
+        "noName": "Mana sutiyuq",
+        "myStore": "Qhatuy"
+      },
+      "errors": {
+        "nameRequired": "Ranqhanapa sutinta qillqay.",
+        "categoryRequired": "Ranqhanapa rikch'aqninta akllay.",
+        "priceRequired": "Ranqhanapa chaninta churay.",
+        "auctionEndDateRequired": "Subastapaq, tukuy p'unchayta churay.",
+        "auctionEndDateRequiredSubmit": "Subastapaq, tukuy p'unchayta churay",
+        "bulkNameRequired": "Pisi kaqnin huk sutita qillqay.",
+        "bulkCreateFailed": "Mana ni huk atributotapas ruwayta atirqanikuchu."
+      },
+      "toast": {
+        "knownProductCreated": "Reqsisqa ranqhana ruwasqa. + botónwan atributokunata churay",
+        "auctionCreated": "Subasta ruwasqa. Subastakunapa t'aqanpi rikhurinqa.",
+        "productUpdated": "Ranqhana musuqchasqa",
+        "productCreated": "Ranqhana ruwasqa. Administradorpa moderaciónninta suyay.",
+        "bulkAttributesCreated": "{{count}} atributo(kuna) ruwasqa. Sapa hukman chaninta churay."
+      }
+    },
+    "products": {
+      "title": "Ranqhanaykuna ({{count}})",
+      "actions": {
+        "scan": "Escaneay",
+        "copyProduct": "Ranqhanata kupiay",
+        "labels": "Etiquetakuna",
+        "addMultiple": "Askhata yapay",
+        "newProduct": "Musuq ranqhana"
+      },
+      "table": {
+        "product": "Ranqhana",
+        "category": "Rikch'aq",
+        "price": "Chanin",
+        "stock": "Kaqnin",
+        "status": "Kaynin",
+        "actions": "Ruwaykuna"
+      },
+      "status": {
+        "approved": "Chaskisqa",
+        "pending": "Suyashan",
+        "deleted": "Chinkachisqa"
+      },
+      "confirmDelete": "¿Kay ranqhanata chinkachiyta munanki?",
+      "toast": {
+        "deleted": "Ranqhana chinkachisqa",
+        "copied": "Ranqhana kupiasqa. Rikch'ay hinaspa chaninta hunt'achiy rikhurichinaykipaq."
+      },
+      "emptyState": "Manaraq ranqhanakunata churarqankichu",
+      "history": {
+        "tooltip": "Qhipan",
+        "title": "Qhipan — {{name}}",
+        "empty": "Manaraq imapas qillqasqa kachkan.",
+        "action": "Ruway",
+        "author": "Ruwaq",
+        "note": "Qillqa",
+        "date": "P'unchay",
+        "close": "Wisq'ay"
+      },
+      "copyDialog": {
+        "title": "Ranqhanata kupiay",
+        "description": "Multi-tiendapi huk ranqhanata maskhay datunkunata kupianaykipaq (suti, willay, rikch'aq hinaspa sut'inchaykuna). Chaymanta kikin rikch'ayta hinaspa chaninta churanayki tiyan.",
+        "searchLabel": "Ranqhanata sutinmanta utaq kudigumanta maskhay",
+        "searchPlaceholder": "Ej: ryzen 5 5600g",
+        "noResults": "Mana ni huk ranqhanapas tarikurqachu.",
+        "copyButton": "Kupiay",
+        "noSku": "Mana SKU",
+        "minChars": "Pisi kaqnin 2 rimanata qillqay maskhanaykipaq.",
+        "cancel": "Saqiy"
+      }
+    },
+    "coupons": {
+      "title": "Qhatuypa kuponnin",
+      "subtitle": "Ranqhanaykikunapaq descuento kuponkunata utaq regalo kuponkunata ruway. Kuponpa llamk'ananpaq qhatuykipa ranqhanankunata akllay.",
+      "actions": {
+        "create": "Kuponta ruway"
+      },
+      "table": {
+        "code": "Kudigu",
+        "type": "Rikch'aq",
+        "value": "Chanin",
+        "products": "Ranqhanakuna",
+        "uses": "Llamk'achiykuna",
+        "status": "Kaynin",
+        "actions": "Ruwaykuna",
+        "giftValue": "{{value}} ({{spent}} gastasqa)",
+        "productCount": "{{count}} ranqhana(kuna)",
+        "allProducts": "Llapan"
+      },
+      "emptyState": "Manam kuponniyki kanchu. Huk ruway ranqhaykunaykita hatunyachinaykipaq.",
+      "status": {
+        "active": "Kawsachkan",
+        "inactive": "Mana kawsachkanchu"
+      },
+      "type": {
+        "percentage": "Porcentaje",
+        "fixed": "Sayasqa chanin",
+        "gift": "Regalo"
+      },
+      "toast": {
+        "updated": "Kupon musuqchasqa",
+        "created": "Kupon ruwasqa",
+        "deleted": "Kupon chinkachisqa"
+      },
+      "dialog": {
+        "editTitle": "Kuponta allichay",
+        "createTitle": "Kuponta ruway",
+        "codeLabel": "Sapallan kudigu",
+        "descriptionLabel": "Willay",
+        "descriptionPlaceholder": "Ej: 10% huk S7 Edge rantikuypi / 100 Bs regalo gastanapaq qhatuypi",
+        "typeLabel": "Kuponpa rikch'aqnin",
+        "typeOptions": {
+          "percentage": "Descuento porcentaje (%)",
+          "fixed": "Sayasqa descuento chanin (Bs)",
+          "gift": "Regalo (gastanapaq chanin, saldo kutichisqa)"
+        },
+        "valueLabel": {
+          "percentage": "Descuento (%)",
+          "gift": "Regalopa chaninnin (Bs)",
+          "fixed": "Descuento (Bs)"
+        },
+        "giftHint": "Rantiqqa kay chaninta qhatuykipi gastayta atin. Aswan pisita gastan chayqa, saldota efectivopi kutichinki.",
+        "minSpendLabel": "Pisi rantikuy (Bs, mana obligatorio)",
+        "maxUsesLabel": "Llamk'achiykunapa hatun kaynin (mana obligatorio)",
+        "endDateLabel": "Usqhan (mana obligatorio)",
+        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productsLabel": "Llamk'ananpaq ranqhanakuna (ch'usaq = llapan)",
+        "cancel": "Saqiy",
+        "save": "Waqaychay"
+      }
+    },
+    "layout": {
+      "nav": {
+        "dashboard": "Dashboard",
+        "products": "Ranqhanakuna",
+        "labels": "Etiquetakuna",
+        "calendar": "Calendario",
+        "auctions": "Subastakuna",
+        "jobs": "Llamk'aykuna",
+        "vipBuyers": "VIP rantiqkuna",
+        "promotions": "Promocionkuna",
+        "coupons": "Kuponkuna",
+        "giftPromos": "Regalo promokuna",
+        "payments": "Pagoykuna",
+        "team": "Yanapaqkuna",
+        "returns": "Kutichisqakuna",
+        "messages": "Qillqakuna",
+        "orders": "Mañakuykuna",
+        "settings": "Kamachiy"
+      },
+      "header": {
+        "employeePanel": "Yanapaqpa panilnin",
+        "sellerPanel": "Ranqhaqpa panilnin"
+      },
+      "reauth": {
+        "title": "Amachaypa chiqapchaynin",
+        "description": "Qhatupa panilninman yaykunaykipaq, pakasqa simiykita chiqapchay.",
+        "passwordLabel": "Pakasqa simi",
+        "verifying": "Chiqapchashan…",
+        "verify": "Chiqapchay"
+      }
+    },
+    "promotions": {
+      "pageTitle": "Promocionkuna",
+      "pageSubtitle": "Qhatuykipa ranqhanankunapa descuentonkuna, kuponkuna hinaspa regalo promonkuna",
+      "newPromotion": "Musuq promoción",
+      "tabs": {
+        "active": "Kawsachkaqkuna ({{count}})",
+        "finished": "Tukusqakuna ({{count}})"
+      },
+      "empty": {
+        "active": "Manam kawsachkaq promocionniyki kanchu. \"Musuq promoción\" nisqata llamk'achiy huk ruwanaykipaq.",
+        "finished": "Manam tukusqa promocionniyki kanchu."
+      },
+      "card": {
+        "percentOff": "{{value}}% OFF",
+        "amountOff": "{{value}} OFF",
+        "statusActive": "Kawsachkan",
+        "statusFinished": "Tukusqa",
+        "minSpend": "pisi {{amount}}",
+        "maxSpend": "presupuesto {{amount}}",
+        "spent": "llamk'achisqa {{amount}}",
+        "deactivateTooltip": "Promocionta tukuchiy",
+        "productPrice": "{{name}} · {{price}}"
+      },
+      "toasts": {
+        "fillTitleDiscount": "Suti hinaspa descuentota hunt'achiy",
+        "selectProduct": "Pisi kaqnin huk ranqhanata akllay",
+        "promoCreated": "Promoción ruwasqa",
+        "promoDeactivated": "Promoción tukusqa",
+        "fillCodeValue": "Kudigu hinaspa chaninta hunt'achiy",
+        "couponCreated": "Kupon ruwasqa",
+        "fillTitleGiftProducts": "Suti hinaspa regalo ranqhanakunata hunt'achiy",
+        "giftCreated": "Regalo promo ruwasqa"
+      },
+      "dialog": {
+        "title": "Musuq promoción",
+        "typeLabel": "Promociónpa rikch'aqnin",
+        "typeProduct": "Descuento ranqhanakunapi",
+        "typeCoupon": "Descuento kupon (kudigu)",
+        "typeGift": "Regalo promo (rantiy hinaspa chaskiy)",
+        "cancel": "Saqiy",
+        "create": "Ruway",
+        "product": {
+          "titleLabel": "Suti",
+          "descriptionLabel": "Willay",
+          "discountTypeLabel": "Descuentopa rikch'aqnin",
+          "percentageOption": "Porcentaje (%)",
+          "fixedOption": "Sayasqa chanin (Bs)",
+          "percentageFieldLabel": "Porcentaje",
+          "amountFieldLabel": "Chanin",
+          "minSpendLabel": "Pisi rantikuy (Bs, mana obligatorio)",
+          "maxSpendLabel": "Tukuy descuento presupuesto (Bs, mana obligatorio)",
+          "startDateLabel": "Qallariy",
+          "endDateLabel": "Tukuy",
+          "productsLabel": "Promociónpi ranqhanakuna",
+          "productOptionLabel": "{{name}} ({{price}})"
+        },
+        "coupon": {
+          "codeLabel": "Sapallan kudigu",
+          "codeHelper": "Rantiqkuna kay kudigota checkout-pi churanku",
+          "descriptionLabel": "Willay",
+          "typeLabel": "Rikch'aq",
+          "percentageOption": "Porcentaje (%)",
+          "fixedOption": "Sayasqa chanin (Bs)",
+          "giftOption": "Regalo ticket (Bs gastanapaq)",
+          "percentageFieldLabel": "Porcentaje",
+          "amountFieldLabel": "Chanin",
+          "singleUseLabel": "Huk kutillanta sapa rantiqpaq",
+          "maxUsesLabel": "Tukuy llamk'achiykuna hatun kaynin (mana obligatorio)",
+          "perUserLimitLabel": "Llamk'achiykuna sapa rantiqpaq (mana obligatorio)",
+          "minSpendLabel": "Pisi rantikuy (Bs, mana obligatorio)",
+          "maxSpendLabel": "Tukuy descuento presupuesto (Bs, mana obligatorio)",
+          "maxSpendHelper": "Kuponqa mana llamk'anñachu kay tukuy chanin tukukuptin"
+        },
+        "gift": {
+          "titleLabel": "Suti",
+          "descriptionLabel": "Willay",
+          "triggerLabel": "Qallariq",
+          "triggerUnits": "N unidad huk ranqhanata rantiptin",
+          "triggerAmount": "Huk chaninta qhatupi yalliptin",
+          "triggerProduct": "Huk sapaq ranqhanata rantiptin",
+          "quantityLabel": "Unidadkunapa achkan",
+          "triggerProductLabel": "Qallariq ranqhana",
+          "minAmountLabel": "Pisi chanin (Bs)",
+          "allowChoiceLabel": "Rantiqpa regalonta akllayta saqiy",
+          "giftProductsLabel": "Regalo ranqhanakuna"
+        }
+      }
+    },
+    "team": {
+      "pageTitle": "Qhatuypa yanapaqninkuna",
+      "pageSubtitle": "Confianzayuq runakunata invitay qhatuykita kamachinaykipaq yanapananpaq. Administradorkunaqa llapanta kamachinku; yanapaqkunaqa ranqhanakunallata churayta hinaspa mañakuykunata qhawayta atinku (mana chaninkunata nitaq qullqi chaskinankunatapas).",
+      "inviteEmployee": "Yanapaqta invitay",
+      "empty": "Manaraq yanapaqniykikuna kanchu. Pipas invitay qhatuykita kamachiyta yanapananpaq.",
+      "removeTooltip": "Yanapaqkunamanta hurquy",
+      "removeTooltipDisabled": "Kaqniyuqllan yanapaqkunata hurquyta atin",
+      "table": {
+        "member": "Yanapaq",
+        "email": "Email",
+        "role": "Rol",
+        "actions": "Ruwaykuna",
+        "owner": "Kaqniyuq"
+      },
+      "roles": {
+        "admin": "Administrador",
+        "employee": "Yanapaq"
+      },
+      "toasts": {
+        "invited": "Yanapaq invitasqa",
+        "roleUpdated": "Rol musuqchasqa",
+        "removed": "Yanapaq yanapaqninkunamanta hurqusqa"
+      },
+      "dialog": {
+        "title": "Yanapaqta invitay",
+        "searchLabel": "Emailmanta utaq sutinmanta usuariota maskhay",
+        "typeMoreLetters": "Pisi kaqnin 2 letrata qillqay",
+        "noResults": "Mana tarisqa",
+        "roleLabel": "Rol",
+        "roleAdminOption": "Administrador — llapan qhatuta kamachin",
+        "roleEmployeeOption": "Yanapaq — ranqhanakunallata hinaspa mañakuykunata",
+        "cancel": "Saqiy",
+        "invite": "Invitay"
+      }
+    },
+    "labels": {
+      "defaultStoreName": "Qhatuy",
+      "pageTitle": "Ranqhanakunapa etiquetankuna ({{count}})",
+      "printButton": "Etiquetakunata imprimiy",
+      "selectAll": "Llapanta akllay",
+      "noProducts": "Manaraq ranqhanaykikuna kanchu.",
+      "selectAtLeastOne": "Pisi kaqnin huk ranqhanata akllay etiquetakunata imprimiynaykipaq."
+    },
+    "returns": {
+      "title": "Kutichiy mañakuykuna",
+      "empty": "Manam kutichiy mañakuyniykikuna kanchu.",
+      "respond": "Kutichiy",
+      "buyerLabel": "Rantiq:",
+      "itemAmount": "Itempa chaninnin: Bs {{amount}}",
+      "status": {
+        "pending": "Suyashan",
+        "approved": "Chaskisqa",
+        "rejected": "Mana chaskisqa",
+        "completed": "Tukusqa",
+        "cancelled": "Saqisqa"
+      },
+      "reasons": {
+        "productoDefectuoso": "P'akisqa ranqhana",
+        "productoIncorrecto": "Mana chay ranqhana",
+        "noCoincideDescripcion": "Mana willasqawan tupanchu",
+        "yaNoLoNecesito": "Manañam munanichu",
+        "otro": "Huk imayna"
+      },
+      "dialog": {
+        "title": "Kutichiyta kutichiy",
+        "productLabel": "Ranqhana:",
+        "decisionLabel": "Akllay",
+        "decisionApprove": "Chaskiy (kutichiy)",
+        "decisionReject": "Mana chaskiy",
+        "refundAmountLabel": "Kutichiy chanin (Bs)",
+        "responseNoteLabel": "Rantiqpaq qillqa",
+        "cancel": "Saqiy",
+        "save": "Waqaychay",
+        "saving": "Waqaychashan..."
+      }
+    },
+    "dashboard": {
+      "header": {
+        "titleSeller": "Ranqhaqpa panilnin",
+        "titleEmployee": "Yanapaqpa panilnin",
+        "subtitle": "Qhatuykipa ruwasqan LaCase Multi Tiendas-pi"
+      },
+      "promotions": {
+        "summary": "Promocionkuna: {{active}} kawsachkan · {{finished}} tukusqa",
+        "invested": " · churasqa {{amount}}"
+      },
+      "kpis": {
+        "salesMade": "Ruwasqa ranqhaykuna",
+        "customersServed": "Yanapasqa rantiqkuna",
+        "revenue": "Mihasqakuna",
+        "unreadMessages": "Mana leesqa qillqakuna",
+        "totalProducts": "Tukuy ranqhanakuna",
+        "activeProducts": "{{count}} kawsachkan",
+        "pendingModeration": "Moderaciónta suyashan",
+        "sales": "Ranqhaykuna",
+        "totalRevenue": "Tukuy mihasqakuna",
+        "revenueWeek": "Semanapa mihasqan",
+        "revenueMonth": "Killapa mihasqan"
+      },
+      "status": {
+        "pending": "Suyashan",
+        "confirmed": "Chiqapchasqa",
+        "preparing": "Wakichishan",
+        "shipped": "Apachisqa",
+        "delivered": "Chayachisqa",
+        "cancelled": "Saqisqa"
+      },
+      "charts": {
+        "salesLast30Days": "Ranqhaykuniyki — qhipa 30 p'unchaykuna",
+        "revenueSeriesName": "Mihasqakuna",
+        "ordersByStatus": "Mañakuykuna kayninninman hina"
+      },
+      "topProducts": {
+        "title": "Aswan ranqhasqa ranqhanaykikuna",
+        "priceStock": "{{price}} · kaqnin {{stock}}",
+        "sold": "{{count}} ranqhasqa"
+      },
+      "recentOrders": {
+        "title": "Qhipa mañakuykuna",
+        "viewAll": "Llapanta qhaway →",
+        "empty": "Manaraq mañakuykunata chaskirqankichu.",
+        "orderLabel": "#{{id}} — {{buyerName}}",
+        "dateItems": "{{date}} · {{count}} ítems"
+      }
+    },
+    "settings": {
+      "title": "Qhatuykipa kamachiynin",
+      "profilePhotoLabel": "Qhatupa perfil fotonin",
+      "storeNameLabel": "Qhatupa sutin",
+      "descriptionLabel": "Willay",
+      "bioLabel": "Kaqniyuqpa / qhatupa kawsay willayninkuna",
+      "bioPlaceholder": "Qhatuykipa willayninta utaq ranqhasqaykita willay...",
+      "categoryLabel": "Ranqhanakunapa rikch'aqnin",
+      "countryLabel": "Mama llaqta",
+      "logoLabel": "Logo (URL)",
+      "bannerLabel": "Banner (URL)",
+      "cityLabel": "Llaqta",
+      "stateLabel": "Wamani",
+      "selectPlaceholder": "Akllay...",
+      "postalCodeLabel": "Postal kudigu (mana obligatorio)",
+      "mapLocationTitle": "Mapa tiyasqa",
+      "mapHelperText": "Llaqtaykita maskhay, mapapi utaq huk tarisqapi click-ay chiqap puntota señalanaykipaq. Kay tiyasqaqa clientesniykiman rikhurinqa.",
+      "defaultLocationLabel": "Qhatu",
+      "socialTitle": "🌐 Redes sociales hinaspa rimanakuy",
+      "instagramLabel": "Instagram (URL)",
+      "facebookLabel": "Facebook (URL)",
+      "tiktokLabel": "TikTok (URL)",
+      "youtubeLabel": "YouTube (URL)",
+      "whatsappLabel": "WhatsApp (yupay)",
+      "whatsappPlaceholder": "59170000000 (suyupa kudigunwan, mana + niyuq)",
+      "socialHelperText": "Mana obligatoriochu. Perfil publicoykipi rikhurinqaku hunt'achinki chayllapi.",
+      "shippingLocationInfo": "Tiyasqaykiqa apachiy chaninta rantiqman yupanapaq llamk'achisqa kachkan.",
+      "paymentQrLabel": "Pago QR (rikch'aypa URL-n)",
+      "paymentQrHelperText": "Huk rikch'ayta churay aliasniykiwan/QR-ykiwan. Rantiqman rikhurinqa rantikuyta tukuchiptin.",
+      "freeShippingLabel": "Mana qullqiyuq apachiy (Bs)-manta",
+      "freeShippingPlaceholder": "Ej: 500",
+      "freeShippingHelperText": "Rantiqqa kay chaninta yalliptin, apachiyqa mana qullqiyuqchu. Ch'usaqta saqiy mana ofrecenapaq.",
+      "saveButton": "Waqaychay",
+      "verifiedSealTitle": "Chiqapchasqa ranqhaqpa sello",
+      "verifiedChip": "Chiqapchasqa",
+      "storeLocationLabel": "Qhatupa tiyasqan",
+      "locationVerifiedChip": "Administradorwan chiqapchasqa",
+      "locationPendingChip": "Chiqapchayta suyashan",
+      "verificationDescription": "Administradorqa qhatuykipa allpapi kasqanta chiqapchan (NIT hinaspa documentaciónwan tupachispa) mapapi tiyasqaykita chiqapchanapaq. Chiqapchasqa tiyasqayuq qhatukunaqa aswan confianzata ruwanku.",
+      "verifiedSuccessAlert": "Qhatuykiqa chiqapchasqañam. Logoykita sutiyki kaqllapi rikuchinki, rantiqkunapi aswan confianzata ruwaspa.",
+      "pendingReviewAlert": "Chiqapchay mañakuyniykiqa administradorpa qhawaynimpi kachkan. Couchsurfing utaq Twitter hina, qhatuykipa allpapi kasqan chiqapchakun (NIT hinaspa documentación) sello quyanaykipaq.",
+      "requestVerificationAlert": "Chiqapchasqa ranqhaqpa sello chaskiy (Twitterpa kulli kuinta hina): NIT-niykita rikuchiy, administradorqa qhatuykita allpapi chiqapchanqa. Chiqapchasqa qhatukunaqa aswan confianzata hinaspa aswan ranqhaykunata ruwanku.",
+      "nitLabel": "NIT (Tributaria Identificación Yupay)",
+      "nitPlaceholder": "Ej: 10203040123",
+      "noteLabel": "Administradorpaq qillqa (documentokuna, wasipa dirección, etc.)",
+      "notePlaceholder": "Ej: Qhatuyqa Calle 5-pi kachkan, zona Central. NIT-niyta hinaspa comercio matrículayta churani.",
+      "requestSentButton": "Mañakuy apachisqa — qhawaypi",
+      "sendingButton": "Apachishan...",
+      "requestVerificationButton": "Chiqapchayta mañakuy",
+      "errors": {
+        "nitRequired": "NIT-qa obligatoriom chiqapchayta mañakunaykipaq"
+      },
+      "toasts": {
+        "requestSent": "Mañakuy apachisqa",
+        "profileImageReady": "Perfil rikch'ay wakichisqa — tikrasqakunata waqaychay",
+        "settingsSaved": "Kamachiy waqaychasqa"
+      }
+    },
+    "gifts": {
+      "triggerLabels": {
+        "units": "Huk ranqhanapa achkanmanta",
+        "amount": "Rantikuypa chaninmanta",
+        "product": "Huk sapaq ranqhanata rantispa"
+      },
+      "errors": {
+        "titleRequired": "Suti obligatoriom",
+        "giftProductRequired": "Pisi kaqnin huk regalo ranqhanata akllay",
+        "unitsFieldsRequired": "\"Achkanmanta\" rikch'aqpaq, ranqhanata hinaspa achkanta churay",
+        "amountFieldRequired": "\"Chaninmanta\" rikch'aqpaq, pisi chaninta churay",
+        "productFieldRequired": "\"Ranqhanamanta\" rikch'aqpaq, ranqhanata churay"
+      },
+      "toasts": {
+        "promoUpdated": "Promoción musuqchasqa",
+        "promoCreated": "Promoción ruwasqa",
+        "promoDeleted": "Promoción chinkachisqa"
+      },
+      "confirmDelete": "¿Kay regalo promociónta chinkachiyta munanki?",
+      "triggerText": {
+        "units": "{{quantity}} un. {{product}}-manta rantispa",
+        "amount": "{{amount}} Bs-manta rantikuykuna",
+        "product": "{{product}}-ta rantispa",
+        "defaultProduct": "ranqhana",
+        "defaultProductGeneric": "huk ranqhana"
+      },
+      "pageTitle": "Regalo promokuna",
+      "newPromoButton": "Musuq promo",
+      "infoBanner": "Regalo ticketpa lógicanwan clientesniykiman regalokunata ofrecey: huk ranqhanapa achkanta rantispa, huk chaninta yallispa utaq huk sapaq ranqhanata rantispa, clienteqa qhatuykipa huk ranqhananta regalo hina chaskin. Askha regalomanta akllayta saqiyta atinkipas.",
+      "emptyState": "Manaraq regalo promokunata ruwarqankichu.",
+      "activeChip": "Kawsachkan",
+      "inactiveChip": "Mana kawsachkanchu",
+      "triggerLabelPrefix": "Qallariq:",
+      "giftsLabel": "Regalo(kuna): {{names}}",
+      "customerChoosesChip": "Clienteqa akllan",
+      "editButton": "Allichay",
+      "deactivateButton": "Mana kawsachiy",
+      "activateButton": "Kawsachiy",
+      "deleteButton": "Chinkachiy",
+      "dialog": {
+        "editTitle": "Regalo promota allichay",
+        "createTitle": "Musuq regalo promo",
+        "titleLabel": "Suti",
+        "titlePlaceholder": "Ej: 2-ta rantiy, 1-ta regalo apay",
+        "descriptionLabel": "Willay (mana obligatorio)",
+        "triggerTypeLabel": "Qallariqpa rikch'aqnin",
+        "triggerProductLabel": "Qallariq ranqhana",
+        "selectPlaceholder": "Akllay...",
+        "minQuantityLabel": "Pisi achkan",
+        "minQuantityPlaceholder": "Ej: 2",
+        "minAmountLabel": "Pisi chanin (Bs)",
+        "minAmountPlaceholder": "Ej: 3000",
+        "giftProductsLabel": "Regalo ranqhanakuna (hukta utaq askhata akllay)",
+        "allowChoiceLabel": "Clienteqa regalo ranqhanakunamanta akllayta atin",
+        "activeLabel": "Kawsachkaq promoción",
+        "cancelButton": "Saqiy",
+        "saveButton": "Waqaychay"
+      }
+    },
+    "orders": {
+      "pageTitle": "Chaskisqa mañakuykuna",
+      "allStatuses": "Llapan kaynikuna",
+      "columns": {
+        "buyer": "Rantiq",
+        "total": "Tukuy",
+        "delivery": "Chayachiy",
+        "status": "Kaynin",
+        "payment": "Pago"
+      },
+      "pickupChip": "🏬 Hurquy",
+      "shippingChip": "Apachiy",
+      "viewProofLink": "comprobanteta qhaway",
+      "verifyPlaceholder": "Chiqapchay...",
+      "emptyState": "Manaraq mañakuykunata chaskirqankichu",
+      "toasts": {
+        "statusUpdated": "Kaynin musuqchasqa",
+        "paymentStatusUpdated": "Pagopa kaynin musuqchasqa"
+      }
+    }
+  }
+}

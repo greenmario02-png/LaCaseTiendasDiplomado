@@ -8,6 +8,7 @@ import { CategoryIcon } from '../../theme/forumIcons';
 import { useForumStore } from '../../stores/forumStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ForumPost } from '../../services/forum.api';
 import PostVoteBar from './PostVoteBar';
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function PostCard({ post }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { user } = useAuthStore();
   const { votePost } = useForumStore();
@@ -62,7 +64,7 @@ export default function PostCard({ post }: Props) {
             <Chip label={post.type} size="small" sx={{ color: forumPalette.textSecondary, fontSize: '0.7rem' }} />
           )}
           <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>
-            por <strong style={{ color: forumPalette.textSecondary }}>{post.author?.forumUsername ?? 'eliminado'}</strong>
+            {t('forum.postCard.byAuthorPrefix')} <strong style={{ color: forumPalette.textSecondary }}>{post.author?.forumUsername ?? t('forum.postCard.deletedAuthor')}</strong>
             {' · '}
             {formatTimeAgo(post.createdAt)}
           </Typography>
@@ -108,7 +110,7 @@ export default function PostCard({ post }: Props) {
             sx={{ color: post.status === 'RESOLVED' ? forumPalette.karmaUp : forumPalette.textMuted, textTransform: 'none', fontSize: '0.8rem' }}
             onClick={() => navigate(`/foro/post/${post.id}`)}
           >
-            {post.replyCount} {post.status === 'RESOLVED' ? '✓' : ''} {post.replyCount === 1 ? 'respuesta' : 'respuestas'}
+            {t('forum.postCard.replyCount', { count: post.replyCount })} {post.status === 'RESOLVED' ? '✓' : ''}
           </Button>
           <Button
             size="small"
@@ -116,14 +118,14 @@ export default function PostCard({ post }: Props) {
             sx={{ color: forumPalette.textMuted, textTransform: 'none', fontSize: '0.8rem' }}
             onClick={() => navigator.clipboard?.writeText(window.location.origin + `/foro/post/${post.id}`)}
           >
-            Compartir
+            {t('forum.postCard.share')}
           </Button>
           <Button size="small" startIcon={<BookmarkIcon />} sx={{ color: forumPalette.textMuted, textTransform: 'none', fontSize: '0.8rem' }}>
-            Guardar
+            {t('forum.postCard.save')}
           </Button>
           {post.replyCount === 0 && (
             <Chip
-              label="Sin respuesta aún"
+              label={t('forum.postCard.noReplyYet')}
               size="small"
               sx={{ bgcolor: forumPalette.accent, color: '#fff', fontWeight: 700, fontSize: '0.7rem' }}
             />

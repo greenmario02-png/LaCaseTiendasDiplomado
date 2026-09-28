@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Alert,
@@ -108,44 +109,59 @@ const EMPTY_FORM: FormState = {
   contactPhone: '',
 };
 
-const PERIOD_LABEL: Record<PayPeriod, string> = { DAILY: 'Diario', WEEKLY: 'Semanal', MONTHLY: 'Mensual' };
-const STATUS_META: Record<JobStatus, { label: string; color: 'warning' | 'success' | 'error' | 'default' }> = {
-  PENDING: { label: 'Pendiente de aprobación', color: 'warning' },
-  APPROVED: { label: 'Publicado', color: 'success' },
-  REJECTED: { label: 'Rechazado', color: 'error' },
-  CLOSED: { label: 'Cerrado', color: 'default' },
-};
+type TFn = (key: string, options?: Record<string, unknown>) => string;
+
+const PAY_PERIODS: PayPeriod[] = ['DAILY', 'WEEKLY', 'MONTHLY'];
+
+function periodLabel(t: TFn, p: PayPeriod): string {
+  const map: Record<PayPeriod, string> = {
+    DAILY: t('seller.jobs.payPeriod.daily'),
+    WEEKLY: t('seller.jobs.payPeriod.weekly'),
+    MONTHLY: t('seller.jobs.payPeriod.monthly'),
+  };
+  return map[p];
+}
+
+function statusMeta(t: TFn, status: JobStatus): { label: string; color: 'warning' | 'success' | 'error' | 'default' } {
+  const map: Record<JobStatus, { label: string; color: 'warning' | 'success' | 'error' | 'default' }> = {
+    PENDING: { label: t('seller.jobs.status.pending'), color: 'warning' },
+    APPROVED: { label: t('seller.jobs.status.approved'), color: 'success' },
+    REJECTED: { label: t('seller.jobs.status.rejected'), color: 'error' },
+    CLOSED: { label: t('seller.jobs.status.closed'), color: 'default' },
+  };
+  return map[status];
+}
 
 function money(v: string | null): string {
   return `Bs ${Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 })}`;
 }
 
-function salaryText(j: Pick<Job, 'salaryMin' | 'salaryMax' | 'payPeriod'>): string {
-  const p = PERIOD_LABEL[j.payPeriod].toLowerCase();
-  if (j.salaryMin && j.salaryMax) return `${money(j.salaryMin)} - ${money(j.salaryMax)} (${p})`;
-  if (j.salaryMin) return `Desde ${money(j.salaryMin)} (${p})`;
-  if (j.salaryMax) return `Hasta ${money(j.salaryMax)} (${p})`;
-  return `Sueldo a convenir (${p})`;
+function salaryText(t: TFn, j: Pick<Job, 'salaryMin' | 'salaryMax' | 'payPeriod'>): string {
+  const p = periodLabel(t, j.payPeriod).toLowerCase();
+  if (j.salaryMin && j.salaryMax) return t('seller.jobs.salary.range', { min: money(j.salaryMin), max: money(j.salaryMax), period: p });
+  if (j.salaryMin) return t('seller.jobs.salary.from', { min: money(j.salaryMin), period: p });
+  if (j.salaryMax) return t('seller.jobs.salary.upTo', { max: money(j.salaryMax), period: p });
+  return t('seller.jobs.salary.negotiable', { period: p });
 }
 
 function fmtDate(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 }
 
-function validate(f: FormState): Record<string, string> {
+function validate(t: TFn, f: FormState): Record<string, string> {
   const e: Record<string, string> = {};
-  if (f.categoryId === '') e.categoryId = 'Elige una categoría';
-  if (f.title.trim().length < 5) e.title = 'El título debe tener al menos 5 caracteres';
-  if (f.description.trim().length < 20) e.description = 'La descripción debe tener al menos 20 caracteres';
-  if (!f.city.trim()) e.city = 'Indica la ciudad';
+  if (f.categoryId === '') e.categoryId = t('seller.jobs.form.errors.category');
+  if (f.title.trim().length < 5) e.title = t('seller.jobs.form.errors.titleMin');
+  if (f.description.trim().length < 20) e.description = t('seller.jobs.form.errors.descriptionMin');
+  if (!f.city.trim()) e.city = t('seller.jobs.form.errors.city');
   const vac = Number(f.vacancies);
-  if (!Number.isInteger(vac) || vac < 1) e.vacancies = 'Mínimo 1 vacante';
+  if (!Number.isInteger(vac) || vac < 1) e.vacancies = t('seller.jobs.form.errors.vacanciesMin');
   const min = f.salaryMin === '' ? null : Number(f.salaryMin);
   const max = f.salaryMax === '' ? null : Number(f.salaryMax);
-  if (min !== null && (Number.isNaN(min) || min < 0)) e.salaryMin = 'Sueldo inválido';
-  if (max !== null && (Number.isNaN(max) || max < 0)) e.salaryMax = 'Sueldo inválido';
+  if (min !== null && (Number.isNaN(min) || min < 0)) e.salaryMin = t('seller.jobs.form.errors.salaryInvalid');
+  if (max !== null && (Number.isNaN(max) || max < 0)) e.salaryMax = t('seller.jobs.form.errors.salaryInvalid');
   if (!e.salaryMin && !e.salaryMax && min !== null && max !== null && min > max) {
-    e.salaryMax = 'El máximo no puede ser menor al mínimo';
+    e.salaryMax = t('seller.jobs.form.errors.salaryMaxLessThanMin');
   }
   return e;
 }
@@ -174,36 +190,46 @@ interface Applicant {
   };
 }
 
-const APP_STATUS: Record<AppStatus, { label: string; color: 'info' | 'default' | 'primary' | 'error' | 'success' }> = {
-  RECEIVED: { label: 'Nueva', color: 'info' },
-  VIEWED: { label: 'Vista', color: 'default' },
-  SHORTLISTED: { label: 'Preseleccionado/a', color: 'primary' },
-  REJECTED: { label: 'Rechazado/a', color: 'error' },
-  HIRED: { label: 'Contratado/a', color: 'success' },
-};
+function appStatusMeta(t: TFn): Record<AppStatus, { label: string; color: 'info' | 'default' | 'primary' | 'error' | 'success' }> {
+  return {
+    RECEIVED: { label: t('seller.jobs.appStatus.received'), color: 'info' },
+    VIEWED: { label: t('seller.jobs.appStatus.viewed'), color: 'default' },
+    SHORTLISTED: { label: t('seller.jobs.appStatus.shortlisted'), color: 'primary' },
+    REJECTED: { label: t('seller.jobs.appStatus.rejected'), color: 'error' },
+    HIRED: { label: t('seller.jobs.appStatus.hired'), color: 'success' },
+  };
+}
 
-const ACTIONS: { status: ActionStatus; label: string; verb: string }[] = [
-  { status: 'VIEWED', label: 'Marcar vista', verb: 'marcar como vista a' },
-  { status: 'SHORTLISTED', label: 'Preseleccionar', verb: 'preseleccionar a' },
-  { status: 'REJECTED', label: 'Rechazar', verb: 'rechazar a' },
-  { status: 'HIRED', label: 'Contratar', verb: 'contratar a' },
-];
+function getActions(t: TFn): { status: ActionStatus; label: string; verb: string }[] {
+  return [
+    { status: 'VIEWED', label: t('seller.jobs.actions.markViewed'), verb: t('seller.jobs.actionVerbs.markViewed') },
+    { status: 'SHORTLISTED', label: t('seller.jobs.actions.shortlist'), verb: t('seller.jobs.actionVerbs.shortlist') },
+    { status: 'REJECTED', label: t('seller.jobs.actions.reject'), verb: t('seller.jobs.actionVerbs.reject') },
+    { status: 'HIRED', label: t('seller.jobs.actions.hire'), verb: t('seller.jobs.actionVerbs.hire') },
+  ];
+}
 
-const FILTERS: { key: 'ALL' | AppStatus; label: string }[] = [
-  { key: 'ALL', label: 'Todos' },
-  { key: 'RECEIVED', label: 'Nuevas' },
-  { key: 'SHORTLISTED', label: 'Preseleccionados' },
-  { key: 'HIRED', label: 'Contratados' },
-  { key: 'REJECTED', label: 'Rechazados' },
-];
+function getFilters(t: TFn): { key: 'ALL' | AppStatus; label: string }[] {
+  return [
+    { key: 'ALL', label: t('seller.jobs.filters.all') },
+    { key: 'RECEIVED', label: t('seller.jobs.filters.new') },
+    { key: 'SHORTLISTED', label: t('seller.jobs.filters.shortlisted') },
+    { key: 'HIRED', label: t('seller.jobs.filters.hired') },
+    { key: 'REJECTED', label: t('seller.jobs.filters.rejected') },
+  ];
+}
 
 function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClose: () => void; onChanged: () => void }) {
+  const { t: tr } = useTranslation();
   const t = useUnifiedTokens();
+  const actions = getActions(tr);
+  const filters = getFilters(tr);
+  const appStatus = appStatusMeta(tr);
   const [items, setItems] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<'ALL' | AppStatus>('ALL');
-  const [pending, setPending] = useState<{ app: Applicant; action: (typeof ACTIONS)[number] } | null>(null);
+  const [pending, setPending] = useState<{ app: Applicant; action: (typeof actions)[number] } | null>(null);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [hiredHint, setHiredHint] = useState(false);
@@ -239,7 +265,7 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
       const body: { status: ActionStatus; note?: string } = { status: pending.action.status };
       if (note.trim()) body.note = note.trim();
       await api.put(`/seller/jobs/applications/${pending.app.id}/status`, body);
-      toast.success('Estado actualizado. Se notificó al candidato.');
+      toast.success(tr('seller.jobs.toasts.statusUpdated'));
       if (pending.action.status === 'HIRED') setHiredHint(true);
       setPending(null);
       setNote('');
@@ -269,16 +295,16 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
       <Drawer anchor="right" open={!!job} onClose={onClose} PaperProps={{ sx: { width: { xs: '100%', sm: 520 }, bgcolor: t.surface } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between" px={2.5} py={2} gap={1}>
           <Typography variant="h6" fontWeight={700} color={t.onSurface} noWrap>
-            Postulantes de {job?.title}
+            {tr('seller.jobs.applicants.drawerTitle', { title: job?.title })}
           </Typography>
-          <IconButton aria-label="Cerrar" onClick={onClose}>
+          <IconButton aria-label={tr('seller.jobs.applicants.closeDrawer')} onClick={onClose}>
             <CloseIcon />
           </IconButton>
         </Box>
         <Divider />
         <Box px={2.5} py={1.5}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {FILTERS.map((f) => (
+            {filters.map((f) => (
               <Chip
                 key={f.key}
                 size="small"
@@ -292,7 +318,7 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
           </Stack>
           {hiredHint && job && (
             <Alert severity="success" sx={{ mt: 1.5 }} onClose={() => setHiredHint(false)}>
-              Contrataste a {hiredCount} de {job.vacancies} vacante{job.vacancies === 1 ? '' : 's'}. Cuando cubras las vacantes, te conviene cerrar el empleo.
+              {tr('seller.jobs.applicants.hiredHint', { count: job.vacancies, hired: hiredCount })}
             </Alert>
           )}
         </Box>
@@ -302,14 +328,14 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
           ) : error ? (
             <ErrorState message={error} onRetry={fetchList} />
           ) : items.length === 0 ? (
-            <EmptyState message="Todavía no hay postulantes" />
+            <EmptyState message={tr('seller.jobs.applicants.empty')} />
           ) : shown.length === 0 ? (
-            <EmptyState message="No hay postulantes en este estado" />
+            <EmptyState message={tr('seller.jobs.applicants.emptyFiltered')} />
           ) : (
             <Stack spacing={2}>
               {shown.map((a) => {
                 const p = a.applicant;
-                const m = APP_STATUS[a.status];
+                const m = appStatus[a.status];
                 const phone = a.contactPhone || p.phone;
                 const digits = phone ? phone.replace(/\D/g, '') : '';
                 return (
@@ -362,14 +388,14 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
                       </Stack>
                       {a.expectedSalary != null && a.expectedSalary !== '' && (
                         <Typography variant="body2" color={t.onSurfaceVariant}>
-                          Sueldo pretendido: <b>{money(String(a.expectedSalary))}</b>
+                          {tr('seller.jobs.applicants.expectedSalary')} <b>{money(String(a.expectedSalary))}</b>
                         </Typography>
                       )}
                       {a.resumeUrl && (
                         <Stack direction="row" spacing={1} alignItems="center">
                           <DescriptionOutlinedIcon sx={{ fontSize: 16, color: t.onSurfaceVariant }} />
                           <Typography variant="body2" component="a" href={a.resumeUrl} target="_blank" rel="noopener noreferrer" sx={{ color: t.primary }}>
-                            Ver CV
+                            {tr('seller.jobs.applicants.viewCv')}
                           </Typography>
                         </Stack>
                       )}
@@ -377,18 +403,18 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
                         <Stack direction="row" spacing={1} alignItems="center">
                           <DescriptionOutlinedIcon sx={{ fontSize: 16, color: t.onSurfaceVariant }} />
                           <GhostButton type="button" size="small" onClick={() => void downloadCv(a.id)}>
-                            Descargar CV{a.cvName ? ` (${a.cvName})` : ''}
+                            {a.cvName ? tr('seller.jobs.applicants.downloadCvNamed', { name: a.cvName }) : tr('seller.jobs.applicants.downloadCv')}
                           </GhostButton>
                         </Stack>
                       )}
                       {a.storeNote && (
                         <Typography variant="caption" color={t.onSurfaceVariant}>
-                          Tu mensaje: {a.storeNote}
+                          {tr('seller.jobs.applicants.yourMessage', { note: a.storeNote })}
                         </Typography>
                       )}
                     </Stack>
                     <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                      {ACTIONS.filter((x) => x.status !== a.status).map((x) => (
+                      {actions.filter((x) => x.status !== a.status).map((x) => (
                         <GhostButton
                           key={x.status}
                           type="button"
@@ -415,10 +441,14 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
         <DialogTitle>{pending?.action.label}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2}>
-            Vas a {pending?.action.verb} {pending?.app.applicant.firstName} {pending?.app.applicant.lastName}. Se le enviará una notificación.
+            {tr('seller.jobs.applicants.confirmMessage', {
+              verb: pending?.action.verb,
+              firstName: pending?.app.applicant.firstName,
+              lastName: pending?.app.applicant.lastName,
+            })}
           </Typography>
           <TextField
-            label="Mensaje para el candidato (opcional)"
+            label={tr('seller.jobs.applicants.noteLabel')}
             size="small"
             multiline
             minRows={2}
@@ -430,10 +460,10 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <GhostButton type="button" onClick={() => setPending(null)} disabled={busy}>
-            Cancelar
+            {tr('seller.jobs.actions.cancel')}
           </GhostButton>
           <PrimaryButton type="button" onClick={confirm} disabled={busy}>
-            {busy ? <CircularProgress size={20} color="inherit" /> : 'Confirmar'}
+            {busy ? <CircularProgress size={20} color="inherit" /> : tr('seller.jobs.applicants.confirm')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
@@ -442,6 +472,7 @@ function ApplicantsDrawer({ job, onClose, onChanged }: { job: Job | null; onClos
 }
 
 export default function SellerJobs() {
+  const { t: tr } = useTranslation();
   const t = useUnifiedTokens();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [canPost, setCanPost] = useState(false);
@@ -514,7 +545,7 @@ export default function SellerJobs() {
   };
 
   const submit = async () => {
-    const e = validate(form);
+    const e = validate(tr, form);
     setErrors(e);
     if (Object.keys(e).length > 0) return;
     const body: Record<string, unknown> = {
@@ -535,10 +566,10 @@ export default function SellerJobs() {
     try {
       if (editing) {
         await api.put(`/seller/jobs/${editing.id}`, body);
-        toast.success('Empleo actualizado. Quedó pendiente de aprobación.');
+        toast.success(tr('seller.jobs.toasts.updated'));
       } else {
         await api.post('/seller/jobs', body);
-        toast.success('Empleo enviado. Un administrador lo revisará pronto.');
+        toast.success(tr('seller.jobs.toasts.created'));
       }
       setDialogOpen(false);
       void load();
@@ -554,7 +585,7 @@ export default function SellerJobs() {
     setCloseBusy(true);
     try {
       await api.post(`/seller/jobs/${closing.id}/close`);
-      toast.success('Empleo cerrado');
+      toast.success(tr('seller.jobs.toasts.closed'));
       setClosing(null);
       void load();
     } catch (err) {
@@ -569,12 +600,12 @@ export default function SellerJobs() {
   return (
     <Box>
       <PageHeader
-        title="Empleos"
-        subtitle="Publica ofertas de trabajo para tu tienda"
+        title={tr('seller.jobs.title')}
+        subtitle={tr('seller.jobs.subtitle')}
         icon={<WorkOutlineIcon />}
         actions={
           <PrimaryButton type="button" startIcon={postDisabled ? <LockOutlinedIcon /> : <AddIcon />} onClick={openCreate} disabled={postDisabled}>
-            Publicar empleo
+            {tr('seller.jobs.actions.create')}
           </PrimaryButton>
         }
       />
@@ -585,21 +616,21 @@ export default function SellerJobs() {
           sx={{ mb: 2 }}
           action={
             <GhostButton type="button" to="/seller/configuracion" size="small" color="inherit">
-              Ir a configuración
+              {tr('seller.jobs.verification.goToSettings')}
             </GhostButton>
           }
         >
-          Solo las tiendas verificadas pueden publicar empleos. Completa la verificación de tu tienda en{' '}
-          <Link to="/seller/configuracion">Configuración</Link>.
+          {tr('seller.jobs.verification.notVerifiedPrefix')}{' '}
+          <Link to="/seller/configuracion">{tr('seller.jobs.verification.settingsLink')}</Link>.
         </Alert>
       )}
       {!loading && isVerified && !canPost && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Tu tienda debe estar aprobada y activa (no pausada) para publicar empleos.
+          {tr('seller.jobs.verification.notApproved')}
         </Alert>
       )}
       <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
-        Los empleos nuevos o editados quedan pendientes hasta que un administrador los apruebe. Una vez aprobados se publican por 30 días.
+        {tr('seller.jobs.infoBanner')}
       </Alert>
 
       {loading ? (
@@ -608,13 +639,13 @@ export default function SellerJobs() {
         <ErrorState message={error} onRetry={load} />
       ) : jobs.length === 0 ? (
         <SurfaceCard>
-          <EmptyState message="Todavía no publicaste ningún empleo." />
+          <EmptyState message={tr('seller.jobs.empty')} />
         </SurfaceCard>
       ) : (
         <StaggerContainer>
           <Stack spacing={2}>
             {jobs.map((j) => {
-              const meta = STATUS_META[j.status];
+              const meta = statusMeta(tr, j.status);
               return (
                 <StaggerItem key={j.id}>
                   <SurfaceCard>
@@ -629,13 +660,13 @@ export default function SellerJobs() {
                         <Typography variant="body2" color={t.onSurfaceVariant}>
                           {j.category.icon ?? ''} {j.category.name} ·{' '}
                           <PlaceOutlinedIcon sx={{ fontSize: 14, verticalAlign: 'text-bottom' }} /> {j.city}
-                          {j.locationState ? `, ${j.locationState}` : ''} · {j.vacancies} vacante{j.vacancies === 1 ? '' : 's'}
+                          {j.locationState ? `, ${j.locationState}` : ''} · {tr('seller.jobs.vacancyCount', { count: j.vacancies })}
                         </Typography>
                         <Typography variant="body2" fontWeight={600} color={t.primary} mt={0.5}>
-                          {salaryText(j)}
+                          {salaryText(tr, j)}
                         </Typography>
                         <Typography variant="caption" color={t.onSurfaceVariant}>
-                          {j.status === 'APPROVED' ? `Vence: ${fmtDate(j.expiresAt)}` : `Creado: ${fmtDate(j.createdAt)}`}
+                          {j.status === 'APPROVED' ? tr('seller.jobs.expiresOn', { date: fmtDate(j.expiresAt) }) : tr('seller.jobs.createdOn', { date: fmtDate(j.createdAt) })}
                         </Typography>
                       </Box>
                       <Stack direction="row" spacing={0.5}>
@@ -643,7 +674,7 @@ export default function SellerJobs() {
                           <Chip
                             clickable
                             icon={<GroupsOutlinedIcon />}
-                            label={`Postulantes (${j._count?.applications ?? 0})`}
+                            label={tr('seller.jobs.applicantsChip', { count: j._count?.applications ?? 0 })}
                             color={(j._count?.applications ?? 0) > 0 ? 'primary' : 'default'}
                             variant={(j._count?.applications ?? 0) > 0 ? 'filled' : 'outlined'}
                             onClick={() => setApplicantsJob(j)}
@@ -651,15 +682,15 @@ export default function SellerJobs() {
                           />
                         )}
                         {j.status !== 'CLOSED' && (
-                          <Tooltip title="Editar (vuelve a revisión)">
-                            <IconButton aria-label="Editar empleo" onClick={() => openEdit(j)}>
+                          <Tooltip title={tr('seller.jobs.editTooltip')}>
+                            <IconButton aria-label={tr('seller.jobs.editAriaLabel')} onClick={() => openEdit(j)}>
                               <EditOutlinedIcon />
                             </IconButton>
                           </Tooltip>
                         )}
                         {(j.status === 'APPROVED' || j.status === 'PENDING') && (
                           <GhostButton type="button" color="error" size="small" onClick={() => setClosing(j)}>
-                            Cerrar
+                            {tr('seller.jobs.actions.closeJob')}
                           </GhostButton>
                         )}
                       </Stack>
@@ -667,7 +698,7 @@ export default function SellerJobs() {
                     {j.status === 'REJECTED' && j.rejectionReason && (
                       <FadeIn>
                         <Alert severity="error" sx={{ mt: 1.5 }}>
-                          Motivo del rechazo: {j.rejectionReason}. Puedes editarlo y volver a enviarlo.
+                          {tr('seller.jobs.rejectionReason', { reason: j.rejectionReason })}
                         </Alert>
                       </FadeIn>
                     )}
@@ -680,17 +711,17 @@ export default function SellerJobs() {
       )}
 
       <Dialog open={dialogOpen} onClose={() => !saving && setDialogOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editing ? 'Editar empleo' : 'Publicar empleo'}</DialogTitle>
+        <DialogTitle>{editing ? tr('seller.jobs.dialog.editTitle') : tr('seller.jobs.actions.create')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} mt={0.5}>
             {editing && (
-              <Alert severity="warning">Al guardar los cambios, el empleo vuelve a revisión y deja de estar publicado hasta que se apruebe.</Alert>
+              <Alert severity="warning">{tr('seller.jobs.dialog.editWarning')}</Alert>
             )}
             <FormControl fullWidth size="small" error={!!errors.categoryId}>
-              <InputLabel id="job-cat">Categoría</InputLabel>
+              <InputLabel id="job-cat">{tr('seller.jobs.form.category')}</InputLabel>
               <Select
                 labelId="job-cat"
-                label="Categoría"
+                label={tr('seller.jobs.form.category')}
                 value={form.categoryId}
                 onChange={(e) => set('categoryId', Number(e.target.value))}
               >
@@ -702,26 +733,26 @@ export default function SellerJobs() {
               </Select>
               {errors.categoryId && <FormHelperText>{errors.categoryId}</FormHelperText>}
             </FormControl>
-            <TextField label="Título" size="small" value={form.title} onChange={(e) => set('title', e.target.value)} error={!!errors.title} helperText={errors.title} fullWidth />
+            <TextField label={tr('seller.jobs.form.title')} size="small" value={form.title} onChange={(e) => set('title', e.target.value)} error={!!errors.title} helperText={errors.title} fullWidth />
             <TextField
-              label="Descripción"
+              label={tr('seller.jobs.form.description')}
               size="small"
               multiline
               minRows={3}
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
               error={!!errors.description}
-              helperText={errors.description || 'Mínimo 20 caracteres'}
+              helperText={errors.description || tr('seller.jobs.form.descriptionHint')}
               fullWidth
             />
-            <TextField label="Requisitos (opcional)" size="small" multiline minRows={2} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} fullWidth />
+            <TextField label={tr('seller.jobs.form.requirements')} size="small" multiline minRows={2} value={form.requirements} onChange={(e) => set('requirements', e.target.value)} fullWidth />
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField label="Ciudad" size="small" value={form.city} onChange={(e) => set('city', e.target.value)} error={!!errors.city} helperText={errors.city} fullWidth />
-              <TextField label="Departamento" size="small" value={form.locationState} onChange={(e) => set('locationState', e.target.value)} fullWidth />
+              <TextField label={tr('seller.jobs.form.city')} size="small" value={form.city} onChange={(e) => set('city', e.target.value)} error={!!errors.city} helperText={errors.city} fullWidth />
+              <TextField label={tr('seller.jobs.form.locationState')} size="small" value={form.locationState} onChange={(e) => set('locationState', e.target.value)} fullWidth />
             </Stack>
             <Box>
               <Typography variant="caption" color={t.onSurfaceVariant}>
-                Período de pago
+                {tr('seller.jobs.form.payPeriodLabel')}
               </Typography>
               <ToggleButtonGroup
                 exclusive
@@ -732,16 +763,16 @@ export default function SellerJobs() {
                 onChange={(_, v: PayPeriod | null) => v && set('payPeriod', v)}
                 sx={{ mt: 0.5 }}
               >
-                {(Object.keys(PERIOD_LABEL) as PayPeriod[]).map((p) => (
+                {PAY_PERIODS.map((p) => (
                   <ToggleButton key={p} value={p} sx={{ textTransform: 'none' }}>
-                    {PERIOD_LABEL[p]}
+                    {periodLabel(tr, p)}
                   </ToggleButton>
                 ))}
               </ToggleButtonGroup>
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="Sueldo mínimo"
+                label={tr('seller.jobs.form.salaryMin')}
                 size="small"
                 type="number"
                 value={form.salaryMin}
@@ -752,7 +783,7 @@ export default function SellerJobs() {
                 fullWidth
               />
               <TextField
-                label="Sueldo máximo"
+                label={tr('seller.jobs.form.salaryMax')}
                 size="small"
                 type="number"
                 value={form.salaryMax}
@@ -765,7 +796,7 @@ export default function SellerJobs() {
             </Stack>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="Vacantes"
+                label={tr('seller.jobs.form.vacancies')}
                 size="small"
                 type="number"
                 value={form.vacancies}
@@ -775,17 +806,17 @@ export default function SellerJobs() {
                 slotProps={{ htmlInput: { min: 1 } }}
                 fullWidth
               />
-              <TextField label="Horario (opcional)" size="small" value={form.schedule} onChange={(e) => set('schedule', e.target.value)} fullWidth />
+              <TextField label={tr('seller.jobs.form.schedule')} size="small" value={form.schedule} onChange={(e) => set('schedule', e.target.value)} fullWidth />
             </Stack>
-            <TextField label="Teléfono / WhatsApp (opcional)" size="small" value={form.contactPhone} onChange={(e) => set('contactPhone', e.target.value)} fullWidth />
+            <TextField label={tr('seller.jobs.form.contactPhone')} size="small" value={form.contactPhone} onChange={(e) => set('contactPhone', e.target.value)} fullWidth />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>
           <GhostButton type="button" onClick={() => setDialogOpen(false)} disabled={saving}>
-            Cancelar
+            {tr('seller.jobs.actions.cancel')}
           </GhostButton>
           <PrimaryButton type="button" onClick={submit} disabled={saving}>
-            {saving ? <CircularProgress size={20} color="inherit" /> : editing ? 'Guardar y enviar a revisión' : 'Enviar a revisión'}
+            {saving ? <CircularProgress size={20} color="inherit" /> : editing ? tr('seller.jobs.actions.saveAndSubmit') : tr('seller.jobs.actions.submit')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
@@ -793,18 +824,18 @@ export default function SellerJobs() {
       <ApplicantsDrawer job={applicantsJob} onClose={() => setApplicantsJob(null)} onChanged={() => void load()} />
 
       <Dialog open={!!closing} onClose={() => !closeBusy && setClosing(null)}>
-        <DialogTitle>Cerrar empleo</DialogTitle>
+        <DialogTitle>{tr('seller.jobs.closeDialog.title')}</DialogTitle>
         <DialogContent>
           <Typography>
-            ¿Cerrar "{closing?.title}"? Dejará de mostrarse y no podrás reabrirlo (tendrías que publicar uno nuevo).
+            {tr('seller.jobs.closeDialog.confirm', { title: closing?.title })}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <GhostButton type="button" onClick={() => setClosing(null)} disabled={closeBusy}>
-            Cancelar
+            {tr('seller.jobs.actions.cancel')}
           </GhostButton>
           <PrimaryButton type="button" color="error" onClick={confirmClose} disabled={closeBusy}>
-            Cerrar empleo
+            {tr('seller.jobs.closeDialog.title')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography, Box, Chip, Pagination, Skeleton } from '@mui/material';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { useUnifiedTokens } from '../../theme';
@@ -9,23 +10,31 @@ import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { EmptyState } from '../../components/redesign/States';
 import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
 
-const STATUS_LABEL: Record<string, { label: string; color: any }> = {
-  PENDING: { label: 'Pendiente', color: 'warning' },
-  CONFIRMED: { label: 'Confirmada', color: 'info' },
-  PREPARING: { label: 'En preparación', color: 'info' },
-  SHIPPED: { label: 'Enviada', color: 'primary' },
-  DELIVERED: { label: 'Entregada', color: 'success' },
-  CANCELLED: { label: 'Cancelada', color: 'error' },
-};
-
-const PAYMENT_LABEL: Record<string, string> = {
-  PENDING: 'Pago pendiente',
-  PROOF_SUBMITTED: 'Comprobante enviado',
-  VERIFIED: 'Pago verificado',
-  REJECTED: 'Pago rechazado',
+const STATUS_COLOR: Record<string, any> = {
+  PENDING: 'warning',
+  CONFIRMED: 'info',
+  PREPARING: 'info',
+  SHIPPED: 'primary',
+  DELIVERED: 'success',
+  CANCELLED: 'error',
 };
 
 export default function OrdersPage() {
+  const { t: tt } = useTranslation();
+  const STATUS_LABEL: Record<string, { label: string; color: any }> = {
+    PENDING: { label: tt('orders.status.pending'), color: STATUS_COLOR.PENDING },
+    CONFIRMED: { label: tt('orders.status.confirmed'), color: STATUS_COLOR.CONFIRMED },
+    PREPARING: { label: tt('orders.status.preparing'), color: STATUS_COLOR.PREPARING },
+    SHIPPED: { label: tt('orders.status.shipped'), color: STATUS_COLOR.SHIPPED },
+    DELIVERED: { label: tt('orders.status.delivered'), color: STATUS_COLOR.DELIVERED },
+    CANCELLED: { label: tt('orders.status.cancelled'), color: STATUS_COLOR.CANCELLED },
+  };
+  const PAYMENT_LABEL: Record<string, string> = {
+    PENDING: tt('orders.paymentStatus.pending'),
+    PROOF_SUBMITTED: tt('orders.paymentStatus.proofSubmitted'),
+    VERIFIED: tt('orders.paymentStatus.verified'),
+    REJECTED: tt('orders.paymentStatus.rejected'),
+  };
   const money = useMoney();
   const t = useUnifiedTokens();
   const [orders, setOrders] = useState<any[]>([]);
@@ -47,17 +56,17 @@ export default function OrdersPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <PageHeader title="Mis pedidos" subtitle="Sigue el estado de tus compras" icon={<ReceiptLongIcon />} />
+      <PageHeader title={tt('account.myOrders')} subtitle={tt('account.myOrdersSubtitle')} icon={<ReceiptLongIcon />} />
 
       {loading ? (
         <Skeleton variant="rounded" height={300} />
       ) : orders.length === 0 ? (
         <SurfaceCard>
           <EmptyState
-            message="No tienes pedidos aún."
+            message={tt('orders.noOrdersYet')}
             action={
               <PrimaryButton to="/productos" type="button">
-                Comprar algo
+                {tt('orders.buySomething')}
               </PrimaryButton>
             }
           />
@@ -71,7 +80,7 @@ export default function OrdersPage() {
               <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={700} color={t.onSurface}>
-                    Orden #{o.id}
+                    {tt('orders.orderNumber', { id: o.id })}
                   </Typography>
                   <Typography variant="caption" color={t.onSurfaceVariant}>
                     {new Date(o.createdAt).toLocaleString('es-AR')} · {o.seller.storeName}
@@ -88,12 +97,12 @@ export default function OrdersPage() {
                     ×{item.quantity} {item.product.name}
                   </Typography>
                 ))}
-                {o.items?.length > 3 && <Typography variant="caption" color={t.onSurfaceVariant}>+{o.items.length - 3} más</Typography>}
+                {o.items?.length > 3 && <Typography variant="caption" color={t.onSurfaceVariant}>{tt('orders.moreItems', { count: o.items.length - 3 })}</Typography>}
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
                 <Typography fontWeight={700} color={t.primary}>{money(o.total)}</Typography>
                 <GhostButton to={`/cuenta/pedidos/${o.id}`} type="button" size="small">
-                  Ver detalle
+                  {tt('orders.viewDetail')}
                 </GhostButton>
               </Box>
             </SurfaceCard>

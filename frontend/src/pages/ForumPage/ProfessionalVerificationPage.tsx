@@ -6,6 +6,7 @@ import {
 import VerifiedIcon from '@mui/icons-material/Verified';
 import ScienceIcon from '@mui/icons-material/Science';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import {
   listProfessionalFields, getFieldQuestions, submitVerification, getMyVerifications,
 } from '../../services/forum.api';
@@ -14,6 +15,7 @@ import { useUnifiedTokens } from '../../theme';
 import { getErrorMessage } from '../../services/api';
 
 export default function ProfessionalVerificationPage() {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const [fields, setFields] = useState<ProfessionalField[]>([]);
   const [verifiedFieldIds, setVerifiedFieldIds] = useState<Set<number>>(new Set());
@@ -53,7 +55,7 @@ export default function ProfessionalVerificationPage() {
   const submit = async () => {
     if (!activeField) return;
     if (Object.keys(answers).length < questions.length) {
-      toast.error('Responde todas las preguntas antes de enviar.');
+      toast.error(t('forum.professionalVerification.answerAllQuestions'));
       return;
     }
     setSubmitting(true);
@@ -76,11 +78,10 @@ export default function ProfessionalVerificationPage() {
   return (
     <Box>
       <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ScienceIcon sx={{ fontSize: 20, color: tokens.primary }} /> Comunidades profesionales
+        <ScienceIcon sx={{ fontSize: 20, color: tokens.primary }} /> {t('forum.professionalVerification.title')}
       </Typography>
       <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 2 }}>
-        Responde un cuestionario básico de tu área para poder publicar en Ciencia, Debates, Noticias y
-        Preguntas de esa comunidad. Puedes seguir leyendo esas secciones sin verificarte.
+        {t('forum.professionalVerification.description')}
       </Typography>
 
       <Stack spacing={1.5}>
@@ -92,14 +93,14 @@ export default function ProfessionalVerificationPage() {
                 <Box sx={{ flex: 1 }}>
                   <Typography fontWeight={700} sx={{ color: tokens.onSurface, display: 'flex', alignItems: 'center', gap: 1 }}>
                     {f.name}
-                    {verified && <Chip icon={<VerifiedIcon sx={{ fontSize: 14 }} />} label="Verificado" size="small" color="success" variant="outlined" />}
+                    {verified && <Chip icon={<VerifiedIcon sx={{ fontSize: 14 }} />} label={t('forum.professionalVerification.verifiedChip')} size="small" color="success" variant="outlined" />}
                   </Typography>
                   {f.description && (
                     <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant }}>{f.description}</Typography>
                   )}
                 </Box>
                 <Button variant={verified ? 'outlined' : 'contained'} size="small" onClick={() => openQuiz(f)}>
-                  {verified ? 'Reintentar cuestionario' : 'Rendir cuestionario'}
+                  {verified ? t('forum.professionalVerification.retryQuiz') : t('forum.professionalVerification.takeQuiz')}
                 </Button>
               </CardContent>
             </Card>
@@ -108,13 +109,13 @@ export default function ProfessionalVerificationPage() {
       </Stack>
 
       <Dialog open={!!activeField} onClose={() => setActiveField(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Cuestionario — {activeField?.name}</DialogTitle>
+        <DialogTitle>{t('forum.professionalVerification.quizTitle', { field: activeField?.name })}</DialogTitle>
         <DialogContent>
           {result ? (
             <Alert severity={result.status === 'PASSED' ? 'success' : 'error'} sx={{ mt: 1 }}>
               {result.status === 'PASSED'
-                ? `¡Aprobaste! ${result.score}/${result.totalQuestions} correctas. Ya puedes publicar en esta comunidad.`
-                : `No aprobaste (${result.score}/${result.totalQuestions} correctas). Puedes reintentar más tarde.`}
+                ? t('forum.professionalVerification.passedMessage', { score: result.score, total: result.totalQuestions })
+                : t('forum.professionalVerification.failedMessage', { score: result.score, total: result.totalQuestions })}
             </Alert>
           ) : questions.length === 0 ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={24} /></Box>
@@ -137,10 +138,10 @@ export default function ProfessionalVerificationPage() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setActiveField(null)}>{result ? 'Cerrar' : 'Cancelar'}</Button>
+          <Button onClick={() => setActiveField(null)}>{result ? t('forum.professionalVerification.close') : t('forum.professionalVerification.cancel')}</Button>
           {!result && questions.length > 0 && (
             <Button variant="contained" onClick={submit} disabled={submitting}>
-              {submitting ? <CircularProgress size={18} /> : 'Enviar respuestas'}
+              {submitting ? <CircularProgress size={18} /> : t('forum.professionalVerification.submitAnswers')}
             </Button>
           )}
         </DialogActions>

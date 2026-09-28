@@ -4,6 +4,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { getConoEntry, voteConoEntry } from '../../services/cono.api';
 import type { ConoEntry } from '../../services/cono.api';
 import { getErrorMessage, resolveImageUrl } from '../../services/api';
@@ -12,6 +13,7 @@ import CommentsSection from '../../components/forum/CommentsSection';
 import { useModismo } from '../../utils/modismos';
 
 export default function ConoEntryDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const tokens = useUnifiedTokens();
   const [entry, setEntry] = useState<ConoEntry | null>(null);
@@ -38,7 +40,7 @@ export default function ConoEntryDetailPage() {
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>;
-  if (!entry) return <Alert severity="error">Entrada no encontrada.</Alert>;
+  if (!entry) return <Alert severity="error">{t('cono.entryDetail.entryNotFound')}</Alert>;
 
   return (
     <Box sx={{ maxWidth: 700, mx: 'auto', p: 2 }}>
@@ -56,7 +58,7 @@ export default function ConoEntryDetailPage() {
       />
       <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mt: 1 }}>{entry.label}</Typography>
       {entry.submittedBy && (
-        <Typography variant="caption" sx={{ color: tokens.onSurfaceVariant }}>por {entry.submittedBy.forumUsername}</Typography>
+        <Typography variant="caption" sx={{ color: tokens.onSurfaceVariant }}>{t('cono.entryDetail.byAuthor', { username: entry.submittedBy.forumUsername })}</Typography>
       )}
 
       <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
@@ -66,7 +68,7 @@ export default function ConoEntryDetailPage() {
         <Button variant="outlined" color="warning" startIcon={<ThumbDownIcon />} onClick={() => vote('NEGATIVE')}>
           {negativeLabel} ({entry.negativeCount})
         </Button>
-        <Chip label={`Neto: ${entry.positiveCount - entry.negativeCount}`} sx={{ alignSelf: 'center' }} />
+        <Chip label={t('cono.entryDetail.net', { value: entry.positiveCount - entry.negativeCount })} sx={{ alignSelf: 'center' }} />
       </Stack>
 
       <CommentsSection targetType="CONO_ENTRY" targetId={entry.id} />

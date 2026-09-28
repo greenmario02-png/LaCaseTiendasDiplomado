@@ -1,0 +1,2067 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "empty": "No hay nada para mostrar todavía",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "seeAll": "Ver todo",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "yes": "Sí",
+    "no": "No",
+    "notFound": {
+      "title": "Página no encontrada",
+      "message": "La página que buscas no existe o fue movida.",
+      "backHome": "Volver al inicio"
+    }
+  },
+  "account": {
+    "profile": {
+      "title": "Mi cuenta",
+      "buyCoins": "Comprar monedas",
+      "myOrders": "Mis pedidos",
+      "addresses": "Direcciones",
+      "wishlist": "Favoritos",
+      "returns": "Devoluciones",
+      "affiliateProgram": "Programa de afiliados",
+      "notifications": "Notificaciones",
+      "myAuctions": "Mis subastas",
+      "goToMyStore": "Ir a mi tienda",
+      "coinsChipLabel": "monedas",
+      "coinsTitle": "Monedas del proyecto",
+      "coinsInfo": "La moneda oficial de LaCase Multi Tiendas: se <b>compra</b> como token, se <b>gana</b> al hacer compras efectivas (sin devolución) y ayudando en el foro, y se <b>usa</b> para comprar productos, vales de regalo y vales de descuento.",
+      "balanceLabel": "Saldo: {{balance}} monedas",
+      "noCoinMovements": "Todavía no tienes movimientos de monedas.",
+      "inviteTitle": "Invita amigos y gana 50 monedas",
+      "inviteDescription": "Comparte tu código: cuando alguien se registre con él, ganas 50 monedas.",
+      "invitedCount": "Ya invitaste a {{count}} persona(s).",
+      "copy": "Copiar",
+      "copyCodeSuccess": "Código copiado al portapapeles",
+      "copyLink": "Copiar link",
+      "copyLinkSuccess": "Link de invitación copiado",
+      "personalDataTitle": "Datos personales",
+      "firstNameLabel": "Nombre",
+      "lastNameLabel": "Apellido",
+      "phoneLabel": "Teléfono",
+      "countryLabel": "País",
+      "cityLabel": "Ciudad",
+      "provinceLabel": "Provincia",
+      "postalCodeLabel": "Código postal",
+      "bioLabel": "Biografía",
+      "bioPlaceholder": "Cuenta un poco sobre ti o tu tienda...",
+      "saveChanges": "Guardar cambios",
+      "profileUpdated": "Perfil actualizado",
+      "profileImageUpdated": "Foto de perfil actualizada",
+      "invalidCoinAmount": "Ingresa una cantidad válida de monedas.",
+      "boughtCoins": "Compraste {{amount}} moneda(s).",
+      "lastOrdersTitle": "Últimos pedidos",
+      "viewAll": "Ver todos",
+      "noOrdersYet": "No hiciste compras todavía.",
+      "buyCoinsDialogTitle": "Comprar monedas del proyecto",
+      "buyCoinsDialogDescription": "Compras monedas a modo de tokens que puedes usar en LaCase Multi Tiendas (productos, vales de regalo, vales de descuento).",
+      "coinsQuantityLabel": "Cantidad de monedas",
+      "cancel": "Cancelar",
+      "buy": "Comprar"
+    },
+    "applications": {
+      "title": "Mis postulaciones",
+      "subtitle": "Sigue el estado de tus postulaciones a empleos",
+      "statusReceived": "Recibida",
+      "statusViewed": "Vista por la tienda",
+      "statusShortlisted": "Preseleccionado/a",
+      "statusRejected": "No seleccionado/a",
+      "statusHired": "¡Contratado/a!",
+      "statusWithdrawn": "Retirada",
+      "closedNotice": "Este empleo ya venció o se cerró.",
+      "appliedOn": "Te postulaste el {{date}}",
+      "cvAttached": "CV adjunto",
+      "cvAttachedWithName": "CV adjunto: {{name}}",
+      "storeMessage": "Mensaje de la tienda",
+      "downloadCv": "Descargar CV",
+      "withdraw": "Retirar",
+      "viewJob": "Ver empleo",
+      "viewJobs": "Ver empleos",
+      "emptyMessage": "Todavía no te postulaste a ningún empleo.",
+      "withdrawConfirm": "¿Quieres retirar tu postulación a \"{{title}}\"?",
+      "withdrawSuccess": "Postulación retirada"
+    },
+    "myOrders": "Mis pedidos",
+    "myOrdersSubtitle": "Sigue el estado de tus compras",
+    "addresses": {
+      "saved": "Dirección guardada",
+      "deleted": "Dirección eliminada",
+      "title": "Mis direcciones",
+      "subtitle": "Administra tus direcciones de envío",
+      "newAddress": "Nueva dirección",
+      "emptyMessage": "No tienes direcciones guardadas.",
+      "defaultAddress": "Dirección por defecto",
+      "editAddress": "Editar dirección",
+      "street": "Calle",
+      "number": "Número",
+      "floor": "Piso/Dpto",
+      "city": "Ciudad",
+      "state": "Provincia",
+      "postalCode": "CP",
+      "useAsDefault": "Usar como dirección por defecto",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
+    "wishlist": {
+      "title": "Mis favoritos",
+      "productCount": "{{count}} producto(s)",
+      "emptyMessage": "No tienes productos en favoritos"
+    }
+  },
+  "affiliate": {
+    "title": "Programa de afiliados",
+    "referralCode": "Tu código de referido",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "shareNote": "Compártelo con tus amigos. Cuando se registren y compren, ganas comisión.",
+    "commission": "Comisión",
+    "balanceEarned": "Balance ganado",
+    "amountBs": "Bs {{amount}}",
+    "referralStats": "{{referrals}} referidos · {{orders}} compras pagadas",
+    "myReferrals": "Mis referidos",
+    "empty": "Aún no tienes referidos. Comparte tu código para empezar a ganar.",
+    "table": {
+      "referred": "Referido",
+      "email": "Email",
+      "date": "Fecha",
+      "commission": "Comisión"
+    },
+    "pendingPurchase": "Pendiente de compra"
+  },
+  "auctions": {
+    "title": "Subastas",
+    "subtitle": "Puja por productos únicos y llévate las mejores ofertas",
+    "search": {
+      "placeholder": "Buscar subastas... (ej: Game Boy, collar, ryzen)"
+    },
+    "filters": {
+      "category": "Categoría",
+      "categoryAll": "Todas",
+      "sort": "Ordenar",
+      "hasBids": "Con ofertas"
+    },
+    "sorts": {
+      "interest": "Para ti (interés + ofertas)",
+      "priceAsc": "Precio más bajo",
+      "priceDesc": "Precio más alto",
+      "endingSoon": "Terminan pronto",
+      "mostBids": "Más pujas",
+      "newest": "🆕 Más recientes"
+    },
+    "interestNote": "Ordenadas según tu interés y las mejores ofertas (precios más bajos y activas primero).",
+    "empty": "No se encontraron subastas. Prueba con otros términos o quita los filtros.",
+    "emptyWithSearch": "No se encontraron subastas para \"{{search}}\". Prueba con otros términos o quita los filtros.",
+    "badges": {
+      "lastHours": "Últimas horas",
+      "buyNow": "Comprar ya"
+    },
+    "card": {
+      "bids": "{{count}} pujas"
+    },
+    "time": {
+      "ended": "Terminada",
+      "dhm": "{{d}}d {{h}}h {{m}}m",
+      "hm": "{{h}}h {{m}}m",
+      "m": "{{m}}m",
+      "dhms": "{{d}}d {{h}}h {{m}}m {{s}}s",
+      "hms": "{{h}}h {{m}}m {{s}}s",
+      "ms": "{{m}}m {{s}}s",
+      "s": "{{s}}s"
+    },
+    "detail": {
+      "toasts": {
+        "extended": "¡Oferta en los últimos minutos! El tiempo se extendió.",
+        "closed": "Subasta cerrada",
+        "enterAmount": "Ingresa un monto",
+        "bidPlaced": "Oferta registrada",
+        "purchaseDone": "Compra realizada",
+        "watchAdded": "Agregado a tu watchlist",
+        "watchRemoved": "Quitado del watchlist"
+      },
+      "confirmBuyNow": "¿Comprar al instante por {{price}}?",
+      "notFound": "Subasta no encontrada",
+      "breadcrumbHome": "Inicio",
+      "breadcrumbAuctions": "Subastas",
+      "watch": {
+        "remove": "Quitar del watchlist",
+        "add": "Agregar al watchlist"
+      },
+      "chips": {
+        "currentPrice": "Precio actual: {{price}}",
+        "startingPrice": "Inicial: {{price}}",
+        "bidsCount": "{{count}} ofertas",
+        "buyNowPrice": "Comprar ahora: {{price}}",
+        "reserveMet": "Reserva alcanzada ✓",
+        "reserveNotMet": "Reserva no alcanzada ({{price}})",
+        "reserveNotMetShort": "Reserva no alcanzada"
+      },
+      "finished": "Subasta terminada",
+      "sellerLabel": "Vendedor:",
+      "wonBy": "Ganada por {{firstName}} {{lastName}} con {{price}}",
+      "finishedReserveNotMet": "Subasta finalizada (no se alcanzó la reserva).",
+      "finishedNoWinner": "Subasta finalizada (sin ganador).",
+      "isYourAuction": "Esta es tu subasta. No puedes ofertar ni comprarla.",
+      "youAreWinning": "Vas ganando con {{price}}",
+      "yourBestBid": "Tu mejor oferta: {{price}}",
+      "proxyMax": " (proxy máximo: {{price}})",
+      "nextMinBid": "Próxima oferta mínima:",
+      "bidButton": "Ofertar",
+      "buyNowButton": "Comprar ahora",
+      "proxyBiddingNote": "Tu oferta actúa como proxy bidding: pagas solo lo necesario para ganar, hasta el monto que indicas.",
+      "bidHistory": "Historial de ofertas ({{count}})",
+      "noBidsYet": "Aún no hay ofertas. ¡Sé el primero!",
+      "you": "(tú)"
+    },
+    "watchlist": {
+      "title": "Mis subastas",
+      "activeInPlay": "{{count}} activas en juego",
+      "tabs": {
+        "active": "⚡ Activas ({{count}})",
+        "followed": "Seguidas ({{count}})",
+        "won": "Ganadas ({{count}})"
+      },
+      "empty": {
+        "active": "No estás pujando en ninguna subasta activa. Explora las subastas y participa: la adrenalina de ganar con una buena oferta te espera. ⚡",
+        "followed": "No sigues ninguna subasta. Usa el ícono de marcador en una subasta para seguirla.",
+        "won": "Aún no ganaste ninguna subasta."
+      },
+      "paymentWarning": "¡Felicidades! Ganaste una o más subastas. Tienes 48 horas para pagar antes de que vuelvan a subasta. Toca \"Pagar\" en cada tarjeta.",
+      "level": {
+        "winning": "Vas ganando",
+        "lastHour": "¡Última hora!",
+        "competing": "Competís"
+      },
+      "wonBy": "Ganó: {{firstName}}",
+      "remove": "Quitar",
+      "wonFor": "Ganada por {{price}} Bs",
+      "pendingPayment": "⏳ Pendiente de pago",
+      "timeToPay": "⏱️ Te quedan {{hours}}h para pagar",
+      "paid": "Pagada",
+      "payNow": "Pagar ahora"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa para comprar, vender y participar en el foro",
+      "noAccount": "¿No tienes cuenta?",
+      "signUp": "Regístrate",
+      "wantToSell": "¿Quieres vender?",
+      "openStore": "Abre tu tienda",
+      "emailLabel": "Email",
+      "passwordLabel": "Contraseña",
+      "submit": "Ingresar"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Es gratis y toma menos de un minuto",
+      "alreadyHaveAccount": "¿Ya tienes cuenta?",
+      "signIn": "Inicia sesión",
+      "wantToSell": "¿Quieres vender?",
+      "openStore": "Abre tu tienda",
+      "firstNameLabel": "Nombre",
+      "lastNameLabel": "Apellido",
+      "emailLabel": "Email",
+      "phoneLabel": "Teléfono",
+      "passwordLabel": "Contraseña",
+      "passwordHelper": "Mínimo 8 caracteres",
+      "referralCodeLabel": "Código de invitación (opcional)",
+      "referralCodeHelper": "¿Te invitó un amigo? Escribe su código y quien te invitó gana 50 monedas del proyecto.",
+      "submit": "Registrarme",
+      "successToast": "Registro exitoso. Ahora inicia sesión."
+    },
+    "sellerRegister": {
+      "heroTitle": "Abre tu tienda en LaCase Multi Tiendas",
+      "heroItems": [
+        "Publica productos de cualquier rubro",
+        "Elige tu país y departamento/provincia",
+        "El envío se calcula según tu ubicación",
+        "Recibe pagos por QR",
+        "Te contactamos por celular"
+      ],
+      "formTitle": "Registro de vendedor",
+      "formSubtitle": "Tu solicitud será revisada por un administrador. Puedes publicar productos una vez aprobada.",
+      "section1Title": "1. Datos de tu tienda",
+      "storeNameLabel": "Nombre de tu tienda",
+      "storeDescriptionLabel": "Descripción de tu tienda",
+      "storeDescriptionHelper": "Mínimo 10 caracteres",
+      "storeCategoryLabel": "Categoría de productos que vendes",
+      "section2Title": "2. Ubicación",
+      "countryLabel": "País",
+      "divisionHelper": "Puedes escribir o seleccionar",
+      "cityLabel": "Ciudad",
+      "phoneLabel": "Celular de contacto ({{code}})",
+      "phoneHelper": "Los vendedores y clientes te contactarán por este número",
+      "phonePlaceholderBolivia": "Ej: 71234567",
+      "phonePlaceholderOther": "Ej: 1123456789",
+      "section3Title": "3. Datos de acceso",
+      "firstNameLabel": "Nombre",
+      "lastNameLabel": "Apellido",
+      "emailLabel": "Email",
+      "passwordLabel": "Contraseña",
+      "passwordHelper": "Mínimo 8 caracteres",
+      "submit": "Enviar solicitud",
+      "alreadyHaveStore": "¿Ya tienes tienda?",
+      "signIn": "Inicia sesión",
+      "successToast": "Solicitud enviada. Espera la aprobación del administrador.",
+      "reviewFields": "Revisa los campos marcados en rojo",
+      "errors": {
+        "storeName": "El nombre de la tienda es obligatorio",
+        "storeDescription": "La descripción debe tener al menos 10 caracteres",
+        "storeCategory": "Selecciona la categoría de productos que vendes",
+        "country": "Selecciona el país",
+        "locationState": "Selecciona el {{division}}",
+        "locationCity": "La ciudad es obligatoria",
+        "phone": "El celular de contacto es obligatorio",
+        "firstName": "El nombre es obligatorio",
+        "lastName": "El apellido es obligatorio",
+        "email": "Email inválido",
+        "password": "La contraseña debe tener al menos 8 caracteres"
+      }
+    }
+  },
+  "cart": {
+    "emptyMessage": "Tu carrito está vacío",
+    "exploreProducts": "Explorar productos",
+    "title": "Carrito ({{count}} ítems)",
+    "shippingCalculatedAtCheckout": "Envío se calcula en checkout",
+    "noImage": "sin img",
+    "variant": "Variante: {{variant}}",
+    "storeSubtotal": "Subtotal tienda: {{amount}}",
+    "qrAlt": "QR de {{storeName}}",
+    "qrTitle": "QR de pago de {{storeName}}",
+    "qrDescription": "Escanea este QR para pagar el total de esta tienda. El comprobante lo confirmas en el checkout.",
+    "summary": "Resumen",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "calculatedAtCheckout": "Calculado en checkout",
+    "total": "Total",
+    "loginLink": "Inicia sesión",
+    "loginToCheckoutSuffix": "para finalizar la compra",
+    "checkoutButton": "Finalizar compra"
+  },
+  "chat": {
+    "title": "Mensajes",
+    "subtitle": "Compras y ventas separadas",
+    "buyer": "Comprador",
+    "seller": "Vendedor",
+    "buyerInitial": "C",
+    "sellerInitial": "V",
+    "messagesCount": "{{count}} mensajes",
+    "tabs": {
+      "purchases": "Compras",
+      "sales": "Ventas"
+    },
+    "emptyList": {
+      "purchases": "No tienes compras/consultas aún.",
+      "sales": "No tienes ventas en curso.",
+      "purchasesHint": "Inicia una desde la ficha de un producto o de una tienda.",
+      "salesHint": "Cuando un comprador te escriba o compre, aparecerá acá."
+    },
+    "noMessagesYet": "Sin mensajes todavía. Escribe para consultar por el producto.",
+    "icebreakersHint": "💬 Sugerencias para empezar la conversación:",
+    "typing": "Escribiendo...",
+    "inactivityHint": "⏰ Sin respuesta todavía — sugerencias ({{region}}):",
+    "messagePlaceholder": "Escribe un mensaje...",
+    "selectConversation": "Selecciona una conversación de la lista para ver los mensajes.",
+    "loginPrompt": "Inicia sesión para ver tus conversaciones",
+    "loginButton": "Iniciar sesión",
+    "menu": {
+      "visitStore": "Visitar tienda",
+      "viewProfile": "Ver perfil",
+      "goToProduct": "Ir al producto"
+    },
+    "floating": {
+      "noConversations": "No tienes conversaciones todavía.",
+      "noMessagesYet": "Sin mensajes todavía. Escribe para consultar.",
+      "purchaseAndSaleConversations": "Conversaciones de compra y venta",
+      "viewFullPage": "Ver página completa"
+    }
+  },
+  "checkout": {
+    "errors": {
+      "pickupAddressRequired": "Indica la dirección de retiro",
+      "shippingAddressRequired": "Selecciona una dirección de envío"
+    },
+    "orderSuccessToast": "Compra realizada. Paga con el QR del vendedor.",
+    "title": "Checkout",
+    "deliveryType": "Tipo de entrega",
+    "homeDelivery": "Envío a domicilio",
+    "storePickupFree": "🏬 Retiro en tienda (gratis)",
+    "storePickupLabel": "🏬 Retiro en tienda",
+    "pickupAddress": "Dirección de retiro",
+    "shippingAddress": "Dirección de envío",
+    "pickupAddressPlaceholder": "Ej: Av. 16 de Julio 1523, tienda LaCase, La Paz",
+    "pickupAddressHelper": "Indica dónde retirarás el pedido (punto de venta de la tienda).",
+    "noAddressesPrefix": "No tienes direcciones guardadas. Agrégalas en",
+    "myAddressesLink": "Mis direcciones",
+    "continueWithoutShipping": "Continuar sin envío",
+    "calculateShipping": "Calcular envío",
+    "sellerNotes": "Notas para el vendedor (opcional)",
+    "sellerNotesPlaceholder": "Ej: llamar antes de entregar",
+    "orderSummary": "Resumen de la compra",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "storeTotal": "Total tienda",
+    "couponLabel": "Código de descuento",
+    "couponPlaceholder": "Ej: BIENVENIDO10",
+    "couponAppliedPercentage": "{{value}}% de descuento aplicado",
+    "couponAppliedFixed": "{{amount}} de descuento aplicado",
+    "couponAppliedGift": "Cupón de regalo de {{amount}}. Si gastas menos, la tienda te devuelve el saldo en efectivo.",
+    "applyCoupon": "Aplicar cupón",
+    "total": "Total",
+    "paymentQrInfoPrefix": "El pago se realiza por",
+    "paymentQrInfoStrong": "QR del vendedor",
+    "paymentQrInfoSuffix": ". Al confirmar verás el QR y deberás subir el comprobante de la transferencia.",
+    "confirmPurchase": "Confirmar compra",
+    "freePickup": "Gratis (retiro en tienda)",
+    "pickupPaymentInfoPrefix": "Retiras el pedido en la dirección que indicaste. El pago se realiza por",
+    "calculateShippingPrompt": "Calcula el envío o elige retiro en tienda para ver el detalle"
+  },
+  "cono": {
+    "home": {
+      "title": "Rinconcito Boliviano",
+      "subtitle": "Rankings de la comunidad, con humor y con datos. Vota positivo o nica, o sigue un torneo de eliminatorias.",
+      "tabMemes": "Memes",
+      "tabTournaments": "Torneos",
+      "tournamentSingular": "Torneo",
+      "newTheme": "Nuevo tema",
+      "emptyThemes": "Todavía no hay temas en esta categoría. ¡Crea el primero!",
+      "entriesCount": "{{count}} entradas",
+      "byAuthor": "por {{username}}",
+      "newThemeDialogTitle": "Nuevo tema — {{type}}",
+      "verificationRequired": "Necesitas al menos una verificación profesional aprobada para crear un tema.",
+      "verifyMe": "Verificarme",
+      "slugLabel": "Slug (URL)",
+      "titleLabel": "Título",
+      "descriptionLabel": "Descripción (opcional)",
+      "cancel": "Cancelar",
+      "create": "Crear",
+      "slugAndTitleRequired": "Slug y título son obligatorios."
+    },
+    "themeDetail": {
+      "windowHistoric": "Histórico",
+      "windowDaily": "Hoy",
+      "windowWeekly": "Semanal",
+      "windowMonthly": "Mensual",
+      "uploadMeme": "Subir meme",
+      "noEntries": "Todavía no hay entradas.",
+      "noEntriesInPeriod": "Todavía no hay entradas en este período.",
+      "proposeCompetitor": "Proponer competidor",
+      "buildMatch": "Armar enfrentamiento",
+      "noMatches": "Todavía no hay enfrentamientos armados en este torneo.",
+      "memeTitleLabel": "Título del meme",
+      "competitorNameLabel": "Nombre del competidor",
+      "chooseImage": "Elegir imagen",
+      "cancel": "Cancelar",
+      "publish": "Publicar",
+      "competitorALabel": "Competidor A",
+      "competitorBLabel": "Competidor B",
+      "votingDateLabel": "Fecha de votación",
+      "themeNotFound": "Tema no encontrado.",
+      "chooseTwoEntries": "Elige las dos entradas que se enfrentan.",
+      "chooseDistinctEntries": "Elige dos entradas distintas.",
+      "matchCreated": "Enfrentamiento creado.",
+      "chooseImageAndTitle": "Elige una imagen y escribe un nombre/título.",
+      "entryPublished": "¡Entrada publicada!"
+    },
+    "entryDetail": {
+      "entryNotFound": "Entrada no encontrada.",
+      "byAuthor": "por {{username}}",
+      "net": "Neto: {{value}}"
+    },
+    "matchCard": {
+      "round": "Ronda {{round}}",
+      "statusOpen": "Votación abierta",
+      "statusClosed": "Cerrado",
+      "statusPending": "Pendiente",
+      "votes": "{{count}} votos",
+      "infoComments": "Info/comentarios",
+      "votingClosed": "Este enfrentamiento ya no está abierto a votación."
+    }
+  },
+  "footer": {
+    "brandName": "LaCase Multi Tiendas",
+    "description": "Marketplace multi-vendedor. Encuentra los mejores precios de todas las tiendas en un solo lugar, con cálculo de envío según la ubicación del vendedor.",
+    "buyHeading": "Comprar",
+    "allProducts": "Todos los productos",
+    "auctions": "Subastas",
+    "promotions": "Promociones",
+    "buildYourPc": "Arma tu PC",
+    "sellHeading": "Vender",
+    "openStore": "Abre tu tienda",
+    "helpFaq": "Ayuda y preguntas frecuentes",
+    "copyright": "© {{year}} LaCase Multi Tiendas. Todos los derechos reservados.",
+    "developedBy": "Desarrollado por Alvaro Diaz Vallejos"
+  },
+  "forum": {
+    "botReplyBadge": {
+      "label": "Bot LaCASE Multitienda"
+    },
+    "categories": {
+      "title": "Subforos",
+      "emptySubforums": "No hay subforos todavía.",
+      "postsCount": "{{count}} posts",
+      "citiesTitle": "Ciudades",
+      "emptyCityQuestions": "Aún no hay preguntas por ciudad."
+    },
+    "cityBar": {
+      "cityVerified": "{{city}} (verificada)",
+      "defaultCity": "Mi ciudad",
+      "changeCityTooltip": "Cambiar de ciudad",
+      "configurePrompt": "Configura tu ciudad para ver los foros de tu zona.",
+      "configureButton": "Configurar"
+    },
+    "citySelector": {
+      "dialogTitle": "Tu zona del foro",
+      "close": "Cerrar"
+    },
+    "comments": {
+      "title": "Comentarios ({{count}})",
+      "placeholder": "Escribe un comentario…",
+      "send": "Enviar",
+      "empty": "Todavía no hay comentarios.",
+      "agree": "De acuerdo",
+      "isAi": "Es IA",
+      "loadMore": "Cargar más ({{count}})"
+    },
+    "feed": {
+      "modeRecent": "Reciente",
+      "modePopular": "Popular",
+      "modeUnanswered": "Sin respuesta",
+      "modeMyCity": "Mi ciudad",
+      "headerTitle": "LaCASE — ¿alguien sabe?",
+      "askQuestion": "Hacer una pregunta",
+      "citySubforums": "Subforos de {{city}}:",
+      "viewAll": "Ver todo",
+      "emptyPosts": "No hay preguntas aún. ¡Sé el primero en preguntar!",
+      "defaultUsername": "usuario",
+      "defaultCategory": "General",
+      "loading": "Cargando...",
+      "loadMore": "Cargar más"
+    },
+    "geoConfig": {
+      "geolocationNotSupported": "Tu navegador no soporta geolocalización.",
+      "locationFailed": "No pudimos obtener tu ubicación. Elige tu ciudad manualmente.",
+      "chooseCity": "Elige tu ciudad.",
+      "radiusLabel": "Radio de la zona:",
+      "radiusValue": "{{km}} km",
+      "verifiedByGps": "Verificada por GPS",
+      "searching": "Buscando...",
+      "useMyLocation": "Usar mi ubicación",
+      "saving": "Guardando...",
+      "save": "Guardar",
+      "citySummary": "Ciudad: {{name}} ({{department}}) · radio estimado {{radius}} km",
+      "cityFieldLabel": "Ciudad",
+      "cityFieldPlaceholder": "Elige tu ciudad (ej: Oruro)"
+    },
+    "gifPicker": {
+      "title": "Buscar GIFs",
+      "searchLabel": "Buscar GIF (ej: capibara)",
+      "noResults": "No se encontraron GIFs.",
+      "cancel": "Cancelar"
+    },
+    "karmaCard": {
+      "karma": "Karma",
+      "available": "Disponible para canjear: {{available}} (canjeados: {{spent}})",
+      "progressToLegend": "{{pct}}% hacia Leyenda (3000)",
+      "redeemButton": "Canjear karma por monedas"
+    },
+    "newPostModal": {
+      "title": "Hacer una pregunta",
+      "titleLabel": "Título",
+      "titleHelper": "{{length}}/200 · mínimo 10",
+      "bodyLabel": "Descripción",
+      "subforumLabel": "Subforo",
+      "typeLabel": "Tipo",
+      "cityLabel": "Ciudad",
+      "cityHelper": "Se usó tu ciudad del perfil; puedes cambiarla.",
+      "tagsLabel": "Etiquetas (máx 5)",
+      "addTag": "Añadir",
+      "addImages": "Añadir imágenes ({{count}}/4)",
+      "gifCount": "GIF ({{count}})",
+      "removeAllImages": "Quitar todas",
+      "removeGifs": "Quitar GIFs",
+      "botNotice": "El Bot LaCASE Multitienda responderá automáticamente buscando en los productos disponibles.",
+      "cancel": "Cancelar",
+      "submit": "Publicar pregunta",
+      "titleTooShort": "El título debe tener al menos 10 caracteres.",
+      "bodyTooShort": "La descripción debe tener al menos 20 caracteres.",
+      "selectCategory": "Selecciona una categoría."
+    },
+    "postCard": {
+      "byAuthorPrefix": "por",
+      "deletedAuthor": "eliminado",
+      "replyCount_one": "{{count}} respuesta",
+      "replyCount_other": "{{count}} respuestas",
+      "share": "Compartir",
+      "save": "Guardar",
+      "noReplyYet": "Sin respuesta aún"
+    },
+    "postDetail": {
+      "loadError": "No se pudo cargar la pregunta.",
+      "defaultUsername": "usuario",
+      "defaultTag": "Novato",
+      "backToFeed": "Volver al feed",
+      "resolved": "Resuelta",
+      "byAuthorPrefix": "por",
+      "viewsCount": "{{count}} vistas",
+      "replyCount_one": "{{count}} respuesta",
+      "replyCount_other": "{{count}} respuestas",
+      "emptyReplies": "Aún no hay respuestas. ¡Sé el primero!",
+      "replyPlaceholder": "Escribe tu respuesta... (mínimo 10 caracteres)",
+      "loginToReplyPlaceholder": "Inicia sesión para responder...",
+      "publishing": "Publicando...",
+      "publishReply": "Publicar respuesta"
+    },
+    "postVoteBar": {
+      "voteUp": "Votar positivo",
+      "voteDown": "Votar negativo"
+    },
+    "professionalVerification": {
+      "title": "Comunidades profesionales",
+      "description": "Responde un cuestionario básico de tu área para poder publicar en Ciencia, Debates, Noticias y Preguntas de esa comunidad. Puedes seguir leyendo esas secciones sin verificarte.",
+      "verifiedChip": "Verificado",
+      "retryQuiz": "Reintentar cuestionario",
+      "takeQuiz": "Rendir cuestionario",
+      "answerAllQuestions": "Responde todas las preguntas antes de enviar.",
+      "quizTitle": "Cuestionario — {{field}}",
+      "passedMessage": "¡Aprobaste! {{score}}/{{total}} correctas. Ya puedes publicar en esta comunidad.",
+      "failedMessage": "No aprobaste ({{score}}/{{total}} correctas). Puedes reintentar más tarde.",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "submitAnswers": "Enviar respuestas"
+    },
+    "profile": {
+      "notFound": "No se encontró el perfil del foro.",
+      "banned": "Baneado",
+      "myKarma": "Mi karma",
+      "statKarma": "karma",
+      "statQuestions": "preguntas",
+      "statReplies": "respuestas",
+      "statStreakDays": "días de racha",
+      "myLocation": "Mi ubicación",
+      "reputationLine": "Reputación: {{pct}}% positiva ({{count}} valoraciones)",
+      "reputationCommentPlaceholder": "¿Es confiable? (opcional)",
+      "rate": "Valorar",
+      "loginToRate": "Inicia sesión para valorar",
+      "latestQuestions": "Últimas preguntas de {{username}}",
+      "emptyPosts": "Aún no ha publicado preguntas."
+    },
+    "redeemKarmaDialog": {
+      "title": "Canjear karma por monedas",
+      "rateNotice": "Tasa: 100 karma = 10 monedas. El karma histórico y tu etiqueta no bajan; solo se descuenta del \"disponible\".",
+      "amountLabel": "Karma a canjear",
+      "karmaUnit": "karma",
+      "availableHelper": "Disponible: {{available}} karma",
+      "willReceive": "Recibirás:",
+      "coinsCount": "{{count}} monedas",
+      "cancel": "Cancelar",
+      "redeeming": "Canjeando...",
+      "redeem": "Canjear"
+    },
+    "replyCard": {
+      "botLabel": "Bot LaCASE Multitienda",
+      "deletedAuthor": "eliminado",
+      "bestAnswer": "Mejor respuesta",
+      "markAsAnswer": "Marcar como respuesta"
+    },
+    "sidebarLeft": {
+      "navigation": "Navegación",
+      "home": "Inicio",
+      "modeRecent": "Recientes",
+      "modePopular": "Popular",
+      "modeUnanswered": "Sin respuesta",
+      "professionalCommunities": "Comunidades profesionales",
+      "universities": "Universidades",
+      "categories": "Categorías",
+      "cities": "Ciudades"
+    },
+    "sidebarRight": {
+      "askQuestion": "Hacer una pregunta",
+      "topContributors": "Top colaboradores",
+      "trending24h": "Tendencia (24h)",
+      "noDataYet": "Sin datos aún",
+      "footerNotePrefix": "El foro funciona con tu cuenta de LaCase Multi Tiendas. Tu karma se puede canjear por monedas"
+    },
+    "universities": {
+      "title": "Universidades",
+      "description": "Cada subforo es exclusivo de la comunidad universitaria de su ciudad — solo lo ven quienes estén en esa ciudad, o ya tengan actividad previa ahí.",
+      "enterSubforum": "Entrar al subforo"
+    }
+  },
+  "home": {
+    "ticker": {
+      "soldIn": "en {{store}} · {{city}} · {{amount}}"
+    },
+    "hero": {
+      "title": "Todas las tiendas, un solo lugar",
+      "subtitle": "Compara precios entre cientos de vendedores, encuentra el mejor precio y calcula el envío según la ubicación de cada tienda.",
+      "exploreProducts": "Explorar productos",
+      "auctions": "Subastas",
+      "openYourStore": "Abre tu tienda",
+      "categoriesAndFeatured": "{{categories}} categorías · {{featured}}+ productos destacados"
+    },
+    "jobs": {
+      "title": "Empleos",
+      "viewAll": "Ver todos los empleos"
+    },
+    "nearYou": {
+      "title": "Productos cerca de ti",
+      "titleWithCity": "Productos cerca de ti ({{city}})"
+    },
+    "common": {
+      "viewAll": "Ver todo →"
+    },
+    "banners": {
+      "fallbackAlt": "Banner"
+    },
+    "categories": {
+      "title": "Categorías",
+      "productCount": "{{count}} productos",
+      "fallbackName": "Categoría"
+    },
+    "promotions": {
+      "title": "Ofertas relámpago",
+      "limitedTime": "por tiempo limitado",
+      "viewAllFeminine": "Ver todas →",
+      "offLabel": "{{value}} OFF",
+      "storeLabel": "🏪 {{store}}"
+    },
+    "forYou": {
+      "title": "Para ti 👋",
+      "reasonHistory": "Según tus búsquedas y productos que viste",
+      "reasonPopular": "Productos populares para empezar"
+    },
+    "auctions": {
+      "title": "Subastas activas — termina pronto"
+    },
+    "featured": {
+      "title": "Destacados",
+      "mostViewed": "Más vistos",
+      "viewAll": "Ver todos →",
+      "empty": "No hay productos destacados aún"
+    }
+  },
+  "jobs": {
+    "title": "Empleos",
+    "subtitle": "Ofertas de trabajo de tiendas de tu zona",
+    "appStatus": {
+      "received": "Recibida",
+      "viewed": "Vista por la tienda",
+      "shortlisted": "Preseleccionado/a",
+      "rejected": "No seleccionado/a",
+      "hired": "¡Contratado/a!",
+      "withdrawn": "Retirada"
+    },
+    "errors": {
+      "cvType": "El CV debe ser PDF, DOC o DOCX",
+      "cvSize": "El CV no puede superar 5 MB",
+      "messageMinLength": "El mensaje debe tener al menos 10 caracteres",
+      "phoneMinLength": "El teléfono debe tener al menos 6 caracteres",
+      "invalidAmount": "Ingresa un monto válido",
+      "invalidUrl": "Ingresa un enlace válido (https://...)",
+      "ownStore": "No puedes postularte a un empleo de tu propia tienda."
+    },
+    "toasts": {
+      "applicationSent": "¡Postulación enviada!",
+      "applicationWithdrawn": "Postulación retirada"
+    },
+    "confirmWithdraw": "¿Quieres retirar tu postulación?",
+    "search": {
+      "placeholder": "Buscar empleo",
+      "city": "Ciudad"
+    },
+    "filters": {
+      "pay": "Pago",
+      "payAll": "Todos",
+      "payDaily": "Por día",
+      "payWeekly": "Por semana",
+      "payMonthly": "Por mes",
+      "categoryAll": "Todas"
+    },
+    "empty": "No encontramos empleos con esos filtros.",
+    "detail": {
+      "verified": "Verificada",
+      "vacancyOne": "1 vacante",
+      "vacanciesCount": "{{count}} vacantes",
+      "schedule": "Horario: {{schedule}}",
+      "description": "Descripción",
+      "requirements": "Requisitos",
+      "yourApplication": "Tu postulación: {{status}}",
+      "withdrawApplication": "Retirar postulación",
+      "applyButton": "Postularme",
+      "viewStore": "Ver tienda",
+      "close": "Cerrar",
+      "contactWhatsApp": "Contactar por WhatsApp"
+    },
+    "applyDialog": {
+      "title": "Postularme a {{title}}",
+      "messageLabel": "Mensaje para la tienda",
+      "messageHelp": "Contales por qué te interesa (mínimo 10 caracteres)",
+      "phoneLabel": "Teléfono de contacto",
+      "salaryLabel": "Sueldo pretendido en Bs (opcional)",
+      "resumeLabel": "Enlace a tu CV (opcional)",
+      "attachCv": "Adjuntar CV (PDF, DOC o DOCX, máx. 5 MB)",
+      "cancel": "Cancelar",
+      "sending": "Enviando...",
+      "submit": "Enviar postulación"
+    }
+  },
+  "nav": {
+    "search": {
+      "placeholder": "Buscar productos, marcas, vendedores..."
+    },
+    "currency": {
+      "selectAriaLabel": "Seleccionar moneda"
+    },
+    "theme": {
+      "light": "Modo claro",
+      "dark": "Modo oscuro"
+    },
+    "jobs": {
+      "tooltip": "Empleos"
+    },
+    "forum": {
+      "tooltip": "Foro LaCASE"
+    },
+    "cono": {
+      "tooltip": "Rinconcito Boliviano"
+    },
+    "cart": {
+      "tooltip": "Carrito"
+    },
+    "messages": {
+      "tooltip": "Mensajes"
+    },
+    "auctions": {
+      "tooltip": "Mis subastas"
+    },
+    "menu": {
+      "myAccount": "Mi cuenta",
+      "myApplications": "Mis postulaciones",
+      "myStore": "Mi tienda",
+      "adminPanel": "Panel admin",
+      "logout": "Cerrar sesión"
+    }
+  },
+  "notifications": {
+    "centerTitle": "Centro de Notificaciones",
+    "countSummary": "{{total}} notificaciones · {{unread}} sin leer",
+    "showAll": "Mostrar todas",
+    "onlyUnread": "Solo sin leer",
+    "markAllRead": "Marcar todas leídas",
+    "emptyUnread": "No tienes notificaciones sin leer 🎉",
+    "emptyAll": "No tienes notificaciones todavía",
+    "bellTooltip": "Notificaciones",
+    "bellTitle": "Notificaciones",
+    "bellEmpty": "No tienes notificaciones",
+    "time": {
+      "now": "ahora",
+      "minutes": "hace {{count}} min",
+      "hours": "hace {{count}} h",
+      "days": "hace {{count}} d"
+    }
+  },
+  "orders": {
+    "errors": {
+      "proofUrlRequired": "Ingresa la URL del comprobante"
+    },
+    "proofSentToast": "Comprobante enviado. El vendedor lo verificará.",
+    "confirmation": {
+      "title": "¡Compra confirmada!",
+      "subtitle": "Se generaron {{count}} orden(es), una por cada tienda. Ahora realiza el pago por QR."
+    },
+    "orderNumber": "Orden #{{id}}",
+    "defaultStoreName": "Tienda",
+    "subtotal": "Subtotal",
+    "shipping": "Envío",
+    "total": "Total",
+    "qrPaymentTitle": "Pago por QR — {{storeName}}",
+    "paymentVerified": "Pago verificado",
+    "proofSubmittedWaiting": "Comprobante enviado. Esperando verificación del vendedor.",
+    "scanQrInstructions": "Escanea el QR del vendedor y realiza la transferencia. Luego sube el comprobante.",
+    "qrAlt": "QR de pago",
+    "proofUrlPlaceholder": "URL del comprobante (o subilo en Mis pedidos)",
+    "uploadProof": "Subir comprobante",
+    "viewMyOrders": "Ver mis pedidos",
+    "continueShopping": "Seguir comprando",
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmada",
+      "preparing": "En preparación",
+      "shipped": "Enviada",
+      "delivered": "Entregada",
+      "cancelled": "Cancelada"
+    },
+    "paymentStatus": {
+      "pending": "Pago pendiente",
+      "proofSubmitted": "Comprobante enviado",
+      "verified": "Pago verificado",
+      "rejected": "Pago rechazado"
+    },
+    "noOrdersYet": "No tienes pedidos aún.",
+    "buySomething": "Comprar algo",
+    "moreItems": "+{{count}} más",
+    "viewDetail": "Ver detalle",
+    "proofSentToastShort": "Comprobante enviado",
+    "deliveryConfirmedToast": "¡Gracias! Confirmaste la entrega. El pago se liberó al vendedor",
+    "orderNotFound": "Orden no encontrada",
+    "detailSubtitle": "{{date}} · Tienda: {{storeName}}",
+    "products": "Productos",
+    "itemQuantityAt": "×{{quantity}} a {{price}}",
+    "giftLabel": "Regalo",
+    "qrPayment": "Pago por QR",
+    "paymentVerifiedBySeller": "Pago verificado por el vendedor.",
+    "proofSubmittedWaitingShort": "Comprobante enviado. Esperando verificación.",
+    "qrNotAvailable": "QR no disponible",
+    "proofUrlPlaceholderLong": "URL del comprobante de transferencia",
+    "didYouReceiveTitle": "¿Recibiste tu pedido?",
+    "confirmDeliveryDescription": "Confirmar la entrega protege tu compra y libera el pago al vendedor. Es la garantía de confianza de la plataforma.",
+    "confirmDeliveryButton": "Sí, confirmo que recibí el pedido ✓",
+    "shipTo": "Envío a",
+    "pickupAtStoreDefault": "Retira el pedido en la tienda del vendedor."
+  },
+  "pcBuilder": {
+    "title": "Arma tu PC",
+    "subtitle": "Elige cada componente de cualquier tienda. Verificamos que sean compatibles y calculamos el costo total.",
+    "slots": {
+      "cpu": "Procesador",
+      "motherboard": "Motherboard",
+      "ram": "Memoria RAM",
+      "gpu": "Placa de Video",
+      "storage": "Almacenamiento",
+      "psu": "Fuente de Poder",
+      "case": "Gabinete",
+      "cooler": "Refrigeración"
+    },
+    "toasts": {
+      "loginToSave": "Inicia sesión para guardar tu build",
+      "minComponents": "Elige al menos 3 componentes",
+      "buildSaved": "Build guardada",
+      "allAddedToCart": "Todos los componentes agregados al carrito"
+    },
+    "defaultBuildName": "Mi PC",
+    "notSelected": "Sin seleccionar",
+    "change": "Cambiar",
+    "select": "Seleccionar",
+    "summary": "Resumen",
+    "selectedComponents": "Componentes seleccionados: {{count}}/8",
+    "estimatedTotal": "Total estimado",
+    "buildNamePlaceholder": "Nombre de la build (ej: PC Gamer Pro)",
+    "saveBuild": "Guardar build",
+    "addAllToCart": "Agregar todo al carrito",
+    "savedBuilds": "Tus builds guardadas",
+    "buildSummary": "{{price}} · {{count}} componentes",
+    "selectDialogTitle": "Seleccionar {{slot}}",
+    "searchingProducts": "Buscando productos...",
+    "noProductsForSlot": "No hay productos disponibles para este slot.",
+    "outOfStock": "SIN STOCK",
+    "stock": "stock {{count}}",
+    "close": "Cerrar"
+  },
+  "product": {
+    "condition": {
+      "new": "Nuevo",
+      "used": "Usado",
+      "usedWithScore": "Usado ({{score}}/10)",
+      "refurbished": "Reacondicionado"
+    },
+    "card": {
+      "addToCart": "Agregar al carrito",
+      "outOfStock": "Sin stock",
+      "available": "{{count}} disponibles",
+      "addToWishlist": "Agregar a favoritos",
+      "removeFromWishlist": "Quitar de favoritos",
+      "homeDelivery": "Envío a domicilio",
+      "tradeIn": "Permuta",
+      "lastUnit": "Última unidad",
+      "lastUnits": "Últimas {{count}} unidades",
+      "sold_one": "{{count}} vendido",
+      "sold_other": "{{count}} vendidos"
+    },
+    "filters": {
+      "title": "Filtros",
+      "priceWithFormat": "Precio ({{format}})",
+      "categories": "Categorías",
+      "condition": "Condición",
+      "department": "Departamento",
+      "regionCity": "Región / Ciudad",
+      "cityPlaceholder": "Ciudad (ej: La Paz, Tarija...)",
+      "deliveryType": "Tipo de entrega",
+      "brand": "Marca",
+      "acceptsTrade": "Acepta permuta",
+      "apply": "Aplicar filtros",
+      "clear": "Limpiar filtros ({{count}})"
+    },
+    "search": {
+      "tabs": {
+        "products": "Productos",
+        "brands": "Marcas",
+        "sellers": "Vendedores",
+        "categories": "Categorías"
+      },
+      "placeholders": {
+        "products": "Buscar productos... (ej: RTX, celular, juego)",
+        "brands": "Buscar marca... (ej: Samsung, Sony, Logitech)",
+        "sellers": "Buscar vendedor o ciudad... (ej: La Paz, \"Tech Store\")"
+      },
+      "searchButton": "Buscar",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "noSellersMatch": "Sin vendedores que coincidan con \"{{term}}\"",
+      "exploreByCategory": "Explora por categoría o subcategoría:",
+      "selectedStore": "Tienda seleccionada:",
+      "removeStoreFilter": "Quitar filtro de tienda"
+    },
+    "list": {
+      "resultsFor": "Resultados para \"{{term}}\"",
+      "allProducts": "Todos los productos",
+      "totalFromAllStores": "{{count}} productos de todas las tiendas",
+      "sort": {
+        "newest": "Más recientes",
+        "priceAsc": "Menor precio",
+        "priceDesc": "Mayor precio",
+        "bestSellers": "Más vendidos"
+      },
+      "emptyFiltered": "No se encontraron productos con esos filtros"
+    },
+    "detail": {
+      "notFound": "Producto no encontrado",
+      "backToCatalog": "Volver al catálogo",
+      "addedToCart": "Agregado al carrito",
+      "reviewPublished": "Reseña publicada",
+      "breadcrumbHome": "Inicio",
+      "noImage": "Sin imagen",
+      "outOfStock": "Sin stock",
+      "lastUnit": "Última unidad",
+      "lastUnits": "Últimas {{count}}",
+      "viewingNow_one": "{{count}} persona está viendo este producto ahora",
+      "viewingNow_other": "{{count}} personas están viendo este producto ahora",
+      "viewedBy_one": "Visto por {{count}} persona",
+      "viewedBy_other": "Visto por {{count}} personas",
+      "sellerLocationRating": "{{city}}, {{state}} · Rating {{rating}}",
+      "freeShippingOver": "Envío gratis en compras mayores a {{amount}}",
+      "addToCart": "Agregar al carrito",
+      "contact": "Consultar",
+      "soldAndShippedBy": "Vendido y despachado por {{store}}. El costo de envío se calcula en el checkout según tu ubicación.",
+      "specifications": "Especificaciones",
+      "description": "Descripción",
+      "related": "Productos relacionados",
+      "verdict": {
+        "highlyRecommended": "Muy recomendado",
+        "recommended": "Recomendado",
+        "notRecommended": "No recomendado"
+      },
+      "offers": {
+        "title": "Compara precios — {{count}} tiendas venden este producto",
+        "bestPrice": "El mejor precio es {{price}}. Elige la tienda que más te convenga.",
+        "bestPriceChip": "Mejor precio",
+        "viewingChip": "Estás viendo"
+      },
+      "reviews": {
+        "title": "Reseñas ({{count}})",
+        "viewAll": "Ver todas las reseñas",
+        "empty": "Aún no hay reseñas. Sé el primero.",
+        "count": "{{count}} reseña(s)",
+        "writePlaceholder": "Escribe tu reseña...",
+        "publish": "Publicar reseña",
+        "loginToReview": "<0>Inicia sesión</0> para dejar una reseña.",
+        "dialogTitle": "Reseñas del producto ({{count}})",
+        "filters": {
+          "all": "Todas"
+        },
+        "noneInCategory": "No hay reseñas en esta categoría.",
+        "close": "Cerrar"
+      }
+    }
+  },
+  "promotions": {
+    "title": "Promociones activas",
+    "subtitle": "Aprovecha los mejores descuentos",
+    "empty": "No hay promociones activas en este momento.",
+    "discountPercent": "{{value}}% OFF",
+    "discountAmount": "{{value}} OFF",
+    "until": "Hasta el {{date}}"
+  },
+  "returns": {
+    "title": "Mis devoluciones",
+    "requestNote": "Solo puedes solicitar una devolución después de recibir la compra con el pago verificado.",
+    "empty": "No tienes solicitudes de devolución.",
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobada",
+      "rejected": "Rechazada",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    },
+    "reasons": {
+      "defective": "Producto defectuoso",
+      "incorrect": "Producto incorrecto",
+      "notAsDescribed": "No coincide con la descripción",
+      "noLongerNeeded": "Ya no lo necesito",
+      "other": "Otro motivo"
+    },
+    "reasonAndStore": "{{reason}} · Tienda: {{store}}",
+    "sellerResponse": "Respuesta del vendedor: {{response}}",
+    "refund": "Reembolso: Bs {{amount}}",
+    "cancel": "Cancelar"
+  },
+  "sellerProfile": {
+    "toasts": {
+      "requestSent": "Solicitud enviada"
+    },
+    "veredicto": {
+      "highlyRecommended": "Muy recomendado",
+      "recommended": "Recomendado",
+      "notRecommended": "No recomendado"
+    },
+    "notFound": "Vendedor no encontrado",
+    "breadcrumbHome": "Inicio",
+    "salesCount": "{{count}} ventas",
+    "reviewsCount": "{{count}} reseñas",
+    "activeProductsCount": "{{count}} productos activos",
+    "monthlySalesCount": "{{count}} ventas este mes",
+    "freeShippingFrom": "Envío gratis desde {{amount}} Bs",
+    "contact": "Contactar",
+    "privilegedBuyer": "✓ Comprador privilegiado",
+    "requestPending": "Solicitud pendiente",
+    "requestPrivilegedAccess": "Solicitar acceso privilegiado",
+    "whatsappMessage": "Hola {{storeName}}, vi tu tienda en LaCase Multi Tiendas y quiero hacer una consulta.",
+    "storeLocation": "Ubicación de la tienda",
+    "locationVerified": "Ubicación verificada por el administrador (tienda física comprobada)",
+    "locationNotSpecified": "Ubicación no especificada",
+    "privilegedProductsTitle": "Productos nuevos — solo para compradores privilegiados 🔑",
+    "privilegedProductsNote": "Estos productos aún no se publican al público general. Sos de los primeros en verlos.",
+    "productsOf": "Productos de {{storeName}}",
+    "noProducts": "Esta tienda aún no publica productos.",
+    "recentPurchasesTitle": "Referencias — compras recientes",
+    "recentPurchasesNote": "La calificación post-compra es obligatoria: estas personas recibieron su compra y calificaron a esta tienda.",
+    "purchasedOn": "Compró · {{date}}",
+    "reviewsAndTrust": "Reseñas y confianza",
+    "viewAllReviews": "Ver todas las reseñas",
+    "noReviewsYet": "Aún no hay reseñas. Las reseñas solo aparecen después de una compra entregada — generan confianza en la comunidad.",
+    "ratedByCount": "{{count}} persona(s) calificaron",
+    "sales": {
+      "title": "Ventas",
+      "totalSales": "Ventas totales",
+      "monthSales": "Ventas del mes",
+      "monthRevenue": "Ingresos del mes",
+      "lastSales": "Últimas ventas",
+      "noSalesYet": "Sin ventas todavía"
+    },
+    "amountBs": "Bs {{amount}}",
+    "tags": {
+      "howIsItTitle": "¿Cómo es tratar con este vendedor?",
+      "noTagsYet": "Aún no hay etiquetas. Aparecerán cuando los compradores califiquen su experiencia.",
+      "voteTitle": "¿Cómo fue tu experiencia con esta tienda?",
+      "voteNote": "Vota cada par según tu experiencia. El conteo muestra cuántas personas eligieron cada etiqueta."
+    },
+    "reviewBy": "por {{firstName}} {{lastName}}",
+    "reviewsDialog": {
+      "title": "Reseñas del vendedor ({{count}})",
+      "tabAll": "Todas",
+      "noneInCategory": "No hay reseñas en esta categoría."
+    },
+    "close": "Cerrar"
+  },
+  "seller": {
+    "bulkProducts": {
+      "title": "Agregar varios productos",
+      "subtitle": "Carga muchas fotos de distintos productos y publica cada uno reutilizando los datos base (categoría, condición, precio, stock y atributos) para todos.",
+      "employeeWarning": "Como empleado no puedes editar el precio; usa el precio base que deje el administrador.",
+      "defaultProductName": "Producto {{index}}",
+      "baseData": {
+        "title": "Datos base (se reutilizan en todos)",
+        "categoryLabel": "Categoría",
+        "categoryPlaceholder": "Selecciona una categoría",
+        "conditionLabel": "Condición",
+        "conditionNew": "Nuevo",
+        "conditionUsed": "Usado",
+        "conditionRefurbished": "Reacondicionado",
+        "templateLabel": "Plantilla (atributos precargados)",
+        "templateHelper": "Elige una plantilla para precargar los atributos comunes de todos los productos.",
+        "templateNone": "Sin plantilla",
+        "templateGlobalSuffix": " · Global",
+        "basePriceLabel": "Precio base (Bs)",
+        "basePriceHelperEmployee": "Lo define el administrador",
+        "basePriceHelperSeller": "Puede variar por producto",
+        "baseStockLabel": "Stock base",
+        "warrantyLabel": "Garantía",
+        "warrantyPlaceholder": "Ej: 12 meses",
+        "descriptionLabel": "Descripción (se aplica a todos, opcional)"
+      },
+      "photos": {
+        "title": "Fotos de productos ({{count}})",
+        "uploadButton": "Cargar fotos (una por producto)",
+        "uploading": "Subiendo…",
+        "removeTitle": "Quitar",
+        "itemAlt": "Producto {{index}}",
+        "itemLabel": "Producto {{index}}",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Ej: Cuaderno Rayado N° {{index}}",
+        "priceLabel": "Precio (Bs)",
+        "pricePlaceholder": "Precio base"
+      },
+      "actions": {
+        "publish": "Publicar {{count}} producto(s)",
+        "publishing": "Publicando…",
+        "cancel": "Cancelar",
+        "clearPhotos": "Limpiar fotos"
+      },
+      "errors": {
+        "selectCategory": "Elige una categoría para los productos.",
+        "uploadAtLeastOne": "Sube al menos una foto de producto.",
+        "enterPrice": "Indica un precio (puede ser distinto por producto).",
+        "uploadFailed": "No se pudo subir {{fileName}}: {{error}}",
+        "productFailed": "Producto {{index}} ({{name}}): {{error}}",
+        "unnamedProduct": "sin nombre",
+        "noneCould": "No se pudo publicar ningún producto."
+      },
+      "success": {
+        "published": "Se publicaron {{count}} producto(s). Esperan moderación del admin."
+      }
+    },
+    "payouts": {
+      "title": "Mis pagos",
+      "escrowInfoBefore": "El dinero de tus ventas queda ",
+      "escrowInfoStrong": "retenido (escrow)",
+      "escrowInfoAfter": " hasta que el comprador recibe el producto y el pago se verifica. Después de la entrega, el saldo se libera y puedes retirarlo a tu cuenta BNB, banco o QR.",
+      "balanceAvailable": "Balance disponible",
+      "withdraw": "Retirar",
+      "escrowReleased": "Escrow liberado",
+      "deliveredAndPaid": "Ventas entregadas y pagadas",
+      "inProgress": "En proceso",
+      "pendingApprovedWithdrawals": "Retiros pendientes/aprobados",
+      "accountSaved": "Cuenta de cobro guardada",
+      "requestSubmitted": "Retiro solicitado. El administrador lo revisará.",
+      "status": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "paid": "Pagado",
+        "rejected": "Rechazado"
+      },
+      "accountSection": {
+        "title": "Cuenta de cobro",
+        "methodLabel": "Método",
+        "methodBnb": "BNB (Billetera móvil)",
+        "methodBank": "Transferencia bancaria",
+        "methodQr": "QR / Alias",
+        "holderLabel": "Titular",
+        "numberLabelBnb": "Número de celular BNB",
+        "numberLabelBank": "Número de cuenta",
+        "numberLabelQr": "Alias / QR",
+        "bankLabel": "Banco",
+        "idLabel": "Cédula de identidad",
+        "saveButton": "Guardar cuenta"
+      },
+      "history": {
+        "title": "Historial de retiros",
+        "empty": "Aún no solicitaste retiros.",
+        "columnDate": "Fecha",
+        "columnAmount": "Monto",
+        "columnMethod": "Método",
+        "columnStatus": "Estado",
+        "columnNote": "Nota"
+      },
+      "requestDialog": {
+        "title": "Solicitar retiro",
+        "availableBalance": "Balance disponible:",
+        "amountLabel": "Monto a retirar (Bs)",
+        "noteLabel": "Nota (opcional)",
+        "cancel": "Cancelar",
+        "submit": "Solicitar"
+      }
+    },
+    "privileged": {
+      "title": "Compradores privilegiados",
+      "subtitle": "Estos compradores ven tus productos nuevos antes que el público general y pueden reservarlos. Tú decides quiénes son privilegiados.",
+      "pendingRequestsTitle": "Solicitudes pendientes ({{count}})",
+      "noPendingRequests": "No hay solicitudes pendientes.",
+      "requestMeta": "{{email}} · {{totalSales}} compras · solicitó el {{date}}",
+      "approveButton": "Aprobar",
+      "rejectButton": "Rechazar",
+      "approvedToast": "Comprador privilegiado aprobado",
+      "rejectedToast": "Solicitud rechazada",
+      "buyersTitle": "Compradores privilegiados ({{count}})",
+      "noBuyers": "Aún no tienes compradores privilegiados. Cuando apruebes solicitudes, esos compradores verán tus productos nuevos con acceso anticipado.",
+      "buyerMeta": "{{email}} · desde {{date}}",
+      "privilegedChip": "Privilegiado"
+    },
+    "jobs": {
+      "title": "Empleos",
+      "subtitle": "Publica ofertas de trabajo para tu tienda",
+      "payPeriod": {
+        "daily": "Diario",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      },
+      "status": {
+        "pending": "Pendiente de aprobación",
+        "approved": "Publicado",
+        "rejected": "Rechazado",
+        "closed": "Cerrado"
+      },
+      "salary": {
+        "range": "{{min}} - {{max}} ({{period}})",
+        "from": "Desde {{min}} ({{period}})",
+        "upTo": "Hasta {{max}} ({{period}})",
+        "negotiable": "Sueldo a convenir ({{period}})"
+      },
+      "form": {
+        "errors": {
+          "category": "Elige una categoría",
+          "titleMin": "El título debe tener al menos 5 caracteres",
+          "descriptionMin": "La descripción debe tener al menos 20 caracteres",
+          "city": "Indica la ciudad",
+          "vacanciesMin": "Mínimo 1 vacante",
+          "salaryInvalid": "Sueldo inválido",
+          "salaryMaxLessThanMin": "El máximo no puede ser menor al mínimo"
+        },
+        "category": "Categoría",
+        "title": "Título",
+        "description": "Descripción",
+        "descriptionHint": "Mínimo 20 caracteres",
+        "requirements": "Requisitos (opcional)",
+        "city": "Ciudad",
+        "locationState": "Departamento",
+        "payPeriodLabel": "Período de pago",
+        "salaryMin": "Sueldo mínimo",
+        "salaryMax": "Sueldo máximo",
+        "vacancies": "Vacantes",
+        "schedule": "Horario (opcional)",
+        "contactPhone": "Teléfono / WhatsApp (opcional)"
+      },
+      "appStatus": {
+        "received": "Nueva",
+        "viewed": "Vista",
+        "shortlisted": "Preseleccionado/a",
+        "rejected": "Rechazado/a",
+        "hired": "Contratado/a"
+      },
+      "actions": {
+        "markViewed": "Marcar vista",
+        "shortlist": "Preseleccionar",
+        "reject": "Rechazar",
+        "hire": "Contratar",
+        "create": "Publicar empleo",
+        "cancel": "Cancelar",
+        "saveAndSubmit": "Guardar y enviar a revisión",
+        "submit": "Enviar a revisión",
+        "closeJob": "Cerrar"
+      },
+      "actionVerbs": {
+        "markViewed": "marcar como vista a",
+        "shortlist": "preseleccionar a",
+        "reject": "rechazar a",
+        "hire": "contratar a"
+      },
+      "filters": {
+        "all": "Todos",
+        "new": "Nuevas",
+        "shortlisted": "Preseleccionados",
+        "hired": "Contratados",
+        "rejected": "Rechazados"
+      },
+      "vacancyCount_one": "{{count}} vacante",
+      "vacancyCount_other": "{{count}} vacantes",
+      "expiresOn": "Vence: {{date}}",
+      "createdOn": "Creado: {{date}}",
+      "applicantsChip": "Postulantes ({{count}})",
+      "editTooltip": "Editar (vuelve a revisión)",
+      "editAriaLabel": "Editar empleo",
+      "rejectionReason": "Motivo del rechazo: {{reason}}. Puedes editarlo y volver a enviarlo.",
+      "empty": "Todavía no publicaste ningún empleo.",
+      "verification": {
+        "notVerifiedPrefix": "Solo las tiendas verificadas pueden publicar empleos. Completa la verificación de tu tienda en",
+        "settingsLink": "Configuración",
+        "goToSettings": "Ir a configuración",
+        "notApproved": "Tu tienda debe estar aprobada y activa (no pausada) para publicar empleos."
+      },
+      "infoBanner": "Los empleos nuevos o editados quedan pendientes hasta que un administrador los apruebe. Una vez aprobados se publican por 30 días.",
+      "dialog": {
+        "editTitle": "Editar empleo",
+        "editWarning": "Al guardar los cambios, el empleo vuelve a revisión y deja de estar publicado hasta que se apruebe."
+      },
+      "closeDialog": {
+        "title": "Cerrar empleo",
+        "confirm": "¿Cerrar \"{{title}}\"? Dejará de mostrarse y no podrás reabrirlo (tendrías que publicar uno nuevo)."
+      },
+      "toasts": {
+        "statusUpdated": "Estado actualizado. Se notificó al candidato.",
+        "updated": "Empleo actualizado. Quedó pendiente de aprobación.",
+        "created": "Empleo enviado. Un administrador lo revisará pronto.",
+        "closed": "Empleo cerrado"
+      },
+      "applicants": {
+        "drawerTitle": "Postulantes de {{title}}",
+        "closeDrawer": "Cerrar",
+        "hiredHint_one": "Contrataste a {{hired}} de {{count}} vacante. Cuando cubras las vacantes, te conviene cerrar el empleo.",
+        "hiredHint_other": "Contrataste a {{hired}} de {{count}} vacantes. Cuando cubras las vacantes, te conviene cerrar el empleo.",
+        "empty": "Todavía no hay postulantes",
+        "emptyFiltered": "No hay postulantes en este estado",
+        "expectedSalary": "Sueldo pretendido:",
+        "viewCv": "Ver CV",
+        "downloadCv": "Descargar CV",
+        "downloadCvNamed": "Descargar CV ({{name}})",
+        "yourMessage": "Tu mensaje: {{note}}",
+        "confirmMessage": "Vas a {{verb}} {{firstName}} {{lastName}}. Se le enviará una notificación.",
+        "noteLabel": "Mensaje para el candidato (opcional)",
+        "confirm": "Confirmar"
+      }
+    },
+    "auctions": {
+      "title": "Mis subastas ({{count}})",
+      "empty": {
+        "message": "No creaste subastas aún. Al publicar un producto activa la opción \"Publicar como subasta\".",
+        "cta": "Crear subasta"
+      },
+      "table": {
+        "title": "Título",
+        "currentPrice": "Precio actual",
+        "bids": "Ofertas",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "endDate": "Fin: {{date}}",
+      "status": {
+        "wonBy": "Ganada: {{name}}",
+        "noWinner": "Sin ganador",
+        "active": "Activa"
+      },
+      "actions": {
+        "view": "Ver"
+      }
+    },
+    "calendar": {
+      "title": "Calendario de mi tienda",
+      "subtitle": "Promociones activas (rojo), cierre de subastas (morado) y ventas por día (verde) de tu tienda."
+    },
+    "productForm": {
+      "title": {
+        "edit": "Editar producto",
+        "new": "Nuevo producto"
+      },
+      "close": "Cerrar",
+      "steps": {
+        "info": "Información",
+        "photos": "Fotos",
+        "attributes": "Atributos",
+        "preview": "Vista previa"
+      },
+      "fields": {
+        "name": "Nombre del producto",
+        "category": "Categoría",
+        "knownProduct": "Producto conocido (atributos precargados)",
+        "condition": "Condición",
+        "conditionNew": "Nuevo",
+        "conditionUsed": "Usado",
+        "conditionRefurbished": "Reacondicionado",
+        "description": "Descripción",
+        "price": "Precio (Bs)",
+        "priceEmployeeLocked": "Solo el administrador de la tienda puede modificar el precio",
+        "originalPrice": "Precio original",
+        "stock": "Stock",
+        "sku": "SKU",
+        "skuPlaceholder": "Ej: PRO-0001",
+        "skuHelper": "Dejalo en blanco y se genera automáticamente según la categoría",
+        "warranty": "Garantía",
+        "warrantyPlaceholder": "Ej: Garantía 12 meses"
+      },
+      "knownProduct": {
+        "helperNew": "No existe todavía: puedes crearlo y luego asignarle atributos con el botón +.",
+        "helperChoose": "Elige un producto conocido de la categoría para precargar atributos, o escribe uno nuevo.",
+        "createButton": "Crear producto conocido «{{name}}»",
+        "selectedLabel": "Producto conocido seleccionado: {{name}}"
+      },
+      "actions": {
+        "generate": "Generar",
+        "creating": "Creando…",
+        "discard": "Descartar",
+        "cancel": "Cancelar",
+        "back": "Anterior",
+        "next": "Siguiente",
+        "save": "Guardar cambios",
+        "publish": "Publicar producto",
+        "addAttribute": "Agregar atributo",
+        "uploadPhotos": "Subir fotos"
+      },
+      "auction": {
+        "toggleLabel": "Publicar como subasta",
+        "helper": "Los compradores ofertarán por este producto en tiempo real hasta la fecha de fin.",
+        "startingPrice": "Precio inicial (Bs)",
+        "minIncrement": "Incremento mín.",
+        "maxIncrement": "Incremento máx.",
+        "incrementType": "Tipo de incremento",
+        "incrementDynamic": "Dinámico (sube con el precio)",
+        "incrementFixed": "Fijo",
+        "reservePrice": "Precio de reserva (opcional)",
+        "reservePriceHelper": "Mínimo para que la subasta se cierre con éxito",
+        "buyNowPrice": "Comprar ahora (opcional)",
+        "buyNowPriceHelper": "Compra directa inmediata a este precio",
+        "antiSniping": "Anti-sniping (minutos)",
+        "antiSnipingHelper": "Extiende el tiempo si ofertan al final (0 = desactivado)",
+        "endDate": "Fecha de fin",
+        "endDateHelper": "Elige la fecha y hora de cierre de la subasta."
+      },
+      "photos": {
+        "title": "Fotos del producto",
+        "primary": "Principal",
+        "makePrimary": "Hacer principal",
+        "count": "{{count}}/8 · Puedes subir una o varias fotos (JPG, PNG, WebP, SVG · máx 5MB)"
+      },
+      "attributes": {
+        "title": "Especificaciones ({{count}})",
+        "remove": "Quitar {{name}}",
+        "yes": "Sí",
+        "no": "No",
+        "addDialog": {
+          "title": "Agregar atributo",
+          "searchLabel": "Buscar atributo por nombre",
+          "searchPlaceholder": "Ej: Velocidad, Tamaño, Color...",
+          "helper": "Puedes sumar atributos de otras categorías o que no están definidos para la actual. Se guardan como especificación del producto.",
+          "bulkTitle": "¿Falta un atributo? Crea varios separándolos con coma",
+          "bulkLabel": "Nombres separados por coma",
+          "bulkPlaceholder": "Ej: Marca, Color, Tamaño",
+          "bulkHelper": "Se crean como atributos globales y quedan listos para asignarles valor.",
+          "bulkCreate": "Crear"
+        }
+      },
+      "preview": {
+        "title": "Vista previa del card del producto",
+        "summaryTitle": "Resumen del producto",
+        "name": "Nombre:",
+        "category": "Categoría:",
+        "condition": "Condición:",
+        "price": "Precio:",
+        "stock": "Stock:",
+        "sku": "SKU:",
+        "photos": "Fotos:",
+        "attributes": "Atributos:",
+        "warranty": "Garantía:",
+        "footer": "Revisa que la información esté completa. Al publicar, el producto queda pendiente de moderación del administrador.",
+        "noName": "Sin nombre",
+        "myStore": "Mi tienda"
+      },
+      "errors": {
+        "nameRequired": "Escribe el nombre del producto.",
+        "categoryRequired": "Elige la categoría del producto.",
+        "priceRequired": "Indica el precio del producto.",
+        "auctionEndDateRequired": "Para subasta, indica la fecha de fin.",
+        "auctionEndDateRequiredSubmit": "Para subasta, indica la fecha de fin",
+        "bulkNameRequired": "Escribe al menos un nombre.",
+        "bulkCreateFailed": "No se pudo crear ningún atributo."
+      },
+      "toast": {
+        "knownProductCreated": "Producto conocido creado. Asignale atributos con el botón +",
+        "auctionCreated": "Subasta creada. Aparecerá en la sección de subastas.",
+        "productUpdated": "Producto actualizado",
+        "productCreated": "Producto creado. Espera la moderación del admin.",
+        "bulkAttributesCreated": "Se crearon {{count}} atributo(s). Asignales un valor a cada uno."
+      }
+    },
+    "products": {
+      "title": "Mis productos ({{count}})",
+      "actions": {
+        "scan": "Escanear",
+        "copyProduct": "Copiar producto",
+        "labels": "Etiquetas",
+        "addMultiple": "Agregar varios",
+        "newProduct": "Nuevo producto"
+      },
+      "table": {
+        "product": "Producto",
+        "category": "Categoría",
+        "price": "Precio",
+        "stock": "Stock",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "status": {
+        "approved": "Aprobado",
+        "pending": "Pendiente",
+        "deleted": "Eliminado"
+      },
+      "confirmDelete": "¿Eliminar este producto?",
+      "toast": {
+        "deleted": "Producto eliminado",
+        "copied": "Producto copiado. Completa imagen y precio para publicarlo."
+      },
+      "emptyState": "Todavía no cargaste productos",
+      "history": {
+        "tooltip": "Historial",
+        "title": "Historial — {{name}}",
+        "empty": "Sin actividad registrada todavía.",
+        "action": "Acción",
+        "author": "Autor",
+        "note": "Nota",
+        "date": "Fecha",
+        "close": "Cerrar"
+      },
+      "copyDialog": {
+        "title": "Copiar producto",
+        "description": "Busca un producto en la multitienda para copiar sus datos (nombre, descripción, categoría y características). Después tendrás que poner tu propia imagen y precio.",
+        "searchLabel": "Buscar producto por nombre o código",
+        "searchPlaceholder": "Ej: ryzen 5 5600g",
+        "noResults": "No se encontró ningún producto.",
+        "copyButton": "Copiar",
+        "noSku": "Sin SKU",
+        "minChars": "Escribe al menos 2 caracteres para buscar.",
+        "cancel": "Cancelar"
+      }
+    },
+    "coupons": {
+      "title": "Cupones de mi tienda",
+      "subtitle": "Crea cupones de descuento para tus productos o cupones de regalo. Elige los productos de tu tienda a los que aplica el cupón.",
+      "actions": {
+        "create": "Crear cupón"
+      },
+      "table": {
+        "code": "Código",
+        "type": "Tipo",
+        "value": "Valor",
+        "products": "Productos",
+        "uses": "Usos",
+        "status": "Estado",
+        "actions": "Acciones",
+        "giftValue": "{{value}} (gastado {{spent}})",
+        "productCount": "{{count}} producto(s)",
+        "allProducts": "Todos"
+      },
+      "emptyState": "No tienes cupones. Crea uno para incentivar tus ventas.",
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "type": {
+        "percentage": "Porcentaje",
+        "fixed": "Monto fijo",
+        "gift": "Regalo"
+      },
+      "toast": {
+        "updated": "Cupón actualizado",
+        "created": "Cupón creado",
+        "deleted": "Cupón eliminado"
+      },
+      "dialog": {
+        "editTitle": "Editar cupón",
+        "createTitle": "Crear cupón",
+        "codeLabel": "Código único",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Ej: 10% en la compra de un S7 Edge / Regalo de 100 Bs para gastar en mi tienda",
+        "typeLabel": "Tipo de cupón",
+        "typeOptions": {
+          "percentage": "Porcentaje de descuento (%)",
+          "fixed": "Monto fijo de descuento (Bs)",
+          "gift": "Regalo (monto para gastar, se devuelve el saldo)"
+        },
+        "valueLabel": {
+          "percentage": "Descuento (%)",
+          "gift": "Monto del regalo (Bs)",
+          "fixed": "Descuento (Bs)"
+        },
+        "giftHint": "El comprador puede gastar este monto en tu tienda. Si gasta menos, le devuelves el saldo en efectivo.",
+        "minSpendLabel": "Pedido mínimo (Bs, opcional)",
+        "maxUsesLabel": "Límite de usos (opcional)",
+        "endDateLabel": "Vence (opcional)",
+        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productsLabel": "Productos a los que aplica (vacío = todos)",
+        "cancel": "Cancelar",
+        "save": "Guardar"
+      }
+    },
+    "layout": {
+      "nav": {
+        "dashboard": "Dashboard",
+        "products": "Productos",
+        "labels": "Etiquetas",
+        "calendar": "Calendario",
+        "auctions": "Subastas",
+        "jobs": "Empleos",
+        "vipBuyers": "Compradores VIP",
+        "promotions": "Promociones",
+        "coupons": "Cupones",
+        "giftPromos": "Promos de regalo",
+        "payments": "Mis pagos",
+        "team": "Equipo",
+        "returns": "Devoluciones",
+        "messages": "Mensajes",
+        "orders": "Pedidos",
+        "settings": "Configuración"
+      },
+      "header": {
+        "employeePanel": "Panel del empleado",
+        "sellerPanel": "Panel del vendedor"
+      },
+      "reauth": {
+        "title": "Verificación de seguridad",
+        "description": "Para ingresar al panel de la tienda, confirma tu contraseña.",
+        "passwordLabel": "Contraseña",
+        "verifying": "Verificando…",
+        "verify": "Verificar"
+      }
+    },
+    "promotions": {
+      "pageTitle": "Promociones",
+      "pageSubtitle": "Descuentos en productos, cupones y promos de regalo de tu tienda",
+      "newPromotion": "Nueva promoción",
+      "tabs": {
+        "active": "Activas ({{count}})",
+        "finished": "Finalizadas ({{count}})"
+      },
+      "empty": {
+        "active": "No tienes promociones activas. Toca \"Nueva promoción\" para crear una.",
+        "finished": "No tienes promociones finalizadas."
+      },
+      "card": {
+        "percentOff": "{{value}}% OFF",
+        "amountOff": "{{value}} OFF",
+        "statusActive": "Activa",
+        "statusFinished": "Finalizada",
+        "minSpend": "mín {{amount}}",
+        "maxSpend": "presupuesto {{amount}}",
+        "spent": "usado {{amount}}",
+        "deactivateTooltip": "Finalizar promoción",
+        "productPrice": "{{name}} · {{price}}"
+      },
+      "toasts": {
+        "fillTitleDiscount": "Completa título y descuento",
+        "selectProduct": "Elige al menos un producto",
+        "promoCreated": "Promoción creada",
+        "promoDeactivated": "Promoción finalizada",
+        "fillCodeValue": "Completa código y valor",
+        "couponCreated": "Cupón creado",
+        "fillTitleGiftProducts": "Completa título y productos de regalo",
+        "giftCreated": "Promo de regalo creada"
+      },
+      "dialog": {
+        "title": "Nueva promoción",
+        "typeLabel": "Tipo de promoción",
+        "typeProduct": "Descuento en productos",
+        "typeCoupon": "Cupón de descuento (código)",
+        "typeGift": "Promo de regalo (compra y recibe)",
+        "cancel": "Cancelar",
+        "create": "Crear",
+        "product": {
+          "titleLabel": "Título",
+          "descriptionLabel": "Descripción",
+          "discountTypeLabel": "Tipo de descuento",
+          "percentageOption": "Porcentaje (%)",
+          "fixedOption": "Monto fijo (Bs)",
+          "percentageFieldLabel": "Porcentaje",
+          "amountFieldLabel": "Monto",
+          "minSpendLabel": "Compra mínima (Bs, opcional)",
+          "maxSpendLabel": "Presupuesto total de descuento (Bs, opcional)",
+          "startDateLabel": "Inicio",
+          "endDateLabel": "Fin",
+          "productsLabel": "Productos en promoción",
+          "productOptionLabel": "{{name}} ({{price}})"
+        },
+        "coupon": {
+          "codeLabel": "Código único",
+          "codeHelper": "Los clientes ingresan este código en el checkout",
+          "descriptionLabel": "Descripción",
+          "typeLabel": "Tipo",
+          "percentageOption": "Porcentaje (%)",
+          "fixedOption": "Monto fijo (Bs)",
+          "giftOption": "Ticket de regalo (Bs para gastar)",
+          "percentageFieldLabel": "Porcentaje",
+          "amountFieldLabel": "Monto",
+          "singleUseLabel": "Un solo uso por cliente",
+          "maxUsesLabel": "Usos totales máximos (opcional)",
+          "perUserLimitLabel": "Usos por cliente (opcional)",
+          "minSpendLabel": "Compra mínima (Bs, opcional)",
+          "maxSpendLabel": "Presupuesto total de descuento (Bs, opcional)",
+          "maxSpendHelper": "El cupón deja de funcionar cuando se agota este monto total"
+        },
+        "gift": {
+          "titleLabel": "Título",
+          "descriptionLabel": "Descripción",
+          "triggerLabel": "Disparador",
+          "triggerUnits": "Al comprar N unidades de un producto",
+          "triggerAmount": "Al superar un monto en la tienda",
+          "triggerProduct": "Al comprar un producto específico",
+          "quantityLabel": "Cantidad de unidades",
+          "triggerProductLabel": "Producto disparador",
+          "minAmountLabel": "Monto mínimo (Bs)",
+          "allowChoiceLabel": "Permitir que el cliente elija el regalo",
+          "giftProductsLabel": "Productos de regalo"
+        }
+      }
+    },
+    "team": {
+      "pageTitle": "Equipo de mi tienda",
+      "pageSubtitle": "Invita a personas de confianza para que te ayuden a gestionar la tienda. Los administradores gestionan todo; los empleados solo pueden subir productos y ver pedidos (sin precios ni cobros).",
+      "inviteEmployee": "Invitar empleado",
+      "empty": "Todavía no tienes empleados. Invita a alguien para que te ayude a gestionar la tienda.",
+      "removeTooltip": "Quitar del equipo",
+      "removeTooltipDisabled": "Solo el dueño puede quitar empleados",
+      "table": {
+        "member": "Miembro",
+        "email": "Email",
+        "role": "Rol",
+        "actions": "Acciones",
+        "owner": "Dueño"
+      },
+      "roles": {
+        "admin": "Administrador",
+        "employee": "Empleado"
+      },
+      "toasts": {
+        "invited": "Empleado invitado",
+        "roleUpdated": "Rol actualizado",
+        "removed": "Empleado removido del equipo"
+      },
+      "dialog": {
+        "title": "Invitar empleado",
+        "searchLabel": "Buscar usuario por email o nombre",
+        "typeMoreLetters": "Escribe al menos 2 letras",
+        "noResults": "Sin resultados",
+        "roleLabel": "Rol",
+        "roleAdminOption": "Administrador — gestiona toda la tienda",
+        "roleEmployeeOption": "Empleado — solo productos y pedidos",
+        "cancel": "Cancelar",
+        "invite": "Invitar"
+      }
+    },
+    "labels": {
+      "defaultStoreName": "Mi tienda",
+      "pageTitle": "Etiquetas de productos ({{count}})",
+      "printButton": "Imprimir etiquetas",
+      "selectAll": "Seleccionar todos",
+      "noProducts": "Todavía no tienes productos.",
+      "selectAtLeastOne": "Selecciona al menos un producto para imprimir etiquetas."
+    },
+    "returns": {
+      "title": "Solicitudes de devolución",
+      "empty": "No tienes solicitudes de devolución.",
+      "respond": "Responder",
+      "buyerLabel": "Comprador:",
+      "itemAmount": "Monto del item: Bs {{amount}}",
+      "status": {
+        "pending": "Pendiente",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "completed": "Completada",
+        "cancelled": "Cancelada"
+      },
+      "reasons": {
+        "productoDefectuoso": "Producto defectuoso",
+        "productoIncorrecto": "Producto incorrecto",
+        "noCoincideDescripcion": "No coincide con la descripción",
+        "yaNoLoNecesito": "Ya no lo necesito",
+        "otro": "Otro motivo"
+      },
+      "dialog": {
+        "title": "Responder devolución",
+        "productLabel": "Producto:",
+        "decisionLabel": "Decisión",
+        "decisionApprove": "Aprobar (reembolsar)",
+        "decisionReject": "Rechazar",
+        "refundAmountLabel": "Monto del reembolso (Bs)",
+        "responseNoteLabel": "Nota al comprador",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando..."
+      }
+    },
+    "dashboard": {
+      "header": {
+        "titleSeller": "Panel del vendedor",
+        "titleEmployee": "Panel del empleado",
+        "subtitle": "Desempeño de tu tienda en LaCase Multi Tiendas"
+      },
+      "promotions": {
+        "summary": "Promociones: {{active}} activas · {{finished}} finalizadas",
+        "invested": " · invertido {{amount}}"
+      },
+      "kpis": {
+        "salesMade": "Ventas realizadas",
+        "customersServed": "Clientes atendidos",
+        "revenue": "Ingresos",
+        "unreadMessages": "Mensajes sin leer",
+        "totalProducts": "Productos totales",
+        "activeProducts": "{{count}} activos",
+        "pendingModeration": "Pendientes moderación",
+        "sales": "Ventas",
+        "totalRevenue": "Ingresos totales",
+        "revenueWeek": "Ingresos de la semana",
+        "revenueMonth": "Ingresos del mes"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "confirmed": "Confirmada",
+        "preparing": "En preparación",
+        "shipped": "Enviada",
+        "delivered": "Entregada",
+        "cancelled": "Cancelada"
+      },
+      "charts": {
+        "salesLast30Days": "Tus ventas — últimos 30 días",
+        "revenueSeriesName": "Ingresos",
+        "ordersByStatus": "Pedidos por estado"
+      },
+      "topProducts": {
+        "title": "Tus productos más vendidos",
+        "priceStock": "{{price}} · stock {{stock}}",
+        "sold": "{{count}} vendidos"
+      },
+      "recentOrders": {
+        "title": "Pedidos recientes",
+        "viewAll": "Ver todos →",
+        "empty": "Aún no recibiste pedidos.",
+        "orderLabel": "#{{id}} — {{buyerName}}",
+        "dateItems": "{{date}} · {{count}} ítems"
+      }
+    },
+    "settings": {
+      "title": "Configuración de tu tienda",
+      "profilePhotoLabel": "Foto de perfil de la tienda",
+      "storeNameLabel": "Nombre de la tienda",
+      "descriptionLabel": "Descripción",
+      "bioLabel": "Bio del dueño / tienda",
+      "bioPlaceholder": "Cuenta la historia de tu tienda o lo que vendes...",
+      "categoryLabel": "Categoría de productos",
+      "countryLabel": "País",
+      "logoLabel": "Logo (URL)",
+      "bannerLabel": "Banner (URL)",
+      "cityLabel": "Ciudad",
+      "stateLabel": "Departamento/Provincia",
+      "selectPlaceholder": "Seleccionar...",
+      "postalCodeLabel": "Código postal (opcional)",
+      "mapLocationTitle": "Ubicación en el mapa",
+      "mapHelperText": "Busca tu ciudad, haz clic en el mapa o en un resultado para marcar el punto exacto. Esta ubicación se mostrará a tus clientes.",
+      "defaultLocationLabel": "Tienda",
+      "socialTitle": "🌐 Redes sociales y contacto",
+      "instagramLabel": "Instagram (URL)",
+      "facebookLabel": "Facebook (URL)",
+      "tiktokLabel": "TikTok (URL)",
+      "youtubeLabel": "YouTube (URL)",
+      "whatsappLabel": "WhatsApp (número)",
+      "whatsappPlaceholder": "59170000000 (con código de país, sin +)",
+      "socialHelperText": "Son opcionales. Solo se muestran en tu perfil público si los completas.",
+      "shippingLocationInfo": "Tu ubicación se usa para calcular el costo de envío hacia el comprador.",
+      "paymentQrLabel": "QR de pago (URL de imagen)",
+      "paymentQrHelperText": "Sube una imagen con tu alias/QR de Mercado Pago o CBU. Se mostrará al comprador al finalizar la compra.",
+      "freeShippingLabel": "Envío gratis desde (Bs)",
+      "freeShippingPlaceholder": "Ej: 500",
+      "freeShippingHelperText": "Si el comprador supera este monto, el envío es gratis. Dejalo vacío para no ofrecer envío gratis.",
+      "saveButton": "Guardar",
+      "verifiedSealTitle": "Sello de vendedor verificado",
+      "verifiedChip": "Verificado",
+      "storeLocationLabel": "Ubicación de la tienda",
+      "locationVerifiedChip": "Verificada por el admin",
+      "locationPendingChip": "Pendiente de verificación",
+      "verificationDescription": "El administrador comprueba la existencia física de tu tienda (coincidencia con NIT y documentación) para verificar tu ubicación en el mapa. Las tiendas con ubicación verificada inspiran más confianza.",
+      "verifiedSuccessAlert": "Tu tienda está verificada. Muestras el logo junto a tu nombre, lo que genera más confianza en los compradores.",
+      "pendingReviewAlert": "Tu solicitud de verificación está en revisión por el administrador. Como en Couchsurfing o Twitter, se verifica la existencia física de tu tienda (NIT y documentación) antes de otorgar el sello.",
+      "requestVerificationAlert": "Obtiene el sello de vendedor verificado (como la cuenta azul de Twitter): presenta tu NIT y el administrador verificará físicamente tu tienda. Las tiendas verificadas generan más confianza y más ventas.",
+      "nitLabel": "NIT (Número de Identificación Tributaria)",
+      "nitPlaceholder": "Ej: 10203040123",
+      "noteLabel": "Nota para el administrador (documentos, dirección del local, etc.)",
+      "notePlaceholder": "Ej: Mi tienda está en Calle 5, zona Central. Adjunto mi NIT y matrícula de comercio.",
+      "requestSentButton": "Solicitud enviada — en revisión",
+      "sendingButton": "Enviando...",
+      "requestVerificationButton": "Solicitar verificación",
+      "errors": {
+        "nitRequired": "El NIT es obligatorio para solicitar la verificación"
+      },
+      "toasts": {
+        "requestSent": "Solicitud enviada",
+        "profileImageReady": "Foto de perfil lista — guarda los cambios",
+        "settingsSaved": "Configuración guardada"
+      }
+    },
+    "gifts": {
+      "triggerLabels": {
+        "units": "Por cantidad de un producto",
+        "amount": "Por monto de compra",
+        "product": "Por comprar un producto específico"
+      },
+      "errors": {
+        "titleRequired": "El título es obligatorio",
+        "giftProductRequired": "Elige al menos un producto de regalo",
+        "unitsFieldsRequired": "Para el tipo \"por cantidad\" indica el producto y la cantidad",
+        "amountFieldRequired": "Para el tipo \"por monto\" indica el monto mínimo",
+        "productFieldRequired": "Para el tipo \"por producto\" indica el producto"
+      },
+      "toasts": {
+        "promoUpdated": "Promoción actualizada",
+        "promoCreated": "Promoción creada",
+        "promoDeleted": "Promoción eliminada"
+      },
+      "confirmDelete": "¿Eliminar esta promoción de regalo?",
+      "triggerText": {
+        "units": "Comprando {{quantity}} un. de {{product}}",
+        "amount": "Compras desde {{amount}} Bs",
+        "product": "Comprando {{product}}",
+        "defaultProduct": "producto",
+        "defaultProductGeneric": "un producto"
+      },
+      "pageTitle": "Promos de regalo",
+      "newPromoButton": "Nueva promo",
+      "infoBanner": "Ofrece regalos a tus clientes con lógica de ticket de regalo: al comprar una cantidad de un producto, al superar un monto o al comprar un producto específico, el cliente recibe un producto de tu tienda de regalo. También puedes dejar que elija entre varios regalos.",
+      "emptyState": "No creaste promos de regalo todavía.",
+      "activeChip": "Activa",
+      "inactiveChip": "Inactiva",
+      "triggerLabelPrefix": "Disparador:",
+      "giftsLabel": "Regalo(s): {{names}}",
+      "customerChoosesChip": "El cliente elige",
+      "editButton": "Editar",
+      "deactivateButton": "Desactivar",
+      "activateButton": "Activar",
+      "deleteButton": "Eliminar",
+      "dialog": {
+        "editTitle": "Editar promo de regalo",
+        "createTitle": "Nueva promo de regalo",
+        "titleLabel": "Título",
+        "titlePlaceholder": "Ej: Compra 2 y llévate 1 de regalo",
+        "descriptionLabel": "Descripción (opcional)",
+        "triggerTypeLabel": "Tipo de disparador",
+        "triggerProductLabel": "Producto que dispara",
+        "selectPlaceholder": "Seleccionar...",
+        "minQuantityLabel": "Cantidad mínima",
+        "minQuantityPlaceholder": "Ej: 2",
+        "minAmountLabel": "Monto mínimo (Bs)",
+        "minAmountPlaceholder": "Ej: 3000",
+        "giftProductsLabel": "Productos de regalo (elige uno o más)",
+        "allowChoiceLabel": "El cliente puede elegir entre los productos de regalo",
+        "activeLabel": "Promoción activa",
+        "cancelButton": "Cancelar",
+        "saveButton": "Guardar"
+      }
+    },
+    "orders": {
+      "pageTitle": "Pedidos recibidos",
+      "allStatuses": "Todos los estados",
+      "columns": {
+        "buyer": "Comprador",
+        "total": "Total",
+        "delivery": "Entrega",
+        "status": "Estado",
+        "payment": "Pago"
+      },
+      "pickupChip": "🏬 Retiro",
+      "shippingChip": "Envío",
+      "viewProofLink": "ver comprobante",
+      "verifyPlaceholder": "Verificar...",
+      "emptyState": "Todavía no recibiste pedidos",
+      "toasts": {
+        "statusUpdated": "Estado actualizado",
+        "paymentStatusUpdated": "Estado de pago actualizado"
+      }
+    }
+  }
+}

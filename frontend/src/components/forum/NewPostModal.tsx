@@ -11,6 +11,7 @@ import { listCategories, createPost, uploadPostImages } from '../../services/for
 import { getErrorMessage } from '../../services/api';
 import type { ForumCategory, GifResult } from '../../services/forum.api';
 import { PencilLine } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import GifPicker from './GifPicker';
 
 const POST_TYPES = ['GENERAL', 'PRECIO', 'EXISTENCIA', 'EMPLEO', 'ALQUILER', 'ANTICROTICO', 'DIRECCION'];
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export default function NewPostModal({ open, onClose }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { user } = useAuthStore();
   const fetchPosts = useForumStore((s) => s.fetchPosts);
@@ -56,9 +58,9 @@ export default function NewPostModal({ open, onClose }: Props) {
 
   const handleSubmit = async () => {
     setError('');
-    if (title.trim().length < 10) return setError('El título debe tener al menos 10 caracteres.');
-    if (body.trim().length < 20) return setError('La descripción debe tener al menos 20 caracteres.');
-    if (!categoryId) return setError('Selecciona una categoría.');
+    if (title.trim().length < 10) return setError(t('forum.newPostModal.titleTooShort'));
+    if (body.trim().length < 20) return setError(t('forum.newPostModal.bodyTooShort'));
+    if (!categoryId) return setError(t('forum.newPostModal.selectCategory'));
     setSubmitting(true);
     try {
       const post = await createPost({
@@ -97,22 +99,22 @@ export default function NewPostModal({ open, onClose }: Props) {
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ bgcolor: forumPalette.bgCard, color: forumPalette.textPrimary, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <PencilLine size={18} strokeWidth={2.2} /> Hacer una pregunta
+        <PencilLine size={18} strokeWidth={2.2} /> {t('forum.newPostModal.title')}
       </DialogTitle>
       <DialogContent sx={{ bgcolor: forumPalette.bgCard, pt: 2 }}>
         <Stack spacing={2}>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField
-            label="Título"
+            label={t('forum.newPostModal.titleLabel')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
             inputProps={{ maxLength: 200 }}
-            helperText={`${title.length}/200 · mínimo 10`}
+            helperText={t('forum.newPostModal.titleHelper', { length: title.length })}
             sx={{ input: { color: forumPalette.textPrimary } }}
           />
           <TextField
-            label="Descripción"
+            label={t('forum.newPostModal.bodyLabel')}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             fullWidth
@@ -123,40 +125,40 @@ export default function NewPostModal({ open, onClose }: Props) {
           />
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <FormControl fullWidth size="small">
-              <InputLabel>Subforo</InputLabel>
-              <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} label="Subforo">
+              <InputLabel>{t('forum.newPostModal.subforumLabel')}</InputLabel>
+              <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} label={t('forum.newPostModal.subforumLabel')}>
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={c.id}>{c.icon} {c.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
-              <InputLabel>Tipo</InputLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value)} label="Tipo">
-                {POST_TYPES.map((t) => (
-                  <MenuItem key={t} value={t}>{t}</MenuItem>
+              <InputLabel>{t('forum.newPostModal.typeLabel')}</InputLabel>
+              <Select value={type} onChange={(e) => setType(e.target.value)} label={t('forum.newPostModal.typeLabel')}>
+                {POST_TYPES.map((pt) => (
+                  <MenuItem key={pt} value={pt}>{pt}</MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Stack>
           <TextField
-            label="Ciudad"
+            label={t('forum.newPostModal.cityLabel')}
             value={city}
             onChange={(e) => setCity(e.target.value)}
             fullWidth
             size="small"
-            helperText="Se usó tu ciudad del perfil; puedes cambiarla."
+            helperText={t('forum.newPostModal.cityHelper')}
           />
           <Stack direction="row" spacing={1} alignItems="center">
             <TextField
-              label="Etiquetas (máx 5)"
+              label={t('forum.newPostModal.tagsLabel')}
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
               size="small"
               fullWidth
             />
-            <Button onClick={handleAddTag} variant="outlined" size="small">Añadir</Button>
+            <Button onClick={handleAddTag} variant="outlined" size="small">{t('forum.newPostModal.addTag')}</Button>
           </Stack>
           <Stack direction="row" spacing={0.5} flexWrap="wrap">
             {tags.map((t) => (
@@ -172,7 +174,7 @@ export default function NewPostModal({ open, onClose }: Props) {
               startIcon={<AddPhotoAlternateIcon />}
               disabled={images.length >= 4}
             >
-              Añadir imágenes ({images.length}/4)
+              {t('forum.newPostModal.addImages', { count: images.length })}
               <input
                 type="file"
                 accept="image/*"
@@ -192,13 +194,13 @@ export default function NewPostModal({ open, onClose }: Props) {
               disabled={images.length + gifUrls.length >= 4}
               sx={{ color: forumPalette.accent, borderColor: forumPalette.accent }}
             >
-              🎞 GIF ({gifUrls.length})
+              🎞 {t('forum.newPostModal.gifCount', { count: gifUrls.length })}
             </Button>
             {images.length > 0 && (
-              <Button size="small" color="error" onClick={() => setImages([])}>Quitar todas</Button>
+              <Button size="small" color="error" onClick={() => setImages([])}>{t('forum.newPostModal.removeAllImages')}</Button>
             )}
             {gifUrls.length > 0 && (
-              <Button size="small" color="error" onClick={() => setGifUrls([])}>Quitar GIFs</Button>
+              <Button size="small" color="error" onClick={() => setGifUrls([])}>{t('forum.newPostModal.removeGifs')}</Button>
             )}
           </Stack>
           <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -223,15 +225,15 @@ export default function NewPostModal({ open, onClose }: Props) {
           </Stack>
           {(type === 'PRECIO' || type === 'EXISTENCIA') && (
             <Alert severity="info" sx={{ fontSize: '0.8rem' }}>
-              🤖 El Bot LaCASE Multitienda responderá automáticamente buscando en los productos disponibles.
+              🤖 {t('forum.newPostModal.botNotice')}
             </Alert>
           )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ bgcolor: forumPalette.bgCard }}>
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleClose}>{t('forum.newPostModal.cancel')}</Button>
         <Button variant="contained" disabled={submitting} onClick={handleSubmit} sx={{ bgcolor: forumPalette.accent, '&:hover': { bgcolor: forumPalette.accentHover } }}>
-          Publicar pregunta
+          {t('forum.newPostModal.submit')}
         </Button>
       </DialogActions>
       <GifPicker open={gifOpen} onClose={() => setGifOpen(false)} onPick={handlePickGif} />

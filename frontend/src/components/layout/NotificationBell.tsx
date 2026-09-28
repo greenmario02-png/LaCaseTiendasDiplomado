@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Badge,
   IconButton,
@@ -65,6 +66,7 @@ function iconColor(type: string): string {
 }
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [unread, setUnread] = useState(0);
@@ -146,17 +148,17 @@ export default function NotificationBell() {
   const timeAgo = (iso: string, now: number) => {
     const diff = now - new Date(iso).getTime();
     const min = Math.floor(diff / 60000);
-    if (min < 1) return 'ahora';
-    if (min < 60) return `hace ${min} min`;
+    if (min < 1) return t('notifications.time.now');
+    if (min < 60) return t('notifications.time.minutes', { count: min });
     const h = Math.floor(min / 60);
-    if (h < 24) return `hace ${h} h`;
+    if (h < 24) return t('notifications.time.hours', { count: h });
     const d = Math.floor(h / 24);
-    return `hace ${d} d`;
+    return t('notifications.time.days', { count: d });
   };
 
   return (
     <>
-      <Tooltip title="Notificaciones">
+      <Tooltip title={t('notifications.bellTooltip')}>
         <IconButton color="inherit" onClick={openMenu}>
           <Badge badgeContent={unread} color="error">
             <NotificationsIcon />
@@ -172,11 +174,11 @@ export default function NotificationBell() {
       >
         <Box px={2} py={1} display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" fontWeight={700}>
-            Notificaciones
+            {t('notifications.bellTitle')}
           </Typography>
           {unread > 0 && (
             <Button size="small" onClick={markAll}>
-              Marcar todas leídas
+              {t('notifications.markAllRead')}
             </Button>
           )}
         </Box>
@@ -192,7 +194,7 @@ export default function NotificationBell() {
           <Box textAlign="center" py={4}>
             <NotificationsIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
             <Typography variant="body2" color="text.secondary">
-              No tienes notificaciones
+              {t('notifications.bellEmpty')}
             </Typography>
           </Box>
         )}

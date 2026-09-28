@@ -8,19 +8,21 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ScienceIcon from '@mui/icons-material/Science';
 import SchoolIcon from '@mui/icons-material/School';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CategoryIcon } from '../../theme/forumIcons';
 import { useForumPalette } from '../../theme/forumTheme';
 import { useForumStore } from '../../stores/forumStore';
 import { listCategories, getCitiesStats } from '../../services/forum.api';
 import type { ForumCategory } from '../../services/forum.api';
 
-const MODES = [
-  { key: 'RECIENTE', label: 'Recientes', icon: <AccessTimeIcon fontSize="small" /> },
-  { key: 'POPULAR', label: 'Popular', icon: <LocalFireDepartmentIcon fontSize="small" /> },
-  { key: 'SIN_RESPUESTA', label: 'Sin respuesta', icon: <HelpOutlineIcon fontSize="small" /> },
+const MODE_KEYS = [
+  { key: 'RECIENTE', labelKey: 'forum.sidebarLeft.modeRecent', icon: <AccessTimeIcon fontSize="small" /> },
+  { key: 'POPULAR', labelKey: 'forum.sidebarLeft.modePopular', icon: <LocalFireDepartmentIcon fontSize="small" /> },
+  { key: 'SIN_RESPUESTA', labelKey: 'forum.sidebarLeft.modeUnanswered', icon: <HelpOutlineIcon fontSize="small" /> },
 ];
 
 export default function ForumSidebarLeft() {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const navigate = useNavigate();
   const { activeMode, activeCategory, activeCity, setMode, setCategory, setCity } = useForumStore();
@@ -35,31 +37,31 @@ export default function ForumSidebarLeft() {
   return (
     <Box sx={{ display: { xs: 'none', lg: 'block' }, width: 240, flexShrink: 0, pr: 2 }}>
       <Box sx={{ bgcolor: forumPalette.bgCard, borderRadius: '10px', border: `1px solid ${forumPalette.border}`, p: 1 }}>
-        <Typography variant="subtitle2" fontWeight={700} sx={{ px: 1, py: 0.5, color: forumPalette.textPrimary }}>Navegación</Typography>
+        <Typography variant="subtitle2" fontWeight={700} sx={{ px: 1, py: 0.5, color: forumPalette.textPrimary }}>{t('forum.sidebarLeft.navigation')}</Typography>
         <List dense disablePadding>
           <ListItemButton onClick={() => { setMode('RECIENTE'); setCategory(''); }}>
             <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}><HomeIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary="Inicio" sx={{ color: forumPalette.textPrimary }} />
+            <ListItemText primary={t('forum.sidebarLeft.home')} sx={{ color: forumPalette.textPrimary }} />
           </ListItemButton>
-          {MODES.map((m) => (
+          {MODE_KEYS.map((m) => (
             <ListItemButton key={m.key} selected={activeMode === m.key} onClick={() => setMode(m.key)}>
               <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}>{m.icon}</ListItemIcon>
-              <ListItemText primary={m.label} sx={{ color: forumPalette.textPrimary }} />
+              <ListItemText primary={t(m.labelKey)} sx={{ color: forumPalette.textPrimary }} />
             </ListItemButton>
           ))}
           <ListItemButton onClick={() => navigate('/foro/verificacion')}>
             <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}><ScienceIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary="Comunidades profesionales" sx={{ color: forumPalette.textPrimary }} />
+            <ListItemText primary={t('forum.sidebarLeft.professionalCommunities')} sx={{ color: forumPalette.textPrimary }} />
           </ListItemButton>
           <ListItemButton onClick={() => navigate('/foro/universidades')}>
             <ListItemIcon sx={{ minWidth: 30, color: forumPalette.textSecondary }}><SchoolIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary="Universidades" sx={{ color: forumPalette.textPrimary }} />
+            <ListItemText primary={t('forum.sidebarLeft.universities')} sx={{ color: forumPalette.textPrimary }} />
           </ListItemButton>
         </List>
       </Box>
 
       <Box sx={{ bgcolor: forumPalette.bgCard, borderRadius: '10px', border: `1px solid ${forumPalette.border}`, mt: 1.5, p: 1 }}>
-        <Typography variant="subtitle2" fontWeight={700} sx={{ px: 1, py: 0.5, color: forumPalette.textPrimary }}>Categorías</Typography>
+        <Typography variant="subtitle2" fontWeight={700} sx={{ px: 1, py: 0.5, color: forumPalette.textPrimary }}>{t('forum.sidebarLeft.categories')}</Typography>
         {categories.length === 0 ? <CircularProgress size={18} sx={{ m: 2 }} /> : (
           <List dense disablePadding>
             {categories.filter((c) => c.isActive).slice(0, 12).map((c) => (
@@ -73,7 +75,7 @@ export default function ForumSidebarLeft() {
 
       <Box sx={{ bgcolor: forumPalette.bgCard, borderRadius: '10px', border: `1px solid ${forumPalette.border}`, mt: 1.5, p: 1 }}>
         <Typography variant="subtitle2" fontWeight={700} sx={{ px: 1, py: 0.5, color: forumPalette.textPrimary }}>
-          <LocationOnIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />Ciudades
+          <LocationOnIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />{t('forum.sidebarLeft.cities')}
         </Typography>
         <List dense disablePadding>
           {cities.slice(0, 8).map((c) => (

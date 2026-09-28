@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { listCategories, getCitiesStats } from '../../services/forum.api';
 import { useForumStore } from '../../stores/forumStore';
 import { MapPin } from 'lucide-react';
@@ -9,6 +10,7 @@ import { FilterBar } from '../../components/redesign/FilterBar';
 import { useUnifiedTokens } from '../../theme';
 
 export function ForumCategoriesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { setCategory, setMode } = useForumStore();
   const [categories, setCategories] = useState<any[]>([]);
@@ -32,10 +34,10 @@ export function ForumCategoriesPage() {
   return (
     <Box>
       <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mb: 2 }}>
-        📂 Subforos
+        📂 {t('forum.categories.title')}
       </Typography>
       {categories.filter((c) => c.isActive).length === 0 ? (
-        <EmptyState message="No hay subforos todavía." />
+        <EmptyState message={t('forum.categories.emptySubforums')} />
       ) : (
         <Grid container spacing={1.5}>
           {categories.filter((c) => c.isActive).map((c) => (
@@ -56,7 +58,7 @@ export function ForumCategoriesPage() {
               >
                 <Typography sx={{ fontSize: '1.8rem' }}>{c.icon}</Typography>
                 <Typography sx={{ color: tokens.onSurface, fontWeight: 600, fontSize: '0.85rem' }}>{c.name}</Typography>
-                <Typography sx={{ color: tokens.onSurfaceVariant, fontSize: '0.7rem' }}>{c._count?.posts ?? 0} posts</Typography>
+                <Typography sx={{ color: tokens.onSurfaceVariant, fontSize: '0.7rem' }}>{t('forum.categories.postsCount', { count: c._count?.posts ?? 0 })}</Typography>
               </Box>
             </Grid>
           ))}
@@ -64,10 +66,10 @@ export function ForumCategoriesPage() {
       )}
 
       <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, my: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <MapPin size={20} strokeWidth={2.4} color={tokens.primary} /> Ciudades
+        <MapPin size={20} strokeWidth={2.4} color={tokens.primary} /> {t('forum.categories.citiesTitle')}
       </Typography>
       {cities.length === 0 ? (
-        <Typography sx={{ color: tokens.onSurfaceVariant, fontSize: '0.85rem' }}>Aún no hay preguntas por ciudad.</Typography>
+        <Typography sx={{ color: tokens.onSurfaceVariant, fontSize: '0.85rem' }}>{t('forum.categories.emptyCityQuestions')}</Typography>
       ) : (
         <FilterBar
           options={cities.map((c) => ({ key: c.city, label: `${c.city} (${c._count.posts ?? c.posts})` }))}

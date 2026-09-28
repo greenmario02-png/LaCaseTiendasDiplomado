@@ -1,5 +1,6 @@
 import { Card, Box, Typography, Chip, Button, Stack, Avatar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useTranslation } from 'react-i18next';
 import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 import { useAuthStore } from '../../stores/authStore';
 import type { ForumReply } from '../../services/forum.api';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const { user } = useAuthStore();
 
@@ -32,7 +34,7 @@ export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props)
         <Stack direction="row" spacing={1} flexWrap="wrap" mb={1} alignItems="center">
           {reply.isBotReply ? (
             <Chip
-              label="🤖 Bot LaCASE Multitienda"
+              label={`🤖 ${t('forum.replyCard.botLabel')}`}
               size="small"
               sx={{ bgcolor: forumPalette.accentMuted, color: forumPalette.accent, fontWeight: 700 }}
             />
@@ -42,13 +44,13 @@ export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props)
                 {(reply.author?.forumUsername ?? '?')[0].toUpperCase()}
               </Avatar>
               <Typography variant="caption" sx={{ color: forumPalette.textSecondary, fontWeight: 600 }}>
-                {reply.author?.forumUsername ?? 'eliminado'}
+                {reply.author?.forumUsername ?? t('forum.replyCard.deletedAuthor')}
               </Typography>
               <Chip label={reply.author?.tag} size="small" sx={{ bgcolor: forumPalette.bgInput, color: forumPalette.karmaGold, fontSize: '0.65rem' }} />
             </>
           )}
           {reply.isAccepted && (
-            <Chip icon={<CheckCircleIcon />} label="Mejor respuesta" size="small" sx={{ bgcolor: 'rgba(76,175,80,0.15)', color: forumPalette.karmaUp, fontWeight: 700 }} />
+            <Chip icon={<CheckCircleIcon />} label={t('forum.replyCard.bestAnswer')} size="small" sx={{ bgcolor: 'rgba(76,175,80,0.15)', color: forumPalette.karmaUp, fontWeight: 700 }} />
           )}
           <Typography variant="caption" sx={{ color: forumPalette.textMuted }}>
             · {formatTimeAgo(reply.createdAt)}
@@ -67,7 +69,7 @@ export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props)
             sx={{ color: forumPalette.karmaUp, borderColor: forumPalette.karmaUp, textTransform: 'none', mt: 1 }}
             onClick={() => onAccept(reply.id)}
           >
-            Marcar como respuesta
+            {t('forum.replyCard.markAsAnswer')}
           </Button>
         )}
       </Box>

@@ -12,6 +12,7 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import { useTranslation } from 'react-i18next';
 import PriceDisplay from './PriceDisplay';
 import { useAuthStore } from '../../stores/authStore';
 import { useWishlistStore } from '../../stores/wishlistStore';
@@ -19,6 +20,7 @@ import type { Product } from '../../types/domain';
 import { useState } from 'react';
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const wishlist = useWishlistStore((s) => s.wishlist);
   const toggle = useWishlistStore((s) => s.toggle);
@@ -32,13 +34,17 @@ export default function ProductCard({ product }: { product: Product }) {
   const slug = product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   const conditionLabel =
-    product.condition === 'USED' ? `Usado (${product.conditionScore ?? '?'}/10)` : product.condition === 'REFURBISHED' ? 'Reacondicionado' : 'Nuevo';
+    product.condition === 'USED'
+      ? t('product.condition.usedWithScore', { score: product.conditionScore ?? '?' })
+      : product.condition === 'REFURBISHED'
+      ? t('product.condition.refurbished')
+      : t('product.condition.new');
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
         {user && (
-          <Tooltip title={inWishlist ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+          <Tooltip title={inWishlist ? t('product.card.removeFromWishlist') : t('product.card.addToWishlist')}>
             <IconButton
               size="small"
               onClick={(e) => {
@@ -65,7 +71,7 @@ export default function ProductCard({ product }: { product: Product }) {
             />
           ) : (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999', fontSize: '0.9rem' }}>
-              Sin imagen
+              {t('product.detail.noImage')}
             </Box>
           )}
         </Box>
@@ -93,9 +99,14 @@ export default function ProductCard({ product }: { product: Product }) {
           </Box>
 
           {outOfStock ? (
-            <Chip label="Sin stock" size="small" color="error" sx={{ mt: 0.5, alignSelf: 'flex-start' }} />
+            <Chip label={t('product.detail.outOfStock')} size="small" color="error" sx={{ mt: 0.5, alignSelf: 'flex-start' }} />
           ) : lowStock ? (
-            <Chip label={product.stock === 1 ? 'Última unidad' : `Últimas ${product.stock} unidades`} size="small" color="warning" sx={{ mt: 0.5, alignSelf: 'flex-start' }} />
+            <Chip
+              label={product.stock === 1 ? t('product.card.lastUnit') : t('product.card.lastUnits', { count: product.stock })}
+              size="small"
+              color="warning"
+              sx={{ mt: 0.5, alignSelf: 'flex-start' }}
+            />
           ) : null}
 
           {/* Prueba social: vendidos */}
@@ -107,17 +118,17 @@ export default function ProductCard({ product }: { product: Product }) {
               <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mt={0.5}>
                 {sold > 0 && (
                   <Typography variant="caption" color="success.main" fontWeight={600}>
-                    {sold} {sold === 1 ? 'vendido' : 'vendidos'}
+                    {sold === 1 ? t('product.card.sold_one', { count: sold }) : t('product.card.sold_other', { count: sold })}
                   </Typography>
                 )}
                 {product.deliveryTypes?.includes('DELIVERY') && (
                   <Typography variant="caption" color="text.secondary">
-                    Envío a domicilio
+                    {t('product.card.homeDelivery')}
                   </Typography>
                 )}
                 {product.deliveryTypes?.includes('PERMUTA') && (
                   <Typography variant="caption" color="text.secondary">
-                    Permuta
+                    {t('product.card.tradeIn')}
                   </Typography>
                 )}
               </Box>

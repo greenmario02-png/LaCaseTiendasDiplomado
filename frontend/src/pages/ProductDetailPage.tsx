@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Truck, ShieldCheck } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   Container,
   Grid,
@@ -45,6 +46,7 @@ import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
 
 export default function ProductDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const money = useMoney();
   const navigate = useNavigate();
@@ -102,9 +104,9 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <Typography variant="h5">Producto no encontrado</Typography>
+        <Typography variant="h5">{t('product.detail.notFound')}</Typography>
         <Button component={Link} to="/productos" sx={{ mt: 2 }}>
-          Volver al catálogo
+          {t('product.detail.backToCatalog')}
         </Button>
       </Container>
     );
@@ -115,7 +117,7 @@ export default function ProductDetailPage() {
   const handleAddToCart = async () => {
     try {
       await addItem(product.id, quantity);
-      setToast({ type: 'success', msg: 'Agregado al carrito' });
+      setToast({ type: 'success', msg: t('product.detail.addedToCart') });
     } catch (err) {
       setToast({ type: 'error', msg: getErrorMessage(err) });
     }
@@ -139,7 +141,7 @@ export default function ProductDetailPage() {
       await api.post(`/products/${product.id}/reviews`, { rating: reviewRating, comment: reviewText });
       setReviewText('');
       setReloadReviews((n) => n + 1);
-      setToast({ type: 'success', msg: 'Reseña publicada' });
+      setToast({ type: 'success', msg: t('product.detail.reviewPublished') });
     } catch (err) {
       setToast({ type: 'error', msg: getErrorMessage(err) });
     }
@@ -152,16 +154,16 @@ export default function ProductDetailPage() {
   /** Resumen de reseñas client-side + veredicto comercial. */
   const avgRating = reviews.length ? reviews.reduce((a: number, r: any) => a + r.rating, 0) / reviews.length : 0;
   const veredicto = (rating: number): { label: string; color: 'success' | 'info' | 'warning' } => {
-    if (rating >= 4.5) return { label: 'Muy recomendado', color: 'success' };
-    if (rating >= 3.5) return { label: 'Recomendado', color: 'info' };
-    return { label: 'No recomendado', color: 'warning' };
+    if (rating >= 4.5) return { label: t('product.detail.verdict.highlyRecommended'), color: 'success' };
+    if (rating >= 3.5) return { label: t('product.detail.verdict.recommended'), color: 'info' };
+    return { label: t('product.detail.verdict.notRecommended'), color: 'warning' };
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Typography component={Link} to="/" color="inherit" sx={{ textDecoration: 'none' }}>
-          Inicio
+          {t('product.detail.breadcrumbHome')}
         </Typography>
         <Typography component={Link} to={`/categoria/${product.category.slug}`} color="inherit" sx={{ textDecoration: 'none' }}>
           {product.category.name}
@@ -177,7 +179,7 @@ export default function ProductDetailPage() {
               {mainImage ? (
                 <img src={mainImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <Typography color="text.disabled">Sin imagen</Typography>
+                <Typography color="text.disabled">{t('product.detail.noImage')}</Typography>
               )}
             </Box>
             {images.length > 1 && (
@@ -210,12 +212,12 @@ export default function ProductDetailPage() {
             {product.name}
           </Typography>
           <Box display="flex" alignItems="center" gap={1} mt={1}>
-            {product.condition === 'NEW' && <Chip label="Nuevo" size="small" color="success" />}
-            {product.condition === 'USED' && <Chip label={`Usado (${product.conditionScore}/10)`} size="small" color="warning" />}
-            {product.condition === 'REFURBISHED' && <Chip label="Reacondicionado" size="small" color="info" />}
-            {product.stock > 0 && product.stock <= 5 && <Chip label={`Últimas ${product.stock}`} size="small" color="warning" />}
-            {product.stock === 1 && <Chip label="Última unidad" size="small" color="error" />}
-            {outOfStock && <Chip label="Sin stock" size="small" color="error" />}
+            {product.condition === 'NEW' && <Chip label={t('product.condition.new')} size="small" color="success" />}
+            {product.condition === 'USED' && <Chip label={t('product.condition.usedWithScore', { score: product.conditionScore })} size="small" color="warning" />}
+            {product.condition === 'REFURBISHED' && <Chip label={t('product.condition.refurbished')} size="small" color="info" />}
+            {product.stock > 0 && product.stock <= 5 && <Chip label={t('product.detail.lastUnits', { count: product.stock })} size="small" color="warning" />}
+            {product.stock === 1 && <Chip label={t('product.detail.lastUnit')} size="small" color="error" />}
+            {outOfStock && <Chip label={t('product.detail.outOfStock')} size="small" color="error" />}
           </Box>
 
           {/* Prueba social: personas viendo + vistas totales */}
@@ -224,12 +226,16 @@ export default function ProductDetailPage() {
               {product.viewingNow > 0 && (
                 <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#4caf50', animation: 'pulse 1.5s infinite' }} />
-                  {product.viewingNow} {product.viewingNow === 1 ? 'persona está viendo' : 'personas están viendo'} este producto ahora
+                  {product.viewingNow === 1
+                    ? t('product.detail.viewingNow_one', { count: product.viewingNow })
+                    : t('product.detail.viewingNow_other', { count: product.viewingNow })}
                 </Typography>
               )}
               {product.viewCount > 0 && (
                 <Typography variant="caption" color="text.secondary">
-                  Visto por {product.viewCount} {product.viewCount === 1 ? 'persona' : 'personas'}
+                  {product.viewCount === 1
+                    ? t('product.detail.viewedBy_one', { count: product.viewCount })
+                    : t('product.detail.viewedBy_other', { count: product.viewCount })}
                 </Typography>
               )}
             </Box>
@@ -257,11 +263,11 @@ export default function ProductDetailPage() {
                   {product.seller.isVerified && <VerifiedIcon color="primary" fontSize="small" />}
                 </Box>
                 <Typography variant="caption" color="text.secondary">
-                  {product.seller.locationCity}, {product.seller.locationState} · Rating {product.seller.rating}
+                  {t('product.detail.sellerLocationRating', { city: product.seller.locationCity, state: product.seller.locationState, rating: product.seller.rating })}
                 </Typography>
                 {(product.seller as any).freeShippingThreshold != null && Number((product.seller as any).freeShippingThreshold) > 0 && (
                   <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 600 }}>
-                    Envío gratis en compras mayores a {money(Number((product.seller as any).freeShippingThreshold))}
+                    {t('product.detail.freeShippingOver', { amount: money(Number((product.seller as any).freeShippingThreshold)) })}
                   </Typography>
                 )}
               </Box>
@@ -286,15 +292,15 @@ export default function ProductDetailPage() {
             />
             <Box sx={{ flex: 1 }}>
               <PrimaryButton onClick={handleAddToCart} disabled={outOfStock} startIcon={<AddShoppingCartIcon />} fullWidth>
-                {outOfStock ? 'Sin stock' : 'Agregar al carrito'}
+                {outOfStock ? t('product.detail.outOfStock') : t('product.detail.addToCart')}
               </PrimaryButton>
             </Box>
             <SecondaryButton onClick={startChat} startIcon={<ChatIcon />}>
-              Consultar
+              {t('product.detail.contact')}
             </SecondaryButton>
           </Box>
           <Typography variant="caption" color="text.secondary">
-            Vendido y despachado por {product.seller.storeName}. El costo de envío se calcula en el checkout según tu ubicación.
+            {t('product.detail.soldAndShippedBy', { store: product.seller.storeName })}
           </Typography>
         </Grid>
       </Grid>
@@ -303,10 +309,10 @@ export default function ProductDetailPage() {
       {offers && offers.count > 1 && (
         <Paper sx={{ mt: 3, p: 2 }}>
           <Typography variant="h6" fontWeight={700} mb={1}>
-            Compara precios — {offers.count} tiendas venden este producto
+            {t('product.detail.offers.title', { count: offers.count })}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            El mejor precio es {money(offers.bestPrice)}. Elige la tienda que más te convenga.
+            {t('product.detail.offers.bestPrice', { price: money(offers.bestPrice) })}
           </Typography>
           <Box>
             {offers.offers.map((o: any) => {
@@ -342,17 +348,17 @@ export default function ProductDetailPage() {
                       {o.seller.isVerified && <VerifiedIcon color="primary" fontSize="small" />}
                     </Box>
                     <Typography variant="caption" color="text.secondary">
-                      {o.seller.locationCity}, {o.seller.locationState} · Rating {o.seller.rating}
+                      {t('product.detail.sellerLocationRating', { city: o.seller.locationCity, state: o.seller.locationState, rating: o.seller.rating })}
                     </Typography>
-                    {o.stock <= 0 && <Chip label="Sin stock" size="small" color="error" sx={{ mt: 0.5 }} />}
+                    {o.stock <= 0 && <Chip label={t('product.detail.outOfStock')} size="small" color="error" sx={{ mt: 0.5 }} />}
                   </Box>
                   <Box textAlign="right">
                     <Typography variant="body1" className="price-color" fontWeight={700}>
                       {money(o.price)}
                     </Typography>
                     <Box display="flex" gap={0.5} justifyContent="flex-end" mt={0.5}>
-                      {isBest && <Chip label="Mejor precio" size="small" color="success" />}
-                      {isCurrent && <Chip label="Estás viendo" size="small" color="primary" />}
+                      {isBest && <Chip label={t('product.detail.offers.bestPriceChip')} size="small" color="success" />}
+                      {isCurrent && <Chip label={t('product.detail.offers.viewingChip')} size="small" color="primary" />}
                     </Box>
                   </Box>
                 </Box>
@@ -366,7 +372,7 @@ export default function ProductDetailPage() {
       {attributes.length > 0 && (
         <Paper sx={{ mt: 3, p: 2 }}>
           <Typography variant="h6" fontWeight={700} mb={2}>
-            Especificaciones
+            {t('product.detail.specifications')}
           </Typography>
           <Table size="small">
             <TableBody>
@@ -390,7 +396,7 @@ export default function ProductDetailPage() {
       {product.description && (
         <Paper sx={{ mt: 3, p: 2 }}>
           <Typography variant="h6" fontWeight={700} mb={1}>
-            Descripción
+            {t('product.detail.description')}
           </Typography>
           <Typography variant="body2" color="text.secondary" whiteSpace="pre-wrap">
             {product.description}
@@ -402,17 +408,17 @@ export default function ProductDetailPage() {
       <Paper sx={{ mt: 3, p: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" fontWeight={700}>
-            Reseñas ({reviews.length})
+            {t('product.detail.reviews.title', { count: reviews.length })}
           </Typography>
           {reviews.length > 0 && (
             <Button size="small" variant="outlined" onClick={() => setReviewsOpen(true)}>
-              Ver todas las reseñas
+              {t('product.detail.reviews.viewAll')}
             </Button>
           )}
         </Box>
 
         {reviews.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">Aún no hay reseñas. Sé el primero.</Typography>
+          <Typography variant="body2" color="text.secondary">{t('product.detail.reviews.empty')}</Typography>
         ) : (
           <>
             {/* Resumen de calificación */}
@@ -426,7 +432,7 @@ export default function ProductDetailPage() {
                   <Chip label={veredicto(avgRating).label} color={veredicto(avgRating).color} size="small" sx={{ fontWeight: 700 }} />
                 </Box>
                 <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
-                  {reviews.length} reseña(s)
+                  {t('product.detail.reviews.count', { count: reviews.length })}
                 </Typography>
               </Box>
               <Box flexGrow={1} minWidth={200}>
@@ -479,31 +485,33 @@ export default function ProductDetailPage() {
               size="small"
               multiline
               rows={2}
-              placeholder="Escribe tu reseña..."
+              placeholder={t('product.detail.reviews.writePlaceholder')}
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               sx={{ mt: 1, mb: 1 }}
             />
             <Button variant="contained" size="small" onClick={submitReview} disabled={!reviewText.trim()}>
-              Publicar reseña
+              {t('product.detail.reviews.publish')}
             </Button>
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            <Link to="/login">Inicia sesión</Link> para dejar una reseña.
+            <Trans i18nKey="product.detail.reviews.loginToReview" t={t}>
+              <Link to="/login">Inicia sesión</Link> para dejar una reseña.
+            </Trans>
           </Typography>
         )}
       </Paper>
 
       {/* Modal de todas las reseñas */}
       <Dialog open={reviewsOpen} onClose={() => setReviewsOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle>Reseñas del producto ({reviews.length})</DialogTitle>
+        <DialogTitle>{t('product.detail.reviews.dialogTitle', { count: reviews.length })}</DialogTitle>
         <DialogContent dividers>
           <Tabs value={reviewFilter} onChange={(_e, v) => setReviewFilter(v)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
-            <Tab label="Todas" value="all" />
-            <Tab label="Muy recomendado" value="good" />
-            <Tab label="Recomendado" value="neutral" />
-            <Tab label="No recomendado" value="bad" />
+            <Tab label={t('product.detail.reviews.filters.all')} value="all" />
+            <Tab label={t('product.detail.verdict.highlyRecommended')} value="good" />
+            <Tab label={t('product.detail.verdict.recommended')} value="neutral" />
+            <Tab label={t('product.detail.verdict.notRecommended')} value="bad" />
           </Tabs>
           {reviews
             .filter((r: any) => {
@@ -541,12 +549,12 @@ export default function ProductDetailPage() {
             return true;
           }).length === 0 && (
             <Typography color="text.secondary" textAlign="center" py={3}>
-              No hay reseñas en esta categoría.
+              {t('product.detail.reviews.noneInCategory')}
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setReviewsOpen(false)}>Cerrar</Button>
+          <Button onClick={() => setReviewsOpen(false)}>{t('product.detail.reviews.close')}</Button>
         </DialogActions>
       </Dialog>
 
@@ -554,7 +562,7 @@ export default function ProductDetailPage() {
       {related.length > 0 && (
         <>
           <Typography variant="h6" fontWeight={700} mt={4} mb={2}>
-            Productos relacionados
+            {t('product.detail.related')}
           </Typography>
           <Grid container spacing={2}>
           {related.slice(0, 5).map((p) => (

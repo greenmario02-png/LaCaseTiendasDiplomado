@@ -4,6 +4,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { listComments, createComment, voteComment } from '../../services/forum.api';
 import type { GenericComment } from '../../services/forum.api';
 import { useAuthStore } from '../../stores/authStore';
@@ -24,6 +25,7 @@ interface Props {
 const PAGE_SIZE = 20;
 
 export default function CommentsSection({ targetType, targetId }: Props) {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const { user } = useAuthStore();
   // "Está mamando" varía por departamento (ver locales/modismos/es-BO.json) — este componente
@@ -89,7 +91,7 @@ export default function CommentsSection({ targetType, targetId }: Props) {
   return (
     <Box sx={{ mt: 2 }}>
       <Typography variant="subtitle2" fontWeight={700} sx={{ color: tokens.onSurface, mb: 1 }}>
-        Comentarios ({total})
+        {t('forum.comments.title', { count: total })}
       </Typography>
 
       {user && (
@@ -99,13 +101,13 @@ export default function CommentsSection({ targetType, targetId }: Props) {
             size="small"
             multiline
             maxRows={4}
-            placeholder="Escribe un comentario…"
+            placeholder={t('forum.comments.placeholder')}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             inputProps={{ maxLength: 500 }}
           />
           <Button variant="contained" onClick={submit} disabled={posting || !body.trim()}>
-            Enviar
+            {t('forum.comments.send')}
           </Button>
         </Stack>
       )}
@@ -113,7 +115,7 @@ export default function CommentsSection({ targetType, targetId }: Props) {
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}><CircularProgress size={20} /></Box>
       ) : comments.length === 0 ? (
-        <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant }}>Todavía no hay comentarios.</Typography>
+        <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant }}>{t('forum.comments.empty')}</Typography>
       ) : (
         <Stack spacing={1.5}>
           {comments.map((c) => (
@@ -128,13 +130,13 @@ export default function CommentsSection({ targetType, targetId }: Props) {
               <Typography variant="body2" sx={{ color: tokens.onSurface, mb: 1 }}>{c.body}</Typography>
               <Stack direction="row" spacing={1}>
                 <Button size="small" startIcon={<ThumbUpIcon sx={{ fontSize: 14 }} />} onClick={() => vote(c.id, 'AGREE')} sx={{ textTransform: 'none', fontSize: '0.75rem' }}>
-                  De acuerdo {c.agreeCount > 0 && `(${c.agreeCount})`}
+                  {t('forum.comments.agree')} {c.agreeCount > 0 && `(${c.agreeCount})`}
                 </Button>
                 <Button size="small" color="warning" startIcon={<ReportProblemIcon sx={{ fontSize: 14 }} />} onClick={() => vote(c.id, 'FAKE')} sx={{ textTransform: 'none', fontSize: '0.75rem' }}>
                   {fakeLabel} {c.fakeCount > 0 && `(${c.fakeCount})`}
                 </Button>
                 <Button size="small" color="secondary" startIcon={<SmartToyIcon sx={{ fontSize: 14 }} />} onClick={() => vote(c.id, 'AI_GENERATED')} sx={{ textTransform: 'none', fontSize: '0.75rem' }}>
-                  Es IA {c.aiCount > 0 && `(${c.aiCount})`}
+                  {t('forum.comments.isAi')} {c.aiCount > 0 && `(${c.aiCount})`}
                 </Button>
               </Stack>
             </Box>
@@ -146,7 +148,7 @@ export default function CommentsSection({ targetType, targetId }: Props) {
               disabled={loadingMore}
               sx={{ alignSelf: 'center', textTransform: 'none' }}
             >
-              {loadingMore ? <CircularProgress size={16} /> : `Cargar más (${total - comments.length})`}
+              {loadingMore ? <CircularProgress size={16} /> : t('forum.comments.loadMore', { count: total - comments.length })}
             </Button>
           )}
         </Stack>

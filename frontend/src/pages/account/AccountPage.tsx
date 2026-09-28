@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Coins } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   Container,
   Typography,
@@ -33,6 +34,7 @@ import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
 
 export default function AccountPage() {
+  const { t } = useTranslation();
   const money = useMoney();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
@@ -77,7 +79,7 @@ export default function AccountPage() {
   const handleBuyCoins = async () => {
     const amount = Number(buyAmount);
     if (!Number.isInteger(amount) || amount <= 0) {
-      toast.error('Ingresa una cantidad válida de monedas.');
+      toast.error(t('account.profile.invalidCoinAmount'));
       return;
     }
     setBuying(true);
@@ -85,7 +87,7 @@ export default function AccountPage() {
       const { data } = await api.post('/coins/buy', { amount });
       setCoins(data.data);
       if (user) setUser({ ...user, gamerCoins: data.data.balance });
-      toast.success(`Compraste ${amount} moneda(s).`);
+      toast.success(t('account.profile.boughtCoins', { amount }));
       setBuyOpen(false);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -106,7 +108,7 @@ export default function AccountPage() {
       if (url) {
         const { data: updated } = await api.put('/account', { profileImage: url });
         setUser(updated.data);
-        toast.success('Foto de perfil actualizada');
+        toast.success(t('account.profile.profileImageUpdated'));
       }
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -120,7 +122,7 @@ export default function AccountPage() {
     try {
       const { data } = await api.put('/account', form);
       setUser(data.data);
-      toast.success('Perfil actualizado');
+      toast.success(t('account.profile.profileUpdated'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -133,7 +135,7 @@ export default function AccountPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h5" fontWeight={700} mb={3}>
-        Mi cuenta
+        {t('account.profile.title')}
       </Typography>
 
       <Grid container spacing={3}>
@@ -172,24 +174,24 @@ export default function AccountPage() {
             <Typography color="text.secondary">{user?.email}</Typography>
             <Chip label={user?.role} color={user?.role === 'ADMIN' ? 'error' : user?.role === 'SELLER' ? 'primary' : 'default'} size="small" sx={{ mt: 1 }} />
             <Box mt={1}>
-              <CoinChip coins={user?.gamerCoins ?? 0} label="monedas" />
+              <CoinChip coins={user?.gamerCoins ?? 0} label={t('account.profile.coinsChipLabel')} />
             </Box>
             <Box mt={1} display="flex" gap={1} justifyContent="center">
               <GhostButton size="small" onClick={() => setBuyOpen(true)}>
-                Comprar monedas
+                {t('account.profile.buyCoins')}
               </GhostButton>
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box display="flex" flexDirection="column" gap={1}>
-              <GhostButton to="/cuenta/pedidos">Mis pedidos</GhostButton>
-              <GhostButton to="/cuenta/direcciones">Direcciones</GhostButton>
-              <GhostButton to="/cuenta/wishlist">Favoritos</GhostButton>
-              <GhostButton to="/cuenta/devoluciones">Devoluciones</GhostButton>
-              <GhostButton to="/cuenta/afiliados">Programa de afiliados</GhostButton>
-              <GhostButton to="/cuenta/notificaciones">Notificaciones</GhostButton>
-              <GhostButton to="/subastas/mis">Mis subastas</GhostButton>
+              <GhostButton to="/cuenta/pedidos">{t('account.profile.myOrders')}</GhostButton>
+              <GhostButton to="/cuenta/direcciones">{t('account.profile.addresses')}</GhostButton>
+              <GhostButton to="/cuenta/wishlist">{t('account.profile.wishlist')}</GhostButton>
+              <GhostButton to="/cuenta/devoluciones">{t('account.profile.returns')}</GhostButton>
+              <GhostButton to="/cuenta/afiliados">{t('account.profile.affiliateProgram')}</GhostButton>
+              <GhostButton to="/cuenta/notificaciones">{t('account.profile.notifications')}</GhostButton>
+              <GhostButton to="/subastas/mis">{t('account.profile.myAuctions')}</GhostButton>
               {user?.role === 'SELLER' && (
-                <GhostButton to="/seller">Ir a mi tienda</GhostButton>
+                <GhostButton to="/seller">{t('account.profile.goToMyStore')}</GhostButton>
               )}
             </Box>
           </Paper>
@@ -199,19 +201,17 @@ export default function AccountPage() {
           <Paper sx={{ p: 3, mb: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
               <Typography variant="h6" fontWeight={700}>
-                Monedas del proyecto
+                {t('account.profile.coinsTitle')}
               </Typography>
               <SecondaryButton size="small" onClick={() => setBuyOpen(true)}>
-                Comprar monedas
+                {t('account.profile.buyCoins')}
               </SecondaryButton>
             </Box>
             <Alert severity="info" sx={{ mb: 2 }}>
-              La moneda oficial de LaCase Multi Tiendas: se <b>compra</b> como token, se <b>gana</b> al hacer
-              compras efectivas (sin devolución) y ayudando en el foro, y se <b>usa</b> para comprar productos,
-              vales de regalo y vales de descuento.
+              <Trans i18nKey="account.profile.coinsInfo" components={{ b: <b /> }} />
             </Alert>
             <Typography variant="body2" fontWeight={700} mb={1}>
-              Saldo: {coins?.balance ?? user?.gamerCoins ?? 0} monedas
+              {t('account.profile.balanceLabel', { balance: coins?.balance ?? user?.gamerCoins ?? 0 })}
             </Typography>
             {coins?.transactions?.length ? (
               <List dense>
@@ -233,16 +233,16 @@ export default function AccountPage() {
               </List>
             ) : (
               <Typography color="text.secondary" variant="body2">
-                Todavía no tienes movimientos de monedas.
+                {t('account.profile.noCoinMovements')}
               </Typography>
             )}
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              Invita amigos y gana 50 monedas
+              {t('account.profile.inviteTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={1}>
-              Comparte tu código: cuando alguien se registre con él, ganas 50 monedas.
-              {invite?.referredCount ? ` Ya invitaste a ${invite.referredCount} persona(s).` : ''}
+              {t('account.profile.inviteDescription')}
+              {invite?.referredCount ? ` ${t('account.profile.invitedCount', { count: invite.referredCount })}` : ''}
             </Typography>
             <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
               <TextField
@@ -255,64 +255,64 @@ export default function AccountPage() {
                 size="small"
                 onClick={() => {
                   navigator.clipboard?.writeText(invite?.inviteCode ?? '');
-                  toast.success('Código copiado al portapapeles');
+                  toast.success(t('account.profile.copyCodeSuccess'));
                 }}
               >
-                Copiar
+                {t('account.profile.copy')}
               </SecondaryButton>
               <SecondaryButton
                 size="small"
                 onClick={() => {
                   navigator.clipboard?.writeText(`${window.location.origin}${invite?.inviteUrl ?? ''}`);
-                  toast.success('Link de invitación copiado');
+                  toast.success(t('account.profile.copyLinkSuccess'));
                 }}
               >
-                Copiar link
+                {t('account.profile.copyLink')}
               </SecondaryButton>
             </Box>
           </Paper>
 
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Datos personales
+              {t('account.profile.personalDataTitle')}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField label="Nombre" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.firstNameLabel')} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Apellido" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.lastNameLabel')} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Teléfono" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.phoneLabel')} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="País" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.countryLabel')} value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Ciudad" value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.cityLabel')} value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Provincia" value={form.locationState} onChange={(e) => setForm({ ...form, locationState: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.provinceLabel')} value={form.locationState} onChange={(e) => setForm({ ...form, locationState: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label="Código postal" value={form.locationPostalCode} onChange={(e) => setForm({ ...form, locationPostalCode: e.target.value })} fullWidth />
+                <TextField label={t('account.profile.postalCodeLabel')} value={form.locationPostalCode} onChange={(e) => setForm({ ...form, locationPostalCode: e.target.value })} fullWidth />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Biografía"
+                  label={t('account.profile.bioLabel')}
                   value={form.bio}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   fullWidth
                   multiline
                   rows={3}
-                  placeholder="Cuenta un poco sobre ti o tu tienda..."
+                  placeholder={t('account.profile.bioPlaceholder')}
                 />
               </Grid>
             </Grid>
             <Box mt={2}>
               <PrimaryButton onClick={save} disabled={saving}>
-                {saving ? <CircularProgress size={20} /> : 'Guardar cambios'}
+                {saving ? <CircularProgress size={20} /> : t('account.profile.saveChanges')}
               </PrimaryButton>
             </Box>
           </Paper>
@@ -320,13 +320,13 @@ export default function AccountPage() {
           <Paper sx={{ p: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Typography variant="h6" fontWeight={700}>
-                Últimos pedidos
+                {t('account.profile.lastOrdersTitle')}
               </Typography>
               <GhostButton to="/cuenta/pedidos" size="small">
-                Ver todos
+                {t('account.profile.viewAll')}
               </GhostButton>
             </Box>
-            {orders.length === 0 && <Typography color="text.secondary">No hiciste compras todavía.</Typography>}
+            {orders.length === 0 && <Typography color="text.secondary">{t('account.profile.noOrdersYet')}</Typography>}
             {orders.map((o) => (
               <Box key={o.id} display="flex" justifyContent="space-between" alignItems="center" py={1} borderBottom={1} borderColor="divider">
                 <Box>
@@ -350,13 +350,13 @@ export default function AccountPage() {
       </Grid>
 
       <Dialog open={buyOpen} onClose={() => setBuyOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Comprar monedas del proyecto</DialogTitle>
+        <DialogTitle>{t('account.profile.buyCoinsDialogTitle')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Compras monedas a modo de tokens que puedes usar en LaCase Multi Tiendas (productos, vales de regalo, vales de descuento).
+            {t('account.profile.buyCoinsDialogDescription')}
           </Typography>
           <TextField
-            label="Cantidad de monedas"
+            label={t('account.profile.coinsQuantityLabel')}
             type="number"
             value={buyAmount}
             onChange={(e) => setBuyAmount(e.target.value)}
@@ -366,9 +366,9 @@ export default function AccountPage() {
           />
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setBuyOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setBuyOpen(false)}>{t('account.profile.cancel')}</GhostButton>
           <PrimaryButton color="warning" onClick={handleBuyCoins} disabled={buying}>
-            {buying ? <CircularProgress size={20} /> : 'Comprar'}
+            {buying ? <CircularProgress size={20} /> : t('account.profile.buy')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import {
   Box,
@@ -28,8 +29,9 @@ const printStyles = `
 
 /** Generador de etiquetas imprimibles con SKU (código de barras) y nombre del producto. */
 export default function SellerLabels() {
+  const { t } = useTranslation();
   const money = useMoney();
-  const storeName = useAuthStore((s) => s.user?.storeName) ?? 'Mi tienda';
+  const storeName = useAuthStore((s) => s.user?.storeName) ?? t('seller.labels.defaultStoreName');
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -74,10 +76,10 @@ export default function SellerLabels() {
       <style>{printStyles}</style>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} className="labels-toolbar">
         <Typography variant="h6" fontWeight={700}>
-          Etiquetas de productos ({toPrint.length})
+          {t('seller.labels.pageTitle', { count: toPrint.length })}
         </Typography>
         <PrimaryButton startIcon={<PrintIcon />} disabled={toPrint.length === 0} onClick={() => window.print()}>
-          Imprimir etiquetas
+          {t('seller.labels.printButton')}
         </PrimaryButton>
       </Box>
 
@@ -91,11 +93,11 @@ export default function SellerLabels() {
                 onChange={toggleAll}
               />
             }
-            label="Seleccionar todos"
+            label={t('seller.labels.selectAll')}
           />
           <Divider sx={{ my: 1 }} />
           {products.length === 0 && (
-            <Alert severity="info">Todavía no tienes productos.</Alert>
+            <Alert severity="info">{t('seller.labels.noProducts')}</Alert>
           )}
           {products.map((p) => (
             <FormControlLabel
@@ -117,7 +119,7 @@ export default function SellerLabels() {
 
       {toPrint.length === 0 && (
         <Alert severity="info" sx={{ mt: 2 }} className="labels-toolbar">
-          Selecciona al menos un producto para imprimir etiquetas.
+          {t('seller.labels.selectAtLeastOne')}
         </Alert>
       )}
 

@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/es';
+import './i18n';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useThemeStore } from './stores/themeStore';

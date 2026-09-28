@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import {
   Box,
@@ -48,6 +49,7 @@ interface UserOption {
 }
 
 export default function SellerTeam() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const isOwner = user?.storeRole === 'OWNER';
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -93,7 +95,7 @@ export default function SellerTeam() {
     setSaving(true);
     try {
       await api.post('/seller/team/invite', { email: selected.email, role });
-      toast.success('Empleado invitado');
+      toast.success(t('seller.team.toasts.invited'));
       setOpen(false);
       setSelected(null);
       setSearch('');
@@ -108,7 +110,7 @@ export default function SellerTeam() {
   const changeRole = async (m: TeamMember, newRole: string) => {
     try {
       await api.put(`/seller/team/${m.id}/role`, { role: newRole });
-      toast.success('Rol actualizado');
+      toast.success(t('seller.team.toasts.roleUpdated'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -118,7 +120,7 @@ export default function SellerTeam() {
   const remove = async (m: TeamMember) => {
     try {
       await api.delete(`/seller/team/${m.id}`);
-      toast.success('Empleado removido del equipo');
+      toast.success(t('seller.team.toasts.removed'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -133,26 +135,25 @@ export default function SellerTeam() {
         <Box display="flex" alignItems="center" gap={1}>
           <GroupIcon color="primary" />
           <Typography variant="h5" fontWeight={700}>
-            Equipo de mi tienda
+            {t('seller.team.pageTitle')}
           </Typography>
         </Box>
         <PrimaryButton startIcon={<PersonAddIcon />} onClick={() => setOpen(true)}>
-          Invitar empleado
+          {t('seller.team.inviteEmployee')}
         </PrimaryButton>
       </Box>
       <Typography variant="body2" color="text.secondary" mb={3}>
-        Invita a personas de confianza para que te ayuden a gestionar la tienda. Los administradores gestionan todo; los empleados
-        solo pueden subir productos y ver pedidos (sin precios ni cobros).
+        {t('seller.team.pageSubtitle')}
       </Typography>
 
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: 'action.hover' }}>
-              <TableCell>Miembro</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rol</TableCell>
-              <TableCell align="right">Acciones</TableCell>
+              <TableCell>{t('seller.team.table.member')}</TableCell>
+              <TableCell>{t('seller.team.table.email')}</TableCell>
+              <TableCell>{t('seller.team.table.role')}</TableCell>
+              <TableCell align="right">{t('seller.team.table.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -163,7 +164,7 @@ export default function SellerTeam() {
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Chip size="small" color="primary" label="Dueño" />
+                  <Chip size="small" color="primary" label={t('seller.team.table.owner')} />
                 </TableCell>
                 <TableCell align="right">—</TableCell>
               </TableRow>
@@ -171,7 +172,7 @@ export default function SellerTeam() {
             {members.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  Todavía no tienes empleados. Invita a alguien para que te ayude a gestionar la tienda.
+                  {t('seller.team.empty')}
                 </TableCell>
               </TableRow>
             )}
@@ -188,12 +189,12 @@ export default function SellerTeam() {
                     onChange={(e) => changeRole(m, e.target.value)}
                     sx={{ minWidth: 170 }}
                   >
-                    <MenuItem value="ADMIN">Administrador</MenuItem>
-                    <MenuItem value="EMPLOYEE">Empleado</MenuItem>
+                    <MenuItem value="ADMIN">{t('seller.team.roles.admin')}</MenuItem>
+                    <MenuItem value="EMPLOYEE">{t('seller.team.roles.employee')}</MenuItem>
                   </TextField>
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title={isOwner ? 'Quitar del equipo' : 'Solo el dueño puede quitar empleados'}>
+                  <Tooltip title={isOwner ? t('seller.team.removeTooltip') : t('seller.team.removeTooltipDisabled')}>
                     <span>
                       <IconButton size="small" color="error" disabled={!isOwner} onClick={() => remove(m)}>
                         <DeleteIcon fontSize="small" />
@@ -208,7 +209,7 @@ export default function SellerTeam() {
       </TableContainer>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Invitar empleado</DialogTitle>
+        <DialogTitle>{t('seller.team.dialog.title')}</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
             <Autocomplete
@@ -219,21 +220,27 @@ export default function SellerTeam() {
               onInputChange={(_, v) => setSearch(v)}
               onChange={(_, v) => setSelected(v)}
               filterOptions={(x) => x}
-              noOptionsText={search.trim().length < 2 ? 'Escribe al menos 2 letras' : 'Sin resultados'}
+              noOptionsText={search.trim().length < 2 ? t('seller.team.dialog.typeMoreLetters') : t('seller.team.dialog.noResults')}
               renderInput={(params) => (
-                <TextField {...params} label="Buscar usuario por email o nombre" placeholder="juan@mail.com" />
+                <TextField {...params} label={t('seller.team.dialog.searchLabel')} placeholder="juan@mail.com" />
               )}
             />
-            <TextField select label="Rol" value={role} onChange={(e) => setRole(e.target.value as 'ADMIN' | 'EMPLOYEE')} fullWidth>
-              <MenuItem value="ADMIN">Administrador — gestiona toda la tienda</MenuItem>
-              <MenuItem value="EMPLOYEE">Empleado — solo productos y pedidos</MenuItem>
+            <TextField
+              select
+              label={t('seller.team.dialog.roleLabel')}
+              value={role}
+              onChange={(e) => setRole(e.target.value as 'ADMIN' | 'EMPLOYEE')}
+              fullWidth
+            >
+              <MenuItem value="ADMIN">{t('seller.team.dialog.roleAdminOption')}</MenuItem>
+              <MenuItem value="EMPLOYEE">{t('seller.team.dialog.roleEmployeeOption')}</MenuItem>
             </TextField>
           </Box>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setOpen(false)}>{t('seller.team.dialog.cancel')}</GhostButton>
           <PrimaryButton onClick={invite} disabled={saving || !selected}>
-            {saving ? <CircularProgress size={18} /> : 'Invitar'}
+            {saving ? <CircularProgress size={18} /> : t('seller.team.dialog.invite')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

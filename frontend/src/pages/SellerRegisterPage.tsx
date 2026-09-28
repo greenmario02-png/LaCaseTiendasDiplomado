@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton } from '../components/redesign/Buttons';
 import {
   Container,
@@ -33,6 +34,7 @@ interface FieldError {
 }
 
 export default function SellerRegisterPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const registerSeller = useAuthStore((s) => s.registerSeller);
 
@@ -73,18 +75,18 @@ export default function SellerRegisterPage() {
   // Validación local antes de enviar
   const validateLocal = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!form.storeName.trim() || form.storeName.trim().length < 2) newErrors.storeName = 'El nombre de la tienda es obligatorio';
+    if (!form.storeName.trim() || form.storeName.trim().length < 2) newErrors.storeName = t('auth.sellerRegister.errors.storeName');
     if (!form.storeDescription.trim() || form.storeDescription.trim().length < 10)
-      newErrors.storeDescription = 'La descripción debe tener al menos 10 caracteres';
-    if (!form.storeCategory) newErrors.storeCategory = 'Selecciona la categoría de productos que vendes';
-    if (!form.country) newErrors.country = 'Selecciona el país';
-    if (!form.locationState) newErrors.locationState = `Selecciona el ${country?.divisionLabel.toLowerCase() || 'departamento/provincia'}`;
-    if (!form.locationCity.trim() || form.locationCity.trim().length < 2) newErrors.locationCity = 'La ciudad es obligatoria';
-    if (!form.phone.trim() || form.phone.trim().length < 7) newErrors.phone = 'El celular de contacto es obligatorio';
-    if (!form.firstName.trim() || form.firstName.trim().length < 2) newErrors.firstName = 'El nombre es obligatorio';
-    if (!form.lastName.trim() || form.lastName.trim().length < 2) newErrors.lastName = 'El apellido es obligatorio';
-    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = 'Email inválido';
-    if (form.password.length < 8) newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+      newErrors.storeDescription = t('auth.sellerRegister.errors.storeDescription');
+    if (!form.storeCategory) newErrors.storeCategory = t('auth.sellerRegister.errors.storeCategory');
+    if (!form.country) newErrors.country = t('auth.sellerRegister.errors.country');
+    if (!form.locationState) newErrors.locationState = t('auth.sellerRegister.errors.locationState', { division: country?.divisionLabel.toLowerCase() || 'departamento/provincia' });
+    if (!form.locationCity.trim() || form.locationCity.trim().length < 2) newErrors.locationCity = t('auth.sellerRegister.errors.locationCity');
+    if (!form.phone.trim() || form.phone.trim().length < 7) newErrors.phone = t('auth.sellerRegister.errors.phone');
+    if (!form.firstName.trim() || form.firstName.trim().length < 2) newErrors.firstName = t('auth.sellerRegister.errors.firstName');
+    if (!form.lastName.trim() || form.lastName.trim().length < 2) newErrors.lastName = t('auth.sellerRegister.errors.lastName');
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = t('auth.sellerRegister.errors.email');
+    if (form.password.length < 8) newErrors.password = t('auth.sellerRegister.errors.password');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,21 +108,21 @@ export default function SellerRegisterPage() {
     setErrors({});
 
     if (!validateLocal()) {
-      setServerError('Revisa los campos marcados en rojo');
+      setServerError(t('auth.sellerRegister.reviewFields'));
       return;
     }
 
     setLoading(true);
     try {
       await registerSeller(form);
-      toast.success('Solicitud enviada. Espera la aprobación del administrador.');
+      toast.success(t('auth.sellerRegister.successToast'));
       navigate('/login');
     } catch (err) {
       const msg = getErrorMessage(err);
       if (msg.includes('Validación')) {
         const details = (err as any)?.response?.data?.error?.details;
         applyServerErrors(details);
-        setServerError('Revisa los campos marcados en rojo');
+        setServerError(t('auth.sellerRegister.reviewFields'));
       } else {
         setServerError(msg);
       }
@@ -138,16 +140,10 @@ export default function SellerRegisterPage() {
           <Paper sx={{ p: 3, bgcolor: 'primary.main', color: 'white', height: '100%' }}>
             <StorefrontIcon sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h5" fontWeight={700} mb={2}>
-              Abre tu tienda en LaCase Multi Tiendas
+              {t('auth.sellerRegister.heroTitle')}
             </Typography>
             <List>
-              {[
-                'Publica productos de cualquier rubro',
-                'Elige tu país y departamento/provincia',
-                'El envío se calcula según tu ubicación',
-                'Recibe pagos por QR',
-                'Te contactamos por celular',
-              ].map((item) => (
+              {(t('auth.sellerRegister.heroItems', { returnObjects: true }) as string[]).map((item) => (
                 <ListItem key={item} disableGutters>
                   <ListItemIcon sx={{ color: 'white', minWidth: 32 }}>
                     <CheckCircleOutlineIcon fontSize="small" />
@@ -162,10 +158,10 @@ export default function SellerRegisterPage() {
         <Grid item xs={12} md={7}>
           <Paper sx={{ p: 4 }}>
             <Typography variant="h5" fontWeight={700} mb={1}>
-              Registro de vendedor
+              {t('auth.sellerRegister.formTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
-              Tu solicitud será revisada por un administrador. Puedes publicar productos una vez aprobada.
+              {t('auth.sellerRegister.formSubtitle')}
             </Typography>
 
             {serverError && (
@@ -176,28 +172,28 @@ export default function SellerRegisterPage() {
 
             <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
               <Typography variant="subtitle2" fontWeight={700} color="primary">
-                1. Datos de tu tienda
+                {t('auth.sellerRegister.section1Title')}
               </Typography>
               <TextField
-                label="Nombre de tu tienda"
+                label={t('auth.sellerRegister.storeNameLabel')}
                 required
                 value={form.storeName}
                 onChange={handleChange('storeName')}
                 {...fieldError('storeName')}
               />
               <TextField
-                label="Descripción de tu tienda"
+                label={t('auth.sellerRegister.storeDescriptionLabel')}
                 multiline
                 rows={2}
                 required
                 value={form.storeDescription}
                 onChange={handleChange('storeDescription')}
-                helperText={errors.storeDescription || 'Mínimo 10 caracteres'}
+                helperText={errors.storeDescription || t('auth.sellerRegister.storeDescriptionHelper')}
                 error={Boolean(errors.storeDescription)}
               />
               <TextField
                 select
-                label="Categoría de productos que vendes"
+                label={t('auth.sellerRegister.storeCategoryLabel')}
                 required
                 value={form.storeCategory}
                 onChange={handleChange('storeCategory')}
@@ -213,13 +209,13 @@ export default function SellerRegisterPage() {
               <Divider />
 
               <Typography variant="subtitle2" fontWeight={700} color="primary">
-                2. Ubicación
+                {t('auth.sellerRegister.section2Title')}
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                   <TextField
                     select
-                    label="País"
+                    label={t('auth.sellerRegister.countryLabel')}
                     required
                     value={form.country}
                     onChange={(e) => handleCountryChange(e.target.value)}
@@ -243,14 +239,14 @@ export default function SellerRegisterPage() {
                         {...params}
                         label={`${country?.divisionLabel || 'Departamento/Provincia'} *`}
                         error={Boolean(errors.locationState)}
-                        helperText={errors.locationState || 'Puedes escribir o seleccionar'}
+                        helperText={errors.locationState || t('auth.sellerRegister.divisionHelper')}
                       />
                     )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <TextField
-                    label="Ciudad"
+                    label={t('auth.sellerRegister.cityLabel')}
                     required
                     value={form.locationCity}
                     onChange={handleChange('locationCity')}
@@ -260,54 +256,54 @@ export default function SellerRegisterPage() {
               </Grid>
 
               <TextField
-                label={`Celular de contacto (${country?.phoneCode || '+xxx'})`}
+                label={t('auth.sellerRegister.phoneLabel', { code: country?.phoneCode || '+xxx' })}
                 required
-                placeholder={country?.code === 'BO' ? 'Ej: 71234567' : 'Ej: 1123456789'}
+                placeholder={country?.code === 'BO' ? t('auth.sellerRegister.phonePlaceholderBolivia') : t('auth.sellerRegister.phonePlaceholderOther')}
                 value={form.phone}
                 onChange={handleChange('phone')}
                 {...fieldError('phone')}
-                helperText={errors.phone || `Los vendedores y clientes te contactarán por este número`}
+                helperText={errors.phone || t('auth.sellerRegister.phoneHelper')}
               />
 
               <Divider />
 
               <Typography variant="subtitle2" fontWeight={700} color="primary">
-                3. Datos de acceso
+                {t('auth.sellerRegister.section3Title')}
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Nombre" required value={form.firstName} onChange={handleChange('firstName')} {...fieldError('firstName')} fullWidth />
+                  <TextField label={t('auth.sellerRegister.firstNameLabel')} required value={form.firstName} onChange={handleChange('firstName')} {...fieldError('firstName')} fullWidth />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Apellido" required value={form.lastName} onChange={handleChange('lastName')} {...fieldError('lastName')} fullWidth />
+                  <TextField label={t('auth.sellerRegister.lastNameLabel')} required value={form.lastName} onChange={handleChange('lastName')} {...fieldError('lastName')} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Email" type="email" required value={form.email} onChange={handleChange('email')} {...fieldError('email')} fullWidth />
+                  <TextField label={t('auth.sellerRegister.emailLabel')} type="email" required value={form.email} onChange={handleChange('email')} {...fieldError('email')} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="Contraseña"
+                    label={t('auth.sellerRegister.passwordLabel')}
                     type="password"
                     required
                     value={form.password}
                     onChange={handleChange('password')}
                     {...fieldError('password')}
                     fullWidth
-                    helperText={errors.password || 'Mínimo 8 caracteres'}
+                    helperText={errors.password || t('auth.sellerRegister.passwordHelper')}
                   />
                 </Grid>
               </Grid>
 
               <Box mt={1}>
                 <PrimaryButton type="submit" size="large" disabled={loading}>
-                  {loading ? <CircularProgress size={22} color="inherit" /> : 'Enviar solicitud'}
+                  {loading ? <CircularProgress size={22} color="inherit" /> : t('auth.sellerRegister.submit')}
                 </PrimaryButton>
               </Box>
             </Box>
 
             <Box mt={2} textAlign="center">
               <Typography variant="body2" color="text.secondary">
-                ¿Ya tienes tienda? <Link to="/login">Inicia sesión</Link>
+                {t('auth.sellerRegister.alreadyHaveStore')} <Link to="/login">{t('auth.sellerRegister.signIn')}</Link>
               </Typography>
             </Box>
           </Paper>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Chip, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, IconButton, Tooltip } from '@mui/material';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { MapPin, Check, SlidersHorizontal } from 'lucide-react';
 import ForumSidebarLeft from '../../components/forum/ForumSidebarLeft';
@@ -11,8 +12,9 @@ import { useForumPalette } from '../../theme/forumTheme';
 import { useUnifiedTokens } from '../../theme';
 
 export default function ForumPage() {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
-  const t = useUnifiedTokens();
+  const tokens = useUnifiedTokens();
   const { geo, geoLoaded, fetchGeoSession } = useForumStore();
   const [cityOpen, setCityOpen] = useState(false);
 
@@ -22,7 +24,7 @@ export default function ForumPage() {
   }, []);
 
   return (
-    <Box sx={{ position: 'relative', minHeight: 'calc(100vh - 64px)', color: forumPalette.textPrimary, overflow: 'hidden', bgcolor: t.background }}>
+    <Box sx={{ position: 'relative', minHeight: 'calc(100vh - 64px)', color: forumPalette.textPrimary, overflow: 'hidden', bgcolor: tokens.background }}>
       <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: 'calc(100vh - 64px)' }}>
         {/* Sidebar izquierdo: navegación, categorías, ciudades */}
         <ForumSidebarLeft />
@@ -34,12 +36,14 @@ export default function ForumPage() {
               <>
                 <Chip
                   icon={<MapPin size={13} strokeWidth={2.2} />}
-                  label={geo.cityVerified ? `${geo.city ?? 'Mi ciudad'} (verificada)` : geo.city ?? 'Mi ciudad'}
+                  label={geo.cityVerified
+                    ? t('forum.cityBar.cityVerified', { city: geo.city ?? t('forum.cityBar.defaultCity') })
+                    : geo.city ?? t('forum.cityBar.defaultCity')}
                   size="small"
-                  sx={{ color: forumPalette.amarillo, fontWeight: 700, bgcolor: `${t.secondaryContainer}1A` }}
+                  sx={{ color: forumPalette.amarillo, fontWeight: 700, bgcolor: `${tokens.secondaryContainer}1A` }}
                 />
-                {geo.cityVerified && <Check size={14} strokeWidth={2.4} color={t.tertiaryContainer} />}
-                <Tooltip title="Cambiar de ciudad">
+                {geo.cityVerified && <Check size={14} strokeWidth={2.4} color={tokens.tertiaryContainer} />}
+                <Tooltip title={t('forum.cityBar.changeCityTooltip')}>
                   <IconButton size="small" onClick={() => setCityOpen(true)} sx={{ color: forumPalette.textSecondary }}>
                     <ChangeCircleIcon fontSize="small" />
                   </IconButton>
@@ -47,11 +51,11 @@ export default function ForumPage() {
               </>
             ) : (
               geoLoaded && (
-                <Alert severity="info" icon={<MapPin size={16} strokeWidth={2.2} />} sx={{ flex: 1, fontSize: '0.85rem', bgcolor: `${t.primary}14`, color: t.onSurface }}>
-                  Configura tu ciudad para ver los foros de tu zona.
+                <Alert severity="info" icon={<MapPin size={16} strokeWidth={2.2} />} sx={{ flex: 1, fontSize: '0.85rem', bgcolor: `${tokens.primary}14`, color: tokens.onSurface }}>
+                  {t('forum.cityBar.configurePrompt')}
                   <Button size="small" onClick={() => setCityOpen(true)}
                     sx={{ ml: 1, color: forumPalette.accent, textTransform: 'none' }}>
-                    Configurar
+                    {t('forum.cityBar.configureButton')}
                   </Button>
                 </Alert>
               )
@@ -66,14 +70,14 @@ export default function ForumPage() {
         {/* Selector de ciudad (reutiliza GeoConfig) */}
         <Dialog open={cityOpen} onClose={() => setCityOpen(false)} fullWidth maxWidth="sm">
           <DialogTitle sx={{ color: forumPalette.textPrimary, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SlidersHorizontal size={18} strokeWidth={2.2} /> Tu zona del foro
+            <SlidersHorizontal size={18} strokeWidth={2.2} /> {t('forum.citySelector.dialogTitle')}
           </DialogTitle>
           <DialogContent>
             <GeoConfig compact onSaved={() => setCityOpen(false)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setCityOpen(false)} sx={{ color: forumPalette.textSecondary, textTransform: 'none' }}>
-              Cerrar
+              {t('forum.citySelector.close')}
             </Button>
           </DialogActions>
         </Dialog>

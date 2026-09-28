@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { Link } from 'react-router-dom';
 import {
@@ -20,6 +21,7 @@ import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 
 export default function SellerAuctions() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [auctions, setAuctions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,18 +46,18 @@ export default function SellerAuctions() {
       <Box display="flex" alignItems="center" gap={1} mb={2}>
         <GavelIcon color="primary" />
         <Typography variant="h6" fontWeight={700}>
-          Mis subastas ({auctions.length})
+          {t('seller.auctions.title', { count: auctions.length })}
         </Typography>
       </Box>
 
       {auctions.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography color="text.secondary">
-            No creaste subastas aún. Al publicar un producto activa la opción "Publicar como subasta".
+            {t('seller.auctions.empty.message')}
           </Typography>
           <Box sx={{ mt: 2 }}>
             <PrimaryButton to="/seller/productos/nuevo">
-              Crear subasta
+              {t('seller.auctions.empty.cta')}
             </PrimaryButton>
           </Box>
         </Paper>
@@ -64,11 +66,11 @@ export default function SellerAuctions() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Título</TableCell>
-                <TableCell align="right">Precio actual</TableCell>
-                <TableCell align="center">Ofertas</TableCell>
-                <TableCell align="center">Estado</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('seller.auctions.table.title')}</TableCell>
+                <TableCell align="right">{t('seller.auctions.table.currentPrice')}</TableCell>
+                <TableCell align="center">{t('seller.auctions.table.bids')}</TableCell>
+                <TableCell align="center">{t('seller.auctions.table.status')}</TableCell>
+                <TableCell align="center">{t('seller.auctions.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -79,7 +81,7 @@ export default function SellerAuctions() {
                       {a.title}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Fin: {new Date(a.endDate).toLocaleString('es-BO')}
+                      {t('seller.auctions.endDate', { date: new Date(a.endDate).toLocaleString('es-BO') })}
                     </Typography>
                   </TableCell>
                   <TableCell align="right" className="price-color">
@@ -89,17 +91,17 @@ export default function SellerAuctions() {
                   <TableCell align="center">
                     {a.isExpired ? (
                       a.isSold && a.winner ? (
-                        <Chip label={`Ganada: ${a.winner.firstName}`} size="small" color="success" />
+                        <Chip label={t('seller.auctions.status.wonBy', { name: a.winner.firstName })} size="small" color="success" />
                       ) : (
-                        <Chip label="Sin ganador" size="small" color="default" />
+                        <Chip label={t('seller.auctions.status.noWinner')} size="small" color="default" />
                       )
                     ) : (
-                      <Chip label="Activa" size="small" color="primary" />
+                      <Chip label={t('seller.auctions.status.active')} size="small" color="primary" />
                     )}
                   </TableCell>
                   <TableCell align="center">
                     <PrimaryButton to={`/subasta/${a.id}`} size="small">
-                      Ver
+                      {t('seller.auctions.actions.view')}
                     </PrimaryButton>
                   </TableCell>
                 </TableRow>

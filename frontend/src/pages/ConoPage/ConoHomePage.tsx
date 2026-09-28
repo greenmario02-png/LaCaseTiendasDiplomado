@@ -7,6 +7,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { listConoThemes, createConoTheme } from '../../services/cono.api';
 import type { ConoTheme, ConoThemeType } from '../../services/cono.api';
 import { useAuthStore } from '../../stores/authStore';
@@ -16,6 +17,7 @@ import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerLi
 import { MotionCard } from '../../components/motion/MotionCard';
 
 export default function ConoHomePage() {
+  const { t } = useTranslation();
   const tokens = useUnifiedTokens();
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -35,7 +37,7 @@ export default function ConoHomePage() {
 
   const submitTheme = async () => {
     if (!form.slug.trim() || !form.title.trim()) {
-      toast.error('Slug y título son obligatorios.');
+      toast.error(t('cono.home.slugAndTitleRequired'));
       return;
     }
     setSaving(true);
@@ -54,20 +56,20 @@ export default function ConoHomePage() {
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', p: 2 }}>
       <Typography variant="h5" fontWeight={800} sx={{ color: tokens.onSurface, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <EmojiEventsIcon sx={{ fontSize: 26, color: tokens.primary }} /> Rinconcito Boliviano
+        <EmojiEventsIcon sx={{ fontSize: 26, color: tokens.primary }} /> {t('cono.home.title')}
       </Typography>
       <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 2 }}>
-        Rankings de la comunidad, con humor y con datos. Vota positivo o nica, o sigue un torneo de eliminatorias.
+        {t('cono.home.subtitle')}
       </Typography>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab label="Memes" value="MEME" />
-          <Tab label="Torneos" value="TOURNAMENT" icon={<EmojiEventsIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
+          <Tab label={t('cono.home.tabMemes')} value="MEME" />
+          <Tab label={t('cono.home.tabTournaments')} value="TOURNAMENT" icon={<EmojiEventsIcon sx={{ fontSize: 18 }} />} iconPosition="start" />
         </Tabs>
         {user && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
-            Nuevo tema
+            {t('cono.home.newTheme')}
           </Button>
         )}
       </Box>
@@ -75,25 +77,25 @@ export default function ConoHomePage() {
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>
       ) : themes.length === 0 ? (
-        <Alert severity="info">Todavía no hay temas en esta categoría. ¡Crea el primero!</Alert>
+        <Alert severity="info">{t('cono.home.emptyThemes')}</Alert>
       ) : (
         <StaggerContainer>
           <Grid container spacing={2}>
-            {themes.map((t) => (
-              <Grid item xs={12} sm={6} key={t.id}>
+            {themes.map((theme) => (
+              <Grid item xs={12} sm={6} key={theme.id}>
                 <StaggerItem>
                   <MotionCard>
                     <Card sx={{ bgcolor: tokens.surfaceContainerLowest, borderRadius: '12px', boxShadow: tokens.cardShadow }}>
-                      <CardActionArea onClick={() => navigate(`/cono/${t.slug}`)}>
+                      <CardActionArea onClick={() => navigate(`/cono/${theme.slug}`)}>
                         <CardContent>
-                          <Typography fontWeight={700} sx={{ color: tokens.onSurface }}>{t.title}</Typography>
-                          {t.description && (
-                            <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 1 }}>{t.description}</Typography>
+                          <Typography fontWeight={700} sx={{ color: tokens.onSurface }}>{theme.title}</Typography>
+                          {theme.description && (
+                            <Typography variant="body2" sx={{ color: tokens.onSurfaceVariant, mb: 1 }}>{theme.description}</Typography>
                           )}
-                          <Chip label={`${t._count?.entries ?? 0} entradas`} size="small" />
-                          {t.createdBy && (
+                          <Chip label={t('cono.home.entriesCount', { count: theme._count?.entries ?? 0 })} size="small" />
+                          {theme.createdBy && (
                             <Typography variant="caption" sx={{ display: 'block', mt: 1, color: tokens.onSurfaceVariant }}>
-                              por {t.createdBy.forumUsername}
+                              {t('cono.home.byAuthor', { username: theme.createdBy.forumUsername })}
                             </Typography>
                           )}
                         </CardContent>
@@ -108,29 +110,29 @@ export default function ConoHomePage() {
       )}
 
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Nuevo tema — {tab === 'MEME' ? 'Memes' : 'Torneo'}</DialogTitle>
+        <DialogTitle>{t('cono.home.newThemeDialogTitle', { type: tab === 'MEME' ? t('cono.home.tabMemes') : t('cono.home.tournamentSingular') })}</DialogTitle>
         <DialogContent>
           <Alert severity="info" sx={{ mb: 2, fontSize: '0.8rem' }}>
-            Necesitas al menos una verificación profesional aprobada para crear un tema.
-            <Button size="small" onClick={() => navigate('/foro/verificacion')} sx={{ ml: 1 }}>Verificarme</Button>
+            {t('cono.home.verificationRequired')}
+            <Button size="small" onClick={() => navigate('/foro/verificacion')} sx={{ ml: 1 }}>{t('cono.home.verifyMe')}</Button>
           </Alert>
           <TextField
-            fullWidth margin="dense" label="Slug (URL)" placeholder="peor-banco-bolivia"
+            fullWidth margin="dense" label={t('cono.home.slugLabel')} placeholder="peor-banco-bolivia"
             value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
           />
           <TextField
-            fullWidth margin="dense" label="Título" placeholder="Peor banco de Bolivia"
+            fullWidth margin="dense" label={t('cono.home.titleLabel')} placeholder="Peor banco de Bolivia"
             value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
           <TextField
-            fullWidth margin="dense" label="Descripción (opcional)" multiline minRows={2}
+            fullWidth margin="dense" label={t('cono.home.descriptionLabel')} multiline minRows={2}
             value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setCreateOpen(false)}>{t('cono.home.cancel')}</Button>
           <Button variant="contained" onClick={submitTheme} disabled={saving}>
-            {saving ? <CircularProgress size={18} /> : 'Crear'}
+            {saving ? <CircularProgress size={18} /> : t('cono.home.create')}
           </Button>
         </DialogActions>
       </Dialog>

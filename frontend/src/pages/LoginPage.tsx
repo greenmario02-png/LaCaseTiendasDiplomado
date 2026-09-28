@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TextField, Box, Alert, CircularProgress } from '@mui/material';
 import AuthCard from '../components/redesign/AuthCard';
 import { PrimaryButton } from '../components/redesign/Buttons';
@@ -8,6 +9,7 @@ import { useCartStore } from '../stores/cartStore';
 import { getErrorMessage } from '../services/api';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
@@ -41,12 +43,12 @@ export default function LoginPage() {
 
   return (
     <AuthCard
-      title="Iniciar sesión"
-      subtitle="Ingresa para comprar, vender y participar en el foro"
+      title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
       footer={
         <>
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link> · ¿Quieres vender?{' '}
-          <Link to="/registro-vendedor">Abre tu tienda</Link>
+          {t('auth.login.noAccount')} <Link to="/register">{t('auth.login.signUp')}</Link> · {t('auth.login.wantToSell')}{' '}
+          <Link to="/registro-vendedor">{t('auth.login.openStore')}</Link>
         </>
       }
     >
@@ -56,10 +58,10 @@ export default function LoginPage() {
         </Alert>
       )}
       <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
-        <TextField label="Email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <TextField label="Contraseña" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <TextField label={t('auth.login.emailLabel')} type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <TextField label={t('auth.login.passwordLabel')} type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <PrimaryButton type="submit" size="large" fullWidth disabled={loading}>
-          {loading ? <CircularProgress size={22} color="inherit" /> : 'Ingresar'}
+          {loading ? <CircularProgress size={22} color="inherit" /> : t('auth.login.submit')}
         </PrimaryButton>
       </Box>
     </AuthCard>

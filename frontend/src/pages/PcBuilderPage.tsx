@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Container,
   Typography,
@@ -32,18 +33,18 @@ import { useMoney } from '../hooks/useMoney';
 import { getErrorMessage } from '../services/api';
 import toast from 'react-hot-toast';
 
-const SLOTS = [
-  { type: 'CPU', label: 'Procesador', required: true },
-  { type: 'MOTHERBOARD', label: 'Motherboard', required: true },
-  { type: 'RAM', label: 'Memoria RAM', required: true },
-  { type: 'GPU', label: 'Placa de Video', required: true },
-  { type: 'STORAGE', label: 'Almacenamiento', required: true },
-  { type: 'PSU', label: 'Fuente de Poder', required: true },
-  { type: 'CASE', label: 'Gabinete', required: true },
-  { type: 'COOLER', label: 'Refrigeración', required: true },
-];
-
 export default function PcBuilderPage() {
+  const { t: tr } = useTranslation();
+  const SLOTS = [
+    { type: 'CPU', label: tr('pcBuilder.slots.cpu'), required: true },
+    { type: 'MOTHERBOARD', label: tr('pcBuilder.slots.motherboard'), required: true },
+    { type: 'RAM', label: tr('pcBuilder.slots.ram'), required: true },
+    { type: 'GPU', label: tr('pcBuilder.slots.gpu'), required: true },
+    { type: 'STORAGE', label: tr('pcBuilder.slots.storage'), required: true },
+    { type: 'PSU', label: tr('pcBuilder.slots.psu'), required: true },
+    { type: 'CASE', label: tr('pcBuilder.slots.case'), required: true },
+    { type: 'COOLER', label: tr('pcBuilder.slots.cooler'), required: true },
+  ];
   const money = useMoney();
   const user = useAuthStore((s) => s.user);
   const addItem = useCartStore((s) => s.addItem);
@@ -84,11 +85,11 @@ export default function PcBuilderPage() {
 
   const saveBuild = async () => {
     if (!user) {
-      toast.error('Inicia sesión para guardar tu build');
+      toast.error(tr('pcBuilder.toasts.loginToSave'));
       return;
     }
     if (completedSlots < 3) {
-      toast.error('Elige al menos 3 componentes');
+      toast.error(tr('pcBuilder.toasts.minComponents'));
       return;
     }
     const components = Object.entries(selected).map(([slotType, product]: [string, any]) => ({
@@ -96,8 +97,8 @@ export default function PcBuilderPage() {
       slotType,
     }));
     try {
-      await api.post('/builds', { name: buildName || 'Mi PC', components });
-      toast.success('Build guardada');
+      await api.post('/builds', { name: buildName || tr('pcBuilder.defaultBuildName'), components });
+      toast.success(tr('pcBuilder.toasts.buildSaved'));
       const { data } = await api.get('/builds');
       setBuilds(data.data);
     } catch (err) {
@@ -109,7 +110,7 @@ export default function PcBuilderPage() {
     for (const [slot, product] of Object.entries(selected)) {
       await addItem((product as any).id, 1);
     }
-    toast.success('Todos los componentes agregados al carrito');
+    toast.success(tr('pcBuilder.toasts.allAddedToCart'));
   };
 
   return (
@@ -117,11 +118,11 @@ export default function PcBuilderPage() {
       <Box display="flex" alignItems="center" gap={1} mb={2}>
         <ComputerIcon color="primary" />
         <Typography variant="h5" fontWeight={700}>
-          Arma tu PC
+          {tr('pcBuilder.title')}
         </Typography>
       </Box>
       <Typography color="text.secondary" mb={3}>
-        Elige cada componente de cualquier tienda. Verificamos que sean compatibles y calculamos el costo total.
+        {tr('pcBuilder.subtitle')}
       </Typography>
 
       <Grid container spacing={3}>
@@ -145,12 +146,12 @@ export default function PcBuilderPage() {
                         </Box>
                       ) : (
                         <Typography variant="caption" color="text.secondary">
-                          Sin seleccionar
+                          {tr('pcBuilder.notSelected')}
                         </Typography>
                       )}
                     </Box>
                     <SecondaryButton size="small" onClick={() => openSlotSelector(slot.type)}>
-                      {product ? 'Cambiar' : 'Seleccionar'}
+                      {product ? tr('pcBuilder.change') : tr('pcBuilder.select')}
                     </SecondaryButton>
                     {product && (
                       <GhostButton size="small" color="error" onClick={() => setSelected((prev) => ({ ...prev, [slot.type]: undefined }))}>
@@ -168,15 +169,15 @@ export default function PcBuilderPage() {
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Resumen
+              {tr('pcBuilder.summary')}
             </Typography>
             <Box mb={1}>
               <Typography color="text.secondary" variant="body2">
-                Componentes seleccionados: {completedSlots}/8
+                {tr('pcBuilder.selectedComponents', { count: completedSlots })}
               </Typography>
             </Box>
             <Box display="flex" justifyContent="space-between" mb={2}>
-              <Typography variant="h6">Total estimado</Typography>
+              <Typography variant="h6">{tr('pcBuilder.estimatedTotal')}</Typography>
               <Typography variant="h6" className="price-color">
                 {money(total)}
               </Typography>
@@ -184,29 +185,29 @@ export default function PcBuilderPage() {
             <input
               value={buildName}
               onChange={(e) => setBuildName(e.target.value)}
-              placeholder="Nombre de la build (ej: PC Gamer Pro)"
+              placeholder={tr('pcBuilder.buildNamePlaceholder')}
               style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #ccc', marginBottom: 12 }}
             />
             <Box mb={1}>
               <PrimaryButton fullWidth startIcon={<SaveIcon />} onClick={saveBuild}>
-                Guardar build
+                {tr('pcBuilder.saveBuild')}
               </PrimaryButton>
             </Box>
             <SecondaryButton fullWidth startIcon={<ShoppingCartIcon />} onClick={addAllToCart} disabled={completedSlots === 0}>
-              Agregar todo al carrito
+              {tr('pcBuilder.addAllToCart')}
             </SecondaryButton>
 
             {builds.length > 0 && (
               <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                  Tus builds guardadas
+                  {tr('pcBuilder.savedBuilds')}
                 </Typography>
                 {builds.map((b) => (
                   <Box key={b.id} py={0.5}>
                     <Typography variant="body2">{b.name}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {money(Number(b.totalPrice))} · {b.components.length} componentes
+                      {tr('pcBuilder.buildSummary', { price: money(Number(b.totalPrice)), count: b.components.length })}
                     </Typography>
                   </Box>
                 ))}
@@ -218,13 +219,13 @@ export default function PcBuilderPage() {
 
       <Dialog open={Boolean(openSlot)} onClose={() => setOpenSlot(null)} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Seleccionar {SLOTS.find((s) => s.type === openSlot)?.label}
+          {tr('pcBuilder.selectDialogTitle', { slot: SLOTS.find((s) => s.type === openSlot)?.label })}
         </DialogTitle>
         <DialogContent dividers>
           {loadingSlot ? (
-            <Typography>Buscando productos...</Typography>
+            <Typography>{tr('pcBuilder.searchingProducts')}</Typography>
           ) : slotProducts.length === 0 ? (
-            <Alert severity="info">No hay productos disponibles para este slot.</Alert>
+            <Alert severity="info">{tr('pcBuilder.noProductsForSlot')}</Alert>
           ) : (
             <List disablePadding>
               {slotProducts.map((p) => (
@@ -239,7 +240,7 @@ export default function PcBuilderPage() {
                     secondary={
                       <>
                         {p.seller.storeName} · {money(Number(p.price))}
-                        {p.stock <= 0 ? ' · SIN STOCK' : ` · stock ${p.stock}`}
+                        {p.stock <= 0 ? ` · ${tr('pcBuilder.outOfStock')}` : ` · ${tr('pcBuilder.stock', { count: p.stock })}`}
                       </>
                     }
                   />
@@ -249,7 +250,7 @@ export default function PcBuilderPage() {
           )}
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setOpenSlot(null)}>Cerrar</GhostButton>
+          <GhostButton onClick={() => setOpenSlot(null)}>{tr('pcBuilder.close')}</GhostButton>
         </DialogActions>
       </Dialog>
     </Container>

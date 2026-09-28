@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -27,8 +28,9 @@ const STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED', '
 const PAYMENT_STATUSES = ['PENDING', 'PROOF_SUBMITTED', 'VERIFIED', 'REJECTED'];
 
 export default function SellerOrders() {
+  const { t } = useTranslation();
   const money = useMoney();
-  const t = useUnifiedTokens();
+  const t2 = useUnifiedTokens();
   const [orders, setOrders] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<any>(null);
@@ -51,7 +53,7 @@ export default function SellerOrders() {
   const changeStatus = async (orderId: number, status: string) => {
     try {
       await api.put(`/orders/seller/${orderId}/status`, { status });
-      toast.success('Estado actualizado');
+      toast.success(t('seller.orders.toasts.statusUpdated'));
       load(page);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -61,7 +63,7 @@ export default function SellerOrders() {
   const changePayment = async (orderId: number, paymentStatus: string) => {
     try {
       await api.put(`/orders/seller/${orderId}/payment-status`, { paymentStatus });
-      toast.success('Estado de pago actualizado');
+      toast.success(t('seller.orders.toasts.paymentStatusUpdated'));
       load(page);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -71,11 +73,11 @@ export default function SellerOrders() {
   return (
     <Box>
       <PageHeader
-        title="Pedidos recibidos"
+        title={t('seller.orders.pageTitle')}
         icon={<ReceiptLongIcon />}
         actions={
           <Select size="small" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} displayEmpty>
-            <MenuItem value="">Todos los estados</MenuItem>
+            <MenuItem value="">{t('seller.orders.allStatuses')}</MenuItem>
             {STATUSES.map((s) => (
               <MenuItem key={s} value={s}>
                 {s}
@@ -89,13 +91,13 @@ export default function SellerOrders() {
       <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ bgcolor: t.surface, '& th': { color: t.onSurfaceVariant, fontWeight: 700 } }}>
+            <TableRow sx={{ bgcolor: t2.surface, '& th': { color: t2.onSurfaceVariant, fontWeight: 700 } }}>
               <TableCell>#</TableCell>
-              <TableCell>Comprador</TableCell>
-              <TableCell align="right">Total</TableCell>
-              <TableCell>Entrega</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Pago</TableCell>
+              <TableCell>{t('seller.orders.columns.buyer')}</TableCell>
+              <TableCell align="right">{t('seller.orders.columns.total')}</TableCell>
+              <TableCell>{t('seller.orders.columns.delivery')}</TableCell>
+              <TableCell>{t('seller.orders.columns.status')}</TableCell>
+              <TableCell>{t('seller.orders.columns.payment')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -114,7 +116,7 @@ export default function SellerOrders() {
                 <TableCell>
                   {o.fulfillmentType === 'PICKUP' ? (
                     <Box>
-                      <Chip label="🏬 Retiro" size="small" color="secondary" variant="outlined" />
+                      <Chip label={t('seller.orders.pickupChip')} size="small" color="secondary" variant="outlined" />
                       {o.pickupAddress && (
                         <Typography variant="caption" color="text.secondary" display="block">
                           {o.pickupAddress}
@@ -122,7 +124,7 @@ export default function SellerOrders() {
                       )}
                     </Box>
                   ) : (
-                    <Chip icon={<Truck size={13} strokeWidth={2.2} />} label="Envío" size="small" variant="outlined" />
+                    <Chip icon={<Truck size={13} strokeWidth={2.2} />} label={t('seller.orders.shippingChip')} size="small" variant="outlined" />
                   )}
                 </TableCell>
                 <TableCell>
@@ -140,13 +142,13 @@ export default function SellerOrders() {
                       <Chip label={o.paymentStatus} size="small" color={o.paymentStatus === 'VERIFIED' ? 'success' : 'warning'} />
                       <Box mt={0.5}>
                         <a href={o.paymentProofUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12 }}>
-                          ver comprobante
+                          {t('seller.orders.viewProofLink')}
                         </a>
                       </Box>
                       {o.paymentStatus === 'PROOF_SUBMITTED' && (
                         <Select size="small" value="" onChange={(e) => changePayment(o.id, e.target.value)} displayEmpty sx={{ mt: 0.5, width: '100%' }}>
                           <MenuItem value="" disabled>
-                            Verificar...
+                            {t('seller.orders.verifyPlaceholder')}
                           </MenuItem>
                           {PAYMENT_STATUSES.filter((s) => s !== 'PROOF_SUBMITTED').map((s) => (
                             <MenuItem key={s} value={s}>
@@ -165,7 +167,7 @@ export default function SellerOrders() {
           </TableBody>
         </Table>
       </TableContainer>
-      {orders.length === 0 && <EmptyState message="Todavía no recibiste pedidos" />}
+      {orders.length === 0 && <EmptyState message={t('seller.orders.emptyState')} />}
       </SurfaceCard>
 
       {meta?.totalPages > 1 && (
@@ -176,4 +178,3 @@ export default function SellerOrders() {
     </Box>
   );
 }
-

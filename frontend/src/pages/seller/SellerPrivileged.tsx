@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { api, getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface RequestItem {
   id: number;
@@ -21,6 +22,7 @@ interface BuyerItem {
 }
 
 export default function SellerPrivileged() {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [buyers, setBuyers] = useState<BuyerItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,11 @@ export default function SellerPrivileged() {
   const decide = async (id: number, decision: 'APPROVED' | 'REJECTED') => {
     try {
       await api.put(`/seller/privileged/${id}`, { decision });
-      toast.success(decision === 'APPROVED' ? 'Comprador privilegiado aprobado' : 'Solicitud rechazada');
+      toast.success(
+        decision === 'APPROVED'
+          ? t('seller.privileged.approvedToast')
+          : t('seller.privileged.rejectedToast'),
+      );
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -57,19 +63,19 @@ export default function SellerPrivileged() {
       <Box display="flex" alignItems="center" gap={1} mb={2}>
         <WorkspacePremiumIcon color="secondary" />
         <Typography variant="h5" fontWeight={700}>
-          Compradores privilegiados
+          {t('seller.privileged.title')}
         </Typography>
       </Box>
       <Typography variant="body2" color="text.secondary" mb={3}>
-        Estos compradores ven tus productos nuevos antes que el público general y pueden reservarlos. Tú decides quiénes son privilegiados.
+        {t('seller.privileged.subtitle')}
       </Typography>
 
       <Typography variant="h6" fontWeight={700} mb={1}>
-        Solicitudes pendientes ({requests.length})
+        {t('seller.privileged.pendingRequestsTitle', { count: requests.length })}
       </Typography>
       {requests.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center', mb: 3 }}>
-          <Typography color="text.secondary">No hay solicitudes pendientes.</Typography>
+          <Typography color="text.secondary">{t('seller.privileged.noPendingRequests')}</Typography>
         </Paper>
       ) : (
         <Stack spacing={1.5} mb={3}>
@@ -82,16 +88,20 @@ export default function SellerPrivileged() {
                     {r.buyer.firstName} {r.buyer.lastName}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {r.buyer.email} · {r.buyer.totalSales} compras · solicitó el {new Date(r.createdAt).toLocaleDateString('es-BO')}
+                    {t('seller.privileged.requestMeta', {
+                      email: r.buyer.email,
+                      totalSales: r.buyer.totalSales,
+                      date: new Date(r.createdAt).toLocaleDateString('es-BO'),
+                    })}
                   </Typography>
                 </Box>
               </Box>
               <Stack direction="row" spacing={1}>
                 <PrimaryButton size="small" color="success" startIcon={<CheckIcon />} onClick={() => decide(r.id, 'APPROVED')}>
-                  Aprobar
+                  {t('seller.privileged.approveButton')}
                 </PrimaryButton>
                 <SecondaryButton size="small" color="error" startIcon={<CloseIcon />} onClick={() => decide(r.id, 'REJECTED')}>
-                  Rechazar
+                  {t('seller.privileged.rejectButton')}
                 </SecondaryButton>
               </Stack>
             </Paper>
@@ -100,12 +110,12 @@ export default function SellerPrivileged() {
       )}
 
       <Typography variant="h6" fontWeight={700} mb={1}>
-        Compradores privilegiados ({buyers.length})
+        {t('seller.privileged.buyersTitle', { count: buyers.length })}
       </Typography>
       {buyers.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
           <Alert severity="info" sx={{ maxWidth: 480, mx: 'auto' }}>
-            Aún no tienes compradores privilegiados. Cuando apruebes solicitudes, esos compradores verán tus productos nuevos con acceso anticipado.
+            {t('seller.privileged.noBuyers')}
           </Alert>
         </Paper>
       ) : (
@@ -118,10 +128,13 @@ export default function SellerPrivileged() {
                   {b.buyer.firstName} {b.buyer.lastName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {b.buyer.email} · desde {b.approvedAt ? new Date(b.approvedAt).toLocaleDateString('es-BO') : ''}
+                  {t('seller.privileged.buyerMeta', {
+                    email: b.buyer.email,
+                    date: b.approvedAt ? new Date(b.approvedAt).toLocaleDateString('es-BO') : '',
+                  })}
                 </Typography>
               </Box>
-              <Chip label="Privilegiado" size="small" color="secondary" sx={{ ml: 'auto' }} />
+              <Chip label={t('seller.privileged.privilegedChip')} size="small" color="secondary" sx={{ ml: 'auto' }} />
             </Paper>
           ))}
         </Stack>

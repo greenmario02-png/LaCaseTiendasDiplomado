@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Container, Grid, Box, IconButton } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../../services/api';
 import ProductCard from '../../components/ui/ProductCard';
 import toast from 'react-hot-toast';
@@ -10,6 +11,7 @@ import { EmptyState } from '../../components/redesign/States';
 import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
 
 export default function WishlistPage() {
+  const { t: tt } = useTranslation();
   const t = useUnifiedTokens();
   const [items, setItems] = useState<any[]>([]);
 
@@ -34,10 +36,10 @@ export default function WishlistPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <PageHeader title="Mis favoritos" subtitle={`${items.length} ${items.length === 1 ? 'producto' : 'productos'}`} icon={<FavoriteIcon />} />
+      <PageHeader title={tt('account.wishlist.title')} subtitle={tt('account.wishlist.productCount', { count: items.length })} icon={<FavoriteIcon />} />
 
       {items.length === 0 ? (
-        <EmptyState message="No tienes productos en favoritos" />
+        <EmptyState message={tt('account.wishlist.emptyMessage')} />
       ) : (
         <StaggerContainer>
         <Grid container spacing={2}>

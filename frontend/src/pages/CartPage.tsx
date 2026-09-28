@@ -18,6 +18,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useTranslation } from 'react-i18next';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { useMoney } from '../hooks/useMoney';
@@ -26,6 +27,7 @@ import { EmptyState } from '../components/redesign/States';
 import { PrimaryButton } from '../components/redesign/Buttons';
 
 export default function CartPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const money = useMoney();
   const { cart, loading, fetchCart, updateQuantity, removeItem } = useCartStore();
@@ -48,8 +50,8 @@ export default function CartPage() {
     return (
       <Container maxWidth="md" sx={{ py: 6, textAlign: 'center' }}>
         <EmptyState
-          message="Tu carrito está vacío"
-          action={<PrimaryButton to="/productos">Explorar productos</PrimaryButton>}
+          message={t('cart.emptyMessage')}
+          action={<PrimaryButton to="/productos">{t('cart.exploreProducts')}</PrimaryButton>}
         />
       </Container>
     );
@@ -62,7 +64,7 @@ export default function CartPage() {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h5" fontWeight={700}>
-          Carrito ({cart.itemCount} ítems)
+          {t('cart.title', { count: cart.itemCount })}
         </Typography>
       </Box>
 
@@ -82,7 +84,7 @@ export default function CartPage() {
                     {group.seller.locationCity}
                   </Typography>
                 </Box>
-                <Chip label="Envío se calcula en checkout" size="small" variant="outlined" />
+                <Chip label={t('cart.shippingCalculatedAtCheckout')} size="small" variant="outlined" />
               </Box>
 
               {group.items.map((item) => (
@@ -92,7 +94,7 @@ export default function CartPage() {
                       <img src={item.product.images[0].url} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <Typography variant="caption" color="text.disabled">
-                        sin img
+                        {t('cart.noImage')}
                       </Typography>
                     )}
                   </Box>
@@ -100,7 +102,7 @@ export default function CartPage() {
                     <Typography component={Link} to={`/producto/${item.product.id}/${item.product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} variant="body2" fontWeight={600} sx={{ textDecoration: 'none', color: 'inherit' }}>
                       {item.product.name}
                     </Typography>
-                    {item.variant && <Typography variant="caption" color="text.secondary">Variante: {JSON.stringify(item.variant)}</Typography>}
+                    {item.variant && <Typography variant="caption" color="text.secondary">{t('cart.variant', { variant: JSON.stringify(item.variant) })}</Typography>}
                     <PriceDisplay price={Number(item.unitPrice)} />
                   </Box>
                   <TextField
@@ -122,7 +124,7 @@ export default function CartPage() {
 
               <Box textAlign="right" mt={1}>
                 <Typography variant="subtitle1" fontWeight={700}>
-                  Subtotal tienda: {money(group.subtotal)}
+                  {t('cart.storeSubtotal', { amount: money(group.subtotal) })}
                 </Typography>
               </Box>
 
@@ -130,15 +132,15 @@ export default function CartPage() {
                 <Box display="flex" alignItems="center" gap={2} mt={2} p={1.5} bgcolor="#f5f5f5" borderRadius={2}>
                   <img
                     src={(group.seller as any).paymentQrUrl}
-                    alt={`QR de ${group.seller.storeName}`}
+                    alt={t('cart.qrAlt', { storeName: group.seller.storeName })}
                     style={{ width: 96, height: 96, borderRadius: 8, objectFit: 'cover', background: '#fff', border: '1px solid #ddd' }}
                   />
                   <Box>
                     <Typography variant="body2" fontWeight={700}>
-                      QR de pago de {group.seller.storeName}
+                      {t('cart.qrTitle', { storeName: group.seller.storeName })}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Escanea este QR para pagar el total de esta tienda. El comprobante lo confirmas en el checkout.
+                      {t('cart.qrDescription')}
                     </Typography>
                   </Box>
                 </Box>
@@ -150,26 +152,26 @@ export default function CartPage() {
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
             <Typography variant="h6" fontWeight={700} mb={2}>
-              Resumen
+              {t('cart.summary')}
             </Typography>
             <Box display="flex" justifyContent="space-between" mb={1}>
-              <Typography color="text.secondary">Subtotal</Typography>
+              <Typography color="text.secondary">{t('cart.subtotal')}</Typography>
               <Typography fontWeight={600}>{money(cart.subtotal)}</Typography>
             </Box>
             <Box display="flex" justifyContent="space-between" mb={1}>
-              <Typography color="text.secondary">Envío</Typography>
-              <Typography fontWeight={600}>Calculado en checkout</Typography>
+              <Typography color="text.secondary">{t('cart.shipping')}</Typography>
+              <Typography fontWeight={600}>{t('cart.calculatedAtCheckout')}</Typography>
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box display="flex" justifyContent="space-between" mb={2}>
-              <Typography variant="h6">Total</Typography>
+              <Typography variant="h6">{t('cart.total')}</Typography>
               <Typography variant="h6" className="price-color">
                 {money(cart.subtotal)}
               </Typography>
             </Box>
             {!user && (
               <Alert severity="info" sx={{ mb: 2 }}>
-                <Link to="/login">Inicia sesión</Link> para finalizar la compra
+                <Link to="/login">{t('cart.loginLink')}</Link> {t('cart.loginToCheckoutSuffix')}
               </Alert>
             )}
             <PrimaryButton
@@ -178,7 +180,7 @@ export default function CartPage() {
               disabled={!user}
               onClick={() => navigate('/checkout')}
             >
-              Finalizar compra
+              {t('cart.checkoutButton')}
             </PrimaryButton>
           </Paper>
         </Grid>

@@ -3,6 +3,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
   Box, CircularProgress, Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useForumPalette } from '../../theme/forumTheme';
 import { searchGifs, type GifResult } from '../../services/forum.api';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function GifPicker({ open, onClose, onPick }: Props) {
+  const { t } = useTranslation();
   const forumPalette = useForumPalette();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GifResult[]>([]);
@@ -51,12 +53,12 @@ export default function GifPicker({ open, onClose, onPick }: Props) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ bgcolor: forumPalette.bgCard, color: forumPalette.textPrimary, fontWeight: 700 }}>
-        🎞 Buscar GIFs
+        🎞 {t('forum.gifPicker.title')}
       </DialogTitle>
       <DialogContent sx={{ bgcolor: forumPalette.bgCard }}>
         <TextField
           autoFocus
-          label="Buscar GIF (ej: capibara)"
+          label={t('forum.gifPicker.searchLabel')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           fullWidth
@@ -69,7 +71,7 @@ export default function GifPicker({ open, onClose, onPick }: Props) {
           </Box>
         ) : query.trim().length >= 2 && results.length === 0 ? (
           <Typography color="textSecondary" textAlign="center" py={4}>
-            No se encontraron GIFs.
+            {t('forum.gifPicker.noResults')}
           </Typography>
         ) : (
           <Box
@@ -104,7 +106,7 @@ export default function GifPicker({ open, onClose, onPick }: Props) {
         )}
       </DialogContent>
       <DialogActions sx={{ bgcolor: forumPalette.bgCard }}>
-        <Button onClick={onClose}>Cancelar</Button>
+        <Button onClick={onClose}>{t('forum.gifPicker.cancel')}</Button>
       </DialogActions>
     </Dialog>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { Gift } from 'lucide-react';
 import {
@@ -46,13 +47,13 @@ interface GiftPromo {
   triggerProduct?: { id: number; name: string } | null;
 }
 
-const TRIGGER_LABELS: Record<string, string> = {
-  UNITS: 'Por cantidad de un producto',
-  AMOUNT: 'Por monto de compra',
-  PRODUCT: 'Por comprar un producto específico',
-};
-
 export default function SellerGifts() {
+  const { t } = useTranslation();
+  const TRIGGER_LABELS: Record<string, string> = {
+    UNITS: t('seller.gifts.triggerLabels.units'),
+    AMOUNT: t('seller.gifts.triggerLabels.amount'),
+    PRODUCT: t('seller.gifts.triggerLabels.product'),
+  };
   const [promos, setPromos] = useState<GiftPromo[]>([]);
   const [products, setProducts] = useState<GiftProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,16 +112,16 @@ export default function SellerGifts() {
   };
 
   const save = async () => {
-    if (!form.title.trim()) return toast.error('El título es obligatorio');
-    if (form.productIds.length === 0) return toast.error('Elige al menos un producto de regalo');
+    if (!form.title.trim()) return toast.error(t('seller.gifts.errors.titleRequired'));
+    if (form.productIds.length === 0) return toast.error(t('seller.gifts.errors.giftProductRequired'));
     if (form.triggerType === 'UNITS' && (!form.triggerProductId || !form.triggerQuantity)) {
-      return toast.error('Para el tipo "por cantidad" indica el producto y la cantidad');
+      return toast.error(t('seller.gifts.errors.unitsFieldsRequired'));
     }
     if (form.triggerType === 'AMOUNT' && !form.triggerAmount) {
-      return toast.error('Para el tipo "por monto" indica el monto mínimo');
+      return toast.error(t('seller.gifts.errors.amountFieldRequired'));
     }
     if (form.triggerType === 'PRODUCT' && !form.triggerProductId) {
-      return toast.error('Para el tipo "por producto" indica el producto');
+      return toast.error(t('seller.gifts.errors.productFieldRequired'));
     }
 
     const payload = {
@@ -139,7 +140,7 @@ export default function SellerGifts() {
     try {
       if (editing) await api.put(`/seller/gifts/${editing.id}`, payload);
       else await api.post('/seller/gifts', payload);
-      toast.success(editing ? 'Promoción actualizada' : 'Promoción creada');
+      toast.success(editing ? t('seller.gifts.toasts.promoUpdated') : t('seller.gifts.toasts.promoCreated'));
       setOpen(false);
       load();
     } catch (err) {
@@ -159,10 +160,10 @@ export default function SellerGifts() {
   };
 
   const remove = async (promo: GiftPromo) => {
-    if (!window.confirm('¿Eliminar esta promoción de regalo?')) return;
+    if (!window.confirm(t('seller.gifts.confirmDelete'))) return;
     try {
       await api.delete(`/seller/gifts/${promo.id}`);
-      toast.success('Promoción eliminada');
+      toast.success(t('seller.gifts.toasts.promoDeleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -170,9 +171,18 @@ export default function SellerGifts() {
   };
 
   const triggerText = (p: GiftPromo) => {
-    if (p.triggerType === 'UNITS') return `Comprando ${p.triggerQuantity} un. de ${p.triggerProduct?.name ?? 'producto'}`;
-    if (p.triggerType === 'AMOUNT') return `Compras desde ${Number(p.triggerAmount).toLocaleString('es-BO')} Bs`;
-    return `Comprando ${p.triggerProduct?.name ?? 'un producto'}`;
+    if (p.triggerType === 'UNITS') {
+      return t('seller.gifts.triggerText.units', {
+        quantity: p.triggerQuantity,
+        product: p.triggerProduct?.name ?? t('seller.gifts.triggerText.defaultProduct'),
+      });
+    }
+    if (p.triggerType === 'AMOUNT') {
+      return t('seller.gifts.triggerText.amount', { amount: Number(p.triggerAmount).toLocaleString('es-BO') });
+    }
+    return t('seller.gifts.triggerText.product', {
+      product: p.triggerProduct?.name ?? t('seller.gifts.triggerText.defaultProductGeneric'),
+    });
   };
 
   if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 8 }} />;
@@ -183,22 +193,20 @@ export default function SellerGifts() {
         <Box display="flex" alignItems="center" gap={1}>
           <RedeemIcon color="primary" />
           <Typography variant="h5" fontWeight={700}>
-            Promos de regalo
+            {t('seller.gifts.pageTitle')}
           </Typography>
         </Box>
         <PrimaryButton startIcon={<AddIcon />} onClick={openCreate}>
-          Nueva promo
+          {t('seller.gifts.newPromoButton')}
         </PrimaryButton>
       </Box>
       <Alert severity="info" sx={{ mb: 3 }}>
-        Ofrece regalos a tus clientes con lógica de ticket de regalo: al comprar una cantidad de un producto, al
-        superar un monto o al comprar un producto específico, el cliente recibe un producto de tu tienda de regalo.
-        También puedes dejar que elija entre varios regalos.
+        {t('seller.gifts.infoBanner')}
       </Alert>
 
       {promos.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary">No creaste promos de regalo todavía.</Typography>
+          <Typography color="text.secondary">{t('seller.gifts.emptyState')}</Typography>
         </Paper>
       ) : (
         <Stack spacing={2}>
@@ -209,25 +217,25 @@ export default function SellerGifts() {
                   <Typography variant="h6" fontWeight={700}>
                     {promo.title}
                   </Typography>
-                  <Chip size="small" color={promo.isActive ? 'success' : 'default'} label={promo.isActive ? 'Activa' : 'Inactiva'} />
+                  <Chip size="small" color={promo.isActive ? 'success' : 'default'} label={promo.isActive ? t('seller.gifts.activeChip') : t('seller.gifts.inactiveChip')} />
                 </Box>
                 {promo.description && <Typography variant="body2" color="text.secondary">{promo.description}</Typography>}
                 <Typography variant="body2" mt={1}>
-                  <b>Disparador:</b> {TRIGGER_LABELS[promo.triggerType]} → <i>{triggerText(promo)}</i>
+                  <b>{t('seller.gifts.triggerLabelPrefix')}</b> {TRIGGER_LABELS[promo.triggerType]} → <i>{triggerText(promo)}</i>
                 </Typography>
                 <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
-                  <Chip size="small" label={`Regalo(s): ${promo.items.map((i) => i.product.name).join(', ')}`} />
-                  {promo.allowChoice && <Chip size="small" color="primary" label="El cliente elige" />}
+                  <Chip size="small" label={t('seller.gifts.giftsLabel', { names: promo.items.map((i) => i.product.name).join(', ') })} />
+                  {promo.allowChoice && <Chip size="small" color="primary" label={t('seller.gifts.customerChoosesChip')} />}
                 </Stack>
                 <Stack direction="row" spacing={1} mt={2}>
                   <SecondaryButton size="small" onClick={() => openEdit(promo)}>
-                    Editar
+                    {t('seller.gifts.editButton')}
                   </SecondaryButton>
                   <SecondaryButton size="small" color={promo.isActive ? 'warning' : 'success'} onClick={() => toggleActive(promo)}>
-                    {promo.isActive ? 'Desactivar' : 'Activar'}
+                    {promo.isActive ? t('seller.gifts.deactivateButton') : t('seller.gifts.activateButton')}
                   </SecondaryButton>
                   <SecondaryButton size="small" color="error" onClick={() => remove(promo)}>
-                    Eliminar
+                    {t('seller.gifts.deleteButton')}
                   </SecondaryButton>
                 </Stack>
               </CardContent>
@@ -237,33 +245,33 @@ export default function SellerGifts() {
       )}
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{editing ? 'Editar promo de regalo' : 'Nueva promo de regalo'}</DialogTitle>
+        <DialogTitle>{editing ? t('seller.gifts.dialog.editTitle') : t('seller.gifts.dialog.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Título" fullWidth value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Compra 2 y llévate 1 de regalo" />
-            <TextField label="Descripción (opcional)" fullWidth multiline rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <TextField label={t('seller.gifts.dialog.titleLabel')} fullWidth value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t('seller.gifts.dialog.titlePlaceholder')} />
+            <TextField label={t('seller.gifts.dialog.descriptionLabel')} fullWidth multiline rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             <TextField
               select
-              label="Tipo de disparador"
+              label={t('seller.gifts.dialog.triggerTypeLabel')}
               fullWidth
               value={form.triggerType}
               onChange={(e) => setForm({ ...form, triggerType: e.target.value })}
             >
-              <MenuItem value="UNITS">Por cantidad de un producto</MenuItem>
-              <MenuItem value="AMOUNT">Por monto de compra</MenuItem>
-              <MenuItem value="PRODUCT">Por comprar un producto específico</MenuItem>
+              <MenuItem value="UNITS">{t('seller.gifts.triggerLabels.units')}</MenuItem>
+              <MenuItem value="AMOUNT">{t('seller.gifts.triggerLabels.amount')}</MenuItem>
+              <MenuItem value="PRODUCT">{t('seller.gifts.triggerLabels.product')}</MenuItem>
             </TextField>
 
             {form.triggerType !== 'AMOUNT' && (
               <TextField
                 select
-                label="Producto que dispara"
+                label={t('seller.gifts.dialog.triggerProductLabel')}
                 fullWidth
                 value={form.triggerProductId}
                 onChange={(e) => setForm({ ...form, triggerProductId: e.target.value })}
               >
                 <MenuItem value="">
-                  <em>Seleccionar...</em>
+                  <em>{t('seller.gifts.dialog.selectPlaceholder')}</em>
                 </MenuItem>
                 {products.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
@@ -275,29 +283,29 @@ export default function SellerGifts() {
 
             {form.triggerType === 'UNITS' && (
               <TextField
-                label="Cantidad mínima"
+                label={t('seller.gifts.dialog.minQuantityLabel')}
                 type="number"
                 fullWidth
                 value={form.triggerQuantity}
                 onChange={(e) => setForm({ ...form, triggerQuantity: e.target.value })}
-                placeholder="Ej: 2"
+                placeholder={t('seller.gifts.dialog.minQuantityPlaceholder')}
               />
             )}
 
             {form.triggerType === 'AMOUNT' && (
               <TextField
-                label="Monto mínimo (Bs)"
+                label={t('seller.gifts.dialog.minAmountLabel')}
                 type="number"
                 fullWidth
                 value={form.triggerAmount}
                 onChange={(e) => setForm({ ...form, triggerAmount: e.target.value })}
-                placeholder="Ej: 3000"
+                placeholder={t('seller.gifts.dialog.minAmountPlaceholder')}
               />
             )}
 
             <TextField
               select
-              label="Productos de regalo (elige uno o más)"
+              label={t('seller.gifts.dialog.giftProductsLabel')}
               fullWidth
               SelectProps={{ multiple: true }}
               value={form.productIds}
@@ -314,18 +322,18 @@ export default function SellerGifts() {
               control={
                 <Switch checked={form.allowChoice} onChange={(e) => setForm({ ...form, allowChoice: e.target.checked })} />
               }
-              label="El cliente puede elegir entre los productos de regalo"
+              label={t('seller.gifts.dialog.allowChoiceLabel')}
             />
             <FormControlLabel
               control={<Switch checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />}
-              label="Promoción activa"
+              label={t('seller.gifts.dialog.activeLabel')}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setOpen(false)}>{t('seller.gifts.dialog.cancelButton')}</GhostButton>
           <PrimaryButton onClick={save} disabled={saving}>
-            {saving ? <CircularProgress size={18} /> : 'Guardar'}
+            {saving ? <CircularProgress size={18} /> : t('seller.gifts.dialog.saveButton')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

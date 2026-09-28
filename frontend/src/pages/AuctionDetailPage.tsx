@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { PartyPopper } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -65,17 +67,18 @@ interface Auction {
   isWatching?: boolean;
 }
 
-function formatTimeLeft(ms: number): string {
-  if (ms <= 0) return 'Terminada';
+function formatTimeLeft(ms: number, tr: TFunction): string {
+  if (ms <= 0) return tr('auctions.time.ended');
   const totalSec = Math.floor(ms / 1000);
   const d = Math.floor(totalSec / 86400);
   const h = Math.floor((totalSec % 86400) / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
-  return `${d > 0 ? d + 'd ' : ''}${h}h ${m}m ${s}s`;
+  return d > 0 ? tr('auctions.time.dhms', { d, h, m, s }) : tr('auctions.time.hms', { h, m, s });
 }
 
 export default function AuctionDetailPage() {
+  const { t: tr } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const money = useMoney();
@@ -128,14 +131,14 @@ export default function AuctionDetailPage() {
         setAuction(payload.auction);
         setTimeLeft(payload.auction.timeLeftMs);
         if (payload.extendedTo) {
-          toast.success('¡Oferta en los últimos minutos! El tiempo se extendió.');
+          toast.success(tr('auctions.detail.toasts.extended'));
         }
       }
     });
 
     socket.on('auction:sold', () => {
       load(true);
-      toast.success('Subasta cerrada');
+      toast.success(tr('auctions.detail.toasts.closed'));
     });
 
     return () => {
@@ -153,13 +156,13 @@ export default function AuctionDetailPage() {
     }
     const amount = Number(bidAmount);
     if (!amount) {
-      toast.error('Ingresa un monto');
+      toast.error(tr('auctions.detail.toasts.enterAmount'));
       return;
     }
     setBidding(true);
     try {
       const { data } = await api.post(`/auctions/${id}/bid`, { bidAmount: amount });
-      toast.success(data.message || 'Oferta registrada');
+      toast.success(data.message || tr('auctions.detail.toasts.bidPlaced'));
       setBidAmount('');
       if (data.data.auction) setAuction(data.data.auction);
       setTimeLeft(data.data.auction?.timeLeftMs ?? 0);
@@ -175,11 +178,11 @@ export default function AuctionDetailPage() {
       navigate('/login');
       return;
     }
-    if (!confirm(`¿Comprar al instante por ${money(auction!.buyNowPrice!)}?`)) return;
+    if (!confirm(tr('auctions.detail.confirmBuyNow', { price: money(auction!.buyNowPrice!) }))) return;
     setBidding(true);
     try {
       const { data } = await api.post(`/auctions/${id}/buy-now`);
-      toast.success(data.message || 'Compra realizada');
+      toast.success(data.message || tr('auctions.detail.toasts.purchaseDone'));
       load(true);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -196,7 +199,7 @@ export default function AuctionDetailPage() {
     try {
       const { data } = await api.post(`/auctions/${id}/watch`);
       setAuction((a) => (a ? { ...a, isWatching: data.data.watched } : a));
-      toast.success(data.data.watched ? 'Agregado a tu watchlist' : 'Quitado del watchlist');
+      toast.success(data.data.watched ? tr('auctions.detail.toasts.watchAdded') : tr('auctions.detail.toasts.watchRemoved'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -207,7 +210,7 @@ export default function AuctionDetailPage() {
   if (!auction) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <Typography variant="h5">Subasta no encontrada</Typography>
+        <Typography variant="h5">{tr('auctions.detail.notFound')}</Typography>
       </Container>
     );
   }
@@ -221,10 +224,10 @@ export default function AuctionDetailPage() {
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Typography component={Link} to="/" color="inherit" sx={{ textDecoration: 'none' }}>
-          Inicio
+          {tr('auctions.detail.breadcrumbHome')}
         </Typography>
         <Typography component={Link} to="/subastas" color="inherit" sx={{ textDecoration: 'none' }}>
-          Subastas
+          {tr('auctions.detail.breadcrumbAuctions')}
         </Typography>
         <Typography color="text.primary">{auction.title}</Typography>
       </Breadcrumbs>
@@ -248,7 +251,7 @@ export default function AuctionDetailPage() {
               {auction.title}
             </Typography>
             {user && !isSeller && (
-              <Tooltip title={auction.isWatching ? 'Quitar del watchlist' : 'Agregar al watchlist'}>
+              <Tooltip title={auction.isWatching ? tr('auctions.detail.watch.remove') : tr('auctions.detail.watch.add')}>
                 <IconButton onClick={toggleWatch}>
                   {auction.isWatching ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
                 </IconButton>
@@ -256,15 +259,15 @@ export default function AuctionDetailPage() {
             )}
           </Box>
           <Box display="flex" alignItems="center" gap={1} mt={1} mb={2} flexWrap="wrap">
-            <Chip label={`Precio actual: ${money(auction.currentPrice)}`} color="primary" />
-            <Chip label={`Inicial: ${money(auction.startingPrice)}`} variant="outlined" />
-            <Chip label={`${auction.bidsCount} ofertas`} variant="outlined" />
+            <Chip label={tr('auctions.detail.chips.currentPrice', { price: money(auction.currentPrice) })} color="primary" />
+            <Chip label={tr('auctions.detail.chips.startingPrice', { price: money(auction.startingPrice) })} variant="outlined" />
+            <Chip label={tr('auctions.detail.chips.bidsCount', { count: auction.bidsCount })} variant="outlined" />
             {auction.buyNowPrice && !isExpired && (
-              <Chip label={`Comprar ahora: ${money(auction.buyNowPrice)}`} color="secondary" icon={<LocalOfferIcon />} />
+              <Chip label={tr('auctions.detail.chips.buyNowPrice', { price: money(auction.buyNowPrice) })} color="secondary" icon={<LocalOfferIcon />} />
             )}
             {auction.reservePrice && (
               <Chip
-                label={auction.reserveMet ? 'Reserva alcanzada ✓' : `Reserva no alcanzada (${money(auction.reservePrice)})`}
+                label={auction.reserveMet ? tr('auctions.detail.chips.reserveMet') : tr('auctions.detail.chips.reserveNotMet', { price: money(auction.reservePrice) })}
                 variant="outlined"
                 color={auction.reserveMet ? 'success' : 'warning'}
               />
@@ -275,14 +278,14 @@ export default function AuctionDetailPage() {
             <TimerIcon color={isExpired ? 'error' : 'success'} />
             <Box flex={1}>
               <Typography variant="body1" fontWeight={700} color={isExpired ? 'error' : 'success.main'}>
-                {isExpired ? 'Subasta terminada' : formatTimeLeft(timeLeft)}
+                {isExpired ? tr('auctions.detail.finished') : formatTimeLeft(timeLeft, tr)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {new Date(auction.endDate).toLocaleString('es-BO')}
               </Typography>
             </Box>
             {auction.reservePrice && !auction.reserveMet && !isExpired && (
-              <Chip icon={<LockIcon />} label="Reserva no alcanzada" size="small" color="warning" />
+              <Chip icon={<LockIcon />} label={tr('auctions.detail.chips.reserveNotMetShort')} size="small" color="warning" />
             )}
           </Paper>
 
@@ -294,7 +297,7 @@ export default function AuctionDetailPage() {
 
           <Box mb={2}>
             <Typography variant="body2" fontWeight={600}>
-              Vendedor:{' '}
+              {tr('auctions.detail.sellerLabel')}{' '}
               <Link to={`/vendedor/${auction.seller.id}`} style={{ color: 'inherit' }}>
                 {auction.seller.storeName}
               </Link>{' '}
@@ -305,26 +308,26 @@ export default function AuctionDetailPage() {
           {isExpired ? (
             auction.isSold && auction.winner ? (
               <Alert severity="success">
-                Ganada por {auction.winner.firstName} {auction.winner.lastName} con {money(auction.currentPrice)}
+                {tr('auctions.detail.wonBy', { firstName: auction.winner.firstName, lastName: auction.winner.lastName, price: money(auction.currentPrice) })}
               </Alert>
             ) : (
               <Alert severity="info">
-                Subasta finalizada {auction.reservePrice && !auction.reserveMet ? '(no se alcanzó la reserva)' : '(sin ganador)'}.
+                {auction.reservePrice && !auction.reserveMet ? tr('auctions.detail.finishedReserveNotMet') : tr('auctions.detail.finishedNoWinner')}
               </Alert>
             )
           ) : isSeller ? (
-            <Alert severity="info">Esta es tu subasta. No puedes ofertar ni comprarla.</Alert>
+            <Alert severity="info">{tr('auctions.detail.isYourAuction')}</Alert>
           ) : (
             <Paper sx={{ p: 2 }}>
-              {iAmWinning && <Alert severity="success" sx={{ mb: 2 }}>Vas ganando con {money(auction.currentPrice)}</Alert>}
+              {iAmWinning && <Alert severity="success" sx={{ mb: 2 }}>{tr('auctions.detail.youAreWinning', { price: money(auction.currentPrice) })}</Alert>}
               {myHighestBid && !iAmWinning && !isExpired && (
                 <Alert severity="info" sx={{ mb: 2 }}>
-                  Tu mejor oferta: {money(myHighestBid.bidAmount)}
-                  {auction.myProxyBid ? ` (proxy máximo: ${money(auction.myProxyBid)})` : ''}
+                  {tr('auctions.detail.yourBestBid', { price: money(myHighestBid.bidAmount) })}
+                  {auction.myProxyBid ? tr('auctions.detail.proxyMax', { price: money(auction.myProxyBid) }) : ''}
                 </Alert>
               )}
               <Typography variant="body2" color="text.secondary" mb={1}>
-                Próxima oferta mínima: <strong>{money(auction.nextBid)}</strong>
+                {tr('auctions.detail.nextMinBid')} <strong>{money(auction.nextBid)}</strong>
               </Typography>
               <Box display="flex" gap={1} flexWrap="wrap">
                 <TextField
@@ -336,16 +339,16 @@ export default function AuctionDetailPage() {
                   sx={{ flex: 1, minWidth: 140 }}
                 />
                 <PrimaryButton onClick={placeBid} disabled={bidding}>
-                  {bidding ? <CircularProgress size={20} color="inherit" /> : 'Ofertar'}
+                  {bidding ? <CircularProgress size={20} color="inherit" /> : tr('auctions.detail.bidButton')}
                 </PrimaryButton>
                 {auction.buyNowPrice && (
                   <SecondaryButton onClick={doBuyNow} disabled={bidding}>
-                    <LocalOfferIcon sx={{ mr: 0.5 }} /> Comprar ahora
+                    <LocalOfferIcon sx={{ mr: 0.5 }} /> {tr('auctions.detail.buyNowButton')}
                   </SecondaryButton>
                 )}
               </Box>
               <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                Tu oferta actúa como <strong>proxy bidding</strong>: pagas solo lo necesario para ganar, hasta el monto que indicas.
+                {tr('auctions.detail.proxyBiddingNote')}
               </Typography>
             </Paper>
           )}
@@ -355,10 +358,10 @@ export default function AuctionDetailPage() {
       {/* Historial de ofertas */}
       <Paper sx={{ mt: 3, p: 2 }}>
         <Typography variant="h6" fontWeight={700} mb={2}>
-          Historial de ofertas ({auction.bids.length})
+          {tr('auctions.detail.bidHistory', { count: auction.bids.length })}
         </Typography>
         {auction.bids.length === 0 ? (
-          <Typography color="text.secondary">Aún no hay ofertas. ¡Sé el primero!</Typography>
+          <Typography color="text.secondary">{tr('auctions.detail.noBidsYet')}</Typography>
         ) : (
           <List disablePadding>
             {auction.bids.slice(0, 30).map((b, idx) => (
@@ -369,7 +372,7 @@ export default function AuctionDetailPage() {
                 <Box flex={1}>
                   <Typography variant="body2" fontWeight={600}>
                     {b.bidder.storeName || `${b.bidder.firstName} ${b.bidder.lastName}`}
-                    {b.bidder.id === user?.id && ' (tú)'}
+                    {b.bidder.id === user?.id && ` ${tr('auctions.detail.you')}`}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {new Date(b.createdAt).toLocaleTimeString('es-BO')}

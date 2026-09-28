@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Truck, Package, MapPin, Lock } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -88,6 +89,7 @@ interface SellerData {
 }
 
 export default function SellerProfilePage() {
+  const { t: tr } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
@@ -171,7 +173,7 @@ export default function SellerProfilePage() {
     try {
       const { data } = await api.post(`/sellers/${id}/privileged-request`);
       setPrivStatus(data.data.status);
-      toast.success(data.data.message || 'Solicitud enviada');
+      toast.success(data.data.message || tr('sellerProfile.toasts.requestSent'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -179,9 +181,9 @@ export default function SellerProfilePage() {
 
   /** Veredicto comercial según el rating promedio (estilo marketplace). */
   const veredicto = (rating: number): { label: string; color: 'success' | 'info' | 'warning' } => {
-    if (rating >= 4.5) return { label: 'Muy recomendado', color: 'success' };
-    if (rating >= 3.5) return { label: 'Recomendado', color: 'info' };
-    return { label: 'No recomendado', color: 'warning' };
+    if (rating >= 4.5) return { label: tr('sellerProfile.veredicto.highlyRecommended'), color: 'success' };
+    if (rating >= 3.5) return { label: tr('sellerProfile.veredicto.recommended'), color: 'info' };
+    return { label: tr('sellerProfile.veredicto.notRecommended'), color: 'warning' };
   };
 
   if (loading) return <ProductGridSkeleton count={3} />;
@@ -189,7 +191,7 @@ export default function SellerProfilePage() {
   if (!seller) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <Typography variant="h5">Vendedor no encontrado</Typography>
+        <Typography variant="h5">{tr('sellerProfile.notFound')}</Typography>
       </Container>
     );
   }
@@ -200,7 +202,7 @@ export default function SellerProfilePage() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Typography component={Link} to="/" color="inherit" sx={{ textDecoration: 'none' }}>
-          Inicio
+          {tr('sellerProfile.breadcrumbHome')}
         </Typography>
         <Typography color="text.primary">{seller.storeName}</Typography>
       </Breadcrumbs>
@@ -226,7 +228,7 @@ export default function SellerProfilePage() {
                   {seller.storeName}
                 </Typography>
                 {seller.isVerified && <VerifiedIcon color="primary" />}
-                {seller.totalSales > 0 && <Chip label={`${seller.totalSales} ventas`} size="small" variant="outlined" />}
+                {seller.totalSales > 0 && <Chip label={tr('sellerProfile.salesCount', { count: seller.totalSales })} size="small" variant="outlined" />}
               </Box>
               <Box display="flex" alignItems="center" gap={1} mt={0.5}>
                 <Rating value={Number(seller.rating)} readOnly precision={0.1} size="small" />
@@ -241,11 +243,11 @@ export default function SellerProfilePage() {
               </Box>
               {/* Métricas de confianza */}
               <Stack direction="row" spacing={1.5} mt={1} flexWrap="wrap" useFlexGap>
-                <Chip size="small" icon={<StarIcon />} label={`${seller.reviewCount ?? 0} reseñas`} />
-                <Chip size="small" icon={<GroupIcon />} label={`${seller.activeCount ?? 0} productos activos`} />
-                {seller.monthlySales > 0 && <Chip size="small" label={`${seller.monthlySales} ventas este mes`} />}
+                <Chip size="small" icon={<StarIcon />} label={tr('sellerProfile.reviewsCount', { count: seller.reviewCount ?? 0 })} />
+                <Chip size="small" icon={<GroupIcon />} label={tr('sellerProfile.activeProductsCount', { count: seller.activeCount ?? 0 })} />
+                {seller.monthlySales > 0 && <Chip size="small" label={tr('sellerProfile.monthlySalesCount', { count: seller.monthlySales })} />}
                 {seller.freeShippingThreshold && Number(seller.freeShippingThreshold) > 0 && (
-                  <Chip size="small" color="success" label={`Envío gratis desde ${seller.freeShippingThreshold} Bs`} />
+                  <Chip size="small" color="success" label={tr('sellerProfile.freeShippingFrom', { amount: seller.freeShippingThreshold })} />
                 )}
               </Stack>
             </Box>
@@ -263,7 +265,7 @@ export default function SellerProfilePage() {
                       }
                     }}
                   >
-                    Contactar
+                    {tr('sellerProfile.contact')}
                   </PrimaryButton>
                   {privStatus === 'APPROVED' ? (
                     <PrimaryButton
@@ -271,7 +273,7 @@ export default function SellerProfilePage() {
                       startIcon={<WorkspacePremiumIcon />}
                       onClick={requestPrivilege}
                     >
-                      ✓ Comprador privilegiado
+                      {tr('sellerProfile.privilegedBuyer')}
                     </PrimaryButton>
                   ) : (
                     <SecondaryButton
@@ -279,7 +281,7 @@ export default function SellerProfilePage() {
                       disabled={privStatus === 'PENDING'}
                       onClick={requestPrivilege}
                     >
-                      {privStatus === 'PENDING' ? 'Solicitud pendiente' : 'Solicitar acceso privilegiado'}
+                      {privStatus === 'PENDING' ? tr('sellerProfile.requestPending') : tr('sellerProfile.requestPrivilegedAccess')}
                     </SecondaryButton>
                   )}
                 </>
@@ -309,7 +311,7 @@ export default function SellerProfilePage() {
                   variant="contained"
                   color="success"
                   startIcon={<WhatsAppIcon />}
-                  href={`https://wa.me/${seller.whatsappPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${seller.storeName}, vi tu tienda en LaCase Multi Tiendas y quiero hacer una consulta.`)}`}
+                  href={`https://wa.me/${seller.whatsappPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(tr('sellerProfile.whatsappMessage', { storeName: seller.storeName }))}`}
                   target="_blank"
                   rel="noopener"
                 >
@@ -344,19 +346,19 @@ export default function SellerProfilePage() {
       {/* Mapa de la tienda */}
       <Box mt={3}>
         <Typography variant="h6" fontWeight={700} mb={1}>
-          Ubicación de la tienda
+          {tr('sellerProfile.storeLocation')}
         </Typography>
         {seller.latitude != null && seller.longitude != null ? (
           <>
             <MiniMap lat={Number(seller.latitude)} lng={Number(seller.longitude)} storeName={seller.storeName} locationVerified={seller.locationVerified} />
             {seller.locationVerified && (
               <Typography variant="caption" color="success.main" sx={{ display: 'block', mt: 1 }}>
-                Ubicación verificada por el administrador (tienda física comprobada)
+                {tr('sellerProfile.locationVerified')}
               </Typography>
             )}
           </>
         ) : (
-          <Typography color="text.disabled">Ubicación no especificada</Typography>
+          <Typography color="text.disabled">{tr('sellerProfile.locationNotSpecified')}</Typography>
         )}
       </Box>
 
@@ -366,11 +368,11 @@ export default function SellerProfilePage() {
           <Box display="flex" alignItems="center" gap={1} mb={1}>
             <WorkspacePremiumIcon color="secondary" />
             <Typography variant="h6" fontWeight={700}>
-              Productos nuevos — solo para compradores privilegiados 🔑
+              {tr('sellerProfile.privilegedProductsTitle')}
             </Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Estos productos aún no se publican al público general. Sos de los primeros en verlos.
+            {tr('sellerProfile.privilegedProductsNote')}
           </Typography>
           <Grid container spacing={2}>
             {privilegedProducts.map((p) => (
@@ -396,10 +398,10 @@ export default function SellerProfilePage() {
       )}
 
       <Typography variant="h6" fontWeight={700} mb={2}>
-        Productos de {seller.storeName}
+        {tr('sellerProfile.productsOf', { storeName: seller.storeName })}
       </Typography>
       {products.length === 0 ? (
-        <EmptyState message="Esta tienda aún no publica productos." />
+        <EmptyState message={tr('sellerProfile.noProducts')} />
       ) : (
         <Grid container spacing={2} mb={4}>
           {products.map((p) => (
@@ -427,10 +429,10 @@ export default function SellerProfilePage() {
         <>
           <Divider sx={{ my: 2 }} />
           <Typography variant="h6" fontWeight={700} mb={2}>
-            Referencias — compras recientes
+            {tr('sellerProfile.recentPurchasesTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            La calificación post-compra es obligatoria: estas personas recibieron su compra y calificaron a esta tienda.
+            {tr('sellerProfile.recentPurchasesNote')}
           </Typography>
           <Grid container spacing={2} mb={2}>
             {seller.recentBuyers.slice(0, 8).map((b) => (
@@ -444,7 +446,7 @@ export default function SellerProfilePage() {
                           {b.buyer.firstName} {b.buyer.lastName}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Compró · {new Date(b.updatedAt).toLocaleDateString('es-BO')}
+                          {tr('sellerProfile.purchasedOn', { date: new Date(b.updatedAt).toLocaleDateString('es-BO') })}
                         </Typography>
                       </Box>
                     </Box>
@@ -460,11 +462,11 @@ export default function SellerProfilePage() {
       <Divider sx={{ my: 3 }} />
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6" fontWeight={700}>
-          Reseñas y confianza
+          {tr('sellerProfile.reviewsAndTrust')}
         </Typography>
         {reviews.length > 0 && (
           <Button size="small" variant="outlined" component={Link} to={`/vendedor/${id}/resenas`}>
-            Ver todas las reseñas
+            {tr('sellerProfile.viewAllReviews')}
           </Button>
         )}
       </Box>
@@ -472,7 +474,7 @@ export default function SellerProfilePage() {
       {reviews.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
           <Typography color="text.secondary">
-            Aún no hay reseñas. Las reseñas solo aparecen después de una compra entregada — generan confianza en la comunidad.
+            {tr('sellerProfile.noReviewsYet')}
           </Typography>
         </Paper>
       ) : (
@@ -502,7 +504,7 @@ export default function SellerProfilePage() {
                       />
                     </Box>
                     <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                      {overview?.summary?.total ?? 0} persona(s) calificaron
+                      {tr('sellerProfile.ratedByCount', { count: overview?.summary?.total ?? 0 })}
                     </Typography>
                   </Box>
                   {/* Distribución */}
@@ -534,27 +536,27 @@ export default function SellerProfilePage() {
             <Grid item xs={12} md={4}>
               <Card sx={{ height: '100%' }}>
                 <CardContent>
-                  <Typography variant="subtitle1" fontWeight={700}>Ventas</Typography>
+                  <Typography variant="subtitle1" fontWeight={700}>{tr('sellerProfile.sales.title')}</Typography>
                   <Box display="flex" justifyContent="space-between" mt={1}>
-                    <Typography variant="body2" color="text.secondary">Ventas totales</Typography>
+                    <Typography variant="body2" color="text.secondary">{tr('sellerProfile.sales.totalSales')}</Typography>
                     <Typography variant="body2" fontWeight={700}>{overview?.storeStats?.totalOrders ?? 0}</Typography>
                   </Box>
                   <Box display="flex" justifyContent="space-between" mt={0.5}>
-                    <Typography variant="body2" color="text.secondary">Ventas del mes</Typography>
+                    <Typography variant="body2" color="text.secondary">{tr('sellerProfile.sales.monthSales')}</Typography>
                     <Typography variant="body2" fontWeight={700}>{overview?.storeStats?.monthOrders ?? 0}</Typography>
                   </Box>
                   <Box display="flex" justifyContent="space-between" mt={0.5}>
-                    <Typography variant="body2" color="text.secondary">Ingresos del mes</Typography>
-                    <Typography variant="body2" fontWeight={700}>Bs {Number(overview?.storeStats?.monthSales ?? 0).toLocaleString('es-BO')}</Typography>
+                    <Typography variant="body2" color="text.secondary">{tr('sellerProfile.sales.monthRevenue')}</Typography>
+                    <Typography variant="body2" fontWeight={700}>{tr('sellerProfile.amountBs', { amount: Number(overview?.storeStats?.monthSales ?? 0).toLocaleString('es-BO') })}</Typography>
                   </Box>
-                  <Typography variant="subtitle2" fontWeight={700} mt={2}>Últimas ventas</Typography>
+                  <Typography variant="subtitle2" fontWeight={700} mt={2}>{tr('sellerProfile.sales.lastSales')}</Typography>
                   {(overview?.storeStats?.lastOrders ?? []).length === 0 ? (
-                    <Typography variant="caption" color="text.secondary">Sin ventas todavía</Typography>
+                    <Typography variant="caption" color="text.secondary">{tr('sellerProfile.sales.noSalesYet')}</Typography>
                   ) : (
                     (overview?.storeStats?.lastOrders ?? []).slice(0, 5).map((o: any) => (
                       <Box key={o.id} display="flex" justifyContent="space-between" alignItems="center" mt={0.5}>
                         <Typography variant="caption" noWrap sx={{ maxWidth: '60%' }}>{o.productName}</Typography>
-                        <Typography variant="caption" fontWeight={700}>Bs {Number(o.total).toLocaleString('es-BO')}</Typography>
+                        <Typography variant="caption" fontWeight={700}>{tr('sellerProfile.amountBs', { amount: Number(o.total).toLocaleString('es-BO') })}</Typography>
                       </Box>
                     ))
                   )}
@@ -566,10 +568,10 @@ export default function SellerProfilePage() {
             <Grid item xs={12} md={4}>
               <Card sx={{ height: '100%' }}>
                 <CardContent>
-                  <Typography variant="subtitle1" fontWeight={700}>¿Cómo es tratar con este vendedor?</Typography>
+                  <Typography variant="subtitle1" fontWeight={700}>{tr('sellerProfile.tags.howIsItTitle')}</Typography>
                   {(overview?.topTags ?? []).length === 0 ? (
                     <Typography variant="caption" color="text.secondary">
-                      Aún no hay etiquetas. Aparecerán cuando los compradores califiquen su experiencia.
+                      {tr('sellerProfile.tags.noTagsYet')}
                     </Typography>
                   ) : (
                     <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
@@ -586,10 +588,10 @@ export default function SellerProfilePage() {
           {/* Etiquetas votables (12 pares positivo/negativo) */}
           <Paper sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={1}>
-              ¿Cómo fue tu experiencia con esta tienda?
+              {tr('sellerProfile.tags.voteTitle')}
             </Typography>
             <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-              Vota cada par según tu experiencia. El conteo muestra cuántas personas eligieron cada etiqueta.
+              {tr('sellerProfile.tags.voteNote')}
             </Typography>
             <Box display="flex" flexWrap="wrap" gap={1}>
               {REVIEW_TAG_PAIRS.map((pair) => {
@@ -628,7 +630,7 @@ export default function SellerProfilePage() {
                 <Rating value={r.rating} readOnly size="small" />
                 <Chip label={veredicto(r.rating).label} color={veredicto(r.rating).color} size="small" variant="outlined" />
                 <Typography variant="caption" color="text.secondary">
-                  por {r.user.firstName} {r.user.lastName}
+                  {tr('sellerProfile.reviewBy', { firstName: r.user.firstName, lastName: r.user.lastName })}
                 </Typography>
                 <Typography variant="caption" color="text.disabled">
                   · {new Date(r.createdAt).toLocaleDateString('es-BO')}
@@ -649,7 +651,7 @@ export default function SellerProfilePage() {
 
       {/* Modal de todas las reseñas */}
       <Dialog open={reviewsOpen} onClose={() => setReviewsOpen(false)} fullWidth maxWidth="md">
-        <DialogTitle>Reseñas del vendedor ({reviews.length})</DialogTitle>
+        <DialogTitle>{tr('sellerProfile.reviewsDialog.title', { count: reviews.length })}</DialogTitle>
         <DialogContent dividers>
           <Tabs
             value={reviewFilter}
@@ -658,10 +660,10 @@ export default function SellerProfilePage() {
             scrollButtons="auto"
             sx={{ mb: 2 }}
           >
-            <Tab label="Todas" value="all" />
-            <Tab label="Muy recomendado" value="good" />
-            <Tab label="Recomendado" value="neutral" />
-            <Tab label="No recomendado" value="bad" />
+            <Tab label={tr('sellerProfile.reviewsDialog.tabAll')} value="all" />
+            <Tab label={tr('sellerProfile.veredicto.highlyRecommended')} value="good" />
+            <Tab label={tr('sellerProfile.veredicto.recommended')} value="neutral" />
+            <Tab label={tr('sellerProfile.veredicto.notRecommended')} value="bad" />
           </Tabs>
           {reviews
             .filter((r) => {
@@ -676,7 +678,7 @@ export default function SellerProfilePage() {
                   <Rating value={r.rating} readOnly size="small" />
                   <Chip label={veredicto(r.rating).label} color={veredicto(r.rating).color} size="small" variant="outlined" />
                   <Typography variant="caption" color="text.secondary">
-                    por {r.user.firstName} {r.user.lastName}
+                    {tr('sellerProfile.reviewBy', { firstName: r.user.firstName, lastName: r.user.lastName })}
                   </Typography>
                   <Typography variant="caption" color="text.disabled">
                     · {new Date(r.createdAt).toLocaleDateString('es-BO')}
@@ -699,12 +701,12 @@ export default function SellerProfilePage() {
             return true;
           }).length === 0 && (
             <Typography color="text.secondary" textAlign="center" py={3}>
-              No hay reseñas en esta categoría.
+              {tr('sellerProfile.reviewsDialog.noneInCategory')}
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setReviewsOpen(false)}>Cerrar</Button>
+          <Button onClick={() => setReviewsOpen(false)}>{tr('sellerProfile.close')}</Button>
         </DialogActions>
       </Dialog>
     </Container>

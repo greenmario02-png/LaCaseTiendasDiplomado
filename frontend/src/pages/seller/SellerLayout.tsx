@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Container,
@@ -40,23 +41,23 @@ import { PageHeader } from '../../components/redesign/PageHeader';
 import { useAuthStore } from '../../stores/authStore';
 import { useRbacStore, type RbacMenu } from '../../stores/rbacStore';
 
-const MENU = [
-  { to: '/seller', label: 'Dashboard', icon: <DashboardIcon />, end: true },
-  { to: '/seller/productos', label: 'Productos', icon: <InventoryIcon /> },
-  { to: '/seller/etiquetas', label: 'Etiquetas', icon: <QrCode2Icon /> },
-  { to: '/seller/calendario', label: 'Calendario', icon: <CalendarMonthIcon /> },
-  { to: '/seller/subastas', label: 'Subastas', icon: <GavelIcon /> },
-  { to: '/seller/empleos', label: 'Empleos', icon: <WorkOutlineIcon />, adminOnly: true },
-  { to: '/seller/privilegiados', label: 'Compradores VIP', icon: <WorkspacePremiumIcon />, adminOnly: true },
-        { to: '/seller/promociones', label: 'Promociones', icon: <LocalOfferOutlinedIcon />, adminOnly: true },
-        { to: '/seller/cupones', label: 'Cupones', icon: <LocalOfferIcon />, adminOnly: true },
-        { to: '/seller/regalos', label: 'Promos de regalo', icon: <RedeemIcon />, adminOnly: true },
-  { to: '/seller/pagos', label: 'Mis pagos', icon: <PaymentsIcon />, adminOnly: true },
-  { to: '/seller/equipo', label: 'Equipo', icon: <GroupIcon />, adminOnly: true },
-  { to: '/seller/devoluciones', label: 'Devoluciones', icon: <AssignmentReturnIcon /> },
-  { to: '/mensajes', label: 'Mensajes', icon: <ChatIcon /> },
-  { to: '/seller/pedidos', label: 'Pedidos', icon: <ReceiptLongIcon /> },
-  { to: '/seller/configuracion', label: 'Configuración', icon: <SettingsIcon />, adminOnly: true },
+const MENU_CONFIG = [
+  { to: '/seller', labelKey: 'seller.layout.nav.dashboard', icon: <DashboardIcon />, end: true },
+  { to: '/seller/productos', labelKey: 'seller.layout.nav.products', icon: <InventoryIcon /> },
+  { to: '/seller/etiquetas', labelKey: 'seller.layout.nav.labels', icon: <QrCode2Icon /> },
+  { to: '/seller/calendario', labelKey: 'seller.layout.nav.calendar', icon: <CalendarMonthIcon /> },
+  { to: '/seller/subastas', labelKey: 'seller.layout.nav.auctions', icon: <GavelIcon /> },
+  { to: '/seller/empleos', labelKey: 'seller.layout.nav.jobs', icon: <WorkOutlineIcon />, adminOnly: true },
+  { to: '/seller/privilegiados', labelKey: 'seller.layout.nav.vipBuyers', icon: <WorkspacePremiumIcon />, adminOnly: true },
+  { to: '/seller/promociones', labelKey: 'seller.layout.nav.promotions', icon: <LocalOfferOutlinedIcon />, adminOnly: true },
+  { to: '/seller/cupones', labelKey: 'seller.layout.nav.coupons', icon: <LocalOfferIcon />, adminOnly: true },
+  { to: '/seller/regalos', labelKey: 'seller.layout.nav.giftPromos', icon: <RedeemIcon />, adminOnly: true },
+  { to: '/seller/pagos', labelKey: 'seller.layout.nav.payments', icon: <PaymentsIcon />, adminOnly: true },
+  { to: '/seller/equipo', labelKey: 'seller.layout.nav.team', icon: <GroupIcon />, adminOnly: true },
+  { to: '/seller/devoluciones', labelKey: 'seller.layout.nav.returns', icon: <AssignmentReturnIcon /> },
+  { to: '/mensajes', labelKey: 'seller.layout.nav.messages', icon: <ChatIcon /> },
+  { to: '/seller/pedidos', labelKey: 'seller.layout.nav.orders', icon: <ReceiptLongIcon /> },
+  { to: '/seller/configuracion', labelKey: 'seller.layout.nav.settings', icon: <SettingsIcon />, adminOnly: true },
 ];
 
 // Paths que solo ven OWNER/ADMIN de tienda (para ocultar a empleados en menús dinámicos).
@@ -72,7 +73,7 @@ const SELLER_ADMIN_ONLY_PATHS = [
 ];
 
 // Iconos por path (menús dinámicos RBAC; fallback DashboardIcon).
-const SELLER_ICONS: Record<string, ReactNode> = Object.fromEntries(MENU.map((m) => [m.to, m.icon]));
+const SELLER_ICONS: Record<string, ReactNode> = Object.fromEntries(MENU_CONFIG.map((m) => [m.to, m.icon]));
 
 // Convierte los menús RBAC del módulo seller (+ /mensajes) al shape de MENU.
 function rbacSellerMenus(rbacMenus: RbacMenu[], isEmployee: boolean) {
@@ -104,6 +105,7 @@ function isReauthValid(userId: number): boolean {
 }
 
 export default function SellerLayout() {
+  const { t: tr } = useTranslation();
   const theme = useTheme();
   const t = useUnifiedTokens();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -114,6 +116,7 @@ export default function SellerLayout() {
   const rbacMenus = useRbacStore((s) => s.menus);
   const rbacLoaded = useRbacStore((s) => s.loaded);
   const dynamicSeller = rbacSellerMenus(rbacMenus, isEmployee);
+  const MENU = MENU_CONFIG.map((item) => ({ ...item, label: tr(item.labelKey) }));
   const menu = rbacLoaded && dynamicSeller.length > 0 ? dynamicSeller : MENU.filter((item) => !(item.adminOnly && isEmployee));
 
   // Re-autenticación al entrar al panel (verify-password + TTL por sesión).
@@ -177,7 +180,7 @@ export default function SellerLayout() {
 
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, md: 3 } }}>
         <Container maxWidth="lg">
-          <PageHeader title={isEmployee ? 'Panel del empleado' : 'Panel del vendedor'} icon={<StorefrontIcon />} />
+          <PageHeader title={isEmployee ? tr('seller.layout.header.employeePanel') : tr('seller.layout.header.sellerPanel')} icon={<StorefrontIcon />} />
           <Outlet />
         </Container>
       </Box>
@@ -198,13 +201,13 @@ export default function SellerLayout() {
           }}
         >
           <Typography id="reauth-title" variant="h6" fontWeight={700} mb={1}>
-            Verificación de seguridad
+            {tr('seller.layout.reauth.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={3}>
-            Para ingresar al panel de la tienda, confirma tu contraseña.
+            {tr('seller.layout.reauth.description')}
           </Typography>
           <TextField
-            label="Contraseña"
+            label={tr('seller.layout.reauth.passwordLabel')}
             type="password"
             value={reauthPassword}
             onChange={(e) => setReauthPassword(e.target.value)}
@@ -224,7 +227,7 @@ export default function SellerLayout() {
             disabled={reauthSubmitting || !reauthPassword}
             onClick={handleVerifyPassword}
           >
-            {reauthSubmitting ? 'Verificando…' : 'Verificar'}
+            {reauthSubmitting ? tr('seller.layout.reauth.verifying') : tr('seller.layout.reauth.verify')}
           </Button>
         </Box>
       </Modal>
