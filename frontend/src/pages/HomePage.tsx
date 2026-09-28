@@ -14,7 +14,6 @@ import {
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import { LaCaseDiceBanner } from '../components/ui/LaCaseDiceBanner';
 import { JobCard, type Job } from '../components/redesign/JobCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -212,9 +211,6 @@ export default function HomePage() {
           </Box>
         </Box>
       )}
-
-      {/* LETRERO "LACASE DICE" */}
-      <LaCaseDiceBanner />
 
       {/* HERO */}
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>

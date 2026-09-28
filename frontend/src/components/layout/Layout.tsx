@@ -4,11 +4,13 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import ReturnToTop from '../ui/ReturnToTop';
 import FloatingChat from '../chat/FloatingChat';
+import { LaCaseDiceBanner } from '../ui/LaCaseDiceBanner';
 
 export default function Layout() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
+      <LaCaseDiceBanner />
       <Box component="main" sx={{ flex: 1 }}>
         <Outlet />
       </Box>
