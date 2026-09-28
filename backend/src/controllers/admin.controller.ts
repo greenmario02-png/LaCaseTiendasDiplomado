@@ -367,7 +367,7 @@ export async function updateUser(req: AuthRequest, res: Response, next: NextFunc
         type: isApproved ? 'SELLER_APPROVED' : 'SELLER_REJECTED',
         title: isApproved ? '¡Tu tienda fue aprobada! 🎉' : 'Tu tienda fue rechazada',
         message: isApproved
-          ? 'Ya podés publicar productos en MultiTienda.'
+          ? 'Ya puedes publicar productos en MultiTienda.'
           : 'Tu solicitud de tienda fue rechazada. Contactá al administrador.',
         refType: 'seller',
         refId: userId,
@@ -381,7 +381,7 @@ export async function updateUser(req: AuthRequest, res: Response, next: NextFunc
         type: 'SYSTEM',
         title: isActive ? 'Tu tienda fue reactivada' : 'Tu tienda fue suspendida',
         message: isActive
-          ? 'Ya podés operar con normalidad.'
+          ? 'Ya puedes operar con normalidad.'
           : 'Tu tienda fue suspendida temporalmente. Contactá al administrador.',
         refType: 'seller',
         refId: userId,

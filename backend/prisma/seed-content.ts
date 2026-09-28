@@ -610,6 +610,66 @@ async function corregirImagenesRotas() {
   if (total > 0) console.log(`[seed-content] Imágenes rotas de LoremFlickr corregidas: ${total}`);
 }
 
+// ---------- Empleos ----------
+const JOB_CATEGORIES = [
+  { name: 'Tecnología', slug: 'tecnologia', icon: 'Computer' },
+  { name: 'Ventas y Atención al Cliente', slug: 'ventas-atencion-cliente', icon: 'Storefront' },
+  { name: 'Logística y Reparto', slug: 'logistica-reparto', icon: 'LocalShipping' },
+  { name: 'Diseño y Marketing', slug: 'diseno-marketing', icon: 'Brush' },
+  { name: 'Administración', slug: 'administracion', icon: 'Business' },
+];
+
+const JOB_POSTINGS = [
+  { categorySlug: 'tecnologia', title: 'Desarrollador/a Frontend Junior', description: 'Buscamos apoyo para mantener y mejorar nuestra tienda en línea. Se valora conocimiento de React.', requirements: 'Conocimientos básicos de HTML, CSS y JavaScript. Ganas de aprender.', payPeriod: 'MONTHLY' as const, salaryMin: 3000, salaryMax: 4500, schedule: 'Lunes a viernes, horario de oficina' },
+  { categorySlug: 'ventas-atencion-cliente', title: 'Vendedor/a de Tienda', description: 'Atención al cliente en tienda física y por WhatsApp, manejo de pedidos y caja.', requirements: 'Buena atención al cliente, disponibilidad de horario completo.', payPeriod: 'MONTHLY' as const, salaryMin: 2200, salaryMax: 2800, schedule: 'Turnos rotativos' },
+  { categorySlug: 'logistica-reparto', title: 'Repartidor/a con Movilidad Propia', description: 'Entrega de pedidos dentro de la ciudad. Se paga por entrega realizada.', requirements: 'Moto propia y licencia de conducir vigente.', payPeriod: 'DAILY' as const, salaryMin: 100, salaryMax: 180, schedule: 'Medio tiempo o tiempo completo' },
+  { categorySlug: 'diseno-marketing', title: 'Community Manager', description: 'Manejo de redes sociales de la tienda, creación de contenido y promociones.', requirements: 'Manejo de Instagram y Facebook Ads, edición básica de imágenes.', payPeriod: 'MONTHLY' as const, salaryMin: 2000, salaryMax: 3200, schedule: 'Medio tiempo, remoto' },
+  { categorySlug: 'administracion', title: 'Asistente Administrativo/a', description: 'Apoyo en control de inventario, facturación y coordinación con proveedores.', requirements: 'Manejo de Excel, orden y buena redacción.', payPeriod: 'MONTHLY' as const, salaryMin: 2500, salaryMax: 3500, schedule: 'Lunes a sábado' },
+  { categorySlug: 'ventas-atencion-cliente', title: 'Cajero/a', description: 'Manejo de caja, cobros y arqueo diario en tienda física.', requirements: 'Experiencia previa en caja es un plus, no excluyente.', payPeriod: 'MONTHLY' as const, salaryMin: 2000, salaryMax: 2400, schedule: 'Turno mañana o tarde' },
+];
+
+async function seedJobs(sellers: Array<{ id: number; city: string; state: string }>, adminId: number) {
+  const categoryIds: Record<string, number> = {};
+  for (const c of JOB_CATEGORIES) {
+    const cat = await prisma.jobCategory.upsert({ where: { slug: c.slug }, update: {}, create: c });
+    categoryIds[c.slug] = cat.id;
+  }
+
+  const existing = await prisma.jobPosting.count();
+  if (existing > 0) return;
+
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 30 * 86400000);
+  let created = 0;
+  for (const [i, job] of JOB_POSTINGS.entries()) {
+    const seller = sellers[i % sellers.length];
+    await prisma.jobPosting.create({
+      data: {
+        storeId: seller.id,
+        createdById: seller.id,
+        categoryId: categoryIds[job.categorySlug],
+        title: job.title,
+        description: job.description,
+        requirements: job.requirements,
+        city: seller.city,
+        locationState: seller.state,
+        payPeriod: job.payPeriod,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        vacancies: faker.number.int({ min: 1, max: 3 }),
+        schedule: job.schedule,
+        status: 'APPROVED',
+        reviewedById: adminId,
+        reviewedAt: now,
+        publishedAt: now,
+        expiresAt,
+      },
+    });
+    created++;
+  }
+  console.log(`[seed-content] Ofertas de empleo creadas: ${created}`);
+}
+
 async function main() {
   const demoPassword = process.env.DEMO_PASSWORD;
   if (!demoPassword) throw new Error('Falta DEMO_PASSWORD en el entorno (se reutiliza para los usuarios adicionales de demostración).');
@@ -625,7 +685,7 @@ async function main() {
   const demoBuyer = await prisma.user.findUnique({ where: { email: 'comprador.demo@lacase.bo' } });
   const admin = await prisma.user.findFirst({ where: { role: Role.ADMIN } });
   if (!demoSeller || !demoBuyer || !admin) {
-    throw new Error('Faltan las cuentas base (admin/vendedor.demo/comprador.demo). Corré primero npm run db:seed:prod.');
+    throw new Error('Faltan las cuentas base (admin/vendedor.demo/comprador.demo). Corre primero npm run db:seed:prod.');
   }
 
   const allSellerIds = [demoSeller.id, ...extraSellers];
@@ -643,6 +703,13 @@ async function main() {
   console.log('[seed-content] Sembrando conversaciones y mensajes...');
   await seedConversations(demoBuyer.id, demoSeller.id);
   await seedConversations(extraCustomers[0], extraSellers[0]);
+
+  console.log('[seed-content] Sembrando ofertas de empleo...');
+  const sellersForJobs = [
+    { id: demoSeller.id, city: 'Cochabamba', state: 'Cochabamba' },
+    ...extraSellers.map((id, i) => ({ id, city: EXTRA_SELLERS[i].city, state: EXTRA_SELLERS[i].dept })),
+  ];
+  await seedJobs(sellersForJobs, admin.id);
 
   console.log('[seed-content] Sembrando perfiles de foro...');
   const adminProfile = await ensureForumProfile(admin.id, 'La Paz', `Admin_${admin.id}`);

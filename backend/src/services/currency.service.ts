@@ -27,6 +27,9 @@ const CURRENCY_META: Record<string, { name: string; symbol: string }> = {
   CLP: { name: 'Peso chileno', symbol: 'CL$' },
   UYU: { name: 'Peso uruguayo', symbol: '$U' },
   BRL: { name: 'Real brasileño', symbol: 'R$' },
+  CNY: { name: 'Yuan chino', symbol: '¥C' },
+  PYG: { name: 'Guaraní paraguayo', symbol: '₲' },
+  COP: { name: 'Peso colombiano', symbol: 'CO$' },
 };
 
 // Tasas por defecto: cuántas Bs equivalen a 1 unidad de cada moneda (ago 2026, referencia).
@@ -41,6 +44,9 @@ const DEFAULT_RATES: Record<string, number> = {
   CLP: 0.0122, // ~1 USD ≈ 950 CLP
   UYU: 0.282, // ~1 USD ≈ 41 UYU
   BRL: 2.1, // ~1 USD ≈ 5,50 BRL
+  CNY: 0.98, // ~1 USD ≈ 7,10 CNY
+  PYG: 0.00093, // ~1 USD ≈ 7.500 PYG
+  COP: 0.0017, // ~1 USD ≈ 4.100 COP
   USDT: 6.96,
 };
 
@@ -191,12 +197,25 @@ export async function refreshRates(): Promise<Record<string, number>> {
     'https://api.exchangerate-api.com/v4/latest/USD',
   ];
 
-  let usdToBob: number | null = await fetchBinanceUsdRate();
+  // Se piden Binance y BCB en paralelo: Binance sigue siendo la fuente primaria (más sensible al
+  // mercado paralelo), pero comparamos contra el BCB para detectar si se desvió demasiado en vez
+  // de solo usarlo cuando Binance falla. No agrega una fuente nueva: ya estaba en el código, solo
+  // se aprovecha también como verificación cuando Binance sí responde.
+  const [binanceRate, bcbRate] = await Promise.all([fetchBinanceUsdRate(), fetchBcbUsdRate()]);
+
+  let usdToBob: number | null = binanceRate;
   let source = 'Binance P2P';
   let lastError: string | null = usdToBob === null ? 'Binance no disponible' : null;
 
+  if (usdToBob !== null && bcbRate !== null) {
+    const diffPct = Math.abs(usdToBob - bcbRate) / bcbRate;
+    if (diffPct > 0.08) {
+      logger.warn(`[Currency] Binance (${usdToBob}) se desvía ${(diffPct * 100).toFixed(1)}% del BCB (${bcbRate}); se mantiene Binance como referencia del mercado paralelo.`);
+    }
+  }
+
   if (usdToBob === null) {
-    usdToBob = await fetchBcbUsdRate();
+    usdToBob = bcbRate;
     source = 'Banco Central de Bolivia (BCB)';
     if (usdToBob === null) lastError = 'Binance y BCB no disponibles';
   }
@@ -222,11 +241,11 @@ export async function refreshRates(): Promise<Record<string, number>> {
   }
 
   if (usdToBob === null) {
-    throw new Error(`No se pudo obtener la tasa USD/BOB (${lastError}). Usá la tasa manual.`);
+    throw new Error(`No se pudo obtener la tasa USD/BOB (${lastError}). Usa la tasa manual.`);
   }
 
   // Tasas objetivo contra USD (er-api o exchangerate-api): 1 USD = N unidades
-  const targetCodes = ['EUR', 'JPY', 'ARS', 'PEN', 'CLP', 'UYU', 'BRL'] as const;
+  const targetCodes = ['EUR', 'JPY', 'ARS', 'PEN', 'CLP', 'UYU', 'BRL', 'CNY', 'PYG', 'COP'] as const;
   let usdRates: Record<string, number> = {};
   for (const url of sources) {
     try {
@@ -337,8 +356,8 @@ export function formatPrice(amount: number, currency: string, rates: Record<stri
 
 export interface LiveRates {
   base: string;
-  rates: { usd: number; eur: number; jpy: number; ars: number; pen: number; clp: number; uyu: number; brl: number; usdt: number };
-  source: { usd: string; eur: string; jpy: string; ars: string; pen: string; clp: string; uyu: string; brl: string; usdt: string };
+  rates: { usd: number; eur: number; jpy: number; ars: number; pen: number; clp: number; uyu: number; brl: number; cny: number; pyg: number; cop: number; usdt: number };
+  source: { usd: string; eur: string; jpy: string; ars: string; pen: string; clp: string; uyu: string; brl: string; cny: string; pyg: string; cop: string; usdt: string };
   updatedAt: string;
 }
 
@@ -420,9 +439,12 @@ async function computeLiveRates(): Promise<LiveRates> {
   let clp: number | null = null;
   let uyu: number | null = null;
   let brl: number | null = null;
+  let cny: number | null = null;
+  let pyg: number | null = null;
+  let cop: number | null = null;
   try {
     const data = (await fetchJson('https://open.er-api.com/v6/latest/USD')) as {
-      rates?: { EUR?: number; JPY?: number; ARS?: number; CLP?: number; BRL?: number; UYU?: number; PEN?: number };
+      rates?: { EUR?: number; JPY?: number; ARS?: number; CLP?: number; BRL?: number; UYU?: number; PEN?: number; CNY?: number; PYG?: number; COP?: number };
     };
     const r = data.rates;
     if (r) {
@@ -433,6 +455,9 @@ async function computeLiveRates(): Promise<LiveRates> {
       if (r.CLP) clp = usd / Number(r.CLP);
       if (r.UYU) uyu = usd / Number(r.UYU);
       if (r.BRL) brl = usd / Number(r.BRL);
+      if (r.CNY) cny = usd / Number(r.CNY);
+      if (r.PYG) pyg = usd / Number(r.PYG);
+      if (r.COP) cop = usd / Number(r.COP);
     }
   } catch {
     /* sin red: usar defaults */
@@ -447,6 +472,9 @@ async function computeLiveRates(): Promise<LiveRates> {
     clp: clp ?? DEFAULT_RATES.CLP ?? usd / 950,
     uyu: uyu ?? DEFAULT_RATES.UYU ?? usd / 41,
     brl: brl ?? DEFAULT_RATES.BRL ?? usd / 5.5,
+    cny: cny ?? DEFAULT_RATES.CNY ?? usd / 7.1,
+    pyg: pyg ?? DEFAULT_RATES.PYG ?? usd / 7500,
+    cop: cop ?? DEFAULT_RATES.COP ?? usd / 4100,
     usdt: Number(settingsMap[getKey('USDT')]) > 0 ? Number(settingsMap[getKey('USDT')]) : usd * usdtUsd,
   };
 
@@ -462,6 +490,9 @@ async function computeLiveRates(): Promise<LiveRates> {
       clp: 'API pública (er-api.com)',
       uyu: 'API pública (er-api.com)',
       brl: 'API pública (er-api.com)',
+      cny: 'API pública (er-api.com)',
+      pyg: 'API pública (er-api.com)',
+      cop: 'API pública (er-api.com)',
       usdt: storedSource === 'Binance P2P' ? 'Binance P2P' : 'Binance',
     },
     updatedAt: new Date().toISOString(),

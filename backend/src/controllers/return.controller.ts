@@ -19,7 +19,7 @@ export async function createReturn(req: AuthRequest, res: Response) {
   });
   if (!item) throw ApiError.notFound('Item de orden no encontrado');
   if (item.order.status !== 'DELIVERED' || item.order.paymentStatus !== 'VERIFIED')
-    throw ApiError.badRequest('Solo podés solicitar una devolución después de recibir la compra con pago verificado');
+    throw ApiError.badRequest('Solo puedes solicitar una devolución después de recibir la compra con pago verificado');
 
   const existing = await prisma.returnRequest.findFirst({ where: { orderItemId, status: { in: ['PENDING', 'APPROVED'] } } });
   if (existing) throw ApiError.badRequest('Ya existe una solicitud de devolución activa para este producto');

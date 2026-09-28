@@ -26,7 +26,7 @@ export async function inviteEmployee(req: AuthRequest, res: Response, next: Next
     const target = await prisma.user.findUnique({ where: { email } });
     if (!target) throw ApiError.notFound('No existe un usuario registrado con ese email');
     if (target.role === Role.ADMIN) throw ApiError.badRequest('No se puede invitar a un administrador del sistema');
-    if (target.id === storeId) throw ApiError.badRequest('No podés invitarte a vos mismo');
+    if (target.id === storeId) throw ApiError.badRequest('No puedes invitarte a ti mismo');
 
     const updated = await prisma.user.update({
       where: { id: target.id },

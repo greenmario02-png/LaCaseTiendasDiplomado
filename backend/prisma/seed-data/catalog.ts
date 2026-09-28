@@ -618,18 +618,53 @@ export const DESC_CLOSERS = [
 // Ciudades del catálogo de geolocalización del foro (ForumCity). Sin estas filas, las
 // universidades y los subforos por ciudad no se pueden crear (dependen de una ForumCity).
 export const FORUM_CITIES = [
+  // La Paz
   { name: 'La Paz', department: 'La Paz', latitude: -16.4897, longitude: -68.1193, radiusKm: 40, sortOrder: 1 },
   { name: 'El Alto', department: 'La Paz', latitude: -16.5047, longitude: -68.1633, radiusKm: 35, sortOrder: 2 },
+  { name: 'Viacha', department: 'La Paz', latitude: -16.6503, longitude: -68.3006, radiusKm: 15, sortOrder: 3 },
+  { name: 'Achacachi', department: 'La Paz', latitude: -16.0464, longitude: -68.6883, radiusKm: 15, sortOrder: 4 },
+  { name: 'Caranavi', department: 'La Paz', latitude: -15.8378, longitude: -67.5686, radiusKm: 15, sortOrder: 5 },
+  { name: 'Copacabana', department: 'La Paz', latitude: -16.1697, longitude: -69.0858, radiusKm: 12, sortOrder: 6 },
+  // Oruro
   { name: 'Oruro', department: 'Oruro', latitude: -17.9667, longitude: -67.1167, radiusKm: 30, sortOrder: 1 },
+  { name: 'Challapata', department: 'Oruro', latitude: -18.9, longitude: -66.7667, radiusKm: 12, sortOrder: 2 },
+  { name: 'Huanuni', department: 'Oruro', latitude: -18.2833, longitude: -66.8333, radiusKm: 10, sortOrder: 3 },
+  // Santa Cruz
   { name: 'Santa Cruz de la Sierra', department: 'Santa Cruz', latitude: -17.7833, longitude: -63.1821, radiusKm: 55, sortOrder: 1 },
   { name: 'Montero', department: 'Santa Cruz', latitude: -17.3383, longitude: -63.2583, radiusKm: 25, sortOrder: 2 },
+  { name: 'Warnes', department: 'Santa Cruz', latitude: -17.5136, longitude: -63.1667, radiusKm: 15, sortOrder: 3 },
+  { name: 'Camiri', department: 'Santa Cruz', latitude: -20.0333, longitude: -63.5167, radiusKm: 15, sortOrder: 4 },
+  { name: 'Puerto Suárez', department: 'Santa Cruz', latitude: -18.9667, longitude: -57.8, radiusKm: 12, sortOrder: 5 },
+  { name: 'San Ignacio de Velasco', department: 'Santa Cruz', latitude: -16.3667, longitude: -60.95, radiusKm: 15, sortOrder: 6 },
+  // Cochabamba
   { name: 'Cochabamba', department: 'Cochabamba', latitude: -17.3895, longitude: -66.1568, radiusKm: 40, sortOrder: 1 },
   { name: 'Quillacollo', department: 'Cochabamba', latitude: -17.3916, longitude: -66.2837, radiusKm: 20, sortOrder: 2 },
+  { name: 'Sacaba', department: 'Cochabamba', latitude: -17.4033, longitude: -66.0403, radiusKm: 18, sortOrder: 3 },
+  { name: 'Punata', department: 'Cochabamba', latitude: -17.5486, longitude: -65.8333, radiusKm: 12, sortOrder: 4 },
+  { name: 'Villa Tunari', department: 'Cochabamba', latitude: -16.9667, longitude: -65.4167, radiusKm: 15, sortOrder: 5 },
+  // Potosí
   { name: 'Potosí', department: 'Potosí', latitude: -19.5729, longitude: -65.755, radiusKm: 25, sortOrder: 1 },
+  { name: 'Uyuni', department: 'Potosí', latitude: -20.4597, longitude: -66.825, radiusKm: 15, sortOrder: 2 },
+  { name: 'Llallagua', department: 'Potosí', latitude: -18.4247, longitude: -66.5828, radiusKm: 12, sortOrder: 3 },
+  { name: 'Tupiza', department: 'Potosí', latitude: -21.4406, longitude: -65.7194, radiusKm: 12, sortOrder: 4 },
+  { name: 'Villazón', department: 'Potosí', latitude: -22.0864, longitude: -65.5942, radiusKm: 12, sortOrder: 5 },
+  // Chuquisaca
   { name: 'Sucre', department: 'Chuquisaca', latitude: -19.0333, longitude: -65.2627, radiusKm: 20, sortOrder: 1 },
+  { name: 'Monteagudo', department: 'Chuquisaca', latitude: -19.8167, longitude: -63.9667, radiusKm: 12, sortOrder: 2 },
+  { name: 'Camargo', department: 'Chuquisaca', latitude: -20.6333, longitude: -65.2167, radiusKm: 10, sortOrder: 3 },
+  // Tarija
   { name: 'Tarija', department: 'Tarija', latitude: -21.5355, longitude: -64.7296, radiusKm: 20, sortOrder: 1 },
+  { name: 'Yacuiba', department: 'Tarija', latitude: -22.0167, longitude: -63.6833, radiusKm: 15, sortOrder: 2 },
+  { name: 'Bermejo', department: 'Tarija', latitude: -22.7333, longitude: -64.35, radiusKm: 12, sortOrder: 3 },
+  { name: 'Villamontes', department: 'Tarija', latitude: -21.25, longitude: -63.4333, radiusKm: 12, sortOrder: 4 },
+  // Beni
   { name: 'Trinidad', department: 'Beni', latitude: -14.8333, longitude: -64.9, radiusKm: 25, sortOrder: 1 },
+  { name: 'Riberalta', department: 'Beni', latitude: -10.9833, longitude: -66.1, radiusKm: 15, sortOrder: 2 },
+  { name: 'Guayaramerín', department: 'Beni', latitude: -10.8167, longitude: -65.35, radiusKm: 12, sortOrder: 3 },
+  { name: 'San Borja', department: 'Beni', latitude: -14.8167, longitude: -66.85, radiusKm: 12, sortOrder: 4 },
+  // Pando
   { name: 'Cobija', department: 'Pando', latitude: -11.0267, longitude: -68.7692, radiusKm: 15, sortOrder: 1 },
+  { name: 'Porvenir', department: 'Pando', latitude: -11.25, longitude: -68.7167, radiusKm: 10, sortOrder: 2 },
 ];
 
 export const REVIEW_COMMENTS = [

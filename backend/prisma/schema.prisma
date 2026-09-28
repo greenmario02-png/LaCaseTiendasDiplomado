@@ -92,6 +92,11 @@ locationPostalCode String?
 latitude           Float?
 longitude          Float?
 locationVerified   Boolean   @default(false)
+// Antifraude: evita que un vendedor cambie el nombre o la ubicación de su tienda para "resetear"
+// su reputación justo después de una estafa. Se actualizan solo cuando el valor efectivamente
+// cambia (ver updateSellerProfile), no en cada guardado del formulario.
+storeNameChangedAt     DateTime?
+storeLocationChangedAt DateTime?
 paymentQrUrl       String?
 youtubeUrl         String?
 tiktokUrl          String?

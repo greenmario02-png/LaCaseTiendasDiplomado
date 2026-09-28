@@ -40,7 +40,7 @@ const SLOTS = [
   { type: 'STORAGE', label: 'Almacenamiento', required: true },
   { type: 'PSU', label: 'Fuente de Poder', required: true },
   { type: 'CASE', label: 'Gabinete', required: true },
-  { type: 'COOLER', label: 'RefrigeraciÃ³n', required: true },
+  { type: 'COOLER', label: 'Refrigeración', required: true },
 ];
 
 export default function PcBuilderPage() {
@@ -84,11 +84,11 @@ export default function PcBuilderPage() {
 
   const saveBuild = async () => {
     if (!user) {
-      toast.error('IniciÃ¡ sesiÃ³n para guardar tu build');
+      toast.error('Inicia sesión para guardar tu build');
       return;
     }
     if (completedSlots < 3) {
-      toast.error('ElegÃ­ al menos 3 componentes');
+      toast.error('Elige al menos 3 componentes');
       return;
     }
     const components = Object.entries(selected).map(([slotType, product]: [string, any]) => ({
@@ -121,7 +121,7 @@ export default function PcBuilderPage() {
         </Typography>
       </Box>
       <Typography color="text.secondary" mb={3}>
-        ElegÃ­ cada componente de cualquier tienda. Verificamos que sean compatibles y calculamos el costo total.
+        Elige cada componente de cualquier tienda. Verificamos que sean compatibles y calculamos el costo total.
       </Typography>
 
       <Grid container spacing={3}>
@@ -206,7 +206,7 @@ export default function PcBuilderPage() {
                   <Box key={b.id} py={0.5}>
                     <Typography variant="body2">{b.name}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {money(Number(b.totalPrice))} Â· {b.components.length} componentes
+                      {money(Number(b.totalPrice))} · {b.components.length} componentes
                     </Typography>
                   </Box>
                 ))}
@@ -238,8 +238,8 @@ export default function PcBuilderPage() {
                     primary={p.name}
                     secondary={
                       <>
-                        {p.seller.storeName} Â· {money(Number(p.price))}
-                        {p.stock <= 0 ? ' Â· SIN STOCK' : ` Â· stock ${p.stock}`}
+                        {p.seller.storeName} · {money(Number(p.price))}
+                        {p.stock <= 0 ? ' · SIN STOCK' : ` · stock ${p.stock}`}
                       </>
                     }
                   />

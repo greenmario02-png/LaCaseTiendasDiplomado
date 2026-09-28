@@ -119,7 +119,7 @@ export default function AdminProducts() {
     <Box>
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
         <Tab label={`Pendientes (${pending.length})`} />
-        <Tab label="CatÃ¡logo" />
+        <Tab label="Catálogo" />
       </Tabs>
 
       {tab === 0 && (
@@ -222,7 +222,7 @@ export default function AdminProducts() {
             {money(Number(preview?.price))}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Tienda: {preview?.seller?.storeName} Â· CategorÃ­a: {preview?.category?.name} Â· Stock: {preview?.stock}
+            Tienda: {preview?.seller?.storeName} · Categoría: {preview?.category?.name} · Stock: {preview?.stock}
           </Typography>
         </DialogContent>
         <DialogActions>

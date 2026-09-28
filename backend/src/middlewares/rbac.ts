@@ -58,7 +58,7 @@ export function requirePermission(...codes: string[]) {
       if (!req.user) return next(ApiError.unauthorized('No autenticado'));
       const effective = await getUserPermissionCodes(req.user.id, req.user.role);
       if (effective.has('*') || codes.every((c) => effective.has(c))) return next();
-      return next(ApiError.forbidden('No tenés el permiso necesario para esta acción'));
+      return next(ApiError.forbidden('No tienes el permiso necesario para esta acción'));
     } catch (error) {
       return next(error);
     }

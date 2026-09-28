@@ -32,7 +32,7 @@ export async function createOrGetConversation(req: AuthRequest, res: Response, n
     const { sellerId, productId } = req.body;
     const userId = req.user!.id;
     if (!sellerId) throw ApiError.badRequest('sellerId obligatorio');
-    if (sellerId === userId) throw ApiError.badRequest('No podés chatear con tu propia tienda');
+    if (sellerId === userId) throw ApiError.badRequest('No puedes chatear con tu propia tienda');
 
     const seller = await prisma.user.findFirst({ where: { id: sellerId, isActive: true } });
     if (!seller) throw ApiError.notFound('Usuario no encontrado');
@@ -283,7 +283,7 @@ export async function getChatSuggestions(req: AuthRequest, res: Response, next: 
       (req.user!.role === Role.SELLER || req.user!.role === Role.SELLER) &&
       (req.user!.id === conversation.sellerId || req.user!.storeOwnerId === conversation.sellerId);
     if (!isParticipant && !isGlobalAdmin && !isTeamMember) {
-      throw ApiError.forbidden('No tenés permiso para exportar esta conversación');
+      throw ApiError.forbidden('No tienes permiso para exportar esta conversación');
     }
 
     const senderName = (m: any) =>

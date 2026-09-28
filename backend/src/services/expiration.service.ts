@@ -22,7 +22,7 @@ export async function expireProducts(): Promise<number> {
 export async function reactivateProduct(productId: number, sellerId: number): Promise<{ product: unknown; reactivationLeft: number }> {
   const product = await prisma.product.findUnique({ where: { id: productId } });
   if (!product) throw new Error('Producto no encontrado');
-  if (product.sellerId !== sellerId) throw new Error('No tenés permiso para reactivar este producto');
+  if (product.sellerId !== sellerId) throw new Error('No tienes permiso para reactivar este producto');
   if (product.reactivationCount >= 3) {
     throw new Error('Este producto alcanzó el máximo de reactivaciones (3). Ya no puede volver a publicarse.');
   }

@@ -94,7 +94,7 @@ export async function requestPayout(sellerId: number, amount: number, note?: str
 
   const available = await availableBalance(sellerId);
   if (amount > available + 0.01) {
-    throw ApiError.badRequest(`No tenés ese saldo disponible. Tu balance es ${available.toFixed(2)} Bs`);
+    throw ApiError.badRequest(`No tienes ese saldo disponible. Tu balance es ${available.toFixed(2)} Bs`);
   }
 
   const payout = await prisma.payout.create({

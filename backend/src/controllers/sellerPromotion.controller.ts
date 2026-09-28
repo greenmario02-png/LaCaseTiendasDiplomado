@@ -69,7 +69,7 @@ export async function createSellerPromotion(req: AuthRequest, res: Response, nex
       where: { id: { in: productIds as number[] }, sellerId },
     });
     if (ownProducts !== productIds.length) {
-      throw ApiError.forbidden('Solo podés crear promociones con tus propios productos');
+      throw ApiError.forbidden('Solo puedes crear promociones con tus propios productos');
     }
 
     const promotion = await prisma.promotion.create({
@@ -120,7 +120,7 @@ export async function updateSellerPromotion(req: AuthRequest, res: Response, nex
     if (productIds !== undefined) {
       const ownProducts = await prisma.product.count({ where: { id: { in: productIds as number[] }, sellerId } });
       if (ownProducts !== productIds.length) {
-        throw ApiError.forbidden('Solo podés usar tus propios productos');
+        throw ApiError.forbidden('Solo puedes usar tus propios productos');
       }
       await prisma.promotionProduct.deleteMany({ where: { promotionId } });
       update.products = { create: (productIds as number[]).map((productId) => ({ productId })) };

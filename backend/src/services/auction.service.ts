@@ -106,7 +106,7 @@ export async function processBid(auctionId: number, bidderId: number, bidAmount:
   const auction = await prisma.auction.findUnique({ where: { id: auctionId } });
   if (!auction) throw ApiError.notFound('Subasta no encontrada');
   if (auction.endDate.getTime() < Date.now()) throw ApiError.badRequest('La subasta ya terminó');
-  if (auction.sellerId === bidderId) throw ApiError.forbidden('No podés ofertar en tu propia subasta');
+  if (auction.sellerId === bidderId) throw ApiError.forbidden('No puedes ofertar en tu propia subasta');
 
   const current = Number(auction.currentPrice);
   const starting = Number(auction.startingPrice);
@@ -189,7 +189,7 @@ export async function buyNow(auctionId: number, buyerId: number) {
     const auction = await tx.auction.findUnique({ where: { id: auctionId } });
     if (!auction) throw ApiError.notFound('Subasta no encontrada');
     if (auction.endDate.getTime() < Date.now()) throw ApiError.badRequest('La subasta ya terminó');
-    if (auction.sellerId === buyerId) throw ApiError.forbidden('No podés comprar tu propia subasta');
+    if (auction.sellerId === buyerId) throw ApiError.forbidden('No puedes comprar tu propia subasta');
     if (!auction.buyNowPrice) throw ApiError.badRequest('Esta subasta no tiene compra directa');
     if (auction.isSold) throw ApiError.badRequest('Ya fue vendida');
 
