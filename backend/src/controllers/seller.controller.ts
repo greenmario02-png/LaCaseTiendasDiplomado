@@ -47,7 +47,7 @@ export async function createProduct(req: AuthRequest, res: Response, next: NextF
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.role !== Role.SELLER) throw ApiError.forbidden('Solo los vendedores pueden publicar');
     if (!user.isApproved) throw ApiError.forbidden('Tu tienda debe ser aprobada por un administrador');
-    if (user.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No podés publicar productos por el momento');
+    if (user.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No puedes publicar productos por el momento');
 
     // req.body ya viene filtrado por createProductSchema (lista blanca de campos)
     const { attributes, tags, images, ...data } = req.body;
@@ -111,7 +111,7 @@ export async function updateProduct(req: AuthRequest, res: Response, next: NextF
     }
 
     const seller = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, storePaused: true } });
-    if (seller?.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No podés modificar productos por el momento');
+    if (seller?.storePaused) throw ApiError.forbidden('Tu tienda está pausada por el administrador. No puedes modificar productos por el momento');
 
     // req.body ya viene filtrado por updateProductSchema (lista blanca de campos)
     const { attributes, tags, images, ...data } = req.body;
@@ -123,7 +123,7 @@ export async function updateProduct(req: AuthRequest, res: Response, next: NextF
       const priceFields = ['price', 'originalPrice', 'salePrice', 'compareAtPrice'];
       const hasPriceChange = Object.keys(data).some((k) => priceFields.includes(k));
       if (hasPriceChange) {
-        throw ApiError.forbidden('Como empleado no podés modificar el precio del producto. Solo el administrador de la tienda.');
+        throw ApiError.forbidden('Como empleado no puedes modificar el precio del producto. Solo el administrador de la tienda.');
       }
       // Empleado: la modificación queda pendiente de aprobación del dueño
       await recordAudit({
@@ -194,7 +194,7 @@ export async function deleteProduct(req: AuthRequest, res: Response, next: NextF
     // Empleados: NO pueden eliminar productos (solo dueño/admin de tienda o admin global)
     const isEmployee = req.user!.role === Role.SELLER && req.user!.storeRole === 'EMPLOYEE';
     if (isEmployee) {
-      throw ApiError.forbidden('Como empleado no podés eliminar productos. Solo el administrador de la tienda.');
+      throw ApiError.forbidden('Como empleado no puedes eliminar productos. Solo el administrador de la tienda.');
     }
 
     await prisma.product.update({ where: { id: productId }, data: { isActive: false } });
@@ -361,6 +361,18 @@ export async function getSellerDashboard(req: AuthRequest, res: Response, next: 
   }
 }
 
+// Antifraude: no se puede cambiar el nombre ni la ubicación de la tienda más de una vez cada
+// tantos días, para que un vendedor no pueda "resetear" su identidad justo después de una estafa.
+const STORE_IDENTITY_COOLDOWN_DAYS = 30;
+const LOCATION_FIELDS = ['locationCity', 'locationState', 'latitude', 'longitude'] as const;
+
+function daysLeft(changedAt: Date | null, cooldownDays: number): number {
+  if (!changedAt) return 0;
+  const elapsedMs = Date.now() - changedAt.getTime();
+  const remainingMs = cooldownDays * 86400000 - elapsedMs;
+  return remainingMs > 0 ? Math.ceil(remainingMs / 86400000) : 0;
+}
+
 export async function updateSellerProfile(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const userId = req.user!.id;
@@ -387,6 +399,12 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
       'paymentQrUrl',
       'freeShippingThreshold',
     ];
+    const current = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { storeName: true, locationCity: true, locationState: true, latitude: true, longitude: true, storeNameChangedAt: true, storeLocationChangedAt: true },
+    });
+    if (!current) throw ApiError.notFound('Usuario no encontrado');
+
     const data: Prisma.UserUpdateInput = {};
     for (const key of allowed) {
       if (req.body[key] !== undefined) {
@@ -398,6 +416,23 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
           (data as any)[key] = req.body[key];
         }
       }
+    }
+
+    if (data.storeName !== undefined && data.storeName !== current.storeName) {
+      const left = daysLeft(current.storeNameChangedAt, STORE_IDENTITY_COOLDOWN_DAYS);
+      if (left > 0) {
+        throw ApiError.forbidden(`Ya cambiaste el nombre de tu tienda hace poco. Puedes volver a hacerlo en ${left} día${left === 1 ? '' : 's'}.`);
+      }
+      data.storeNameChangedAt = new Date();
+    }
+
+    const locationChanged = LOCATION_FIELDS.some((key) => (data as any)[key] !== undefined && (data as any)[key] !== current[key]);
+    if (locationChanged) {
+      const left = daysLeft(current.storeLocationChangedAt, STORE_IDENTITY_COOLDOWN_DAYS);
+      if (left > 0) {
+        throw ApiError.forbidden(`Ya cambiaste la ubicación de tu tienda hace poco. Puedes volver a hacerlo en ${left} día${left === 1 ? '' : 's'}.`);
+      }
+      data.storeLocationChangedAt = new Date();
     }
 
     const user = await prisma.user.update({ where: { id: userId }, data });
@@ -444,7 +479,7 @@ export async function respondPrivilegedRequest(req: AuthRequest, res: Response, 
 
     const rel = await prisma.privilegedBuyer.findUnique({ where: { id: Number(id) } });
     if (!rel) throw ApiError.notFound('Solicitud no encontrada');
-    if (rel.sellerId !== req.user!.id) throw ApiError.forbidden('No tenés permiso');
+    if (rel.sellerId !== req.user!.id) throw ApiError.forbidden('No tienes permiso');
 
     const updated = await prisma.privilegedBuyer.update({
       where: { id: rel.id },

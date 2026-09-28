@@ -90,7 +90,7 @@ async function applyToJobInner(
     select: { id: true, title: true, storeId: true },
   });
   if (!job) throw ApiError.notFound('Empleo no encontrado o ya no está disponible');
-  if (job.storeId === storeIdOf(actor)) throw ApiError.forbidden('No podés postularte a un empleo de tu propia tienda');
+  if (job.storeId === storeIdOf(actor)) throw ApiError.forbidden('No puedes postularte a un empleo de tu propia tienda');
 
   const existing = await prisma.jobApplication.findUnique({ where: { jobId_applicantId: { jobId, applicantId: actor.id } } });
   if (existing && existing.status !== 'WITHDRAWN') throw ApiError.badRequest('Ya te postulaste a este empleo');
@@ -125,7 +125,7 @@ async function applyToJobInner(
 
 export async function withdrawApplication(actor: Actor, jobId: number) {
   const app = await prisma.jobApplication.findUnique({ where: { jobId_applicantId: { jobId, applicantId: actor.id } } });
-  if (!app || app.status === 'WITHDRAWN') throw ApiError.notFound('No tenés una postulación activa a este empleo');
+  if (!app || app.status === 'WITHDRAWN') throw ApiError.notFound('No tienes una postulación activa a este empleo');
   if (app.status === 'HIRED') throw ApiError.badRequest('Ya fuiste contratado: no se puede retirar la postulación');
   return prisma.jobApplication.update({ where: { id: app.id }, data: { status: 'WITHDRAWN' } });
 }

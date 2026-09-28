@@ -1105,7 +1105,7 @@ async function assertCanModerateReport(actingUserId: number, isAdmin: boolean, r
   ]);
 
   if (!modProfile?.department || !targetDepartment || modProfile.department !== targetDepartment) {
-    throw new ApiError(403, 'DEPARTMENT_MISMATCH', 'Solo podés moderar reportes de tu propio departamento.');
+    throw new ApiError(403, 'DEPARTMENT_MISMATCH', 'Solo puedes moderar reportes de tu propio departamento.');
   }
 }
 

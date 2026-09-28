@@ -21,7 +21,7 @@ export function NearMeButton() {
   }
 
   const label =
-    status === 'denied' ? 'Ubicación bloqueada — activala en el navegador' : status === 'unavailable' ? 'No pudimos obtener tu ubicación' : 'Usar mi ubicación';
+    status === 'denied' ? 'Ubicación bloqueada — actívala en el navegador' : status === 'unavailable' ? 'No pudimos obtener tu ubicación' : 'Usar mi ubicación';
 
   return (
     <Chip

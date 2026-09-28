@@ -39,7 +39,7 @@ export async function listProductAudits(req: AuthRequest, res: Response) {
 
   // Solo el dueño de la tienda, el admin o quien creó el producto puede ver el historial
   if (req.user!.id !== product.sellerId && req.user!.role !== 'ADMIN') {
-    throw ApiError.forbidden('No tenés permiso para ver este historial');
+    throw ApiError.forbidden('No tienes permiso para ver este historial');
   }
 
   const audits = await prisma.productAudit.findMany({

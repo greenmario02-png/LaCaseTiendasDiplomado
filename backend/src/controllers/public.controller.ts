@@ -42,7 +42,7 @@ function assertReviewWindow(deliveredAt: Date | null | undefined) {
   const max = deliveredAt.getTime() + 7 * 24 * 3600000; // +7 días
   if (now < min) {
     throw ApiError.forbidden(
-      'Todavía no podés calificar. Podés hacerlo entre 3 y 7 días después de recibir tu compra.'
+      'Todavía no puedes calificar. Puedes hacerlo entre 3 y 7 días después de recibir tu compra.'
     );
   }
   if (now > max) {
@@ -289,7 +289,7 @@ export async function addProductReview(req: AuthRequest, res: Response, next: Ne
     });
     if (!purchase) {
       throw ApiError.forbidden(
-        'Solo podés calificar un producto después de haberlo comprado y recibido. Tu opinión es valiosa para la comunidad.'
+        'Solo puedes calificar un producto después de haberlo comprado y recibido. Tu opinión es valiosa para la comunidad.'
       );
     }
     assertReviewWindow(purchase.order.deliveredAt);
@@ -349,7 +349,7 @@ export async function addSellerReview(req: AuthRequest, res: Response, next: Nex
       select: { id: true, deliveredAt: true },
     });
     if (!purchase) {
-      throw ApiError.forbidden('Solo podés calificar a un vendedor después de recibir tu compra. Esta calificación genera confianza en la comunidad.');
+      throw ApiError.forbidden('Solo puedes calificar a un vendedor después de recibir tu compra. Esta calificación genera confianza en la comunidad.');
     }
     assertReviewWindow(purchase.deliveredAt);
 
@@ -501,7 +501,7 @@ export async function requestPrivileged(req: AuthRequest, res: Response, next: N
   try {
     const sellerId = Number(req.params.id);
     const buyerId = req.user!.id;
-    if (sellerId === buyerId) throw ApiError.badRequest('No podés ser comprador privilegiado de tu propia tienda');
+    if (sellerId === buyerId) throw ApiError.badRequest('No puedes ser comprador privilegiado de tu propia tienda');
 
     const seller = await prisma.user.findUnique({ where: { id: sellerId, role: 'SELLER' } });
     if (!seller) throw ApiError.notFound('Vendedor no encontrado');

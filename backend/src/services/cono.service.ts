@@ -157,7 +157,7 @@ export async function voteEntry(userId: number, entryId: number, value: 'POSITIV
   const profile = await ensureForumProfile(userId);
   const entry = await prisma.conoEntry.findUniqueOrThrow({ where: { id: entryId } });
   if (entry.submittedById === profile.id) {
-    throw new ApiError(403, 'SELF_VOTE', 'No podés votar tu propia entrada.');
+    throw new ApiError(403, 'SELF_VOTE', 'No puedes votar tu propia entrada.');
   }
 
   const runVoteTx = () => prisma.$transaction(async (tx) => {

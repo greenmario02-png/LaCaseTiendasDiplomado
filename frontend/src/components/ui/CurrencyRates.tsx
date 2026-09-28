@@ -23,8 +23,8 @@ import toast from 'react-hot-toast';
 
 interface RatesData {
   base: string;
-  rates: { usd: number; eur: number; jpy: number; ars: number; pen: number; clp: number; uyu: number; brl: number; usdt: number };
-  source: { usd: string; eur: string; jpy: string; ars: string; pen: string; clp: string; uyu: string; brl: string; usdt: string };
+  rates: { usd: number; eur: number; jpy: number; ars: number; pen: number; clp: number; uyu: number; brl: number; cny: number; pyg: number; cop: number; usdt: number };
+  source: { usd: string; eur: string; jpy: string; ars: string; pen: string; clp: string; uyu: string; brl: string; cny: string; pyg: string; cop: string; usdt: string };
   updatedAt: string;
 }
 
@@ -38,6 +38,9 @@ const MONEDAS: { code: string; label: string; symbol: string }[] = [
   { code: 'CLP', label: 'Peso chileno (CL$)', symbol: 'CL$' },
   { code: 'UYU', label: 'Peso uruguayo ($U)', symbol: '$U' },
   { code: 'BRL', label: 'Real brasileño (R$)', symbol: 'R$' },
+  { code: 'CNY', label: 'Yuan chino (¥C)', symbol: '¥C' },
+  { code: 'PYG', label: 'Guaraní paraguayo (₲)', symbol: '₲' },
+  { code: 'COP', label: 'Peso colombiano (CO$)', symbol: 'CO$' },
   { code: 'USDT', label: 'USDT (Tether)', symbol: 'USDT' },
 ];
 
@@ -51,6 +54,9 @@ const LED_RATES: { key: keyof RatesData['rates']; label: string; dec: number }[]
   { key: 'clp', label: 'CL$', dec: 4 },
   { key: 'uyu', label: '$U', dec: 2 },
   { key: 'brl', label: 'R$', dec: 2 },
+  { key: 'cny', label: '¥C', dec: 2 },
+  { key: 'pyg', label: '₲', dec: 4 },
+  { key: 'cop', label: 'CO$', dec: 5 },
 ];
 
 export default function CurrencyRates() {
@@ -114,6 +120,9 @@ export default function CurrencyRates() {
                 <Box>🇨🇱 Peso chileno: Bs {rates.rates.clp.toFixed(5)} — {rates.source.clp}</Box>
                 <Box>🇺🇾 Peso uruguayo: Bs {rates.rates.uyu.toFixed(2)} — {rates.source.uyu}</Box>
                 <Box>🇧🇷 Real: Bs {rates.rates.brl.toFixed(2)} — {rates.source.brl}</Box>
+                <Box>🇨🇳 Yuan: Bs {rates.rates.cny.toFixed(2)} — {rates.source.cny}</Box>
+                <Box>🇵🇾 Guaraní: Bs {rates.rates.pyg.toFixed(4)} — {rates.source.pyg}</Box>
+                <Box>🇨🇴 Peso colombiano: Bs {rates.rates.cop.toFixed(5)} — {rates.source.cop}</Box>
                 <Box>USDT: Bs {rates.rates.usdt.toFixed(2)} — {rates.source.usdt}</Box>
                 <Box sx={{ mt: 0.5, color: 'text.secondary' }}>
                   Actualizado: {new Date(rates.updatedAt).toLocaleString('es-BO')}

@@ -115,7 +115,7 @@ export async function processAuctionClosures() {
         userId: winnerId,
         type: 'AUCTION_WON',
         title: '¡Ganaste la subasta! 🎉',
-        message: `Ganaste "${auction.title}" por ${finalPrice} Bs. Tenés 48 horas para pagar la orden #${order.id} antes de que vuelva a subasta.`,
+        message: `Ganaste "${auction.title}" por ${finalPrice} Bs. Tienes 48 horas para pagar la orden #${order.id} antes de que vuelva a subasta.`,
         refType: 'order',
         refId: order.id,
       });

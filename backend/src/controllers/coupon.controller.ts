@@ -200,7 +200,7 @@ export async function updateSellerCoupon(req: AuthRequest, res: Response, next: 
     const id = Number(req.params.id);
     const existing = await prisma.coupon.findUnique({ where: { id } });
     if (!existing) throw ApiError.notFound('Cupón no encontrado');
-    if (existing.sellerId !== req.user!.id) throw ApiError.forbidden('No tenés permiso');
+    if (existing.sellerId !== req.user!.id) throw ApiError.forbidden('No tienes permiso');
 
     const { description, type, value, minSpend, maxUses, startDate, endDate, isActive, productIds } = req.body;
     const data: Record<string, unknown> = {};
@@ -237,7 +237,7 @@ export async function deleteSellerCoupon(req: AuthRequest, res: Response, next: 
     const id = Number(req.params.id);
     const existing = await prisma.coupon.findUnique({ where: { id } });
     if (!existing) throw ApiError.notFound('Cupón no encontrado');
-    if (existing.sellerId !== req.user!.id) throw ApiError.forbidden('No tenés permiso');
+    if (existing.sellerId !== req.user!.id) throw ApiError.forbidden('No tienes permiso');
     await prisma.coupon.delete({ where: { id } });
     return ok(res, { message: 'Cupón eliminado' });
   } catch (error) {

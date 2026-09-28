@@ -46,7 +46,7 @@ export async function getMyAffiliate(req: AuthRequest, res: Response) {
 export async function listMyReferrals(req: AuthRequest, res: Response) {
   if (!req.user) return ApiError.unauthorized();
   const affiliate = await prisma.affiliate.findUnique({ where: { userId: req.user.id } });
-  if (!affiliate) throw ApiError.notFound('No tenés cuenta de afiliado todavía');
+  if (!affiliate) throw ApiError.notFound('No tienes cuenta de afiliado todavía');
 
   const referrals = await prisma.affiliateReferral.findMany({
     where: { affiliateId: affiliate.id },
