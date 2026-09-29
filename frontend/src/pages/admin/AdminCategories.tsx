@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import {
   Box,
@@ -43,14 +44,8 @@ import toast from 'react-hot-toast';
 
 const EMPTY = { name: '', parentId: '', icon: '', imageUrl: '', order: '0', description: '' };
 
-const ATTR_TYPES = [
-  { value: 'TEXT', label: 'Texto', hint: 'Ej: Material, Color, Marca — se escribe libre' },
-  { value: 'NUMBER', label: 'Número', hint: 'Ej: Peso (kg), Tamaño (cm), RAM (GB) — se agrega la unidad' },
-  { value: 'SELECT', label: 'Lista de opciones', hint: 'Ej: Talle [S, M, L], Socket [AM5, LGA1700] — el usuario elige de una lista' },
-  { value: 'BOOLEAN', label: 'Sí / No', hint: 'Ej: ¿Incluye garantía?, ¿Es impermeable?' },
-];
-
 export default function AdminCategories() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<any[]>([]);
   const [attrs, setAttrs] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -72,6 +67,13 @@ export default function AdminCategories() {
     categoryId: '',
     attributes: [],
   });
+
+  const ATTR_TYPES = [
+    { value: 'TEXT', label: t('admin.categories.attrType.text.label'), hint: t('admin.categories.attrType.text.hint') },
+    { value: 'NUMBER', label: t('admin.categories.attrType.number.label'), hint: t('admin.categories.attrType.number.hint') },
+    { value: 'SELECT', label: t('admin.categories.attrType.select.label'), hint: t('admin.categories.attrType.select.hint') },
+    { value: 'BOOLEAN', label: t('admin.categories.attrType.boolean.label'), hint: t('admin.categories.attrType.boolean.hint') },
+  ];
 
   const load = () => {
     api.get('/admin/categories').then((res) => setCategories(res.data.data)).catch(() => {});
@@ -108,7 +110,7 @@ export default function AdminCategories() {
 
   const validateCategory = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!form.name.trim() || form.name.trim().length < 2) errs.name = 'Escribe el nombre de la categoría (mín. 2 letras)';
+    if (!form.name.trim() || form.name.trim().length < 2) errs.name = t('admin.categories.validation.nameRequired');
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -125,10 +127,10 @@ export default function AdminCategories() {
       };
       if (editingCatId) {
         await api.put(`/admin/categories/${editingCatId}`, payload);
-        toast.success('Categoría actualizada');
+        toast.success(t('admin.categories.toast.categoryUpdated'));
       } else {
         await api.post('/admin/categories', payload);
-        toast.success('Categoría creada');
+        toast.success(t('admin.categories.toast.categoryCreated'));
       }
       setDialogOpen(false);
       load();
@@ -141,7 +143,7 @@ export default function AdminCategories() {
     // El backend no expone DELETE de categorías; desactivamos en su lugar
     try {
       await api.put(`/admin/categories/${c.id}`, { isActive: false });
-      toast.success('Categoría desactivada');
+      toast.success(t('admin.categories.toast.categoryDeactivated'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -172,8 +174,8 @@ export default function AdminCategories() {
 
   const validateAttr = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!attrForm.name.trim()) errs.name = 'Escribe el nombre del atributo';
-    if (attrForm.type === 'SELECT' && !attrForm.options.trim()) errs.options = 'Escribe al menos una opción';
+    if (!attrForm.name.trim()) errs.name = t('admin.categories.validation.attrNameRequired');
+    if (attrForm.type === 'SELECT' && !attrForm.options.trim()) errs.options = t('admin.categories.validation.attrOptionsRequired');
     setAttrErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -190,10 +192,10 @@ export default function AdminCategories() {
       };
       if (editingAttrId) {
         await api.put(`/admin/attributes/${editingAttrId}`, payload);
-        toast.success('Atributo actualizado');
+        toast.success(t('admin.categories.toast.attributeUpdated'));
       } else {
         await api.post('/admin/attributes', payload);
-        toast.success('Atributo creado');
+        toast.success(t('admin.categories.toast.attributeCreated'));
       }
       setAttrDialog(false);
       load();
@@ -204,7 +206,7 @@ export default function AdminCategories() {
 
   const deleteAttr = async (a: any) => {
     // No hay endpoint DELETE; lo mostramos como no editable por ahora
-    toast.error('La eliminación de atributos no está disponible en esta versión');
+    toast.error(t('admin.categories.notAvailable'));
   };
 
   // ---------- PLANTILLAS ----------
@@ -215,28 +217,28 @@ export default function AdminCategories() {
     setTplDialog(true);
   };
 
-  const openEditTemplate = (t: any) => {
-    const parsed = Array.isArray(t.attributes) ? t.attributes : [];
+  const openEditTemplate = (t2: any) => {
+    const parsed = Array.isArray(t2.attributes) ? t2.attributes : [];
     setTplForm({
-      name: t.name,
-      categoryId: String(t.categoryId ?? ''),
+      name: t2.name,
+      categoryId: String(t2.categoryId ?? ''),
       attributes: parsed.map((a: any) => ({
         attributeDefinitionId: typeof a.attributeDefinitionId === 'number' ? a.attributeDefinitionId : '',
         defaultValue: typeof a.defaultValue === 'string' ? a.defaultValue : '',
         isRequired: Boolean(a.isRequired),
       })),
     });
-    setEditingTplId(t.id);
+    setEditingTplId(t2.id);
     setTplDialog(true);
   };
 
   const saveTemplate = async () => {
     if (!tplForm.name.trim()) {
-      toast.error('Escribe el nombre del producto conocido');
+      toast.error(t('admin.categories.validation.templateNameRequired'));
       return;
     }
     if (!tplForm.categoryId) {
-      toast.error('Elige la categoría');
+      toast.error(t('admin.categories.validation.templateCategoryRequired'));
       return;
     }
     const attributes = tplForm.attributes
@@ -246,10 +248,10 @@ export default function AdminCategories() {
       const payload = { name: tplForm.name.trim(), categoryId: Number(tplForm.categoryId), attributes };
       if (editingTplId) {
         await api.put(`/admin/known-products/${editingTplId}`, payload);
-        toast.success('Producto conocido actualizado');
+        toast.success(t('admin.categories.toast.templateUpdated'));
       } else {
         await api.post('/admin/known-products', payload);
-        toast.success('Producto conocido creado');
+        toast.success(t('admin.categories.toast.templateCreated'));
       }
       setTplDialog(false);
       load();
@@ -258,11 +260,11 @@ export default function AdminCategories() {
     }
   };
 
-  const deleteTemplate = async (t: any) => {
-    if (!window.confirm(`¿Eliminar el producto conocido "${t.name}"?`)) return;
+  const deleteTemplate = async (t2: any) => {
+    if (!window.confirm(t('admin.categories.tplDialog.deleteConfirm', { name: t2.name }))) return;
     try {
-      await api.delete(`/admin/known-products/${t.id}`);
-      toast.success('Producto conocido eliminado');
+      await api.delete(`/admin/known-products/${t2.id}`);
+      toast.success(t('admin.categories.toast.templateDeleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -287,38 +289,36 @@ export default function AdminCategories() {
     <Box>
       <Box display="flex" gap={1} mb={3} flexWrap="wrap">
         <PrimaryButton startIcon={<AddIcon />} onClick={openNewCategory}>
-          Nueva categoría
+          {t('admin.categories.newCategory')}
         </PrimaryButton>
         <SecondaryButton startIcon={<AddIcon />} onClick={openNewAttr}>
-          Nuevo atributo
+          {t('admin.categories.newAttribute')}
         </SecondaryButton>
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Categorías</strong>: agrupa tus productos (ej: Ropa, Bar, Juguetes). La <strong>imagen</strong> se usa
-          para el carrusel de la portada. El <strong>ícono</strong> es el dibujito que acompaña a la categoría.
+          <Trans i18nKey="admin.categories.info.categoriesText" components={{ b: <strong /> }} />
         </Typography>
         <Typography variant="body2" sx={{ mt: 0.5 }}>
-          <strong>Atributos dinámicos</strong>: son las características que describen un producto (ej: talles de ropa,
-          capacidad en litros, socket del procesador). Se muestran como filtros y en la ficha del producto.
+          <Trans i18nKey="admin.categories.info.attributesText" components={{ b: <strong /> }} />
         </Typography>
       </Alert>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Typography variant="subtitle2" fontWeight={700} mb={1}>
-            Categorías ({categories.length})
+            {t('admin.categories.sectionTitle', { count: categories.length })}
           </Typography>
           <TableContainer component={Paper}>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="center">Icono</TableCell>
-                  <TableCell align="center">Imagen</TableCell>
-                  <TableCell align="center">Orden</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+                  <TableCell>{t('admin.categories.table.name')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.table.icon')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.table.image')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.table.order')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -333,10 +333,10 @@ export default function AdminCategories() {
                           </Typography>
                           {c.children?.length > 0 && (
                             <Typography variant="caption" color="text.secondary">
-                              {c.children.length} subcategorías
+                              {t('admin.categories.subcategoriesCount', { count: c.children.length })}
                             </Typography>
                           )}
-                          {!c.isActive && <Chip label="Desactivada" size="small" color="error" sx={{ ml: 1 }} />}
+                          {!c.isActive && <Chip label={t('admin.categories.status.deactivated')} size="small" color="error" sx={{ ml: 1 }} />}
                         </Box>
                       </Box>
                     </TableCell>
@@ -344,10 +344,10 @@ export default function AdminCategories() {
                     <TableCell align="center">{c.imageUrl ? <CheckIcon color="success" fontSize="small" /> : '—'}</TableCell>
                     <TableCell align="center">{c.order}</TableCell>
                     <TableCell align="center">
-                      <IconButton onClick={() => openEditCategory(c)} title="Editar">
+                      <IconButton onClick={() => openEditCategory(c)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton color="error" onClick={() => deleteCategory(c)} title="Desactivar">
+                      <IconButton color="error" onClick={() => deleteCategory(c)} title={t('admin.categories.tooltip.deactivate')}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -360,16 +360,16 @@ export default function AdminCategories() {
 
         <Grid item xs={12} md={6}>
           <Typography variant="subtitle2" fontWeight={700} mb={1}>
-            Atributos dinámicos ({attrs.length})
+            {t('admin.categories.attrSectionTitle', { count: attrs.length })}
           </Typography>
           <TableContainer component={Paper}>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="center">Tipo</TableCell>
-                  <TableCell align="center">Unidad</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+                  <TableCell>{t('admin.categories.attrTable.name')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.attrTable.type')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.attrTable.unit')}</TableCell>
+                  <TableCell align="center">{t('admin.categories.attrTable.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -378,15 +378,15 @@ export default function AdminCategories() {
                     <TableCell>
                       <Typography variant="body2">{a.name}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {a.category?.name || 'Todas las categorías'}
+                        {a.category?.name || t('admin.categories.allCategories')}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Chip label={ATTR_TYPES.find((t) => t.value === a.type)?.label || a.type} size="small" variant="outlined" />
+                      <Chip label={ATTR_TYPES.find((tp) => tp.value === a.type)?.label || a.type} size="small" variant="outlined" />
                     </TableCell>
                     <TableCell align="center">{a.unit || '—'}</TableCell>
                     <TableCell align="center">
-                      <IconButton onClick={() => openEditAttr(a)} title="Editar">
+                      <IconButton onClick={() => openEditAttr(a)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -401,22 +401,21 @@ export default function AdminCategories() {
       {/* ============ PLANTILLAS ============ */}
       <Box mt={4}>
         <Typography variant="subtitle1" fontWeight={700} mb={0.5}>
-          Productos conocidos por categoría
+          {t('admin.categories.templates.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>
-          Define los productos típicos de cada categoría (ej: «Cuaderno» en Libros y Papelería, «Chompa» en Ropa) con sus
-          atributos/etiquetas. Al crear un producto, el vendedor elige el producto conocido de la categoría y los atributos se precargan.
+          {t('admin.categories.templates.description')}
         </Typography>
         <Box display="flex" gap={1} mb={2} flexWrap="wrap" alignItems="center">
           <TextField
             select
-            label="Filtrar por categoría"
+            label={t('admin.categories.templates.filterLabel')}
             value={tplFilter}
             onChange={(e) => setTplFilter(e.target.value)}
             size="small"
             sx={{ minWidth: 260 }}
           >
-            <MenuItem value="">Todas las categorías</MenuItem>
+            <MenuItem value="">{t('admin.categories.allCategories')}</MenuItem>
             {categories.map((c) => (
               <MenuItem key={c.id} value={c.id}>
                 {c.name}
@@ -424,56 +423,62 @@ export default function AdminCategories() {
             ))}
           </TextField>
           <PrimaryButton startIcon={<AddIcon />} onClick={openNewTemplate}>
-            Nuevo producto conocido
+            {t('admin.categories.templates.newTemplate')}
           </PrimaryButton>
         </Box>
         <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Categoría</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell align="center">Ámbito</TableCell>
-                <TableCell align="center">Atributos</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.categories.templates.table.category')}</TableCell>
+                <TableCell>{t('admin.categories.templates.table.name')}</TableCell>
+                <TableCell align="center">{t('admin.categories.templates.table.scope')}</TableCell>
+                <TableCell align="center">{t('admin.categories.templates.table.attributes')}</TableCell>
+                <TableCell align="center">{t('admin.categories.templates.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {templates
-                .filter((t) => !tplFilter || String(t.categoryId) === tplFilter)
-                .map((t) => (
-                  <TableRow key={t.id}>
-                    <TableCell>{t.category?.name || '—'}</TableCell>
+                .filter((t2) => !tplFilter || String(t2.categoryId) === tplFilter)
+                .map((t2) => (
+                  <TableRow key={t2.id}>
+                    <TableCell>{t2.category?.name || '—'}</TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={600}>
-                        {t.name}
+                        {t2.name}
                       </Typography>
-                      {!t.isActive && <Chip label="Inactiva" size="small" color="error" sx={{ ml: 1 }} />}
+                      {!t2.isActive && <Chip label={t('admin.categories.templates.status.inactive')} size="small" color="error" sx={{ ml: 1 }} />}
                     </TableCell>
                     <TableCell align="center">
                       <Chip
                         size="small"
                         variant="outlined"
-                        color={t.sellerId ? 'secondary' : 'primary'}
-                        label={t.sellerId ? `Tienda (${t.seller?.storeName || 'privada'})` : 'Global'}
+                        color={t2.sellerId ? 'secondary' : 'primary'}
+                        label={
+                          t2.sellerId
+                            ? t('admin.categories.templates.scopeStore', {
+                                storeName: t2.seller?.storeName || t('admin.categories.templates.privateStoreFallback'),
+                              })
+                            : t('admin.categories.templates.scopeGlobal')
+                        }
                       />
                     </TableCell>
-                    <TableCell align="center">{Array.isArray(t.attributes) ? t.attributes.length : 0}</TableCell>
+                    <TableCell align="center">{Array.isArray(t2.attributes) ? t2.attributes.length : 0}</TableCell>
                     <TableCell align="center">
-                      <IconButton onClick={() => openEditTemplate(t)} title="Editar">
+                      <IconButton onClick={() => openEditTemplate(t2)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton color="error" onClick={() => deleteTemplate(t)} title="Eliminar">
+                      <IconButton color="error" onClick={() => deleteTemplate(t2)} title={t('admin.common.delete')}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
-              {templates.filter((t) => !tplFilter || String(t.categoryId) === tplFilter).length === 0 && (
+              {templates.filter((t2) => !tplFilter || String(t2.categoryId) === tplFilter).length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center">
                     <Typography variant="body2" color="text.secondary">
-                      No hay productos conocidos. Crea uno para precargar atributos en los productos.
+                      {t('admin.categories.templates.empty')}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -485,49 +490,49 @@ export default function AdminCategories() {
 
       {/* ============ DIALOG CATEGORÍA ============ */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingCatId ? 'Editar categoría' : 'Nueva categoría'}</DialogTitle>
+        <DialogTitle>{editingCatId ? t('admin.categories.dialog.editTitle') : t('admin.categories.dialog.newTitle')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2.5} mt={1}>
             <Box>
               <TextField
-                label="Nombre de la categoría"
+                label={t('admin.categories.dialog.nameLabel')}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 fullWidth
                 error={Boolean(formErrors.name)}
-                helperText={formErrors.name || 'Ej: Ropa, Bar, Juguetes, Electrodomésticos'}
+                helperText={formErrors.name || t('admin.categories.dialog.nameHelper')}
                 required
               />
             </Box>
 
             <Box>
               <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                Categoría padre (opcional)
+                {t('admin.categories.dialog.parentSectionTitle')}
               </Typography>
-              <TextField select label="¿Depende de otra categoría?" value={form.parentId} onChange={(e) => setForm({ ...form, parentId: e.target.value })} fullWidth>
-                <MenuItem value="">Es una categoría principal</MenuItem>
+              <TextField select label={t('admin.categories.dialog.parentSelectLabel')} value={form.parentId} onChange={(e) => setForm({ ...form, parentId: e.target.value })} fullWidth>
+                <MenuItem value="">{t('admin.categories.dialog.parentNone')}</MenuItem>
                 {categories.filter((c) => !c.parentId).map((c) => (
                   <MenuItem key={c.id} value={c.id}>
-                    Depende de: {c.name}
+                    {t('admin.categories.dialog.parentOption', { name: c.name })}
                   </MenuItem>
                 ))}
               </TextField>
-              <FormHelperText>Deja "principal" si esta categoría es de primer nivel.</FormHelperText>
+              <FormHelperText>{t('admin.categories.dialog.parentHelper')}</FormHelperText>
             </Box>
 
             <Box>
               <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                Ícono de la categoría
+                {t('admin.categories.dialog.iconSectionTitle')}
               </Typography>
               <TextField
                 select
-                label="Elige un ícono"
+                label={t('admin.categories.dialog.iconSelectLabel')}
                 value={form.icon}
                 onChange={(e) => setForm({ ...form, icon: e.target.value })}
                 fullWidth
-                helperText="Se muestra junto al nombre. Puedes elegir de la lista."
+                helperText={t('admin.categories.dialog.iconHelper')}
               >
-                <MenuItem value="">Sin ícono</MenuItem>
+                <MenuItem value="">{t('admin.categories.dialog.iconNone')}</MenuItem>
                 {CATEGORY_ICONS.map((ic) => {
                   const Icon = ic.component;
                   return (
@@ -544,10 +549,10 @@ export default function AdminCategories() {
 
             <Box>
               <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                Imagen de portada
+                {t('admin.categories.dialog.imageSectionTitle')}
               </Typography>
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                Tamaño recomendado: <strong>800 × 600 px</strong> (cuadrado 1:1 ideal para el carrusel). Usa el editor para recortar.
+                <Trans i18nKey="admin.categories.dialog.imageSizeHelper" components={{ b: <strong /> }} />
               </Typography>
               <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
                 <Avatar variant="rounded" sx={{ width: 56, height: 56 }}>
@@ -556,10 +561,10 @@ export default function AdminCategories() {
                   ) : null}
                 </Avatar>
                 <TextField
-                  label="URL de la imagen"
+                  label={t('admin.categories.dialog.imageUrlLabel')}
                   value={form.imageUrl}
                   onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  placeholder="https://imagen.com/categoria.jpg"
+                  placeholder={t('admin.categories.dialog.imageUrlPlaceholder')}
                   sx={{ flex: 1, minWidth: 220 }}
                   InputProps={{
                     startAdornment: (
@@ -570,14 +575,14 @@ export default function AdminCategories() {
                   }}
                 />
                 <SecondaryButton size="small" startIcon={<CropIcon />} onClick={() => { setCropUrl(form.imageUrl || ''); setCropOpen(true); }} disabled={!form.imageUrl}>
-                  Recortar
+                  {t('admin.categories.dialog.cropButton')}
                 </SecondaryButton>
               </Box>
             </Box>
 
             <Box>
               <TextField
-                label="Orden en el carrusel"
+                label={t('admin.categories.dialog.orderLabel')}
                 type="number"
                 value={form.order}
                 onChange={(e) => setForm({ ...form, order: e.target.value })}
@@ -589,60 +594,60 @@ export default function AdminCategories() {
                     </InputAdornment>
                   ),
                 }}
-                helperText="Número bajo = aparece primero en la portada. Ej: 1 va antes que 5."
+                helperText={t('admin.categories.dialog.orderHelper')}
               />
             </Box>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialogOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialogOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveCategory}>
-            {editingCatId ? 'Guardar cambios' : 'Crear categoría'}
+            {editingCatId ? t('admin.common.saveChanges') : t('admin.categories.dialog.createCategory')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* ============ DIALOG ATRIBUTO ============ */}
       <Dialog open={attrDialog} onClose={() => setAttrDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingAttrId ? 'Editar atributo' : 'Nuevo atributo'}</DialogTitle>
+        <DialogTitle>{editingAttrId ? t('admin.categories.attrDialog.editTitle') : t('admin.categories.attrDialog.newTitle')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2.5} mt={1}>
             <Box>
               <TextField
-                label="Nombre del atributo"
+                label={t('admin.categories.attrDialog.nameLabel')}
                 value={attrForm.name}
                 onChange={(e) => setAttrForm({ ...attrForm, name: e.target.value })}
                 fullWidth
                 error={Boolean(attrErrors.name)}
-                helperText={attrErrors.name || 'Ej: Talle, Color, Capacidad, Socket, Marca'}
+                helperText={attrErrors.name || t('admin.categories.attrDialog.nameHelper')}
                 required
               />
             </Box>
 
             <Box>
               <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                Tipo de valor
+                {t('admin.categories.attrDialog.typeSectionTitle')}
               </Typography>
-              <TextField select label="¿Cómo se completa?" value={attrForm.type} onChange={(e) => setAttrForm({ ...attrForm, type: e.target.value })} fullWidth>
-                {ATTR_TYPES.map((t) => (
-                  <MenuItem key={t.value} value={t.value}>
-                    {t.label}
+              <TextField select label={t('admin.categories.attrDialog.typeSelectLabel')} value={attrForm.type} onChange={(e) => setAttrForm({ ...attrForm, type: e.target.value })} fullWidth>
+                {ATTR_TYPES.map((tp) => (
+                  <MenuItem key={tp.value} value={tp.value}>
+                    {tp.label}
                   </MenuItem>
                 ))}
               </TextField>
-              <FormHelperText>{ATTR_TYPES.find((t) => t.value === attrForm.type)?.hint}</FormHelperText>
+              <FormHelperText>{ATTR_TYPES.find((tp) => tp.value === attrForm.type)?.hint}</FormHelperText>
             </Box>
 
             <Box>
               <TextField
                 select
-                label="Categoría a la que aplica"
+                label={t('admin.categories.attrDialog.categoryLabel')}
                 value={attrForm.categoryId}
                 onChange={(e) => setAttrForm({ ...attrForm, categoryId: e.target.value })}
                 fullWidth
-                helperText="Elige la categoría donde se usa este atributo."
+                helperText={t('admin.categories.attrDialog.categoryHelper')}
               >
-                <MenuItem value="">Todas las categorías</MenuItem>
+                <MenuItem value="">{t('admin.categories.allCategories')}</MenuItem>
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
                     {c.name}
@@ -653,51 +658,51 @@ export default function AdminCategories() {
 
             <Box>
               <TextField
-                label="Unidad de medida (opcional)"
+                label={t('admin.categories.attrDialog.unitLabel')}
                 value={attrForm.unit}
                 onChange={(e) => setAttrForm({ ...attrForm, unit: e.target.value })}
                 fullWidth
-                placeholder="Ej: kg, cm, GB, W, litros"
-                helperText="Se muestra junto al valor. Ej: 500 GB, 15 kg."
+                placeholder={t('admin.categories.attrDialog.unitPlaceholder')}
+                helperText={t('admin.categories.attrDialog.unitHelper')}
               />
             </Box>
 
             {attrForm.type === 'SELECT' && (
               <Box>
                 <TextField
-                  label="Opciones (separadas por coma)"
+                  label={t('admin.categories.attrDialog.optionsLabel')}
                   value={attrForm.options}
                   onChange={(e) => setAttrForm({ ...attrForm, options: e.target.value })}
                   fullWidth
-                  placeholder="Ej: S, M, L, XL  o  AM4, AM5, LGA1700"
+                  placeholder={t('admin.categories.attrDialog.optionsPlaceholder')}
                   error={Boolean(attrErrors.options)}
-                  helperText={attrErrors.options || 'Cada opción separada por coma. El comprador elegirá una.'}
+                  helperText={attrErrors.options || t('admin.categories.attrDialog.optionsHelper')}
                 />
               </Box>
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setAttrDialog(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setAttrDialog(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveAttr}>
-            {editingAttrId ? 'Guardar cambios' : 'Crear atributo'}
+            {editingAttrId ? t('admin.common.saveChanges') : t('admin.categories.attrDialog.createAttribute')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* ============ DIALOG PLANTILLA ============ */}
       <Dialog open={tplDialog} onClose={() => setTplDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingTplId ? 'Editar producto conocido' : 'Nuevo producto conocido'}</DialogTitle>
+        <DialogTitle>{editingTplId ? t('admin.categories.tplDialog.editTitle') : t('admin.categories.tplDialog.newTitle')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2.5} mt={1}>
             <Box>
               <TextField
-                label="Nombre del producto"
+                label={t('admin.categories.tplDialog.nameLabel')}
                 value={tplForm.name}
                 onChange={(e) => setTplForm({ ...tplForm, name: e.target.value })}
                 fullWidth
-                placeholder="Ej: Cuaderno, Bolígrafo, Chompa, Polera"
-                helperText="Ej: «Cuaderno» dentro de Libros y Papelería."
+                placeholder={t('admin.categories.tplDialog.namePlaceholder')}
+                helperText={t('admin.categories.tplDialog.nameHelper')}
                 required
               />
             </Box>
@@ -705,13 +710,13 @@ export default function AdminCategories() {
             <Box>
               <TextField
                 select
-                label="Categoría"
+                label={t('admin.categories.tplDialog.categoryLabel')}
                 value={tplForm.categoryId}
                 onChange={(e) => setTplForm({ ...tplForm, categoryId: e.target.value })}
                 fullWidth
-                helperText="La categoría donde se ofrece este tipo de producto."
+                helperText={t('admin.categories.tplDialog.categoryHelper')}
               >
-                <MenuItem value="">Selecciona una categoría</MenuItem>
+                <MenuItem value="">{t('admin.categories.tplDialog.selectCategoryPlaceholder')}</MenuItem>
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
                     {c.name}
@@ -723,7 +728,7 @@ export default function AdminCategories() {
             <Box>
               <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
                 <Typography variant="subtitle2" fontWeight={600}>
-                  Atributos del producto (etiquetas)
+                  {t('admin.categories.tplDialog.attributesTitle')}
                 </Typography>
                 <SecondaryButton
                   size="small"
@@ -732,12 +737,12 @@ export default function AdminCategories() {
                     setTplForm((f) => ({ ...f, attributes: [...f.attributes, { attributeDefinitionId: '', defaultValue: '', isRequired: false }] }))
                   }
                 >
-                  Agregar atributo
+                  {t('admin.categories.tplDialog.addAttribute')}
                 </SecondaryButton>
               </Box>
               {tplForm.attributes.length === 0 && (
                 <Typography variant="caption" color="text.secondary">
-                  Todavía no agregaste atributos. Usa «Agregar atributo» para sumar los que debe tener este producto.
+                  {t('admin.categories.tplDialog.noAttributesYet')}
                 </Typography>
               )}
               <Stack spacing={1}>
@@ -745,7 +750,7 @@ export default function AdminCategories() {
                   <Box key={idx} display="flex" gap={1} alignItems="center">
                     <TextField
                       select
-                      label="Atributo"
+                      label={t('admin.categories.tplDialog.attributeLabel')}
                       value={row.attributeDefinitionId}
                       onChange={(e) => {
                         const next = [...tplForm.attributes];
@@ -755,7 +760,7 @@ export default function AdminCategories() {
                       size="small"
                       sx={{ flex: 1 }}
                     >
-                      <MenuItem value="">Selecciona…</MenuItem>
+                      <MenuItem value="">{t('admin.categories.tplDialog.selectAttributePlaceholder')}</MenuItem>
                       {attrs.map((a) => (
                         <MenuItem key={a.id} value={a.id}>
                           {a.name}
@@ -764,7 +769,7 @@ export default function AdminCategories() {
                       ))}
                     </TextField>
                     <TextField
-                      label="Valor por defecto"
+                      label={t('admin.categories.tplDialog.defaultValueLabel')}
                       value={row.defaultValue}
                       onChange={(e) => {
                         const next = [...tplForm.attributes];
@@ -772,7 +777,7 @@ export default function AdminCategories() {
                         setTplForm((f) => ({ ...f, attributes: next }));
                       }}
                       size="small"
-                      placeholder="Ej: 100"
+                      placeholder={t('admin.categories.tplDialog.defaultValuePlaceholder')}
                       sx={{ flex: 1 }}
                     />
                     <FormControlLabel
@@ -787,14 +792,14 @@ export default function AdminCategories() {
                           }}
                         />
                       }
-                      label={<Typography variant="caption">Requerido</Typography>}
+                      label={<Typography variant="caption">{t('admin.categories.tplDialog.requiredLabel')}</Typography>}
                       sx={{ m: 0 }}
                     />
                     <IconButton
                       size="small"
                       color="error"
                       onClick={() => setTplForm((f) => ({ ...f, attributes: f.attributes.filter((_, i) => i !== idx) }))}
-                      title="Quitar"
+                      title={t('admin.categories.tplDialog.removeTooltip')}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -805,9 +810,9 @@ export default function AdminCategories() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setTplDialog(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setTplDialog(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveTemplate}>
-            {editingTplId ? 'Guardar cambios' : 'Crear producto conocido'}
+            {editingTplId ? t('admin.common.saveChanges') : t('admin.categories.tplDialog.createTemplate')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
@@ -817,7 +822,7 @@ export default function AdminCategories() {
         open={cropOpen}
         imageUrl={cropUrl}
         aspect={1}
-        title="Recortar imagen de categoría"
+        title={t('admin.categories.cropDialogTitle')}
         onClose={() => setCropOpen(false)}
         onUploaded={(url) => {
           setForm((f) => ({ ...f, imageUrl: url }));

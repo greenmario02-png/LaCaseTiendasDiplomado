@@ -33,6 +33,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { api, getErrorMessage } from '../../services/api';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface RbacRole {
   id: number;
@@ -81,6 +82,7 @@ function flatMenus(menus: RbacMenu[], depth = 0): (RbacMenu & { depth: number })
 }
 
 export default function AdminRbac() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState(0);
 
   const [roles, setRoles] = useState<RbacRole[]>([]);
@@ -159,20 +161,20 @@ export default function AdminRbac() {
   const saveRole = async () => {
     try {
       if (!/^[A-Z_]+$/.test(roleForm.code)) {
-        toast.error('El código solo puede contener letras mayúsculas y guión bajo (ej: SOPORTE)');
+        toast.error(t('admin.rbac.validation.roleCodeInvalid'));
         return;
       }
       if (!roleForm.name.trim()) {
-        toast.error('Escribe el nombre del rol');
+        toast.error(t('admin.rbac.validation.roleNameRequired'));
         return;
       }
       const payload = { ...roleForm, description: roleForm.description?.trim() || undefined };
       if (editingRole) {
         await api.put(`/admin/rbac/roles/${editingRole.id}`, { name: payload.name, description: payload.description, isActive: payload.isActive });
-        toast.success('Rol actualizado');
+        toast.success(t('admin.rbac.toast.roleUpdated'));
       } else {
         await api.post('/admin/rbac/roles', payload);
-        toast.success('Rol creado');
+        toast.success(t('admin.rbac.toast.roleCreated'));
       }
       setRoleOpen(false);
       load();
@@ -182,10 +184,10 @@ export default function AdminRbac() {
   };
 
   const deleteRole = async (role: RbacRole) => {
-    if (!window.confirm(`¿Eliminar el rol "${role.name}"?`)) return;
+    if (!window.confirm(t('admin.rbac.confirmDeleteRole', { name: role.name }))) return;
     try {
       await api.delete(`/admin/rbac/roles/${role.id}`);
-      toast.success('Rol eliminado');
+      toast.success(t('admin.rbac.toast.roleDeleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -202,20 +204,20 @@ export default function AdminRbac() {
   const savePerm = async () => {
     try {
       if (!/^[a-z]+\.[a-z0-9.]+$/.test(permForm.code)) {
-        toast.error('El código del permiso debe ser tipo "modulo.accion" (ej: users.manage)');
+        toast.error(t('admin.rbac.validation.permCodeInvalid'));
         return;
       }
       if (!permForm.name.trim()) {
-        toast.error('Escribe el nombre del permiso');
+        toast.error(t('admin.rbac.validation.permNameRequired'));
         return;
       }
       const payload = { ...permForm, module: permForm.module || 'core' };
       if (editingPerm) {
         await api.put(`/admin/rbac/permissions/${editingPerm.id}`, { name: payload.name, isActive: payload.isActive });
-        toast.success('Permiso actualizado');
+        toast.success(t('admin.rbac.toast.permUpdated'));
       } else {
         await api.post('/admin/rbac/permissions', payload);
-        toast.success('Permiso creado');
+        toast.success(t('admin.rbac.toast.permCreated'));
       }
       setPermOpen(false);
       load();
@@ -225,10 +227,10 @@ export default function AdminRbac() {
   };
 
   const deletePerm = async (perm: RbacPermission) => {
-    if (!window.confirm(`¿Eliminar el permiso "${perm.code}"?`)) return;
+    if (!window.confirm(t('admin.rbac.confirmDeletePerm', { code: perm.code }))) return;
     try {
       await api.delete(`/admin/rbac/permissions/${perm.id}`);
-      toast.success('Permiso eliminado');
+      toast.success(t('admin.rbac.toast.permDeleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -258,7 +260,7 @@ export default function AdminRbac() {
   const saveMenu = async () => {
     try {
       if (!menuForm.code.trim() || !menuForm.label.trim() || !menuForm.path.trim()) {
-        toast.error('Código, nombre y ruta son obligatorios');
+        toast.error(t('admin.rbac.validation.menuRequiredFields'));
         return;
       }
       const payload = {
@@ -273,10 +275,10 @@ export default function AdminRbac() {
       };
       if (editingMenu) {
         await api.put(`/admin/rbac/menus/${editingMenu.id}`, payload);
-        toast.success('Menú actualizado');
+        toast.success(t('admin.rbac.toast.menuUpdated'));
       } else {
         await api.post('/admin/rbac/menus', payload);
-        toast.success('Menú creado');
+        toast.success(t('admin.rbac.toast.menuCreated'));
       }
       setMenuOpen(false);
       load();
@@ -286,10 +288,10 @@ export default function AdminRbac() {
   };
 
   const deleteMenu = async (menu: RbacMenu) => {
-    if (!window.confirm(`¿Eliminar el menú "${menu.label}" (con sus hijos)?`)) return;
+    if (!window.confirm(t('admin.rbac.confirmDeleteMenu', { label: menu.label }))) return;
     try {
       await api.delete(`/admin/rbac/menus/${menu.id}`);
-      toast.success('Menú eliminado');
+      toast.success(t('admin.rbac.toast.menuDeleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -302,7 +304,7 @@ export default function AdminRbac() {
     try {
       await api.put(`/admin/rbac/roles/${selRoleId}/permissions`, { permissionIds: [...rolePermSel] });
       await api.put(`/admin/rbac/roles/${selRoleId}/menus`, { menuIds: [...roleMenuSel] });
-      toast.success('Asignaciones del rol guardadas');
+      toast.success(t('admin.rbac.toast.assignmentsSaved'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -328,7 +330,7 @@ export default function AdminRbac() {
     setSavingUserRoles(true);
     try {
       await api.put(`/admin/rbac/users/${selUserId.id}/roles`, { roleIds: [...userRolesSel] });
-      toast.success(`Roles asignados a ${selUserId.firstName} ${selUserId.lastName}`);
+      toast.success(t('admin.rbac.toast.userRolesSaved', { name: `${selUserId.firstName} ${selUserId.lastName}` }));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -342,40 +344,40 @@ export default function AdminRbac() {
   return (
     <Box>
       <Typography variant="h5" fontWeight={700} mb={1}>
-        Roles y permisos
+        {t('admin.rbac.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary" mb={2}>
-        Core de administración dinámico: roles, permisos, menús y asignaciones (rol→permiso, rol→menú, usuario→rol).
+        {t('admin.rbac.subtitle')}
       </Typography>
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label="Roles" />
-        <Tab label="Permisos" />
-        <Tab label="Menús" />
-        <Tab label="Asignaciones" />
+        <Tab label={t('admin.rbac.tabs.roles')} />
+        <Tab label={t('admin.rbac.tabs.permissions')} />
+        <Tab label={t('admin.rbac.tabs.menus')} />
+        <Tab label={t('admin.rbac.tabs.assignments')} />
       </Tabs>
 
       {/* ===== TAB ROLES ===== */}
       {tab === 0 && (
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Roles ({roles.length})</Typography>
+            <Typography variant="h6">{t('admin.rbac.rolesHeading', { count: roles.length })}</Typography>
             <PrimaryButton startIcon={<AddIcon />} onClick={() => openRole()}>
-              Nuevo rol
+              {t('admin.rbac.newRole')}
             </PrimaryButton>
           </Box>
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Código</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Sistema</TableCell>
-                  <TableCell>Activo</TableCell>
-                  <TableCell align="center">Permisos</TableCell>
-                  <TableCell align="center">Menús</TableCell>
-                  <TableCell align="center">Usuarios</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+                  <TableCell>{t('admin.rbac.table.code')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.name')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.description')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.system')}</TableCell>
+                  <TableCell>{t('admin.common.active')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.permissions')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.menus')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.users')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -385,20 +387,20 @@ export default function AdminRbac() {
                     <TableCell>{role.name}</TableCell>
                     <TableCell>{role.description || '—'}</TableCell>
                     <TableCell>
-                      {role.isSystem ? <Chip label="Sistema" size="small" color="primary" /> : <Chip label="Personalizado" size="small" variant="outlined" />}
+                      {role.isSystem ? <Chip label={t('admin.rbac.roleType.system')} size="small" color="primary" /> : <Chip label={t('admin.rbac.roleType.custom')} size="small" variant="outlined" />}
                     </TableCell>
                     <TableCell>
-                      <Chip label={role.isActive ? 'Activo' : 'Inactivo'} size="small" color={role.isActive ? 'success' : 'default'} />
+                      <Chip label={role.isActive ? t('admin.common.active') : t('admin.common.inactive')} size="small" color={role.isActive ? 'success' : 'default'} />
                     </TableCell>
                     <TableCell align="center">{role._count?.permissions ?? 0}</TableCell>
                     <TableCell align="center">{role._count?.menus ?? 0}</TableCell>
                     <TableCell align="center">{role._count?.users ?? 0}</TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={() => openRole(role)} title="Editar">
+                      <IconButton size="small" onClick={() => openRole(role)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                       {!role.isSystem && (
-                        <IconButton size="small" color="error" onClick={() => deleteRole(role)} title="Eliminar">
+                        <IconButton size="small" color="error" onClick={() => deleteRole(role)} title={t('admin.common.delete')}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       )}
@@ -415,20 +417,20 @@ export default function AdminRbac() {
       {tab === 1 && (
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Permisos ({permissions.length})</Typography>
+            <Typography variant="h6">{t('admin.rbac.permissionsHeading', { count: permissions.length })}</Typography>
             <PrimaryButton startIcon={<AddIcon />} onClick={() => openPerm()}>
-              Nuevo permiso
+              {t('admin.rbac.newPermission')}
             </PrimaryButton>
           </Box>
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Código</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell>Módulo</TableCell>
-                  <TableCell>Activo</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+                  <TableCell>{t('admin.rbac.table.code')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.name')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.module')}</TableCell>
+                  <TableCell>{t('admin.common.active')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -440,13 +442,13 @@ export default function AdminRbac() {
                       <Chip label={perm.module} size="small" variant="outlined" />
                     </TableCell>
                     <TableCell>
-                      <Chip label={perm.isActive ? 'Activo' : 'Inactivo'} size="small" color={perm.isActive ? 'success' : 'default'} />
+                      <Chip label={perm.isActive ? t('admin.common.active') : t('admin.common.inactive')} size="small" color={perm.isActive ? 'success' : 'default'} />
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={() => openPerm(perm)} title="Editar">
+                      <IconButton size="small" onClick={() => openPerm(perm)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" color="error" onClick={() => deletePerm(perm)} title="Eliminar">
+                      <IconButton size="small" color="error" onClick={() => deletePerm(perm)} title={t('admin.common.delete')}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -462,22 +464,22 @@ export default function AdminRbac() {
       {tab === 2 && (
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Menús ({flatMenus(menus).length})</Typography>
+            <Typography variant="h6">{t('admin.rbac.menusHeading', { count: flatMenus(menus).length })}</Typography>
             <PrimaryButton startIcon={<AddIcon />} onClick={() => openMenu()}>
-              Nuevo menú
+              {t('admin.rbac.newMenu')}
             </PrimaryButton>
           </Box>
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Código</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell>Ruta</TableCell>
-                  <TableCell>Módulo</TableCell>
-                  <TableCell>Orden</TableCell>
-                  <TableCell>Activo</TableCell>
-                  <TableCell align="center">Acciones</TableCell>
+                  <TableCell>{t('admin.rbac.table.code')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.name')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.path')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.module')}</TableCell>
+                  <TableCell>{t('admin.rbac.table.order')}</TableCell>
+                  <TableCell>{t('admin.common.active')}</TableCell>
+                  <TableCell align="center">{t('admin.rbac.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -494,13 +496,13 @@ export default function AdminRbac() {
                     </TableCell>
                     <TableCell>{menu.sortOrder}</TableCell>
                     <TableCell>
-                      <Chip label={menu.isActive ? 'Activo' : 'Inactivo'} size="small" color={menu.isActive ? 'success' : 'default'} />
+                      <Chip label={menu.isActive ? t('admin.common.active') : t('admin.common.inactive')} size="small" color={menu.isActive ? 'success' : 'default'} />
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton size="small" onClick={() => openMenu(menu)} title="Editar">
+                      <IconButton size="small" onClick={() => openMenu(menu)} title={t('admin.common.edit')}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" color="error" onClick={() => deleteMenu(menu)} title="Eliminar">
+                      <IconButton size="small" color="error" onClick={() => deleteMenu(menu)} title={t('admin.common.delete')}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -517,10 +519,10 @@ export default function AdminRbac() {
         <Stack spacing={2}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" mb={1}>
-              Asignar permisos y menús a un rol
+              {t('admin.rbac.assignRoleTitle')}
             </Typography>
-            <TextField select label="Rol" value={selRoleId} onChange={(e) => setSelRoleId(Number(e.target.value))} size="small" sx={{ mb: 2, minWidth: 260 }}>
-              <MenuItem value="">Selecciona un rol…</MenuItem>
+            <TextField select label={t('admin.rbac.roleFieldLabel')} value={selRoleId} onChange={(e) => setSelRoleId(Number(e.target.value))} size="small" sx={{ mb: 2, minWidth: 260 }}>
+              <MenuItem value="">{t('admin.rbac.selectRolePlaceholder')}</MenuItem>
               {roles.map((r) => (
                 <MenuItem key={r.id} value={r.id}>
                   {r.name} ({r.code})
@@ -532,7 +534,7 @@ export default function AdminRbac() {
               <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" mb={1}>
-                  Permisos
+                  {t('admin.rbac.table.permissions')}
                 </Typography>
                 <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
                   {permissions.map((p) => (
@@ -555,7 +557,7 @@ export default function AdminRbac() {
                   ))}
                 </Box>
                 <Typography variant="subtitle2" mb={1}>
-                  Menús
+                  {t('admin.rbac.table.menus')}
                 </Typography>
                 <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
                   {flatMenus(menus).map((m) => (
@@ -578,7 +580,7 @@ export default function AdminRbac() {
                   ))}
                 </Box>
                 <PrimaryButton disabled={savingAssign} onClick={saveRoleAssignments}>
-                  {savingAssign ? 'Guardando…' : 'Guardar asignaciones del rol'}
+                  {savingAssign ? t('admin.rbac.savingEllipsis') : t('admin.rbac.saveRoleAssignments')}
                 </PrimaryButton>
               </>
             )}
@@ -586,7 +588,7 @@ export default function AdminRbac() {
 
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" mb={1}>
-              Asignar roles a un usuario
+              {t('admin.rbac.assignUserTitle')}
             </Typography>
             <Autocomplete
               options={users}
@@ -596,13 +598,13 @@ export default function AdminRbac() {
               onChange={(_e, v) => pickUser(v)}
               size="small"
               sx={{ mb: 2, minWidth: 320 }}
-              renderInput={(params) => <TextField {...params} label="Buscar usuario" />}
+              renderInput={(params) => <TextField {...params} label={t('admin.rbac.searchUserLabel')} />}
             />
             {selUserId && (
               <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" mb={1}>
-                  Roles de {selUserId.firstName} {selUserId.lastName}
+                  {t('admin.rbac.userRolesHeading', { name: `${selUserId.firstName} ${selUserId.lastName}` })}
                 </Typography>
                 <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
                   {roles.map((r) => (
@@ -625,10 +627,10 @@ export default function AdminRbac() {
                   ))}
                 </Box>
                 <PrimaryButton disabled={savingUserRoles} onClick={saveUserRoles}>
-                  {savingUserRoles ? 'Guardando…' : 'Guardar roles del usuario'}
+                  {savingUserRoles ? t('admin.rbac.savingEllipsis') : t('admin.rbac.saveUserRoles')}
                 </PrimaryButton>
                 <Alert severity="info" sx={{ mt: 2 }}>
-                  El rol primario ({selUserId.role}) del usuario se mantiene; estos roles se suman y amplían sus permisos y menús.
+                  {t('admin.rbac.primaryRoleInfo', { role: selUserId.role })}
                 </Alert>
               </>
             )}
@@ -638,21 +640,21 @@ export default function AdminRbac() {
 
       {/* ===== DIALOG ROL ===== */}
       <Dialog open={roleOpen} onClose={() => setRoleOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{editingRole ? 'Editar rol' : 'Nuevo rol'}</DialogTitle>
+        <DialogTitle>{editingRole ? t('admin.rbac.dialog.editRoleTitle') : t('admin.rbac.newRole')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label="Código"
+              label={t('admin.rbac.table.code')}
               value={roleForm.code}
               onChange={(e) => setRoleForm({ ...roleForm, code: e.target.value })}
               disabled={!!editingRole}
-              helperText="Solo mayúsculas y guión bajo (ej: SOPORTE)"
+              helperText={t('admin.rbac.dialog.roleCodeHelper')}
               fullWidth
               size="small"
             />
-            <TextField label="Nombre" value={roleForm.name} onChange={(e) => setRoleForm({ ...roleForm, name: e.target.value })} fullWidth size="small" />
+            <TextField label={t('admin.rbac.table.name')} value={roleForm.name} onChange={(e) => setRoleForm({ ...roleForm, name: e.target.value })} fullWidth size="small" />
             <TextField
-              label="Descripción"
+              label={t('admin.rbac.table.description')}
               value={roleForm.description}
               onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}
               fullWidth
@@ -664,36 +666,36 @@ export default function AdminRbac() {
               control={
                 <Checkbox checked={roleForm.isActive} onChange={(e) => setRoleForm({ ...roleForm, isActive: e.target.checked })} disabled={!!editingRole && editingRole.isSystem} />
               }
-              label="Activo"
+              label={t('admin.common.active')}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setRoleOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setRoleOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveRole}>
-            {editingRole ? 'Guardar cambios' : 'Crear rol'}
+            {editingRole ? t('admin.rbac.dialog.saveChanges') : t('admin.rbac.dialog.createRole')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* ===== DIALOG PERMISO ===== */}
       <Dialog open={permOpen} onClose={() => setPermOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{editingPerm ? 'Editar permiso' : 'Nuevo permiso'}</DialogTitle>
+        <DialogTitle>{editingPerm ? t('admin.rbac.dialog.editPermTitle') : t('admin.rbac.newPermission')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label="Código"
+              label={t('admin.rbac.table.code')}
               value={permForm.code}
               onChange={(e) => setPermForm({ ...permForm, code: e.target.value })}
               disabled={!!editingPerm}
-              helperText={'Tipo "modulo.accion" (ej: users.manage)'}
+              helperText={t('admin.rbac.dialog.permCodeHelper')}
               fullWidth
               size="small"
             />
-            <TextField label="Nombre" value={permForm.name} onChange={(e) => setPermForm({ ...permForm, name: e.target.value })} fullWidth size="small" />
+            <TextField label={t('admin.rbac.table.name')} value={permForm.name} onChange={(e) => setPermForm({ ...permForm, name: e.target.value })} fullWidth size="small" />
             <TextField
               select
-              label="Módulo"
+              label={t('admin.rbac.table.module')}
               value={permForm.module}
               onChange={(e) => setPermForm({ ...permForm, module: e.target.value })}
               fullWidth
@@ -705,35 +707,35 @@ export default function AdminRbac() {
                 </MenuItem>
               ))}
             </TextField>
-            <FormControlLabel control={<Checkbox checked={permForm.isActive} onChange={(e) => setPermForm({ ...permForm, isActive: e.target.checked })} />} label="Activo" />
+            <FormControlLabel control={<Checkbox checked={permForm.isActive} onChange={(e) => setPermForm({ ...permForm, isActive: e.target.checked })} />} label={t('admin.common.active')} />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setPermOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setPermOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={savePerm}>
-            {editingPerm ? 'Guardar cambios' : 'Crear permiso'}
+            {editingPerm ? t('admin.rbac.dialog.saveChanges') : t('admin.rbac.dialog.createPermission')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* ===== DIALOG MENÚ ===== */}
       <Dialog open={menuOpen} onClose={() => setMenuOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{editingMenu ? 'Editar menú' : 'Nuevo menú'}</DialogTitle>
+        <DialogTitle>{editingMenu ? t('admin.rbac.dialog.editMenuTitle') : t('admin.rbac.newMenu')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Código" value={menuForm.code} onChange={(e) => setMenuForm({ ...menuForm, code: e.target.value })} disabled={!!editingMenu} helperText="ej: admin.dashboard" fullWidth size="small" />
-            <TextField label="Nombre" value={menuForm.label} onChange={(e) => setMenuForm({ ...menuForm, label: e.target.value })} fullWidth size="small" />
-            <TextField label="Ruta" value={menuForm.path} onChange={(e) => setMenuForm({ ...menuForm, path: e.target.value })} helperText="ej: /admin" fullWidth size="small" />
-            <TextField label="Ícono" value={menuForm.icon} onChange={(e) => setMenuForm({ ...menuForm, icon: e.target.value })} helperText="Nombre del ícono MUI (opcional)" fullWidth size="small" />
+            <TextField label={t('admin.rbac.table.code')} value={menuForm.code} onChange={(e) => setMenuForm({ ...menuForm, code: e.target.value })} disabled={!!editingMenu} helperText={t('admin.rbac.dialog.menuCodeHelper')} fullWidth size="small" />
+            <TextField label={t('admin.rbac.table.name')} value={menuForm.label} onChange={(e) => setMenuForm({ ...menuForm, label: e.target.value })} fullWidth size="small" />
+            <TextField label={t('admin.rbac.table.path')} value={menuForm.path} onChange={(e) => setMenuForm({ ...menuForm, path: e.target.value })} helperText={t('admin.rbac.dialog.pathHelper')} fullWidth size="small" />
+            <TextField label={t('admin.rbac.dialog.iconLabel')} value={menuForm.icon} onChange={(e) => setMenuForm({ ...menuForm, icon: e.target.value })} helperText={t('admin.rbac.dialog.iconHelper')} fullWidth size="small" />
             <TextField
               select
-              label="Menú padre"
+              label={t('admin.rbac.dialog.parentLabel')}
               value={menuForm.parentId}
               onChange={(e) => setMenuForm({ ...menuForm, parentId: e.target.value })}
               fullWidth
               size="small"
             >
-              <MenuItem value="">— Sin padre (raíz) —</MenuItem>
+              <MenuItem value="">{t('admin.rbac.dialog.noParentOption')}</MenuItem>
               {flatMenus(menus)
                 .filter((m) => m.id !== editingMenu?.id)
                 .map((m) => (
@@ -742,7 +744,7 @@ export default function AdminRbac() {
                   </MenuItem>
                 ))}
             </TextField>
-            <TextField select label="Módulo" value={menuForm.module} onChange={(e) => setMenuForm({ ...menuForm, module: e.target.value })} fullWidth size="small">
+            <TextField select label={t('admin.rbac.table.module')} value={menuForm.module} onChange={(e) => setMenuForm({ ...menuForm, module: e.target.value })} fullWidth size="small">
               {['core', 'admin', 'seller', 'forum', 'public'].map((mod) => (
                 <MenuItem key={mod} value={mod}>
                   {mod}
@@ -750,20 +752,20 @@ export default function AdminRbac() {
               ))}
             </TextField>
             <TextField
-              label="Orden"
+              label={t('admin.rbac.table.order')}
               type="number"
               value={menuForm.sortOrder}
               onChange={(e) => setMenuForm({ ...menuForm, sortOrder: e.target.value })}
               fullWidth
               size="small"
             />
-            <FormControlLabel control={<Checkbox checked={menuForm.isActive} onChange={(e) => setMenuForm({ ...menuForm, isActive: e.target.checked })} />} label="Activo" />
+            <FormControlLabel control={<Checkbox checked={menuForm.isActive} onChange={(e) => setMenuForm({ ...menuForm, isActive: e.target.checked })} />} label={t('admin.common.active')} />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setMenuOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setMenuOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveMenu}>
-            {editingMenu ? 'Guardar cambios' : 'Crear menú'}
+            {editingMenu ? t('admin.rbac.dialog.saveChanges') : t('admin.rbac.dialog.createMenu')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

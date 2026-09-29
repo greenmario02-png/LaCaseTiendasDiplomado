@@ -183,6 +183,45 @@ export async function updateProduct(req: AuthRequest, res: Response, next: NextF
   }
 }
 
+/**
+ * Guarda (o borra, si vienen ambos campos vacíos) la traducción de name/description de un
+ * producto para UN idioma. Se guarda aparte de `updateProduct` para que el vendedor pueda
+ * ir completando idiomas de a uno sin tener que reenviar todo el producto.
+ */
+export async function setProductTranslation(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const productId = Number(req.params.id);
+    const { locale, name, description } = req.body as { locale: string; name?: string; description?: string };
+
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product) throw ApiError.notFound('Producto no encontrado');
+    if (product.sellerId !== req.user!.id && req.user!.role !== Role.ADMIN) {
+      throw ApiError.forbidden('No puedes modificar este producto');
+    }
+
+    const translations = (product.translations as Record<string, { name?: string; description?: string }> | null) ?? {};
+    const hasContent = !!(name?.trim() || description?.trim());
+    if (hasContent) {
+      translations[locale] = {
+        ...(name?.trim() ? { name: name.trim() } : {}),
+        ...(description?.trim() ? { description: description.trim() } : {}),
+      };
+    } else {
+      delete translations[locale];
+    }
+
+    const updated = await prisma.product.update({
+      where: { id: productId },
+      data: { translations },
+      include: PRODUCT_INCLUDE,
+    });
+
+    return ok(res, updated);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deleteProduct(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const productId = Number(req.params.id);

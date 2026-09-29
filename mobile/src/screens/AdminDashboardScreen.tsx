@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import {
   ShieldCheck,
   Store,
@@ -20,21 +21,21 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { StatCard } from '../components/redesign/StatCard';
 import { LoadingState } from '../components/redesign/States';
 
-const ADMIN_MENU = [
-  { label: 'Vendedores', icon: Store, route: 'AdminSellers', desc: 'Aprobar, pausar y suspender tiendas' },
-  { label: 'Verificación de tiendas', icon: BadgeCheck, route: 'AdminVerification', desc: 'Verificar NIT y ubicación' },
-  { label: 'Moderación del foro', icon: MessageSquareWarning, route: 'ForumModeration', desc: 'Reportes y contenido del foro' },
-  { label: 'Carga masiva de productos', icon: Upload, route: 'SellerBulkProducts', desc: 'Alta de productos en lote' },
-  { label: 'Mis pagos', icon: Wallet, route: 'SellerPayouts', desc: 'Payouts y cuenta de cobro' },
-  { label: 'Notificaciones', icon: Bell, route: 'Notifications', desc: 'Centro de notificaciones' },
-  { label: 'Mis pedidos', icon: ClipboardList, route: 'Orders', desc: 'Historial de pedidos' },
-];
-
 const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
 export default function AdminDashboardScreen() {
   const { colors, raised } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const ADMIN_MENU = [
+    { label: t('mobile.adminDashboard.menuSellersLabel'), icon: Store, route: 'AdminSellers', desc: t('mobile.adminDashboard.menuSellersDesc') },
+    { label: t('mobile.adminDashboard.menuVerificationLabel'), icon: BadgeCheck, route: 'AdminVerification', desc: t('mobile.adminDashboard.menuVerificationDesc') },
+    { label: t('mobile.adminDashboard.menuForumModerationLabel'), icon: MessageSquareWarning, route: 'ForumModeration', desc: t('mobile.adminDashboard.menuForumModerationDesc') },
+    { label: t('mobile.adminDashboard.menuBulkProductsLabel'), icon: Upload, route: 'SellerBulkProducts', desc: t('mobile.adminDashboard.menuBulkProductsDesc') },
+    { label: t('mobile.adminDashboard.menuPayoutsLabel'), icon: Wallet, route: 'SellerPayouts', desc: t('mobile.adminDashboard.menuPayoutsDesc') },
+    { label: t('mobile.adminDashboard.menuNotificationsLabel'), icon: Bell, route: 'Notifications', desc: t('mobile.adminDashboard.menuNotificationsDesc') },
+    { label: t('mobile.adminDashboard.menuOrdersLabel'), icon: ClipboardList, route: 'Orders', desc: t('mobile.adminDashboard.menuOrdersDesc') },
+  ];
   const [kpis, setKpis] = useState<any>(null);
   const [salesToday, setSalesToday] = useState<any>(null);
   const [copies, setCopies] = useState<any[]>([]);
@@ -69,15 +70,15 @@ export default function AdminDashboardScreen() {
 
   const k = kpis || {};
   const cards: { label: string; value: string }[] = [
-    { label: 'Productos', value: String(k.totalProducts ?? 0) },
-    { label: 'Vendedores', value: String(k.totalSellers ?? 0) },
-    { label: 'Clientes', value: String(k.totalUsers ?? 0) },
-    { label: 'Órdenes', value: String(k.totalOrders ?? 0) },
-    { label: 'Ventas', value: money(k.totalRevenue ?? 0) },
-    { label: 'Mes', value: money(k.monthRevenue ?? 0) },
-    { label: 'Pedidos pendientes', value: String(k.pendingOrders ?? 0) },
-    { label: 'Productos pend.', value: String(k.pendingProducts ?? 0) },
-    { label: 'Vendedores pend.', value: String(k.pendingSellers ?? 0) },
+    { label: t('mobile.adminDashboard.productsLabel'), value: String(k.totalProducts ?? 0) },
+    { label: t('mobile.adminDashboard.sellersLabel'), value: String(k.totalSellers ?? 0) },
+    { label: t('mobile.adminDashboard.customersLabel'), value: String(k.totalUsers ?? 0) },
+    { label: t('mobile.adminDashboard.ordersLabel'), value: String(k.totalOrders ?? 0) },
+    { label: t('mobile.adminDashboard.salesLabel'), value: money(k.totalRevenue ?? 0) },
+    { label: t('mobile.adminDashboard.monthLabel'), value: money(k.monthRevenue ?? 0) },
+    { label: t('mobile.adminDashboard.pendingOrdersLabel'), value: String(k.pendingOrders ?? 0) },
+    { label: t('mobile.adminDashboard.pendingProductsLabel'), value: String(k.pendingProducts ?? 0) },
+    { label: t('mobile.adminDashboard.pendingSellersLabel'), value: String(k.pendingSellers ?? 0) },
   ];
 
   const todayProducts: any[] = salesToday?.products ?? [];
@@ -90,12 +91,12 @@ export default function AdminDashboardScreen() {
           <ShieldCheck size={22} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Panel de administración</Text>
-          <Text style={styles.subtitle}>Visión general de la multitienda</Text>
+          <Text style={styles.title}>{t('mobile.adminDashboard.title')}</Text>
+          <Text style={styles.subtitle}>{t('mobile.adminDashboard.subtitle')}</Text>
         </View>
       </View>
 
-      <Text style={styles.menuTitle}>Menú de administración</Text>
+      <Text style={styles.menuTitle}>{t('mobile.adminDashboard.menuTitle')}</Text>
       <View style={styles.menuList}>
         {ADMIN_MENU.map((m) => {
           const Icon = m.icon;
@@ -130,14 +131,14 @@ export default function AdminDashboardScreen() {
         <View style={[styles.sectionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.warning }, raised]}>
           <View style={styles.sectionTitleRow}>
             <TriangleAlert size={16} color={colors.warning} />
-            <Text style={[styles.sectionTitle, { color: colors.warning }]}>Copias masivas detectadas</Text>
+            <Text style={[styles.sectionTitle, { color: colors.warning }]}>{t('mobile.adminDashboard.copiesDetectedTitle')}</Text>
           </View>
           {copies.slice(0, 5).map((c: any, i: number) => (
             <View key={i} style={styles.row}>
               <Text style={styles.rowTitle} numberOfLines={1}>
                 {c.actor?.storeName || `${c.actor?.firstName} ${c.actor?.lastName}`} ({c.actor?.email})
               </Text>
-              <Text style={[styles.rowValue, { color: colors.warning }]}>{c.count} copia(s)</Text>
+              <Text style={[styles.rowValue, { color: colors.warning }]}>{t('mobile.adminDashboard.copiesCount', { count: c.count })}</Text>
             </View>
           ))}
         </View>
@@ -147,14 +148,14 @@ export default function AdminDashboardScreen() {
         <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
             <ShoppingCart size={16} color={colors.textSecondary} />
-            <Text style={styles.sectionTitle}>Vendidos hoy</Text>
+            <Text style={styles.sectionTitle}>{t('mobile.adminDashboard.soldTodayTitle')}</Text>
           </View>
           {todayProducts.slice(0, 6).map((p: any) => (
             <View key={p.productId} style={styles.row}>
               <Text style={styles.rowTitle} numberOfLines={1}>
                 {p.name}
               </Text>
-              <Text style={styles.rowValue}>{p.quantity} vendido(s)</Text>
+              <Text style={styles.rowValue}>{t('mobile.adminDashboard.soldCount', { count: p.quantity })}</Text>
             </View>
           ))}
         </View>
@@ -164,7 +165,7 @@ export default function AdminDashboardScreen() {
         <View style={[styles.sectionCard, { backgroundColor: colors.surface }, raised]}>
           <View style={styles.sectionTitleRow}>
             <Zap size={16} color={colors.warning} />
-            <Text style={styles.sectionTitle}>Promociones activas</Text>
+            <Text style={styles.sectionTitle}>{t('mobile.adminDashboard.activePromotionsTitle')}</Text>
           </View>
           {todayPromos.slice(0, 5).map((promo: any) => (
             <View key={promo.id} style={styles.row}>
@@ -172,7 +173,7 @@ export default function AdminDashboardScreen() {
                 {promo.title}
               </Text>
               <Text style={[styles.rowValue, { color: colors.error }]}>
-                {promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}%` : money(promo.discountValue)} OFF
+                {promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}%` : money(promo.discountValue)} {t('mobile.adminDashboard.offSuffix')}
               </Text>
             </View>
           ))}

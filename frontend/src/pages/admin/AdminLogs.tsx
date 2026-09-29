@@ -20,6 +20,7 @@ import { api } from '../../services/api';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
 import { LoadingState, ErrorState } from '../../components/redesign/States';
+import { useTranslation } from 'react-i18next';
 
 type AuditAction =
   | 'CREATED'
@@ -81,6 +82,7 @@ function formatDate(iso: string) {
 
 export default function AdminLogs() {
   const t = useUnifiedTokens();
+  const { t: tr } = useTranslation();
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -101,7 +103,7 @@ export default function AdminLogs() {
         setRows(res.data.data ?? []);
         setTotal(res.data.meta?.total ?? 0);
       })
-      .catch((err) => setError(err?.response?.data?.message || 'No se pudieron cargar los logs'))
+      .catch((err) => setError(err?.response?.data?.message || tr('admin.logs.loadError')))
       .finally(() => setLoading(false));
   }, [page, limit, action, search]);
 
@@ -112,11 +114,11 @@ export default function AdminLogs() {
 
   return (
     <Box>
-      <PageHeader title="Logs de acciones" subtitle="Auditoría de cambios sobre productos" icon={<HistoryIcon />} />
+      <PageHeader title={tr('admin.logs.title')} subtitle={tr('admin.logs.subtitle')} icon={<HistoryIcon />} />
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={3}>
         <TextField
           size="small"
-          label="Buscar producto o usuario"
+          label={tr('admin.logs.searchLabel')}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -127,7 +129,7 @@ export default function AdminLogs() {
         <TextField
           select
           size="small"
-          label="Acción"
+          label={tr('admin.logs.actionLabel')}
           value={action}
           onChange={(e) => {
             setAction(e.target.value);
@@ -135,7 +137,7 @@ export default function AdminLogs() {
           }}
           sx={{ minWidth: 200 }}
         >
-          <MenuItem value="">Todas</MenuItem>
+          <MenuItem value="">{tr('admin.logs.allActions')}</MenuItem>
           {ACTIONS.map((a) => (
             <MenuItem key={a} value={a}>
               {a}
@@ -151,11 +153,11 @@ export default function AdminLogs() {
           <Table size="small">
             <TableHead sx={{ bgcolor: t.surface }}>
               <TableRow>
-                <TableCell>Fecha</TableCell>
-                <TableCell>Acción</TableCell>
-                <TableCell>Producto</TableCell>
-                <TableCell>Usuario</TableCell>
-                <TableCell>Nota</TableCell>
+                <TableCell>{tr('admin.logs.colDate')}</TableCell>
+                <TableCell>{tr('admin.logs.colAction')}</TableCell>
+                <TableCell>{tr('admin.logs.colProduct')}</TableCell>
+                <TableCell>{tr('admin.logs.colUser')}</TableCell>
+                <TableCell>{tr('admin.logs.colNote')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -169,7 +171,7 @@ export default function AdminLogs() {
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 4, color: t.onSurfaceVariant }}>
                     <Typography variant="body2">
-                      No hay logs de auditoría todavía. Se registran cuando se crean, editan o moderan productos.
+                      {tr('admin.logs.emptyState')}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -194,7 +196,7 @@ export default function AdminLogs() {
                         </>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
-                          Producto {r.productId}
+                          {tr('admin.logs.productFallback', { id: r.productId })}
                         </Typography>
                       )}
                     </TableCell>
@@ -209,7 +211,7 @@ export default function AdminLogs() {
                         </Typography>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
-                          Usuario {r.actorId}
+                          {tr('admin.logs.userFallback', { id: r.actorId })}
                         </Typography>
                       )}
                     </TableCell>
@@ -234,7 +236,7 @@ export default function AdminLogs() {
             setLimit(Number(e.target.value));
             setPage(0);
           }}
-          labelRowsPerPage="Filas por página"
+          labelRowsPerPage={tr('admin.logs.rowsPerPage')}
           rowsPerPageOptions={[10, 20, 50]}
         />
       </SurfaceCard>

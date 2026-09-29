@@ -39,6 +39,8 @@ import dayjs from 'dayjs';
 import ProductCard from '../../components/ui/ProductCard';
 import { SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
+import { ProductTranslationModal } from '../../components/redesign/ProductTranslationModal';
+import TranslateIcon from '@mui/icons-material/Translate';
 import { useUnifiedTokens } from '../../theme';
 
 export default function SellerProductForm() {
@@ -56,6 +58,8 @@ export default function SellerProductForm() {
   const user = useAuthStore((s) => s.user);
   const isEmployee = user?.storeRole === 'EMPLOYEE';
   const isEdit = Boolean(id);
+  const [translations, setTranslations] = useState<Record<string, { name?: string; description?: string }>>({});
+  const [translateOpen, setTranslateOpen] = useState(false);
 
   const [categories, setCategories] = useState<any[]>([]);
   const [attrs, setAttrs] = useState<any[]>([]);
@@ -204,6 +208,7 @@ export default function SellerProductForm() {
           })),
         });
         setImages((p.images || []).map((img: any, i: number) => ({ url: img.url, isPrimary: i === 0 })));
+        setTranslations(p.translations || {});
         // En edición también cargamos las definiciones de la categoría y las de
         // atributos agregados a mano que no pertenecen a la categoría.
         const defs = await loadAttrs(p.categoryId);
@@ -589,9 +594,20 @@ export default function SellerProductForm() {
           <Typography variant="h6" fontWeight={800} color={tk.onSurface}>
             {isEdit ? t('seller.productForm.title.edit') : t('seller.productForm.title.new')}
           </Typography>
-          <IconButton onClick={close} title={t('seller.productForm.close')} aria-label={t('seller.productForm.close')}>
-            <CloseIcon />
-          </IconButton>
+          <Box display="flex" alignItems="center" gap={0.5}>
+            {isEdit && (
+              <IconButton
+                onClick={() => setTranslateOpen(true)}
+                title={t('seller.productForm.translations.title', { defaultValue: 'Traducir producto' })}
+                aria-label={t('seller.productForm.translations.title', { defaultValue: 'Traducir producto' })}
+              >
+                <TranslateIcon />
+              </IconButton>
+            )}
+            <IconButton onClick={close} title={t('seller.productForm.close')} aria-label={t('seller.productForm.close')}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
         {!isEdit && (
           <Stepper activeStep={activeStep} alternativeLabel sx={{ mt: 1, mb: 1 }}>
@@ -1437,6 +1453,16 @@ export default function SellerProductForm() {
           </>
         )}
       </DialogActions>
+
+      {isEdit && (
+        <ProductTranslationModal
+          open={translateOpen}
+          onClose={() => setTranslateOpen(false)}
+          productId={Number(id)}
+          translations={translations}
+          onSaved={setTranslations}
+        />
+      )}
     </Dialog>
   );
 }

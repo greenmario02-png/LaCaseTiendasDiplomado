@@ -8,6 +8,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { api, getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface VerificationSeller {
   id: number;
@@ -28,6 +29,7 @@ interface VerificationSeller {
 }
 
 export default function AdminVerification() {
+  const { t } = useTranslation();
   const [sellers, setSellers] = useState<VerificationSeller[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export default function AdminVerification() {
   const decide = async (id: number, isVerified: boolean) => {
     try {
       await api.put(`/admin/users/${id}`, { isVerified });
-      toast.success(isVerified ? 'Sello de vendedor verificado otorgado' : 'Sello revocado');
+      toast.success(isVerified ? t('admin.verification.toastGranted') : t('admin.verification.toastRevoked'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -55,7 +57,7 @@ export default function AdminVerification() {
   const decideLocation = async (id: number, locationVerified: boolean) => {
     try {
       await api.put(`/admin/users/${id}`, { locationVerified });
-      toast.success(locationVerified ? 'Ubicación verificada' : 'Ubicación marcada como no verificada');
+      toast.success(locationVerified ? t('admin.verification.toastLocationVerified') : t('admin.verification.toastLocationUnverified'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -77,13 +79,18 @@ export default function AdminVerification() {
               {s.storeName}
             </Typography>
             {s.isVerified ? (
-              <Chip size="small" color="success" icon={<CheckCircleIcon />} label="Verificado" />
+              <Chip size="small" color="success" icon={<CheckCircleIcon />} label={t('admin.verification.status.verified')} />
             ) : (
-              <Chip size="small" color="warning" label="Pendiente de revisión" />
+              <Chip size="small" color="warning" label={t('admin.verification.status.pending')} />
             )}
           </Box>
           <Typography variant="caption" color="text.secondary">
-            {s.firstName} {s.lastName} · {s.email} · desde {new Date(s.createdAt).toLocaleDateString('es-BO')}
+            {t('admin.verification.sellerMeta', {
+              firstName: s.firstName,
+              lastName: s.lastName,
+              email: s.email,
+              date: new Date(s.createdAt).toLocaleDateString('es-BO'),
+            })}
           </Typography>
           <Box display="flex" alignItems="center" gap={0.5} mt={0.5}>
             <LocationOnIcon fontSize="small" color="action" />
@@ -98,7 +105,7 @@ export default function AdminVerification() {
 
       <Box mb={1}>
         <Typography variant="caption" fontWeight={700} color="text.secondary">
-          NIT presentado:
+          {t('admin.verification.nitLabel')}
         </Typography>{' '}
         <Typography component="span" variant="body2" sx={{ fontVariantNumeric: 'tabular-nums' }}>
           {s.nit ?? '—'}
@@ -107,7 +114,7 @@ export default function AdminVerification() {
       {s.verificationNote && (
         <Box mb={1}>
           <Typography variant="caption" fontWeight={700} color="text.secondary">
-            Nota del vendedor:
+            {t('admin.verification.sellerNoteLabel')}
           </Typography>{' '}
           <Typography component="span" variant="body2">
             {s.verificationNote}
@@ -124,15 +131,15 @@ export default function AdminVerification() {
         {!s.isVerified ? (
           <>
             <PrimaryButton size="small" color="success" startIcon={<VerifiedUserIcon />} onClick={() => decide(s.id, true)}>
-              Otorgar sello verificado
+              {t('admin.verification.grantBadge')}
             </PrimaryButton>
             <SecondaryButton size="small" color="error" startIcon={<CancelIcon />} onClick={() => decide(s.id, false)}>
-              Rechazar
+              {t('admin.verification.reject')}
             </SecondaryButton>
           </>
         ) : (
           <SecondaryButton size="small" color="error" startIcon={<CancelIcon />} onClick={() => decide(s.id, false)}>
-            Revocar sello
+            {t('admin.verification.revokeBadge')}
           </SecondaryButton>
         )}
       </Stack>
@@ -142,30 +149,35 @@ export default function AdminVerification() {
       {/* Verificación de ubicación (tienda física) */}
       <Box>
         <Typography variant="caption" fontWeight={700} color="text.secondary">
-          Ubicación física de la tienda
+          {t('admin.verification.locationSectionTitle')}
         </Typography>
         {s.latitude != null && s.longitude != null ? (
           <Typography variant="body2" color="text.secondary" mt={0.5}>
-            Coordenadas: {Number(s.latitude).toFixed(5)}, {Number(s.longitude).toFixed(5)} · {s.locationCity}, {s.locationState}
+            {t('admin.verification.coordinates', {
+              lat: Number(s.latitude).toFixed(5),
+              lng: Number(s.longitude).toFixed(5),
+              city: s.locationCity,
+              state: s.locationState,
+            })}
           </Typography>
         ) : (
           <Typography variant="body2" color="text.disabled" mt={0.5}>
-            La tienda aún no marcó su ubicación en el mapa.
+            {t('admin.verification.noLocationSet')}
           </Typography>
         )}
         {s.locationVerified ? (
-          <Chip size="small" color="success" icon={<LocationOnIcon />} label="Ubicación verificada" sx={{ mt: 1 }} />
+          <Chip size="small" color="success" icon={<LocationOnIcon />} label={t('admin.verification.locationVerifiedChip')} sx={{ mt: 1 }} />
         ) : (
-          <Chip size="small" variant="outlined" icon={<LocationOnIcon />} label="Ubicación pendiente" sx={{ mt: 1 }} />
+          <Chip size="small" variant="outlined" icon={<LocationOnIcon />} label={t('admin.verification.locationPendingChip')} sx={{ mt: 1 }} />
         )}
         <Stack direction="row" spacing={1} mt={1}>
           {!s.locationVerified ? (
             <PrimaryButton size="small" color="success" startIcon={<LocationOnIcon />} onClick={() => decideLocation(s.id, true)} disabled={!s.latitude}>
-              Verificar ubicación
+              {t('admin.verification.verifyLocation')}
             </PrimaryButton>
           ) : (
             <SecondaryButton size="small" color="error" startIcon={<CancelIcon />} onClick={() => decideLocation(s.id, false)}>
-              Desmarcar
+              {t('admin.verification.unmarkLocation')}
             </SecondaryButton>
           )}
         </Stack>
@@ -178,32 +190,30 @@ export default function AdminVerification() {
       <Box display="flex" alignItems="center" gap={1} mb={1}>
         <VerifiedUserIcon color="primary" />
         <Typography variant="h5" fontWeight={700}>
-          Sello de vendedor verificado
+          {t('admin.verification.title')}
         </Typography>
       </Box>
       <Alert severity="info" sx={{ mb: 3 }}>
-        Como en Couchsurfing y Twitter (cuenta azul), el sello de verificación se otorga tras la revisión física de la
-        tienda: presencia real del local, NIT y documentación. Las tiendas verificadas pagan una suscripción y muestran
-        el logo junto a su nombre.
+        {t('admin.verification.infoBanner')}
       </Alert>
 
       <Typography variant="h6" fontWeight={700} mb={2}>
-        Solicitudes por revisar ({pending.length})
+        {t('admin.verification.pendingSection', { count: pending.length })}
       </Typography>
       {pending.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center', mb: 3 }}>
-          <Typography color="text.secondary">No hay solicitudes pendientes de verificación.</Typography>
+          <Typography color="text.secondary">{t('admin.verification.noPending')}</Typography>
         </Paper>
       ) : (
         pending.map(renderCard)
       )}
 
       <Typography variant="h6" fontWeight={700} mb={2} mt={3}>
-        Tiendas verificadas ({verified.length})
+        {t('admin.verification.verifiedSection', { count: verified.length })}
       </Typography>
       {verified.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography color="text.secondary">Aún no hay tiendas verificadas.</Typography>
+          <Typography color="text.secondary">{t('admin.verification.noVerified')}</Typography>
         </Paper>
       ) : (
         verified.map(renderCard)

@@ -39,36 +39,65 @@ import ForumIcon from '@mui/icons-material/Forum';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
+import { useTranslation } from 'react-i18next';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader } from '../../components/redesign/PageHeader';
 import { SecondaryButton } from '../../components/redesign/Buttons';
 import { useRbacStore, type RbacMenu } from '../../stores/rbacStore';
 
 const MENU = [
-  { to: '/admin', label: 'Dashboard', icon: <DashboardIcon />, end: true },
-  { to: '/admin/productos', label: 'Moderación productos', icon: <InventoryIcon /> },
-  { to: '/admin/verificacion', label: 'Verificación de tiendas', icon: <VerifiedUserIcon /> },
-  { to: '/admin/vendedores', label: 'Vendedores', icon: <StorefrontIcon /> },
-  { to: '/admin/empleos', label: 'Empleos', icon: <WorkOutlineIcon /> },
-  { to: '/admin/postulaciones', label: 'Postulaciones', icon: <AssignmentIndOutlinedIcon /> },
-  { to: '/admin/usuarios', label: 'Usuarios', icon: <PeopleIcon /> },
-  { to: '/admin/categorias', label: 'Categorías y atributos', icon: <CategoryIcon /> },
-  { to: '/admin/banners', label: 'Banners', icon: <ImageIcon /> },
-  { to: '/admin/promociones', label: 'Promociones', icon: <LocalOfferIcon /> },
-  { to: '/admin/cupones', label: 'Cupones', icon: <LocalOfferIcon /> },
-  { to: '/admin/pagos', label: 'Payouts', icon: <PaymentsIcon /> },
-  { to: '/admin/devoluciones', label: 'Devoluciones', icon: <AssignmentReturnIcon /> },
-  { to: '/admin/impuestos', label: 'Impuestos', icon: <PercentIcon /> },
-  { to: '/admin/afiliados', label: 'Afiliados', icon: <GroupIcon /> },
-  { to: '/admin/reportes', label: 'Reportes', icon: <AssessmentIcon /> },
-  { to: '/admin/contenido', label: 'Contenido del sitio', icon: <ArticleIcon /> },
-  { to: '/admin/moneda', label: 'Moneda', icon: <MonetizationOnIcon /> },
-  { to: '/admin/logs', label: 'Logs de acciones', icon: <HistoryIcon /> },
-  { to: '/admin/calendario', label: 'Calendario', icon: <CalendarMonthIcon /> },
-  { to: '/admin/foro', label: 'Foro LaCASE', icon: <ForumIcon /> },
-  { to: '/admin/configuracion', label: 'Configuración global', icon: <SettingsIcon /> },
-  { to: '/admin/rbac', label: 'Roles y permisos', icon: <ManageAccountsIcon /> },
+  { to: '/admin', labelKey: 'admin.menu.dashboard', fallback: 'Dashboard', icon: <DashboardIcon />, end: true },
+  { to: '/admin/productos', labelKey: 'admin.menu.products', fallback: 'Moderación productos', icon: <InventoryIcon /> },
+  { to: '/admin/verificacion', labelKey: 'admin.menu.verification', fallback: 'Verificación de tiendas', icon: <VerifiedUserIcon /> },
+  { to: '/admin/vendedores', labelKey: 'admin.menu.sellers', fallback: 'Vendedores', icon: <StorefrontIcon /> },
+  { to: '/admin/empleos', labelKey: 'admin.menu.jobs', fallback: 'Empleos', icon: <WorkOutlineIcon /> },
+  { to: '/admin/postulaciones', labelKey: 'admin.menu.jobApplications', fallback: 'Postulaciones', icon: <AssignmentIndOutlinedIcon /> },
+  { to: '/admin/usuarios', labelKey: 'admin.menu.users', fallback: 'Usuarios', icon: <PeopleIcon /> },
+  { to: '/admin/categorias', labelKey: 'admin.menu.categories', fallback: 'Categorías y atributos', icon: <CategoryIcon /> },
+  { to: '/admin/banners', labelKey: 'admin.menu.banners', fallback: 'Banners', icon: <ImageIcon /> },
+  { to: '/admin/promociones', labelKey: 'admin.menu.promotions', fallback: 'Promociones', icon: <LocalOfferIcon /> },
+  { to: '/admin/cupones', labelKey: 'admin.menu.coupons', fallback: 'Cupones', icon: <LocalOfferIcon /> },
+  { to: '/admin/pagos', labelKey: 'admin.menu.payouts', fallback: 'Payouts', icon: <PaymentsIcon /> },
+  { to: '/admin/devoluciones', labelKey: 'admin.menu.returns', fallback: 'Devoluciones', icon: <AssignmentReturnIcon /> },
+  { to: '/admin/impuestos', labelKey: 'admin.menu.taxes', fallback: 'Impuestos', icon: <PercentIcon /> },
+  { to: '/admin/afiliados', labelKey: 'admin.menu.affiliates', fallback: 'Afiliados', icon: <GroupIcon /> },
+  { to: '/admin/reportes', labelKey: 'admin.menu.reports', fallback: 'Reportes', icon: <AssessmentIcon /> },
+  { to: '/admin/contenido', labelKey: 'admin.menu.content', fallback: 'Contenido del sitio', icon: <ArticleIcon /> },
+  { to: '/admin/moneda', labelKey: 'admin.menu.currency', fallback: 'Moneda', icon: <MonetizationOnIcon /> },
+  { to: '/admin/logs', labelKey: 'admin.menu.logs', fallback: 'Logs de acciones', icon: <HistoryIcon /> },
+  { to: '/admin/calendario', labelKey: 'admin.menu.calendar', fallback: 'Calendario', icon: <CalendarMonthIcon /> },
+  { to: '/admin/foro', labelKey: 'admin.menu.forum', fallback: 'Foro LaCASE', icon: <ForumIcon /> },
+  { to: '/admin/configuracion', labelKey: 'admin.menu.settings', fallback: 'Configuración global', icon: <SettingsIcon /> },
+  { to: '/admin/rbac', labelKey: 'admin.menu.rbac', fallback: 'Roles y permisos', icon: <ManageAccountsIcon /> },
 ];
+
+// Códigos del RBAC seed (backend, ver Menu.code en prisma/seed.ts) -> misma clave que MENU.
+// El backend ya expone `code` en cada menú (rbac.controller.ts), así que no hace falta tocar
+// el backend para traducir esto: solo mapear code -> clave de i18n en el frontend.
+const ADMIN_CODE_TO_KEY: Record<string, string> = {
+  'admin.dashboard': 'admin.menu.dashboard',
+  'admin.products': 'admin.menu.products',
+  'admin.verification': 'admin.menu.verification',
+  'admin.sellers': 'admin.menu.sellers',
+  'admin.jobs': 'admin.menu.jobs',
+  'admin.jobApplications': 'admin.menu.jobApplications',
+  'admin.users': 'admin.menu.users',
+  'admin.categories': 'admin.menu.categories',
+  'admin.banners': 'admin.menu.banners',
+  'admin.promotions': 'admin.menu.promotions',
+  'admin.coupons': 'admin.menu.coupons',
+  'admin.payouts': 'admin.menu.payouts',
+  'admin.returns': 'admin.menu.returns',
+  'admin.taxes': 'admin.menu.taxes',
+  'admin.affiliates': 'admin.menu.affiliates',
+  'admin.reports': 'admin.menu.reports',
+  'admin.content': 'admin.menu.content',
+  'admin.currency': 'admin.menu.currency',
+  'admin.logs': 'admin.menu.logs',
+  'admin.calendar': 'admin.menu.calendar',
+  'admin.forum': 'admin.menu.forum',
+  'admin.rbac': 'admin.menu.rbac',
+};
 
 // Iconos por path (para los menús dinámicos del RBAC; fallback DashboardIcon).
 const ADMIN_ICONS: Record<string, ReactNode> = Object.fromEntries(MENU.map((m) => [m.to, m.icon]));
@@ -80,7 +109,8 @@ function rbacAdminMenus(rbacMenus: RbacMenu[]) {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((m) => ({
       to: m.path,
-      label: m.label,
+      labelKey: ADMIN_CODE_TO_KEY[m.code] ?? '',
+      fallback: m.label,
       icon: ADMIN_ICONS[m.path] ?? <DashboardIcon />,
       end: m.path === '/admin',
     }));
@@ -89,6 +119,7 @@ function rbacAdminMenus(rbacMenus: RbacMenu[]) {
 export default function AdminLayout() {
   const theme = useTheme();
   const t = useUnifiedTokens();
+  const { t: tr } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
   const rbacMenus = useRbacStore((s) => s.menus);
@@ -124,7 +155,7 @@ export default function AdminLayout() {
                   }}
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.label} />
+                  <ListItemText primary={item.labelKey ? tr(item.labelKey, { defaultValue: item.fallback }) : item.fallback} />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -140,7 +171,7 @@ export default function AdminLayout() {
                 <ListItemIcon>
                   <StoreIcon />
                 </ListItemIcon>
-                <ListItemText primary="Volver a la tienda" />
+                <ListItemText primary={tr('admin.menu.backToStore', { defaultValue: 'Volver a la tienda' })} />
               </ListItemButton>
             </ListItem>
           </List>
@@ -150,11 +181,11 @@ export default function AdminLayout() {
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, md: 3 } }}>
         <Container maxWidth="lg">
           <PageHeader
-            title="Panel de administración"
+            title={tr('admin.menu.title', { defaultValue: 'Panel de administración' })}
             icon={<DashboardIcon />}
             actions={
               <SecondaryButton type="button" to="/" size="small" startIcon={<StoreIcon />}>
-                Volver a la tienda
+                {tr('admin.menu.backToStore', { defaultValue: 'Volver a la tienda' })}
               </SecondaryButton>
             }
           />

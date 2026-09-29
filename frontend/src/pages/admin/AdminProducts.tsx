@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -32,6 +33,7 @@ import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
 
 export default function AdminProducts() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [tab, setTab] = useState(0);
   const [pending, setPending] = useState<any[]>([]);
@@ -65,7 +67,7 @@ export default function AdminProducts() {
         isActive: editForm.isActive,
         isFeatured: editForm.isFeatured,
       });
-      toast.success('Producto actualizado');
+      toast.success(t('admin.products.toast.updated'));
       setEditing(null);
       load();
     } catch (err) {
@@ -74,10 +76,10 @@ export default function AdminProducts() {
   };
 
   const softDelete = async (productId: number) => {
-    if (!confirm('¿Eliminar este producto? (soft delete)')) return;
+    if (!confirm(t('admin.products.confirmDelete'))) return;
     try {
       await api.delete(`/admin/products/${productId}`);
-      toast.success('Producto eliminado');
+      toast.success(t('admin.products.toast.deleted'));
       setPreview(null);
       load();
     } catch (err) {
@@ -105,7 +107,7 @@ export default function AdminProducts() {
   const moderate = async (productId: number, approve: boolean) => {
     try {
       await api.put(`/admin/products/${productId}/moderate`, { approve });
-      toast.success(approve ? 'Producto aprobado' : 'Producto rechazado');
+      toast.success(approve ? t('admin.products.toast.approved') : t('admin.products.toast.rejected'));
       setPreview(null);
       load();
     } catch (err) {
@@ -118,8 +120,8 @@ export default function AdminProducts() {
   return (
     <Box>
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label={`Pendientes (${pending.length})`} />
-        <Tab label="Catálogo" />
+        <Tab label={t('admin.products.tabs.pending', { count: pending.length })} />
+        <Tab label={t('admin.products.tabs.catalog')} />
       </Tabs>
 
       {tab === 0 && (
@@ -127,17 +129,17 @@ export default function AdminProducts() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Producto</TableCell>
-                <TableCell>Tienda</TableCell>
-                <TableCell align="right">Precio</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.products.table.product')}</TableCell>
+                <TableCell>{t('admin.products.table.store')}</TableCell>
+                <TableCell align="right">{t('admin.products.table.price')}</TableCell>
+                <TableCell align="center">{t('admin.products.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {pending.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} align="center">
-                    <Typography color="text.secondary">No hay productos pendientes ðŸŽ‰</Typography>
+                    <Typography color="text.secondary">{t('admin.products.emptyPending')}</Typography>
                   </TableCell>
                 </TableRow>
               )}
@@ -162,13 +164,13 @@ export default function AdminProducts() {
                   <TableCell align="right">{money(Number(p.price))}</TableCell>
                   <TableCell align="center">
                     <GhostButton size="small" onClick={() => setPreview(p)}>
-                      Ver
+                      {t('admin.products.actions.view')}
                     </GhostButton>
                     <GhostButton size="small" color="success" onClick={() => moderate(p.id, true)}>
-                      <CheckIcon fontSize="small" /> Aprobar
+                      <CheckIcon fontSize="small" /> {t('admin.products.actions.approve')}
                     </GhostButton>
                     <GhostButton size="small" color="error" onClick={() => moderate(p.id, false)}>
-                      <BlockIcon fontSize="small" /> Rechazar
+                      <BlockIcon fontSize="small" /> {t('admin.products.actions.reject')}
                     </GhostButton>
                   </TableCell>
                 </TableRow>
@@ -183,11 +185,11 @@ export default function AdminProducts() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Producto</TableCell>
-                <TableCell>Tienda</TableCell>
-                <TableCell align="right">Precio</TableCell>
-                <TableCell align="center">Stock</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.products.table.product')}</TableCell>
+                <TableCell>{t('admin.products.table.store')}</TableCell>
+                <TableCell align="right">{t('admin.products.table.price')}</TableCell>
+                <TableCell align="center">{t('admin.products.table.stock')}</TableCell>
+                <TableCell align="center">{t('admin.products.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -201,7 +203,7 @@ export default function AdminProducts() {
                   </TableCell>
                   <TableCell align="center">
                     <GhostButton size="small" onClick={() => openEdit(p)}>
-                      <EditIcon fontSize="small" /> Editar
+                      <EditIcon fontSize="small" /> {t('admin.common.edit')}
                     </GhostButton>
                     <GhostButton size="small" color="error" onClick={() => softDelete(p.id)}>
                       <DeleteIcon fontSize="small" />
@@ -222,36 +224,36 @@ export default function AdminProducts() {
             {money(Number(preview?.price))}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Tienda: {preview?.seller?.storeName} · Categoría: {preview?.category?.name} · Stock: {preview?.stock}
+            {t('admin.products.detail.summary', { store: preview?.seller?.storeName, category: preview?.category?.name, stock: preview?.stock })}
           </Typography>
         </DialogContent>
         <DialogActions>
           <GhostButton color="error" onClick={() => moderate(preview.id, false)}>
-            Rechazar
+            {t('admin.products.actions.reject')}
           </GhostButton>
           <PrimaryButton color="success" onClick={() => moderate(preview.id, true)}>
-            Aprobar
+            {t('admin.products.actions.approve')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       <Dialog open={Boolean(editing)} onClose={() => setEditing(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>Editar producto</DialogTitle>
+        <DialogTitle>{t('admin.products.editDialogTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Nombre" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} fullWidth />
-            <TextField label="Marca" value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} fullWidth />
-            <TextField label="Precio (Bs)" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} fullWidth />
-            <TextField label="Precio original (Bs)" type="number" value={editForm.originalPrice} onChange={(e) => setEditForm({ ...editForm, originalPrice: e.target.value })} fullWidth />
-            <TextField label="Stock" type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} fullWidth />
-            <FormControlLabel control={<Switch checked={editForm.isActive} onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })} />} label="Activo" />
-            <FormControlLabel control={<Switch checked={editForm.isFeatured} onChange={(e) => setEditForm({ ...editForm, isFeatured: e.target.checked })} />} label="Destacado" />
+            <TextField label={t('admin.products.form.name')} value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} fullWidth />
+            <TextField label={t('admin.products.form.brand')} value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} fullWidth />
+            <TextField label={t('admin.products.form.price')} type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} fullWidth />
+            <TextField label={t('admin.products.form.originalPrice')} type="number" value={editForm.originalPrice} onChange={(e) => setEditForm({ ...editForm, originalPrice: e.target.value })} fullWidth />
+            <TextField label={t('admin.products.form.stock')} type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} fullWidth />
+            <FormControlLabel control={<Switch checked={editForm.isActive} onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })} />} label={t('admin.common.active')} />
+            <FormControlLabel control={<Switch checked={editForm.isFeatured} onChange={(e) => setEditForm({ ...editForm, isFeatured: e.target.checked })} />} label={t('admin.products.featured')} />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setEditing(null)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setEditing(null)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveEdit}>
-            Guardar
+            {t('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { Plus, Pencil } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -20,6 +21,7 @@ interface JobCategory {
 export default function AdminJobCategoriesScreen() {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
   const [items, setItems] = useState<JobCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +64,7 @@ export default function AdminJobCategoriesScreen() {
   };
 
   const save = async () => {
-    if (name.trim().length < 2) return Alert.alert('Falta información', 'El nombre debe tener al menos 2 caracteres.');
+    if (name.trim().length < 2) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.adminJobCategories.nameTooShortMessage'));
     setBusy(true);
     try {
       const body = { name: name.trim(), icon: icon.trim() || null };
@@ -74,7 +76,7 @@ export default function AdminJobCategoriesScreen() {
       setEditing(null);
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -85,25 +87,25 @@ export default function AdminJobCategoriesScreen() {
       await api.put(`/admin/job-categories/${c.id}`, { name: c.name, icon: c.icon ?? null, sortOrder: c.sortOrder, isActive: !c.isActive });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
   const remove = (c: JobCategory) => {
     Alert.alert(
-      'Eliminar categoría',
-      `¿Eliminar «${c.name}»? Si ya tiene empleos asociados solo se desactivará para no perder el historial.`,
+      t('mobile.adminJobCategories.deleteConfirmTitle'),
+      t('mobile.adminJobCategories.deleteConfirmMessage', { name: c.name }),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('mobile.common.cancel'), style: 'cancel' },
         {
-          text: 'Eliminar',
+          text: t('mobile.common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
               await api.delete(`/admin/job-categories/${c.id}`);
               load();
             } catch (e) {
-              Alert.alert('Error', getErrorMessage(e));
+              Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
             }
           },
         },
@@ -117,17 +119,17 @@ export default function AdminJobCategoriesScreen() {
       <View style={styles.flex1}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={[styles.meta, { color: item.isActive ? colors.success : colors.textSecondary }]}>
-          {item.isActive ? 'Activa' : 'Inactiva'}
+          {item.isActive ? t('mobile.adminJobCategories.activeStatus') : t('mobile.adminJobCategories.inactiveStatus')}
         </Text>
       </View>
-      <TouchableOpacity onPress={() => openEdit(item)} style={styles.iconBtn} accessibilityLabel="Editar categoría">
+      <TouchableOpacity onPress={() => openEdit(item)} style={styles.iconBtn} accessibilityLabel={t('mobile.adminJobCategories.editCategoryA11yLabel')}>
         <Pencil size={18} color={colors.primary} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => toggleActive(item)} style={styles.pill}>
-        <Text style={styles.pillText}>{item.isActive ? 'Desactivar' : 'Activar'}</Text>
+        <Text style={styles.pillText}>{item.isActive ? t('mobile.common.deactivate') : t('mobile.common.activate')}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => remove(item)} style={styles.pill}>
-        <Text style={[styles.pillText, { color: colors.error }]}>Eliminar</Text>
+        <Text style={[styles.pillText, { color: colors.error }]}>{t('mobile.common.delete')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -135,10 +137,10 @@ export default function AdminJobCategoriesScreen() {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Categorías de trabajo</Text>
+        <Text style={styles.title}>{t('mobile.adminJobCategories.title')}</Text>
         <TouchableOpacity style={styles.addBtn} onPress={openNew}>
           <Plus size={16} color="#fff" />
-          <Text style={styles.addText}>Nueva</Text>
+          <Text style={styles.addText}>{t('mobile.adminJobCategories.newButton')}</Text>
         </TouchableOpacity>
       </View>
       {loading ? (
@@ -152,21 +154,21 @@ export default function AdminJobCategoriesScreen() {
           contentContainerStyle={{ padding: 12, gap: 10, paddingBottom: 32 }}
           renderItem={renderItem}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={colors.primary} colors={[colors.primary]} />}
-          ListEmptyComponent={<EmptyState message="Todavía no hay categorías de trabajo." />}
+          ListEmptyComponent={<EmptyState message={t('mobile.adminJobCategories.emptyMessage')} />}
         />
       )}
 
       <Modal visible={!!editing} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>{editing === 'new' ? 'Nueva categoría' : 'Editar categoría'}</Text>
-            <Text style={styles.label}>Nombre *</Text>
-            <NeoInput value={name} onChangeText={setName} placeholder="Ej: Ventas y atención al cliente" />
-            <Text style={styles.label}>Ícono (emoji)</Text>
+            <Text style={styles.modalTitle}>{editing === 'new' ? t('mobile.adminJobCategories.newCategoryModalTitle') : t('mobile.adminJobCategories.editCategoryModalTitle')}</Text>
+            <Text style={styles.label}>{t('mobile.adminJobCategories.nameFieldLabel')}</Text>
+            <NeoInput value={name} onChangeText={setName} placeholder={t('mobile.adminJobCategories.namePlaceholder')} />
+            <Text style={styles.label}>{t('mobile.adminJobCategories.iconFieldLabel')}</Text>
             <NeoInput value={icon} onChangeText={setIcon} placeholder="🛍️" />
             <View style={{ marginTop: 14 }}>
-              <NeoButton title={busy ? 'Guardando…' : 'Guardar'} onPress={save} disabled={busy} />
-              <NeoButton title="Cancelar" variant="ghost" onPress={() => setEditing(null)} style={{ marginTop: 8 }} />
+              <NeoButton title={busy ? t('mobile.common.saving') : t('mobile.common.saveChanges')} onPress={save} disabled={busy} />
+              <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setEditing(null)} style={{ marginTop: 8 }} />
             </View>
           </View>
         </View>

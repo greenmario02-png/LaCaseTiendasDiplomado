@@ -73,6 +73,18 @@ export const updateProductSchema = z.object({
   body: z.object(productFields).partial(),
 });
 
+// Idiomas traducibles del catálogo (coincide con `SUPPORTED_LANGUAGES` del frontend, sin 'es' —
+// el español es el idioma base y vive en los campos name/description normales).
+export const PRODUCT_TRANSLATABLE_LOCALES = ['qu', 'ay', 'gn', 'pt', 'en'] as const;
+
+export const productTranslationSchema = z.object({
+  body: z.object({
+    locale: z.enum(PRODUCT_TRANSLATABLE_LOCALES),
+    name: z.string().trim().max(200).optional(),
+    description: z.string().max(10000).optional(),
+  }),
+});
+
 export const reviewSchema = z.object({
   body: z.object({
     rating: z.number().int().min(1).max(5),

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { Star, Package } from 'lucide-react';
 import {
@@ -33,6 +34,7 @@ import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
 
 export default function AdminSellers() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [tab, setTab] = useState(0);
   const [pending, setPending] = useState<any[]>([]);
@@ -61,7 +63,7 @@ export default function AdminSellers() {
   const approve = async (sellerId: number, isApproved: boolean) => {
     try {
       await api.put(`/admin/users/${sellerId}`, { isApproved });
-      toast.success(isApproved ? 'Vendedor aprobado' : 'Vendedor rechazado');
+      toast.success(isApproved ? t('admin.sellers.toasts.sellerApproved') : t('admin.sellers.toasts.sellerRejected'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -71,7 +73,7 @@ export default function AdminSellers() {
   const toggleActive = async (sellerId: number, isActive: boolean) => {
     try {
       await api.put(`/admin/users/${sellerId}`, { isActive });
-      toast.success(isActive ? 'Vendedor suspendido' : 'Vendedor activado');
+      toast.success(isActive ? t('admin.sellers.toasts.sellerSuspended') : t('admin.sellers.toasts.sellerActivated'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -81,7 +83,7 @@ export default function AdminSellers() {
   const togglePause = async (sellerId: number, storePaused: boolean) => {
     try {
       await api.put(`/admin/sellers/${sellerId}/pause`, { paused: !storePaused });
-      toast.success(!storePaused ? 'Tienda pausada por actividades sospechosas' : 'Tienda reanudada');
+      toast.success(!storePaused ? t('admin.sellers.toasts.storePausedSuspicious') : t('admin.sellers.toasts.storeResumed'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -94,7 +96,7 @@ export default function AdminSellers() {
       setDetail(res.data.data);
       setDetailOpen(true);
     } catch {
-      toast.error('Error al cargar detalle');
+      toast.error(t('admin.sellers.toasts.errorLoadingDetail'));
     }
   };
 
@@ -103,8 +105,8 @@ export default function AdminSellers() {
   return (
     <Box>
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label={`Pendientes de aprobación (${pending.length})`} />
-        <Tab label={`Todos los vendedores (${all.length})`} />
+        <Tab label={t('admin.sellers.tabs.pending', { count: pending.length })} />
+        <Tab label={t('admin.sellers.tabs.all', { count: all.length })} />
       </Tabs>
 
       {tab === 0 && (
@@ -112,18 +114,18 @@ export default function AdminSellers() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Tienda</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Ubicación</TableCell>
-                <TableCell align="center">Categoría</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.sellers.table.store')}</TableCell>
+                <TableCell>{t('admin.sellers.table.email')}</TableCell>
+                <TableCell>{t('admin.sellers.table.location')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.category')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {pending.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center">
-                    <Typography color="text.secondary">No hay vendedores pendientes</Typography>
+                    <Typography color="text.secondary">{t('admin.sellers.noPendingSellers')}</Typography>
                   </TableCell>
                 </TableRow>
               )}
@@ -144,11 +146,11 @@ export default function AdminSellers() {
                   <TableCell align="center">{s.storeCategory || '—'}</TableCell>
                   <TableCell align="center">
                     <PrimaryButton size="small" color="success" onClick={() => approve(s.id, true)}>
-                      <CheckIcon fontSize="small" /> Aprobar
+                      <CheckIcon fontSize="small" /> {t('admin.sellers.approve')}
                     </PrimaryButton>
                     <Box sx={{ ml: 1, display: 'inline-block' }}>
                       <GhostButton size="small" color="error" onClick={() => approve(s.id, false)}>
-                        Rechazar
+                        {t('admin.sellers.reject')}
                       </GhostButton>
                     </Box>
                   </TableCell>
@@ -164,13 +166,13 @@ export default function AdminSellers() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Tienda</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell align="center">Estado</TableCell>
-                <TableCell align="center">Categoría</TableCell>
-                <TableCell align="right">Ventas</TableCell>
-                <TableCell align="center">Rating</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.sellers.table.store')}</TableCell>
+                <TableCell>{t('admin.sellers.table.email')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.status')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.category')}</TableCell>
+                <TableCell align="right">{t('admin.sellers.table.sales')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.rating')}</TableCell>
+                <TableCell align="center">{t('admin.sellers.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -187,7 +189,7 @@ export default function AdminSellers() {
                   <TableCell>{s.email}</TableCell>
                   <TableCell align="center">
                     <Chip
-                      label={!s.isActive ? 'Suspendido' : s.isApproved ? 'Aprobado' : 'Pendiente'}
+                      label={!s.isActive ? t('admin.sellers.status.suspended') : s.isApproved ? t('admin.sellers.status.approved') : t('admin.sellers.status.pending')}
                       size="small"
                       color={!s.isActive ? 'error' : s.isApproved ? 'success' : 'warning'}
                     />
@@ -196,7 +198,7 @@ export default function AdminSellers() {
                   <TableCell align="right">{s.totalSales}</TableCell>
                   <TableCell align="center">{s.rating}</TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => openDetail(s.id)} title="Ver detalle">
+                    <IconButton onClick={() => openDetail(s.id)} title={t('admin.common.viewDetail')}>
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
                     <GhostButton
@@ -204,7 +206,7 @@ export default function AdminSellers() {
                       color={s.isActive ? 'error' : 'success'}
                       onClick={() => toggleActive(s.id, s.isActive)}
                     >
-                      {s.isActive ? 'Suspender' : 'Activar'}
+                      {s.isActive ? t('admin.sellers.suspend') : t('admin.sellers.activate')}
                     </GhostButton>
                     {typeof s.storePaused === 'boolean' && (
                       <GhostButton
@@ -212,7 +214,7 @@ export default function AdminSellers() {
                         color="warning"
                         onClick={() => togglePause(s.id, s.storePaused)}
                       >
-                        {s.storePaused ? 'Reanudar' : 'Pausar'}
+                        {s.storePaused ? t('admin.sellers.resume') : t('admin.sellers.pause')}
                       </GhostButton>
                     )}
                   </TableCell>
@@ -243,7 +245,7 @@ export default function AdminSellers() {
                   </Typography>
                 </Box>
                 <Box ml="auto">
-                  <Chip label={detail.seller.isActive ? 'Activa' : 'Suspendida'} color={detail.seller.isActive ? 'success' : 'error'} size="small" />
+                  <Chip label={detail.seller.isActive ? t('admin.sellers.detail.active') : t('admin.sellers.detail.suspended')} color={detail.seller.isActive ? 'success' : 'error'} size="small" />
                 </Box>
               </Box>
             </DialogTitle>
@@ -257,11 +259,11 @@ export default function AdminSellers() {
 
               <Grid container spacing={2} mt={1}>
                 {[
-                  { label: 'Productos', value: detail.metrics.productCount },
-                  { label: 'Activos', value: detail.metrics.activeProducts },
-                  { label: 'Pendientes moderación', value: detail.metrics.pendingProducts },
-                  { label: 'Pedidos', value: detail.metrics.orderCount },
-                  { label: 'Ingresos', value: money(detail.metrics.revenue), money: true },
+                  { label: t('admin.sellers.metrics.products'), value: detail.metrics.productCount },
+                  { label: t('admin.sellers.metrics.activeProducts'), value: detail.metrics.activeProducts },
+                  { label: t('admin.sellers.metrics.pendingModeration'), value: detail.metrics.pendingProducts },
+                  { label: t('admin.sellers.metrics.orders'), value: detail.metrics.orderCount },
+                  { label: t('admin.sellers.metrics.revenue'), value: money(detail.metrics.revenue), money: true },
                 ].map((m) => (
                   <Grid item xs={6} sm={4} key={m.label}>
                     <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
@@ -277,10 +279,10 @@ export default function AdminSellers() {
               </Grid>
 
               <Typography variant="subtitle2" fontWeight={700} mt={3} mb={1}>
-                Pedidos recientes
+                {t('admin.sellers.recentOrders')}
               </Typography>
               {detail.recentOrders.length === 0 ? (
-                <Typography color="text.secondary">Sin pedidos.</Typography>
+                <Typography color="text.secondary">{t('admin.sellers.noOrders')}</Typography>
               ) : (
                 detail.recentOrders.map((o: any) => (
                   <Box key={o.id} py={1} borderBottom={1} borderColor="divider">
@@ -303,7 +305,7 @@ export default function AdminSellers() {
                 <>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                    Reseñas del vendedor ({detail.reviews.length})
+                    {t('admin.sellers.reviews', { count: detail.reviews.length })}
                   </Typography>
                   {detail.reviews.map((r: any) => (
                     <Box key={r.id} py={0.5}>
@@ -320,14 +322,14 @@ export default function AdminSellers() {
             </DialogContent>
             <DialogActions>
         <GhostButton color={detail.seller.isActive ? 'error' : 'success'} onClick={() => { toggleActive(detail.seller.id, detail.seller.isActive); setDetailOpen(false); }}>
-          {detail.seller.isActive ? 'Suspender tienda' : 'Activar tienda'}
+          {detail.seller.isActive ? t('admin.sellers.suspendStore') : t('admin.sellers.activateStore')}
         </GhostButton>
         {typeof detail.seller.storePaused === 'boolean' && (
           <GhostButton color="warning" onClick={() => { togglePause(detail.seller.id, detail.seller.storePaused); setDetailOpen(false); }}>
-            {detail.seller.storePaused ? 'Reanudar tienda' : 'Pausar tienda'}
+            {detail.seller.storePaused ? t('admin.sellers.resumeStore') : t('admin.sellers.pauseStore')}
           </GhostButton>
         )}
-              <GhostButton onClick={() => setDetailOpen(false)}>Cerrar</GhostButton>
+              <GhostButton onClick={() => setDetailOpen(false)}>{t('admin.sellers.close')}</GhostButton>
             </DialogActions>
           </>
         )}

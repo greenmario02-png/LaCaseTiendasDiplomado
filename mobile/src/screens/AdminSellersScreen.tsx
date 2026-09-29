@@ -1,20 +1,21 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 
-function estado(s: any): { label: string; color: string } {
-  if (s.isActive === false) return { label: 'Suspendido', color: themeColors.error };
-  if (!s.isApproved) return { label: 'Pendiente', color: themeColors.warning };
-  return { label: 'Aprobado', color: themeColors.success };
-}
-
 export default function AdminSellersScreen({ navigation }: any) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const estado = (s: any): { label: string; color: string } => {
+    if (s.isActive === false) return { label: t('mobile.adminSellers.statusSuspended'), color: themeColors.error };
+    if (!s.isApproved) return { label: t('mobile.common.pending'), color: themeColors.warning };
+    return { label: t('mobile.common.approved'), color: themeColors.success };
+  };
   const [sellers, setSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -24,7 +25,7 @@ export default function AdminSellersScreen({ navigation }: any) {
       const { data } = await api.get('/admin/users', { params: { role: 'SELLER', limit: 50 } });
       setSellers(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -43,7 +44,7 @@ export default function AdminSellersScreen({ navigation }: any) {
       await api.put(`/admin/users/${s.id}`, { isApproved });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
@@ -52,7 +53,7 @@ export default function AdminSellersScreen({ navigation }: any) {
       await api.put(`/admin/users/${s.id}`, { isActive: !s.isActive });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
@@ -61,7 +62,7 @@ export default function AdminSellersScreen({ navigation }: any) {
       await api.put(`/admin/sellers/${s.id}/pause`, { paused: !s.storePaused });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
@@ -75,23 +76,23 @@ export default function AdminSellersScreen({ navigation }: any) {
             <Text style={[styles.status, { color: st.color }]}>{st.label}</Text>
           </View>
           <Text style={styles.email}>{item.email}</Text>
-          {item.storePaused ? <Text style={styles.paused}>⏸ Tienda pausada (actividad sospechosa)</Text> : null}
+          {item.storePaused ? <Text style={styles.paused}>{t('mobile.adminSellers.storePausedNotice')}</Text> : null}
         </View>
         <View style={styles.actions}>
           {!item.isApproved && (
             <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.success }]} onPress={() => approve(item, true)}>
-              <Text style={[styles.miniBtnText, { color: colors.success }]}>Aprobar</Text>
+              <Text style={[styles.miniBtnText, { color: colors.success }]}>{t('mobile.common.approve')}</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.warning }]} onPress={() => togglePause(item)}>
-            <Text style={[styles.miniBtnText, { color: colors.warning }]}>{item.storePaused ? 'Reanudar' : 'Pausar'}</Text>
+            <Text style={[styles.miniBtnText, { color: colors.warning }]}>{item.storePaused ? t('mobile.adminSellers.resumeButton') : t('mobile.adminSellers.pauseButton')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.miniBtn, { borderColor: item.isActive ? colors.error : colors.success }]}
             onPress={() => toggleActive(item)}
           >
             <Text style={[styles.miniBtnText, { color: item.isActive ? colors.error : colors.success }]}>
-              {item.isActive ? 'Suspender' : 'Activar'}
+              {item.isActive ? t('mobile.adminSellers.suspendButton') : t('mobile.common.activate')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -102,12 +103,12 @@ export default function AdminSellersScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Vendedores ({sellers.length})</Text>
+        <Text style={styles.title}>{t('mobile.adminSellers.title', { count: sellers.length })}</Text>
       </View>
       {loading ? (
         <LoadingState />
       ) : sellers.length === 0 ? (
-        <EmptyState message="No hay vendedores registrados." />
+        <EmptyState message={t('mobile.adminSellers.emptyMessage')} />
       ) : (
         <FlatList
           data={sellers}

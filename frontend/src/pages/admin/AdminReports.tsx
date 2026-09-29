@@ -37,6 +37,7 @@ import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 // Paleta Unified (Material 3) — reemplaza el rojo viejo #f0320a y azul #4675b9
 const CHART_COLORS = ['#4F46E5', '#FEA619', '#006E4B', '#7C3AED', '#BA1A1A', '#0EA5E9', '#F59E0B', '#10B981'];
@@ -54,6 +55,7 @@ const fmtNum = (n: number, dec = 2) =>
   (Math.round(n * 100) / 100).toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
 export default function AdminReports() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [from, setFrom] = useState(() => new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
   const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
@@ -114,7 +116,7 @@ export default function AdminReports() {
   const saveCommission = async () => {
     try {
       await api.put('/admin/commission', commission);
-      toast.success('Comisión guardada');
+      toast.success(t('admin.reports.commissionSaved'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -179,22 +181,22 @@ export default function AdminReports() {
     <Box id="reporte-print">
       <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} mb={2}>
         <Typography variant="h6" fontWeight={700}>
-          Reportes financieros
+          {t('admin.reports.title')}
         </Typography>
         <Box display="flex" gap={1}>
           <SecondaryButton size="small" onClick={exportCSV}>
-            Exportar CSV
+            {t('admin.reports.exportCsv')}
           </SecondaryButton>
           <PrimaryButton size="small" onClick={printReport}>
-            Imprimir / PDF
+            {t('admin.reports.printPdf')}
           </PrimaryButton>
         </Box>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3 }}>
         <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
-          <TextField label="Desde" type="date" value={from} onChange={(e) => setFrom(e.target.value)} size="small" InputLabelProps={{ shrink: true }} />
-          <TextField label="Hasta" type="date" value={to} onChange={(e) => setTo(e.target.value)} size="small" InputLabelProps={{ shrink: true }} />
+          <TextField label={t('admin.reports.from')} type="date" value={from} onChange={(e) => setFrom(e.target.value)} size="small" InputLabelProps={{ shrink: true }} />
+          <TextField label={t('admin.reports.to')} type="date" value={to} onChange={(e) => setTo(e.target.value)} size="small" InputLabelProps={{ shrink: true }} />
           <Autocomplete
             multiple
             size="small"
@@ -203,7 +205,7 @@ export default function AdminReports() {
             getOptionLabel={(o: any) => o.storeName || o.firstName || o.email}
             value={sellerOptions.filter((o: any) => selectedSellers.includes(o.id))}
             onChange={(_e, v) => setSelectedSellers(v.map((o: any) => o.id))}
-            renderInput={(p) => <TextField {...p} label="Tiendas" placeholder="Todas" />}
+            renderInput={(p) => <TextField {...p} label={t('admin.reports.storesLabel')} placeholder={t('admin.reports.storesPlaceholder')} />}
           />
           <Autocomplete
             multiple
@@ -213,7 +215,7 @@ export default function AdminReports() {
             getOptionLabel={(o: any) => `${o.firstName} ${o.lastName}`}
             value={buyerOptions.filter((o: any) => selectedBuyers.includes(o.id))}
             onChange={(_e, v) => setSelectedBuyers(v.map((o: any) => o.id))}
-            renderInput={(p) => <TextField {...p} label="Usuarios" placeholder="Todos" />}
+            renderInput={(p) => <TextField {...p} label={t('admin.reports.usersLabel')} placeholder={t('admin.reports.usersPlaceholder')} />}
           />
           <SecondaryButton
             onClick={() => {
@@ -222,20 +224,20 @@ export default function AdminReports() {
               load({ sellers: [], buyers: [] });
             }}
           >
-            Limpiar filtros
+            {t('admin.reports.clearFilters')}
           </SecondaryButton>
           <PrimaryButton onClick={() => load()}>
-            Aplicar
+            {t('admin.reports.apply')}
           </PrimaryButton>
         </Box>
       </Paper>
 
       <Grid container spacing={2} mb={3}>
         {[
-          { label: 'Ventas', value: money(sales?.summary?.sales ?? 0), color: 'primary.main' },
-          { label: 'Órdenes', value: sales?.summary?.orders ?? 0, color: 'text.secondary' },
-          { label: 'Comisiones', value: money(sales?.summary?.commission ?? 0), color: 'success.main' },
-          { label: 'Neto vendedores', value: money(sales?.summary?.net ?? 0), color: 'info.main' },
+          { label: t('admin.reports.stats.sales'), value: money(sales?.summary?.sales ?? 0), color: 'primary.main' },
+          { label: t('admin.reports.stats.orders'), value: sales?.summary?.orders ?? 0, color: 'text.secondary' },
+          { label: t('admin.reports.stats.commissions'), value: money(sales?.summary?.commission ?? 0), color: 'success.main' },
+          { label: t('admin.reports.stats.netSellers'), value: money(sales?.summary?.net ?? 0), color: 'info.main' },
         ].map((k) => (
           <Grid item xs={6} md={3} key={k.label}>
             <Paper sx={{ p: 2, textAlign: 'center' }}>
@@ -253,14 +255,14 @@ export default function AdminReports() {
       {/* Pizarra Bolivia (indicadores BCB) */}
       <Paper sx={{ p: 2, mb: 3, bgcolor: 'rgba(79,70,229,0.05)' }}>
         <Typography variant="subtitle1" fontWeight={700} mb={1}>
-          📊 Pizarra oficial — Banco Central de Bolivia
+          {t('admin.reports.bcb.title')}
         </Typography>
         <Grid container spacing={2}>
           {[
-            { label: 'Tipo de cambio USD', value: `Bs ${fmtNum(usdRate)}`, sub: 'vigente — BCB' },
-            { label: 'UFV', value: `Bs ${UFV_VAL}`, sub: 'Unidad de Fomento a la Vivienda' },
-            { label: 'TRe', value: `${TRE_VAL}% MN`, sub: 'Tasa de Referencia' },
-            { label: 'Equivalencia en USD', value: `US$ ${fmtNum(usdEquiv)}`, sub: `ventas / ${fmtNum(usdRate)}` },
+            { label: t('admin.reports.bcb.usdRate'), value: `Bs ${fmtNum(usdRate)}`, sub: t('admin.reports.bcb.usdRateSub') },
+            { label: t('admin.reports.bcb.ufv'), value: `Bs ${UFV_VAL}`, sub: t('admin.reports.bcb.ufvSub') },
+            { label: t('admin.reports.bcb.tre'), value: `${TRE_VAL}% MN`, sub: t('admin.reports.bcb.treSub') },
+            { label: t('admin.reports.bcb.usdEquiv'), value: `US$ ${fmtNum(usdEquiv)}`, sub: t('admin.reports.bcb.usdEquivSub', { rate: fmtNum(usdRate) }) },
           ].map((it) => (
             <Grid item xs={6} md={3} key={it.label}>
               <Typography variant="h6" fontWeight={700} color="primary.main">
@@ -278,14 +280,14 @@ export default function AdminReports() {
       {/* Resumen impositivo referencial */}
       <Paper sx={{ p: 2, mb: 3, border: '1px solid rgba(186,26,26,0.2)' }}>
         <Typography variant="subtitle1" fontWeight={700} mb={1}>
-          🧾 Impuestos referenciales estimados (Ley 843)
+          {t('admin.reports.taxSection.title')}
         </Typography>
         <Grid container spacing={2}>
           {[
-            { label: 'IVA 13%', value: money(ivaEst), sub: 'débito fiscal estimado sobre ventas', color: 'primary.main' },
-            { label: 'IT 3%', value: money(itEst), sub: 'sobre ingresos brutos', color: 'warning.main' },
-            { label: 'IUE 25%', value: money(iueEst), sub: 'sobre utilidad estimada (neto vendedor)', color: 'success.main' },
-            { label: 'Total impuestos est.', value: money(ivaEst + itEst + iueEst), sub: 'IVA + IT + IUE', color: 'error.main' },
+            { label: t('admin.reports.taxSection.iva'), value: money(ivaEst), sub: t('admin.reports.taxSection.ivaSub'), color: 'primary.main' },
+            { label: t('admin.reports.taxSection.it'), value: money(itEst), sub: t('admin.reports.taxSection.itSub'), color: 'warning.main' },
+            { label: t('admin.reports.taxSection.iue'), value: money(iueEst), sub: t('admin.reports.taxSection.iueSub'), color: 'success.main' },
+            { label: t('admin.reports.taxSection.total'), value: money(ivaEst + itEst + iueEst), sub: t('admin.reports.taxSection.totalSub'), color: 'error.main' },
           ].map((it) => (
             <Grid item xs={6} md={3} key={it.label}>
               <Typography variant="h6" fontWeight={700} sx={{ color: it.color }}>
@@ -299,9 +301,8 @@ export default function AdminReports() {
           ))}
         </Grid>
         <Alert severity="info" sx={{ mt: 1 }}>
-          Valores referenciales para gestión interna. Este reporte <strong>NO constituye declaración
-          tributaria ni factura fiscal</strong>. Consulte la normativa vigente del SIN (impuestos.gob.bo)
-          y a su contador para las obligaciones reales.
+          {t('admin.reports.disclaimer.intro')} <strong>{t('admin.reports.disclaimer.bold')}</strong>.{' '}
+          {t('admin.reports.disclaimer.outro')}
         </Alert>
       </Paper>
 
@@ -310,7 +311,7 @@ export default function AdminReports() {
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Ventas por día
+              {t('admin.reports.charts.salesByDay')}
             </Typography>
             {byDayData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
@@ -328,7 +329,7 @@ export default function AdminReports() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <Typography color="text.secondary">Sin datos en el período</Typography>
+              <Typography color="text.secondary">{t('admin.reports.charts.noDataPeriod')}</Typography>
             )}
           </Paper>
         </Grid>
@@ -337,7 +338,7 @@ export default function AdminReports() {
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Ventas por categoría
+              {t('admin.reports.charts.salesByCategory')}
             </Typography>
             {catData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
@@ -351,7 +352,7 @@ export default function AdminReports() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <Typography color="text.secondary">Sin datos</Typography>
+              <Typography color="text.secondary">{t('admin.reports.charts.noData')}</Typography>
             )}
           </Paper>
         </Grid>
@@ -360,7 +361,7 @@ export default function AdminReports() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Ventas por tienda
+              {t('admin.reports.charts.salesByStore')}
             </Typography>
             {sellerData.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
@@ -372,7 +373,7 @@ export default function AdminReports() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <Typography color="text.secondary">Sin datos</Typography>
+              <Typography color="text.secondary">{t('admin.reports.charts.noData')}</Typography>
             )}
           </Paper>
         </Grid>
@@ -381,18 +382,18 @@ export default function AdminReports() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Comisiones de la plataforma
+              {t('admin.reports.charts.platformCommissions')}
             </Typography>
             {commission && (
               <>
                 <FormControlLabel
                   control={<Switch checked={commission.enabled} onChange={(e) => setCommission({ ...commission, enabled: e.target.checked })} />}
-                  label="Habilitar comisiones"
+                  label={t('admin.reports.commission.enable')}
                 />
                 <Grid container spacing={2} mt={1}>
                   <Grid item xs={6}>
                     <TextField
-                      label="Porcentaje (%)"
+                      label={t('admin.reports.commission.percentage')}
                       type="number"
                       value={commission.percentage}
                       onChange={(e) => setCommission({ ...commission, percentage: Number(e.target.value) })}
@@ -403,7 +404,7 @@ export default function AdminReports() {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      label="Comisión mínima (Bs)"
+                      label={t('admin.reports.commission.minimum')}
                       type="number"
                       value={commission.minimum}
                       onChange={(e) => setCommission({ ...commission, minimum: Number(e.target.value) })}
@@ -413,7 +414,7 @@ export default function AdminReports() {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      label="Monto fijo (Bs, 0 = usar %)"
+                      label={t('admin.reports.commission.fixedAmount')}
                       type="number"
                       value={commission.fixed}
                       onChange={(e) => setCommission({ ...commission, fixed: Number(e.target.value) })}
@@ -424,17 +425,17 @@ export default function AdminReports() {
                   <Grid item xs={6} display="flex" alignItems="center">
                     <FormControlLabel
                       control={<Switch checked={commission.onShipping} onChange={(e) => setCommission({ ...commission, onShipping: e.target.checked })} />}
-                      label="Aplicar al envío"
+                      label={t('admin.reports.commission.onShipping')}
                     />
                   </Grid>
                 </Grid>
                 <Box sx={{ mt: 2 }}>
                   <PrimaryButton onClick={saveCommission} size="small">
-                    Guardar configuración
+                    {t('admin.reports.commission.saveConfig')}
                   </PrimaryButton>
                 </Box>
                 <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                  La comisión se descuenta del neto del vendedor en cada orden.
+                  {t('admin.reports.commission.note')}
                 </Typography>
               </>
             )}
@@ -445,19 +446,19 @@ export default function AdminReports() {
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Detalle por tienda
+              {t('admin.reports.detailByStore')}
             </Typography>
             <TableContainer>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tienda</TableCell>
-                    <TableCell align="right">Ventas</TableCell>
-                    <TableCell align="right">Órdenes</TableCell>
-                    <TableCell align="right">Comisión</TableCell>
-                    <TableCell align="right">Neto</TableCell>
-                    <TableCell align="right">IVA 13% est.</TableCell>
-                    <TableCell align="right">IT 3% est.</TableCell>
+                    <TableCell>{t('admin.reports.detailColumns.store')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.sales')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.orders')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.commission')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.net')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.ivaEst')}</TableCell>
+                    <TableCell align="right">{t('admin.reports.detailColumns.itEst')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -475,7 +476,7 @@ export default function AdminReports() {
                   {sellers.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={7} align="center">
-                        <Typography color="text.secondary">Sin ventas en el período</Typography>
+                        <Typography color="text.secondary">{t('admin.reports.noSalesInPeriod')}</Typography>
                       </TableCell>
                     </TableRow>
                   )}
@@ -484,8 +485,7 @@ export default function AdminReports() {
             </TableContainer>
             <Divider sx={{ my: 1.5 }} />
             <Typography variant="caption" color="text.secondary">
-              Impuestos estimados con tasas referenciales de la Ley 843 (IVA 13%, IT 3%, IUE 25%). Fuente
-              de indicadores: Banco Central de Bolivia (bcb.gob.bo) y SIN (impuestos.gob.bo).
+              {t('admin.reports.footerNote')}
             </Typography>
           </Paper>
         </Grid>

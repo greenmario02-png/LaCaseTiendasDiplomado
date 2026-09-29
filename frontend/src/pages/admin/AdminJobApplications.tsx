@@ -4,6 +4,7 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import SearchIcon from '@mui/icons-material/Search';
 import DownloadIcon from '@mui/icons-material/Download';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../../services/api';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
@@ -13,13 +14,13 @@ import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerLi
 
 type AppStatus = 'RECEIVED' | 'VIEWED' | 'SHORTLISTED' | 'REJECTED' | 'HIRED' | 'WITHDRAWN';
 
-const STATUS_LABEL: Record<AppStatus, string> = {
-  RECEIVED: 'Recibida',
-  VIEWED: 'Vista',
-  SHORTLISTED: 'Preseleccionada',
-  REJECTED: 'Rechazada',
-  HIRED: 'Contratada',
-  WITHDRAWN: 'Retirada',
+const STATUS_LABEL_KEY: Record<AppStatus, string> = {
+  RECEIVED: 'admin.jobApplications.status.received',
+  VIEWED: 'admin.jobApplications.status.viewed',
+  SHORTLISTED: 'admin.jobApplications.status.shortlisted',
+  REJECTED: 'admin.jobApplications.status.rejected',
+  HIRED: 'admin.jobApplications.status.hired',
+  WITHDRAWN: 'admin.jobApplications.status.withdrawn',
 };
 const STATUS_COLOR: Record<AppStatus, 'default' | 'info' | 'primary' | 'error' | 'success' | 'warning'> = {
   RECEIVED: 'info',
@@ -29,7 +30,7 @@ const STATUS_COLOR: Record<AppStatus, 'default' | 'info' | 'primary' | 'error' |
   HIRED: 'success',
   WITHDRAWN: 'warning',
 };
-const STATUSES = Object.keys(STATUS_LABEL) as AppStatus[];
+const STATUSES = Object.keys(STATUS_LABEL_KEY) as AppStatus[];
 const LIMIT = 20;
 
 interface Application {
@@ -48,6 +49,7 @@ interface Application {
 
 export default function AdminJobApplications() {
   const t = useUnifiedTokens();
+  const { t: tr } = useTranslation();
   const [status, setStatus] = useState<AppStatus | ''>('');
   const [search, setSearch] = useState('');
   const [q, setQ] = useState('');
@@ -104,18 +106,18 @@ export default function AdminJobApplications() {
 
   return (
     <Box>
-      <PageHeader title="Postulaciones" subtitle="Postulaciones recibidas por las ofertas de trabajo" icon={<AssignmentIndOutlinedIcon />} />
+      <PageHeader title={tr('admin.jobApplications.title')} subtitle={tr('admin.jobApplications.subtitle')} icon={<AssignmentIndOutlinedIcon />} />
 
       <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" mb={2}>
         <Chip
-          label={`Todas (${allCount})`}
+          label={tr('admin.jobApplications.allFilter', { count: allCount })}
           color={status === '' ? 'primary' : 'default'}
           onClick={() => { setStatus(''); setPage(1); }}
         />
         {STATUSES.map((s) => (
           <Chip
             key={s}
-            label={`${STATUS_LABEL[s]} (${stats[s] ?? 0})`}
+            label={`${tr(STATUS_LABEL_KEY[s])} (${stats[s] ?? 0})`}
             color={status === s ? 'primary' : 'default'}
             variant={status === s ? 'filled' : 'outlined'}
             onClick={() => { setStatus(s); setPage(1); }}
@@ -126,7 +128,7 @@ export default function AdminJobApplications() {
       <TextField
         size="small"
         fullWidth
-        placeholder="Buscar por candidato, correo o empleo"
+        placeholder={tr('admin.jobApplications.searchPlaceholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         sx={{ mb: 2, maxWidth: 420 }}
@@ -139,7 +141,7 @@ export default function AdminJobApplications() {
         <ErrorState message={error} onRetry={load} />
       ) : items.length === 0 ? (
         <SurfaceCard>
-          <EmptyState message="No hay postulaciones para este filtro." />
+          <EmptyState message={tr('admin.jobApplications.emptyState')} />
         </SurfaceCard>
       ) : (
         <>
@@ -162,15 +164,15 @@ export default function AdminJobApplications() {
                         <Typography variant="caption" color={t.onSurfaceVariant}>
                           {new Date(a.createdAt).toLocaleDateString('es-BO')}
                           {a.expectedSalary != null && a.expectedSalary !== ''
-                            ? ` · Pretensión: Bs ${Number(a.expectedSalary).toLocaleString('es-BO', { maximumFractionDigits: 2 })}`
+                            ? ` · ${tr('admin.jobApplications.expectedSalary', { amount: Number(a.expectedSalary).toLocaleString('es-BO', { maximumFractionDigits: 2 }) })}`
                             : ''}
                         </Typography>
                       </Box>
                       <Stack alignItems="flex-end" spacing={1}>
-                        <Chip size="small" color={STATUS_COLOR[a.status]} label={STATUS_LABEL[a.status]} />
+                        <Chip size="small" color={STATUS_COLOR[a.status]} label={tr(STATUS_LABEL_KEY[a.status])} />
                         {a.hasCv && (
                           <GhostButton type="button" size="small" startIcon={<DownloadIcon />} onClick={() => downloadCv(a.id)}>
-                            Descargar CV
+                            {tr('admin.jobApplications.downloadCv')}
                           </GhostButton>
                         )}
                       </Stack>

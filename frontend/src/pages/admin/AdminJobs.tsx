@@ -26,6 +26,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../../services/api';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
@@ -67,30 +68,37 @@ interface AdminCategory {
   _count?: { jobs: number };
 }
 
-const TABS: { key: JobStatus | 'CATS'; label: string }[] = [
-  { key: 'PENDING', label: 'Pendientes' },
-  { key: 'APPROVED', label: 'Aprobados' },
-  { key: 'REJECTED', label: 'Rechazados' },
-  { key: 'CLOSED', label: 'Cerrados' },
-  { key: 'CATS', label: 'Categorías de trabajo' },
+type TFn = (key: string, opts?: Record<string, unknown>) => string;
+
+const TABS: { key: JobStatus | 'CATS'; labelKey: string }[] = [
+  { key: 'PENDING', labelKey: 'admin.jobs.tabs.pending' },
+  { key: 'APPROVED', labelKey: 'admin.jobs.tabs.approved' },
+  { key: 'REJECTED', labelKey: 'admin.jobs.tabs.rejected' },
+  { key: 'CLOSED', labelKey: 'admin.jobs.tabs.closed' },
+  { key: 'CATS', labelKey: 'admin.jobs.tabs.categories' },
 ];
 
-const PERIOD_LABEL: Record<PayPeriod, string> = { DAILY: 'Diario', WEEKLY: 'Semanal', MONTHLY: 'Mensual' };
+const PERIOD_KEY: Record<PayPeriod, string> = {
+  DAILY: 'admin.jobs.period.daily',
+  WEEKLY: 'admin.jobs.period.weekly',
+  MONTHLY: 'admin.jobs.period.monthly',
+};
 
 function money(v: string | null): string {
   return `Bs ${Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 })}`;
 }
 
-function salaryText(j: AdminJob): string {
-  const p = PERIOD_LABEL[j.payPeriod].toLowerCase();
+function salaryText(j: AdminJob, t: TFn): string {
+  const p = t(PERIOD_KEY[j.payPeriod]).toLowerCase();
   if (j.salaryMin && j.salaryMax) return `${money(j.salaryMin)} - ${money(j.salaryMax)} (${p})`;
-  if (j.salaryMin) return `Desde ${money(j.salaryMin)} (${p})`;
-  if (j.salaryMax) return `Hasta ${money(j.salaryMax)} (${p})`;
-  return `Sueldo a convenir (${p})`;
+  if (j.salaryMin) return t('admin.jobs.salaryFrom', { amount: money(j.salaryMin), period: p });
+  if (j.salaryMax) return t('admin.jobs.salaryTo', { amount: money(j.salaryMax), period: p });
+  return t('admin.jobs.salaryNegotiable', { period: p });
 }
 
 export default function AdminJobs() {
   const t = useUnifiedTokens();
+  const { t: tr } = useTranslation();
   const [tab, setTab] = useState<JobStatus | 'CATS'>('PENDING');
   const [jobs, setJobs] = useState<AdminJob[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
@@ -146,7 +154,7 @@ export default function AdminJobs() {
     setBusyId(job.id);
     try {
       await api.put(`/admin/jobs/${job.id}/moderate`, action === 'reject' ? { action, reason: why } : { action });
-      toast.success(action === 'approve' ? 'Empleo aprobado' : 'Empleo rechazado');
+      toast.success(action === 'approve' ? tr('admin.jobs.jobApproved') : tr('admin.jobs.jobRejected'));
       setRejecting(null);
       setReason('');
       setPendingCount((c) => Math.max(0, c - 1));
@@ -168,7 +176,7 @@ export default function AdminJobs() {
 
   const saveCat = async () => {
     if (catName.trim().length < 2) {
-      toast.error('El nombre debe tener al menos 2 caracteres');
+      toast.error(tr('admin.jobs.categoryNameTooShort'));
       return;
     }
     const body: Record<string, unknown> = { name: catName.trim(), sortOrder: Number(catOrder) || 0 };
@@ -177,7 +185,7 @@ export default function AdminJobs() {
     try {
       if (catEditing) await api.put(`/admin/job-categories/${catEditing.id}`, body);
       else await api.post('/admin/job-categories', body);
-      toast.success(catEditing ? 'Categoría actualizada' : 'Categoría creada');
+      toast.success(catEditing ? tr('admin.jobs.categoryUpdated') : tr('admin.jobs.categoryCreated'));
       setCatDialog(false);
       void load();
     } catch (err) {
@@ -201,7 +209,7 @@ export default function AdminJobs() {
     setCatBusy(true);
     try {
       await api.delete(`/admin/job-categories/${catDeleting.id}`);
-      toast.success('Categoría eliminada (o desactivada si tenía empleos)');
+      toast.success(tr('admin.jobs.categoryDeleted'));
       setCatDeleting(null);
       void load();
     } catch (err) {
@@ -215,7 +223,7 @@ export default function AdminJobs() {
 
   return (
     <Box>
-      <PageHeader title="Empleos" subtitle="Modera las ofertas de trabajo de las tiendas" icon={<WorkOutlineIcon />} />
+      <PageHeader title={tr('admin.jobs.title')} subtitle={tr('admin.jobs.subtitle')} icon={<WorkOutlineIcon />} />
 
       <Tabs value={tab} onChange={(_, v) => { setTab(v); setExpanded(null); }} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
         {TABS.map((x) => (
@@ -223,7 +231,7 @@ export default function AdminJobs() {
             key={x.key}
             value={x.key}
             sx={{ textTransform: 'none', fontWeight: 600 }}
-            label={x.key === 'PENDING' && pendingCount > 0 ? `${x.label} (${pendingCount})` : x.label}
+            label={x.key === 'PENDING' && pendingCount > 0 ? `${tr(x.labelKey)} (${pendingCount})` : tr(x.labelKey)}
           />
         ))}
       </Tabs>
@@ -236,14 +244,14 @@ export default function AdminJobs() {
         <SurfaceCard>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
             <Typography fontWeight={700} color={t.onSurface}>
-              Categorías de trabajo
+              {tr('admin.jobs.categoriesTitle')}
             </Typography>
             <PrimaryButton type="button" size="small" startIcon={<AddIcon />} onClick={() => openCatDialog(null)}>
-              Nueva categoría
+              {tr('admin.jobs.newCategory')}
             </PrimaryButton>
           </Box>
           {cats.length === 0 ? (
-            <EmptyState message="No hay categorías de trabajo." />
+            <EmptyState message={tr('admin.jobs.noCategoriesEmptyState')} />
           ) : (
             <Stack divider={<Box sx={{ borderBottom: `1px solid ${t.outline}33` }} />}>
               {cats.map((c) => (
@@ -256,18 +264,18 @@ export default function AdminJobs() {
                       {c.name}
                     </Typography>
                     <Typography variant="caption" color={t.onSurfaceVariant}>
-                      Orden {c.sortOrder}
-                      {c._count ? ` · ${c._count.jobs} empleo${c._count.jobs === 1 ? '' : 's'}` : ''}
+                      {tr('admin.jobs.order', { order: c.sortOrder })}
+                      {c._count ? ` · ${tr('admin.jobs.jobsCount', { count: c._count.jobs })}` : ''}
                     </Typography>
                   </Box>
                   <FormControlLabel
                     control={<Switch checked={c.isActive} onChange={() => toggleCat(c)} />}
-                    label={c.isActive ? 'Activa' : 'Inactiva'}
+                    label={c.isActive ? tr('admin.common.active') : tr('admin.common.inactive')}
                   />
-                  <IconButton aria-label="Editar categoría" onClick={() => openCatDialog(c)}>
+                  <IconButton aria-label={tr('admin.jobs.editCategoryAriaLabel')} onClick={() => openCatDialog(c)}>
                     <EditOutlinedIcon />
                   </IconButton>
-                  <IconButton aria-label="Eliminar categoría" color="error" onClick={() => setCatDeleting(c)}>
+                  <IconButton aria-label={tr('admin.jobs.deleteCategoryAriaLabel')} color="error" onClick={() => setCatDeleting(c)}>
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Box>
@@ -277,7 +285,7 @@ export default function AdminJobs() {
         </SurfaceCard>
       ) : jobs.length === 0 ? (
         <SurfaceCard>
-          <EmptyState message="No hay empleos en este estado." />
+          <EmptyState message={tr('admin.jobs.noJobsEmptyState')} />
         </SurfaceCard>
       ) : (
         <StaggerContainer>
@@ -294,19 +302,19 @@ export default function AdminJobs() {
                         <Typography variant="body2" color={t.onSurfaceVariant}>
                           {j.store.storeName}
                         </Typography>
-                        {j.store.isVerified && <Chip size="small" color="success" variant="outlined" icon={<VerifiedIcon />} label="Verificada" />}
+                        {j.store.isVerified && <Chip size="small" color="success" variant="outlined" icon={<VerifiedIcon />} label={tr('admin.jobs.verifiedChip')} />}
                         <Chip size="small" label={`${j.category.icon ?? ''} ${j.category.name}`.trim()} />
                       </Stack>
                       <Typography variant="body2" color={t.onSurfaceVariant} mt={0.5}>
                         {j.city}
-                        {j.locationState ? `, ${j.locationState}` : ''} · {j.vacancies} vacante{j.vacancies === 1 ? '' : 's'}
+                        {j.locationState ? `, ${j.locationState}` : ''} · {tr('admin.jobs.vacanciesCount', { count: j.vacancies })}
                       </Typography>
                       <Typography variant="body2" fontWeight={600} color={t.primary}>
-                        {salaryText(j)}
+                        {salaryText(j, tr)}
                       </Typography>
                     </Box>
                     <IconButton
-                      aria-label="Ver detalle"
+                      aria-label={tr('admin.common.viewDetail')}
                       onClick={() => setExpanded(expanded === j.id ? null : j.id)}
                       sx={{ transform: expanded === j.id ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}
                     >
@@ -316,37 +324,37 @@ export default function AdminJobs() {
                   <Collapse in={expanded === j.id} unmountOnExit>
                     <Box mt={1.5} display="grid" gap={1}>
                       <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                        <b>Descripción:</b> {j.description}
+                        <b>{tr('admin.jobs.descriptionLabel')}</b> {j.description}
                       </Typography>
                       {j.requirements && (
                         <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                          <b>Requisitos:</b> {j.requirements}
+                          <b>{tr('admin.jobs.requirementsLabel')}</b> {j.requirements}
                         </Typography>
                       )}
                       {j.schedule && (
                         <Typography variant="body2">
-                          <b>Horario:</b> {j.schedule}
+                          <b>{tr('admin.jobs.scheduleLabel')}</b> {j.schedule}
                         </Typography>
                       )}
                       {j.contactPhone && (
                         <Typography variant="body2">
-                          <b>Contacto:</b> {j.contactPhone}
+                          <b>{tr('admin.jobs.contactLabel')}</b> {j.contactPhone}
                         </Typography>
                       )}
                     </Box>
                   </Collapse>
                   {j.status === 'REJECTED' && j.rejectionReason && (
                     <Alert severity="error" sx={{ mt: 1.5 }}>
-                      Motivo: {j.rejectionReason}
+                      {tr('admin.jobs.reasonLabel')} {j.rejectionReason}
                     </Alert>
                   )}
                   {j.status === 'PENDING' && (
                     <Stack direction="row" spacing={1} mt={2} justifyContent="flex-end">
                       <GhostButton type="button" color="error" startIcon={<CloseIcon />} disabled={busyId === j.id} onClick={() => { setRejecting(j); setReason(''); }}>
-                        Rechazar
+                        {tr('admin.jobs.reject')}
                       </GhostButton>
                       <PrimaryButton type="button" color="success" startIcon={<CheckIcon />} disabled={busyId === j.id} onClick={() => moderate(j, 'approve')}>
-                        Aprobar
+                        {tr('admin.jobs.approve')}
                       </PrimaryButton>
                     </Stack>
                   )}
@@ -358,65 +366,65 @@ export default function AdminJobs() {
       )}
 
       <Dialog open={!!rejecting} onClose={() => setRejecting(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Rechazar empleo</DialogTitle>
+        <DialogTitle>{tr('admin.jobs.rejectDialogTitle')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2}>
-            "{rejecting?.title}" — el vendedor verá este motivo.
+            {tr('admin.jobs.rejectDialogWarning', { title: rejecting?.title })}
           </Typography>
           <TextField
             autoFocus
             fullWidth
             multiline
             minRows={3}
-            label="Motivo del rechazo"
+            label={tr('admin.jobs.rejectReasonLabel')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             error={reason.length > 0 && !reasonValid}
-            helperText={reason.length > 0 && !reasonValid ? 'Mínimo 5 caracteres' : 'Obligatorio'}
+            helperText={reason.length > 0 && !reasonValid ? tr('admin.jobs.rejectReasonMinLength') : tr('admin.jobs.rejectReasonRequired')}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <GhostButton type="button" onClick={() => setRejecting(null)}>
-            Cancelar
+            {tr('admin.common.cancel')}
           </GhostButton>
           <PrimaryButton type="button" color="error" disabled={!reasonValid || busyId !== null} onClick={() => rejecting && moderate(rejecting, 'reject', reason.trim())}>
-            Rechazar
+            {tr('admin.jobs.reject')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       <Dialog open={catDialog} onClose={() => !catBusy && setCatDialog(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{catEditing ? 'Editar categoría' : 'Nueva categoría'}</DialogTitle>
+        <DialogTitle>{catEditing ? tr('admin.jobs.editCategoryDialogTitle') : tr('admin.jobs.newCategory')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Nombre" size="small" value={catName} onChange={(e) => setCatName(e.target.value)} fullWidth autoFocus />
-            <TextField label="Icono (emoji)" size="small" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} placeholder="💼" fullWidth />
-            <TextField label="Orden" size="small" type="number" value={catOrder} onChange={(e) => setCatOrder(e.target.value)} fullWidth />
+            <TextField label={tr('admin.jobs.categoryNameLabel')} size="small" value={catName} onChange={(e) => setCatName(e.target.value)} fullWidth autoFocus />
+            <TextField label={tr('admin.jobs.categoryIconLabel')} size="small" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} placeholder="💼" fullWidth />
+            <TextField label={tr('admin.jobs.orderLabel')} size="small" type="number" value={catOrder} onChange={(e) => setCatOrder(e.target.value)} fullWidth />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <GhostButton type="button" onClick={() => setCatDialog(false)} disabled={catBusy}>
-            Cancelar
+            {tr('admin.common.cancel')}
           </GhostButton>
           <PrimaryButton type="button" onClick={saveCat} disabled={catBusy}>
-            Guardar
+            {tr('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!catDeleting} onClose={() => !catBusy && setCatDeleting(null)}>
-        <DialogTitle>Eliminar categoría</DialogTitle>
+        <DialogTitle>{tr('admin.jobs.deleteCategoryDialogTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            ¿Eliminar "{catDeleting?.name}"? Si tiene empleos asociados no se borra: solo se desactiva.
+            {tr('admin.jobs.deleteCategoryConfirm', { name: catDeleting?.name })}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <GhostButton type="button" onClick={() => setCatDeleting(null)} disabled={catBusy}>
-            Cancelar
+            {tr('admin.common.cancel')}
           </GhostButton>
           <PrimaryButton type="button" color="error" onClick={deleteCat} disabled={catBusy}>
-            Eliminar
+            {tr('admin.common.delete')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

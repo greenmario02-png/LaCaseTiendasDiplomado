@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Card, Table, TableHead, TableBody, TableRow, TableCell, TableContainer, Alert, Chip, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { api, getErrorMessage } from '../../services/api';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminAffiliatesPage() {
+  const { t } = useTranslation();
   const [affiliates, setAffiliates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -43,7 +45,7 @@ export default function AdminAffiliatesPage() {
   return (
     <Box p={3}>
       <Typography variant="h5" fontWeight={800} mb={2}>
-        Afiliados
+        {t('admin.affiliates.title')}
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -55,13 +57,13 @@ export default function AdminAffiliatesPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Afiliado</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Código</TableCell>
-              <TableCell align="right">Comisión %</TableCell>
-              <TableCell align="right">Balance</TableCell>
-              <TableCell align="right">Referidos</TableCell>
-              <TableCell align="right">Acciones</TableCell>
+              <TableCell>{t('admin.affiliates.columns.affiliate')}</TableCell>
+              <TableCell>{t('admin.affiliates.columns.email')}</TableCell>
+              <TableCell>{t('admin.affiliates.columns.code')}</TableCell>
+              <TableCell align="right">{t('admin.affiliates.columns.commissionPercent')}</TableCell>
+              <TableCell align="right">{t('admin.affiliates.columns.balance')}</TableCell>
+              <TableCell align="right">{t('admin.affiliates.columns.referrals')}</TableCell>
+              <TableCell align="right">{t('admin.affiliates.columns.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -83,7 +85,7 @@ export default function AdminAffiliatesPage() {
                 <TableCell align="right">{a._count?.referrals ?? 0}</TableCell>
                 <TableCell align="right">
                   <GhostButton size="small" onClick={() => { setDialog(a); setPct(String(a.commissionPct)); }}>
-                    Editar %
+                    {t('admin.affiliates.editPercent')}
                   </GhostButton>
                 </TableCell>
               </TableRow>
@@ -93,10 +95,10 @@ export default function AdminAffiliatesPage() {
       </TableContainer>
 
       <Dialog open={Boolean(dialog)} onClose={() => setDialog(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Editar comisión</DialogTitle>
+        <DialogTitle>{t('admin.affiliates.editCommissionTitle')}</DialogTitle>
         <DialogContent>
           <TextField
-            label="Porcentaje de comisión (%)"
+            label={t('admin.affiliates.commissionPercentLabel')}
             type="number"
             value={pct}
             onChange={(e) => setPct(e.target.value)}
@@ -106,9 +108,9 @@ export default function AdminAffiliatesPage() {
           />
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialog(null)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialog(null)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={save} disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar'}
+            {saving ? t('admin.common.saving') : t('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

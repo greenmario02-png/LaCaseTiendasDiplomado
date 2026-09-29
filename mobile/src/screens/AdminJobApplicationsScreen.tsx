@@ -1,26 +1,28 @@
 import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl, ScrollView, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, openApplicationCv } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState, ErrorState } from '../components/redesign/States';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
-const FILTERS: { key: string; label: string }[] = [
-  { key: '', label: 'Todas' },
-  { key: 'RECEIVED', label: 'Recibida' },
-  { key: 'VIEWED', label: 'Vista' },
-  { key: 'SHORTLISTED', label: 'Preseleccionada' },
-  { key: 'REJECTED', label: 'Rechazada' },
-  { key: 'HIRED', label: 'Contratada' },
-  { key: 'WITHDRAWN', label: 'Retirada' },
-];
-const STATUS_LABEL: Record<string, string> = Object.fromEntries(FILTERS.filter((f) => f.key).map((f) => [f.key, f.label]));
 const LIMIT = 20;
 
 export default function AdminJobApplicationsScreen() {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const FILTERS: { key: string; label: string }[] = [
+    { key: '', label: t('mobile.adminJobApplications.filterAll') },
+    { key: 'RECEIVED', label: t('mobile.adminJobApplications.filterReceived') },
+    { key: 'VIEWED', label: t('mobile.adminJobApplications.filterViewed') },
+    { key: 'SHORTLISTED', label: t('mobile.adminJobApplications.filterShortlisted') },
+    { key: 'REJECTED', label: t('mobile.adminJobApplications.filterRejected') },
+    { key: 'HIRED', label: t('mobile.adminJobApplications.filterHired') },
+    { key: 'WITHDRAWN', label: t('mobile.adminJobApplications.filterWithdrawn') },
+  ];
+  const STATUS_LABEL: Record<string, string> = Object.fromEntries(FILTERS.filter((f) => f.key).map((f) => [f.key, f.label]));
   const [status, setStatus] = useState('');
   const [text, setText] = useState('');
   const [q, setQ] = useState('');
@@ -84,7 +86,7 @@ export default function AdminJobApplicationsScreen() {
     return (
       <View style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={[styles.name, styles.flex1]} numberOfLines={1}>{`${a.firstName ?? ''} ${a.lastName ?? ''}`.trim() || 'Candidato'}</Text>
+          <Text style={[styles.name, styles.flex1]} numberOfLines={1}>{`${a.firstName ?? ''} ${a.lastName ?? ''}`.trim() || t('mobile.adminJobApplications.defaultCandidateName')}</Text>
           <View style={styles.pill}><Text style={styles.pillText}>{STATUS_LABEL[item.status] ?? item.status}</Text></View>
         </View>
         {a.email ? <Text style={styles.meta}>{a.email}</Text> : null}
@@ -94,9 +96,9 @@ export default function AdminJobApplicationsScreen() {
         {item.hasCv ? (
           <View style={styles.cv}>
             <NeoButton
-              title="Ver CV"
+              title={t('mobile.adminJobApplications.viewCvButton')}
               variant="ghost"
-              onPress={() => openApplicationCv(item.id).catch((e) => Alert.alert('No se pudo abrir el CV', getErrorMessage(e)))}
+              onPress={() => openApplicationCv(item.id).catch((e) => Alert.alert(t('mobile.adminJobApplications.cvOpenErrorTitle'), getErrorMessage(e)))}
             />
           </View>
         ) : null}
@@ -107,7 +109,7 @@ export default function AdminJobApplicationsScreen() {
   return (
     <View style={styles.flex}>
       <View style={styles.search}>
-        <NeoInput value={text} onChangeText={setText} placeholder="Buscar candidato, empleo o tienda" autoCapitalize="none" autoCorrect={false} />
+        <NeoInput value={text} onChangeText={setText} placeholder={t('mobile.adminJobApplications.searchPlaceholder')} autoCapitalize="none" autoCorrect={false} />
       </View>
       <View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
@@ -135,12 +137,12 @@ export default function AdminJobApplicationsScreen() {
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(1, false); }} tintColor={colors.primary} colors={[colors.primary]} />}
-          ListEmptyComponent={<EmptyState message="No hay postulaciones." />}
+          ListEmptyComponent={<EmptyState message={t('mobile.adminJobApplications.emptyMessage')} />}
           ListFooterComponent={
             loadingMore ? (
               <ActivityIndicator color={colors.primary} style={{ marginVertical: 12 }} />
             ) : items.length < total ? (
-              <NeoButton title="Cargar más" variant="ghost" onPress={loadMore} />
+              <NeoButton title={t('mobile.adminJobApplications.loadMoreButton')} variant="ghost" onPress={loadMore} />
             ) : null
           }
         />

@@ -25,6 +25,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useTranslation } from 'react-i18next';
 import {
   getForumAdminStats,
   listReports,
@@ -89,24 +90,25 @@ interface AdminCity {
   categories: { categoryId: number; category: { id: number; name: string; slug: string } }[];
 }
 
-const REASON_LABEL: Record<string, string> = {
-  SPAM: 'Spam',
-  CONTENIDO_INAPROPIADO: 'Contenido inapropiado',
-  DESINFORMACION: 'Desinformación',
-  CONTENIDO_FALSO: 'Contenido falso / engañoso',
-  CONTENIDO_IA: 'Contenido generado por IA',
-  ESTAFA: 'Posible estafa',
-  DATOS_PERSONALES: 'Expone datos personales',
-  PUBLICIDAD_ENCUBIERTA: 'Publicidad encubierta',
-  ES_UN_BOT: 'Es un bot',
-  ACOSO: 'Acoso',
-  OTRO: 'Otro',
-};
-
 export default function AdminForumPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState(0);
   const tokens = useUnifiedTokens();
   const forumPalette = useForumPalette();
+
+  const REASON_LABEL: Record<string, string> = {
+    SPAM: t('admin.forum.reasons.spam'),
+    CONTENIDO_INAPROPIADO: t('admin.forum.reasons.inappropriateContent'),
+    DESINFORMACION: t('admin.forum.reasons.misinformation'),
+    CONTENIDO_FALSO: t('admin.forum.reasons.fakeContent'),
+    CONTENIDO_IA: t('admin.forum.reasons.aiContent'),
+    ESTAFA: t('admin.forum.reasons.scam'),
+    DATOS_PERSONALES: t('admin.forum.reasons.personalData'),
+    PUBLICIDAD_ENCUBIERTA: t('admin.forum.reasons.disguisedAds'),
+    ES_UN_BOT: t('admin.forum.reasons.bot'),
+    ACOSO: t('admin.forum.reasons.harassment'),
+    OTRO: t('admin.forum.reasons.other'),
+  };
 
   // Moderación
   const [stats, setStats] = useState<ForumStats | null>(null);
@@ -208,7 +210,7 @@ export default function AdminForumPage() {
 
   const saveCity = async () => {
     if (!cityForm.name.trim() || !cityForm.department.trim()) {
-      toast.error('Nombre y departamento son obligatorios');
+      toast.error(t('admin.forum.toast.cityNameDeptRequired'));
       return;
     }
     const payload = {
@@ -220,19 +222,19 @@ export default function AdminForumPage() {
     };
     if (editingCityId) {
       await adminUpdateCity(editingCityId, payload);
-      toast.success('Ciudad actualizada');
+      toast.success(t('admin.forum.toast.cityUpdated'));
     } else {
       await adminCreateCity(payload);
-      toast.success('Ciudad creada');
+      toast.success(t('admin.forum.toast.cityCreated'));
     }
     setCityDialog(false);
     loadCities();
   };
 
   const removeCity = async (c: AdminCity) => {
-    if (!window.confirm(`¿Desactivar la ciudad "${c.name}"?`)) return;
+    if (!window.confirm(t('admin.forum.confirmDeactivateCity', { name: c.name }))) return;
     await adminDeleteCity(c.id);
-    toast.success('Ciudad desactivada');
+    toast.success(t('admin.forum.toast.cityDeactivated'));
     loadCities();
   };
 
@@ -246,11 +248,11 @@ export default function AdminForumPage() {
     setSavingCityCats(true);
     try {
       await adminSetCityCategories(cityCatsOpen.id, [...cityCatSel]);
-      toast.success('Foros por defecto actualizados');
+      toast.success(t('admin.forum.toast.defaultForumsUpdated'));
       setCityCatsOpen(null);
       loadCities();
     } catch {
-      toast.error('No se pudieron guardar los foros por defecto');
+      toast.error(t('admin.forum.toast.defaultForumsSaveError'));
     } finally {
       setSavingCityCats(false);
     }
@@ -270,25 +272,25 @@ export default function AdminForumPage() {
 
   const saveRule = async () => {
     if (!ruleForm.title.trim() || !ruleForm.body.trim()) {
-      toast.error('Título y texto son obligatorios');
+      toast.error(t('admin.forum.toast.ruleTitleBodyRequired'));
       return;
     }
     const payload = { title: ruleForm.title.trim(), body: ruleForm.body.trim(), sortOrder: Number(ruleForm.sortOrder) || 0 };
     if (editingRuleId) {
       await adminUpdateRule(editingRuleId, payload);
-      toast.success('Regla actualizada');
+      toast.success(t('admin.forum.toast.ruleUpdated'));
     } else {
       await adminCreateRule(payload);
-      toast.success('Regla creada');
+      toast.success(t('admin.forum.toast.ruleCreated'));
     }
     setRuleDialog(false);
     loadRules();
   };
 
   const removeRule = async (r: ForumRule) => {
-    if (!window.confirm(`¿Eliminar la regla "${r.title}"?`)) return;
+    if (!window.confirm(t('admin.forum.confirmDeleteRule', { title: r.title }))) return;
     await adminDeleteRule(r.id);
-    toast.success('Regla eliminada');
+    toast.success(t('admin.forum.toast.ruleDeleted'));
     loadRules();
   };
 
@@ -318,7 +320,7 @@ export default function AdminForumPage() {
 
   const saveCategory = async () => {
     if (!catForm.slug.trim() || !catForm.name.trim()) {
-      toast.error('Slug y nombre son obligatorios');
+      toast.error(t('admin.forum.toast.categorySlugNameRequired'));
       return;
     }
     const payload = {
@@ -331,10 +333,10 @@ export default function AdminForumPage() {
     };
     if (editingCatId) {
       await updateCategory(editingCatId, payload);
-      toast.success('Categoría actualizada');
+      toast.success(t('admin.forum.toast.categoryUpdated'));
     } else {
       await createCategory(payload);
-      toast.success('Categoría creada');
+      toast.success(t('admin.forum.toast.categoryCreated'));
     }
     setCatDialog(false);
     loadCategories();
@@ -342,9 +344,9 @@ export default function AdminForumPage() {
   };
 
   const removeCategory = async (c: ForumCategory) => {
-    if (!window.confirm(`¿Desactivar la categoría "${c.name}"?`)) return;
+    if (!window.confirm(t('admin.forum.confirmDeactivateCategory', { name: c.name }))) return;
     await deleteCategory(c.id);
-    toast.success('Categoría desactivada');
+    toast.success(t('admin.forum.toast.categoryDeactivated'));
     loadCategories();
     adminListCategories().then(setAllCategories).catch(() => {});
   };
@@ -358,62 +360,62 @@ export default function AdminForumPage() {
     setSavingSubforos(c.id);
     try {
       const res = await adminGenerateCitySubforos(c.id);
-      toast.success(`Subforos generados para ${c.name} (${(res?.categories ?? []).length})`);
+      toast.success(t('admin.forum.toast.subforosGeneratedForCity', { city: c.name, count: (res?.categories ?? []).length }));
       loadCities();
     } catch {
-      toast.error('No se pudieron generar los subforos');
+      toast.error(t('admin.forum.toast.subforosGenerateError'));
     } finally {
       setSavingSubforos(null);
     }
   };
 
   const generateAllCitySubforos = async () => {
-    if (!window.confirm('¿Asignar todos los subforos activos a todas las ciudades?')) return;
+    if (!window.confirm(t('admin.forum.confirmGenerateAllSubforos'))) return;
     try {
       const res = await adminGenerateAllCitySubforos();
-      toast.success(`Subforos asignados en ${res?.cities ?? 0} ciudades (${res?.categories ?? 0} categorías)`);
+      toast.success(t('admin.forum.toast.subforosGeneratedAll', { cities: res?.cities ?? 0, categories: res?.categories ?? 0 }));
       loadCities();
     } catch {
-      toast.error('No se pudieron generar los subforos');
+      toast.error(t('admin.forum.toast.subforosGenerateError'));
     }
   };
 
   return (
     <Box>
       <Typography variant="h5" fontWeight={700} mb={2} sx={{ color: forumPalette.accent }}>
-        Foro LaCASE — administración
+        {t('admin.forum.title')}
       </Typography>
 
       <Tabs value={tab} onChange={(_e, v) => setTab(v)} sx={{ mb: 2, borderBottom: `1px solid ${forumPalette.border}` }}>
-        <Tab label="Moderación" />
-        <Tab label="Ciudades y foros" />
-        <Tab label="Categorías (etiquetas)" />
-        <Tab label="Reglas de uso" />
-        <Tab label="Moderadores" />
+        <Tab label={t('admin.forum.tabs.moderation')} />
+        <Tab label={t('admin.forum.tabs.citiesAndForums')} />
+        <Tab label={t('admin.forum.tabs.categories')} />
+        <Tab label={t('admin.forum.tabs.rules')} />
+        <Tab label={t('admin.forum.tabs.moderators')} />
       </Tabs>
 
       {tab === 0 && (
         <>
           <Grid container spacing={2} mb={3}>
             <Grid item xs={6} sm={3}>
-              <StatCard title="Preguntas" value={stats?.totalPosts ?? '—'} />
+              <StatCard title={t('admin.forum.stats.questions')} value={stats?.totalPosts ?? '—'} />
             </Grid>
             <Grid item xs={6} sm={3}>
-              <StatCard title="Respuestas" value={stats?.totalReplies ?? '—'} />
+              <StatCard title={t('admin.forum.stats.replies')} value={stats?.totalReplies ?? '—'} />
             </Grid>
             <Grid item xs={6} sm={3}>
-              <StatCard title="Usuarios del foro" value={stats?.totalUsers ?? '—'} />
+              <StatCard title={t('admin.forum.stats.forumUsers')} value={stats?.totalUsers ?? '—'} />
             </Grid>
             <Grid item xs={6} sm={3}>
-              <StatCard title="Reportes pendientes" value={stats?.pendingReports ?? '—'} />
+              <StatCard title={t('admin.forum.stats.pendingReports')} value={stats?.pendingReports ?? '—'} />
             </Grid>
           </Grid>
 
           <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
             <CardContent>
-              <Typography variant="h6" fontWeight={700} mb={2}>🚩 Reportes pendientes ({reports.length})</Typography>
+              <Typography variant="h6" fontWeight={700} mb={2}>🚩 {t('admin.forum.pendingReportsTitle', { count: reports.length })}</Typography>
               {reports.length === 0 ? (
-                <Alert severity="success">No hay reportes pendientes</Alert>
+                <Alert severity="success">{t('admin.forum.noPendingReports')}</Alert>
               ) : (
                 <Stack spacing={1}>
                   {reports.map((r) => (
@@ -426,7 +428,7 @@ export default function AdminForumPage() {
                         {r.detail ? ` — ${r.detail}` : ''}
                       </Typography>
                       <SecondaryButton size="small" color="error" onClick={() => { setActive(r); setResolution(''); }}>
-                        Resolver
+                        {t('admin.forum.resolve')}
                       </SecondaryButton>
                     </Box>
                   ))}
@@ -436,18 +438,18 @@ export default function AdminForumPage() {
           </Card>
 
           <Dialog open={Boolean(active)} onClose={() => setActive(null)} fullWidth maxWidth="sm">
-            <DialogTitle>Resolver reporte</DialogTitle>
+            <DialogTitle>{t('admin.forum.resolveDialog.title')}</DialogTitle>
             <DialogContent>
               <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-                Reporte <b>{REASON_LABEL[active?.reason ?? ''] ?? active?.reason}</b> sobre <b>{active?.targetType}</b>.
-                Aprobarlo eliminará el contenido y aplicará -5 karma al autor. Rechazarlo lo restaura.
+                {t('admin.forum.resolveDialog.summaryPrefix')} <b>{REASON_LABEL[active?.reason ?? ''] ?? active?.reason}</b> {t('admin.forum.resolveDialog.summaryMiddle')} <b>{active?.targetType}</b>.
+                {' '}{t('admin.forum.resolveDialog.summarySuffix')}
               </Typography>
-              <TextField fullWidth label="Nota de resolución" multiline minRows={2}
+              <TextField fullWidth label={t('admin.forum.resolveDialog.resolutionNoteLabel')} multiline minRows={2}
                 value={resolution} onChange={(e) => setResolution(e.target.value)} />
             </DialogContent>
             <DialogActions>
-              <GhostButton onClick={handleReject}>Rechazar (restaurar)</GhostButton>
-              <PrimaryButton color="error" onClick={handleResolve}>Aprobar (eliminar)</PrimaryButton>
+              <GhostButton onClick={handleReject}>{t('admin.forum.resolveDialog.reject')}</GhostButton>
+              <PrimaryButton color="error" onClick={handleResolve}>{t('admin.forum.resolveDialog.approve')}</PrimaryButton>
             </DialogActions>
           </Dialog>
         </>
@@ -457,21 +459,21 @@ export default function AdminForumPage() {
         <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} gap={1} flexWrap="wrap">
-              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><MapPinned size={20} strokeWidth={2.2} /> Ciudades y foros por defecto ({cities.length})</Typography>
+              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><MapPinned size={20} strokeWidth={2.2} /> {t('admin.forum.citiesTitle', { count: cities.length })}</Typography>
               <Box display="flex" gap={1}>
                 <SecondaryButton onClick={generateAllCitySubforos}>
-                  Generar todas
+                  {t('admin.forum.generateAll')}
                 </SecondaryButton>
                 <PrimaryButton startIcon={<AddIcon />} onClick={openNewCity}>
-                  Nueva ciudad
+                  {t('admin.forum.newCity')}
                 </PrimaryButton>
               </Box>
             </Box>
             <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-              Define las ciudades y qué categorías (foros) están activas por defecto en cada una.
+              {t('admin.forum.citiesDescription')}
             </Typography>
             {cities.length === 0 ? (
-              <Alert severity="info">Todavía no hay ciudades configuradas.</Alert>
+              <Alert severity="info">{t('admin.forum.noCitiesConfigured')}</Alert>
             ) : (
               <Stack spacing={1}>
                 {cities.map((c) => (
@@ -482,20 +484,20 @@ export default function AdminForumPage() {
                     <Chip label={`${c.radiusKm} km`} size="small" color="default" variant="outlined" />
                     <Typography variant="caption" sx={{ color: forumPalette.textMuted }} flex={1}>
                       {c.categories.length > 0
-                        ? `Foros: ${c.categories.map((x) => x.category.name).join(', ')}`
-                        : 'Sin foros por defecto'}
+                        ? t('admin.forum.forumsList', { list: c.categories.map((x) => x.category.name).join(', ') })
+                        : t('admin.forum.noDefaultForums')}
                     </Typography>
-                    <GhostButton size="small" onClick={() => openCityCats(c)}>Foros por defecto</GhostButton>
+                    <GhostButton size="small" onClick={() => openCityCats(c)}>{t('admin.forum.defaultForumsButton')}</GhostButton>
                     <SecondaryButton size="small"
                       disabled={savingSubforos === c.id}
                       onClick={() => generateCitySubforos(c)}>
-                      {savingSubforos === c.id ? 'Generando…' : 'Generar subforos'}
+                      {savingSubforos === c.id ? t('admin.forum.generatingSubforums') : t('admin.forum.generateSubforums')}
                     </SecondaryButton>
-                    <Tooltip title="Editar">
+                    <Tooltip title={t('admin.common.edit')}>
                       <IconButton size="small" onClick={() => openEditCity(c)}><EditIcon fontSize="small" /></IconButton>
                     </Tooltip>
                     {c.isActive && (
-                      <Tooltip title="Desactivar">
+                      <Tooltip title={t('admin.common.deactivate')}>
                         <IconButton size="small" color="error" onClick={() => removeCity(c)}><DeleteIcon fontSize="small" /></IconButton>
                       </Tooltip>
                     )}
@@ -511,17 +513,16 @@ export default function AdminForumPage() {
         <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Tags size={20} strokeWidth={2.2} /> Categorías (etiquetas de subforo) ({cats.length})</Typography>
+              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Tags size={20} strokeWidth={2.2} /> {t('admin.forum.categoriesTitle', { count: cats.length })}</Typography>
               <PrimaryButton startIcon={<AddIcon />} onClick={openNewCategory}>
-                Nueva categoría
+                {t('admin.forum.newCategory')}
               </PrimaryButton>
             </Box>
             <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-              Las categorías funcionan como etiquetas: cada post se publica en una (Empleos, General,
-              Alquileres…). Las ciudades activas muestran estas etiquetas como sus subforos por defecto.
+              {t('admin.forum.categoriesDescription')}
             </Typography>
             {cats.length === 0 ? (
-              <Alert severity="info">Todavía no hay categorías configuradas.</Alert>
+              <Alert severity="info">{t('admin.forum.noCategoriesConfigured')}</Alert>
             ) : (
               <Stack spacing={1}>
                 {cats.map((c) => (
@@ -530,7 +531,7 @@ export default function AdminForumPage() {
                     <Typography sx={{ fontSize: 20 }}>{c.icon}</Typography>
                     <Typography fontWeight={700} sx={{ minWidth: 150 }}>{c.name}</Typography>
                     <Chip label={c.slug} size="small" variant="outlined" />
-                    <Chip label={c.isActive ? 'Activa' : 'Inactiva'} size="small"
+                    <Chip label={c.isActive ? t('admin.common.active') : t('admin.common.inactive')} size="small"
                       sx={c.isActive
                         ? { bgcolor: '#E8F5E9', color: '#2E7D32' }
                         : { bgcolor: '#FFEBEE', color: '#C62828' }} />
@@ -538,12 +539,12 @@ export default function AdminForumPage() {
                       {c.description || '—'}
                     </Typography>
                     <GhostButton size="small" onClick={() => toggleCategory(c)}>
-                      {c.isActive ? 'Desactivar' : 'Activar'}
+                      {c.isActive ? t('admin.common.deactivate') : t('admin.common.activate')}
                     </GhostButton>
-                    <Tooltip title="Editar">
+                    <Tooltip title={t('admin.common.edit')}>
                       <IconButton size="small" onClick={() => openEditCategory(c)}><EditIcon fontSize="small" /></IconButton>
                     </Tooltip>
-                    <Tooltip title="Eliminar">
+                    <Tooltip title={t('admin.common.delete')}>
                       <IconButton size="small" color="error" onClick={() => removeCategory(c)}><DeleteIcon fontSize="small" /></IconButton>
                     </Tooltip>
                   </Box>
@@ -558,16 +559,16 @@ export default function AdminForumPage() {
         <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><ScrollText size={20} strokeWidth={2.2} /> Reglas de uso ({rules.length})</Typography>
+              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><ScrollText size={20} strokeWidth={2.2} /> {t('admin.forum.rulesTitle', { count: rules.length })}</Typography>
               <PrimaryButton startIcon={<AddIcon />} onClick={openNewRule}>
-                Nueva regla
+                {t('admin.forum.newRule')}
               </PrimaryButton>
             </Box>
             <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-              Estas reglas se muestran públicamente en el foro para evitar abuso.
+              {t('admin.forum.rulesDescription')}
             </Typography>
             {rules.length === 0 ? (
-              <Alert severity="info">Todavía no hay reglas de uso.</Alert>
+              <Alert severity="info">{t('admin.forum.noRulesConfigured')}</Alert>
             ) : (
               <Stack spacing={1}>
                 {rules.map((r) => (
@@ -576,15 +577,15 @@ export default function AdminForumPage() {
                     <Box flex={1}>
                       <Typography fontWeight={700}>
                         {r.sortOrder}. {r.title}
-                        {!r.isActive && <Chip label="Inactiva" size="small" color="default" sx={{ ml: 1 }} />}
+                        {!r.isActive && <Chip label={t('admin.common.inactive')} size="small" color="default" sx={{ ml: 1 }} />}
                       </Typography>
                       <Typography variant="body2" sx={{ color: forumPalette.textSecondary }}>{r.body}</Typography>
                     </Box>
-                    <GhostButton size="small" onClick={() => toggleRule(r)}>{r.isActive ? 'Desactivar' : 'Activar'}</GhostButton>
-                    <Tooltip title="Editar">
+                    <GhostButton size="small" onClick={() => toggleRule(r)}>{r.isActive ? t('admin.common.deactivate') : t('admin.common.activate')}</GhostButton>
+                    <Tooltip title={t('admin.common.edit')}>
                       <IconButton size="small" onClick={() => openEditRule(r)}><EditIcon fontSize="small" /></IconButton>
                     </Tooltip>
-                    <Tooltip title="Eliminar">
+                    <Tooltip title={t('admin.common.delete')}>
                       <IconButton size="small" color="error" onClick={() => removeRule(r)}><DeleteIcon fontSize="small" /></IconButton>
                     </Tooltip>
                   </Box>
@@ -598,14 +599,12 @@ export default function AdminForumPage() {
       {tab === 4 && (
         <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
           <CardContent>
-            <Typography variant="h6" fontWeight={700} mb={1}>Moderadores ({moderators.length})</Typography>
+            <Typography variant="h6" fontWeight={700} mb={1}>{t('admin.forum.moderatorsTitle', { count: moderators.length })}</Typography>
             <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-              Moderadores de foro por departamento. Para asignar la moderación a un usuario, dale
-              el rol «Moderador de foro» desde «Roles y permisos» (cada uno modera el departamento
-              donde tiene su perfil de foro).
+              {t('admin.forum.moderatorsDescription')}
             </Typography>
             {moderators.length === 0 ? (
-              <Alert severity="info">No hay moderadores de foro. Asigna el rol «Moderador de foro» desde «Roles y permisos».</Alert>
+              <Alert severity="info">{t('admin.forum.noModerators')}</Alert>
             ) : (
               <Stack spacing={1}>
                 {moderators.map((m) => (
@@ -613,7 +612,7 @@ export default function AdminForumPage() {
                     sx={{ borderBottom: `1px solid ${forumPalette.border}`, pb: 1 }}>
                     <Chip label={m.forumUsername} size="small" sx={{ bgcolor: forumPalette.bgInput }} />
                     <Typography variant="body2">{m.user.firstName} {m.user.lastName} · {m.user.email}</Typography>
-                    <Chip label={m.department ?? 'Sin departamento'} size="small" color="default" variant="outlined" />
+                    <Chip label={m.department ?? t('admin.forum.noDepartment')} size="small" color="default" variant="outlined" />
                   </Box>
                 ))}
               </Stack>
@@ -624,37 +623,37 @@ export default function AdminForumPage() {
 
       {/* Dialog ciudad */}
       <Dialog open={cityDialog} onClose={() => setCityDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editingCityId ? 'Editar ciudad' : 'Nueva ciudad'}</DialogTitle>
+        <DialogTitle>{editingCityId ? t('admin.forum.cityDialog.editTitle') : t('admin.forum.cityDialog.newTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Nombre" value={cityForm.name} onChange={(e) => setCityForm({ ...cityForm, name: e.target.value })}
-              placeholder="Ej: La Paz" fullWidth required />
-            <TextField label="Departamento" value={cityForm.department} onChange={(e) => setCityForm({ ...cityForm, department: e.target.value })}
-              placeholder="Ej: La Paz" fullWidth required />
+            <TextField label={t('admin.forum.cityDialog.nameLabel')} value={cityForm.name} onChange={(e) => setCityForm({ ...cityForm, name: e.target.value })}
+              placeholder={t('admin.forum.cityDialog.namePlaceholder')} fullWidth required />
+            <TextField label={t('admin.forum.cityDialog.departmentLabel')} value={cityForm.department} onChange={(e) => setCityForm({ ...cityForm, department: e.target.value })}
+              placeholder={t('admin.forum.cityDialog.departmentPlaceholder')} fullWidth required />
             <Box display="flex" gap={1}>
-              <TextField label="Latitud" type="number" value={cityForm.latitude} onChange={(e) => setCityForm({ ...cityForm, latitude: e.target.value })}
+              <TextField label={t('admin.forum.cityDialog.latitudeLabel')} type="number" value={cityForm.latitude} onChange={(e) => setCityForm({ ...cityForm, latitude: e.target.value })}
                 placeholder="-16.4897" fullWidth />
-              <TextField label="Longitud" type="number" value={cityForm.longitude} onChange={(e) => setCityForm({ ...cityForm, longitude: e.target.value })}
+              <TextField label={t('admin.forum.cityDialog.longitudeLabel')} type="number" value={cityForm.longitude} onChange={(e) => setCityForm({ ...cityForm, longitude: e.target.value })}
                 placeholder="-68.1193" fullWidth />
             </Box>
-            <TextField label="Radio (km)" type="number" value={cityForm.radiusKm} onChange={(e) => setCityForm({ ...cityForm, radiusKm: e.target.value })}
+            <TextField label={t('admin.forum.cityDialog.radiusLabel')} type="number" value={cityForm.radiusKm} onChange={(e) => setCityForm({ ...cityForm, radiusKm: e.target.value })}
               fullWidth />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setCityDialog(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setCityDialog(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveCity}>
-            {editingCityId ? 'Guardar cambios' : 'Crear ciudad'}
+            {editingCityId ? t('admin.forum.cityDialog.saveChanges') : t('admin.forum.cityDialog.create')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* Dialog foros por defecto de una ciudad */}
       <Dialog open={Boolean(cityCatsOpen)} onClose={() => setCityCatsOpen(null)} fullWidth maxWidth="sm">
-        <DialogTitle>Foros por defecto — {cityCatsOpen?.name}</DialogTitle>
+        <DialogTitle>{t('admin.forum.cityCatsDialog.title', { city: cityCatsOpen?.name })}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2} sx={{ color: forumPalette.textSecondary }}>
-            Selecciona las categorías que estarán activas por defecto en esta ciudad.
+            {t('admin.forum.cityCatsDialog.description')}
           </Typography>
           <Stack spacing={0.5}>
             {allCategories.map((cat) => (
@@ -674,59 +673,59 @@ export default function AdminForumPage() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setCityCatsOpen(null)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setCityCatsOpen(null)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveCityCats} disabled={savingCityCats}>
-            {savingCityCats ? <CircularProgress size={18} color="inherit" /> : 'Guardar'}
+            {savingCityCats ? <CircularProgress size={18} color="inherit" /> : t('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* Dialog regla */}
       <Dialog open={ruleDialog} onClose={() => setRuleDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editingRuleId ? 'Editar regla' : 'Nueva regla'}</DialogTitle>
+        <DialogTitle>{editingRuleId ? t('admin.forum.ruleDialog.editTitle') : t('admin.forum.ruleDialog.newTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Título" value={ruleForm.title} onChange={(e) => setRuleForm({ ...ruleForm, title: e.target.value })}
-              placeholder="Ej: Respeto entre usuarios" fullWidth required />
-            <TextField label="Texto de la regla" value={ruleForm.body} onChange={(e) => setRuleForm({ ...ruleForm, body: e.target.value })}
+            <TextField label={t('admin.forum.ruleDialog.titleLabel')} value={ruleForm.title} onChange={(e) => setRuleForm({ ...ruleForm, title: e.target.value })}
+              placeholder={t('admin.forum.ruleDialog.titlePlaceholder')} fullWidth required />
+            <TextField label={t('admin.forum.ruleDialog.bodyLabel')} value={ruleForm.body} onChange={(e) => setRuleForm({ ...ruleForm, body: e.target.value })}
               multiline minRows={3} fullWidth required />
-            <TextField label="Orden" type="number" value={ruleForm.sortOrder} onChange={(e) => setRuleForm({ ...ruleForm, sortOrder: e.target.value })}
+            <TextField label={t('admin.forum.ruleDialog.orderLabel')} type="number" value={ruleForm.sortOrder} onChange={(e) => setRuleForm({ ...ruleForm, sortOrder: e.target.value })}
               fullWidth />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setRuleDialog(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setRuleDialog(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveRule}>
-            {editingRuleId ? 'Guardar cambios' : 'Crear regla'}
+            {editingRuleId ? t('admin.forum.ruleDialog.saveChanges') : t('admin.forum.ruleDialog.create')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       <Dialog open={catDialog} onClose={() => setCatDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editingCatId ? 'Editar categoría' : 'Nueva categoría'}</DialogTitle>
+        <DialogTitle>{editingCatId ? t('admin.forum.categoryDialog.editTitle') : t('admin.forum.categoryDialog.newTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-            <TextField label="Slug" value={catForm.slug} onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
-              placeholder="Ej: empleos" fullWidth required
-              helperText="Identificador en minúsculas con guiones (se usa en las URLs del foro)." />
-            <TextField label="Nombre" value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
-              placeholder="Ej: Empleos" fullWidth required />
+            <TextField label={t('admin.forum.categoryDialog.slugLabel')} value={catForm.slug} onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
+              placeholder={t('admin.forum.categoryDialog.slugPlaceholder')} fullWidth required
+              helperText={t('admin.forum.categoryDialog.slugHelperText')} />
+            <TextField label={t('admin.forum.categoryDialog.nameLabel')} value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })}
+              placeholder={t('admin.forum.categoryDialog.namePlaceholder')} fullWidth required />
             <Box display="flex" gap={2}>
-              <TextField label="Icono (emoji)" value={catForm.icon} onChange={(e) => setCatForm({ ...catForm, icon: e.target.value })}
-                placeholder="Briefcase" sx={{ width: 140 }} />
-              <TextField label="Color (hex)" value={catForm.color} onChange={(e) => setCatForm({ ...catForm, color: e.target.value })}
-                placeholder="#00897B" fullWidth />
+              <TextField label={t('admin.forum.categoryDialog.iconLabel')} value={catForm.icon} onChange={(e) => setCatForm({ ...catForm, icon: e.target.value })}
+                placeholder={t('admin.forum.categoryDialog.iconPlaceholder')} sx={{ width: 140 }} />
+              <TextField label={t('admin.forum.categoryDialog.colorLabel')} value={catForm.color} onChange={(e) => setCatForm({ ...catForm, color: e.target.value })}
+                placeholder={t('admin.forum.categoryDialog.colorPlaceholder')} fullWidth />
             </Box>
-            <TextField label="Descripción" value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })}
-              placeholder="Ej: Ofertas laborales, currículums y búsqueda de trabajo." multiline minRows={2} fullWidth />
-            <TextField label="Orden" type="number" value={catForm.sortOrder} onChange={(e) => setCatForm({ ...catForm, sortOrder: e.target.value })}
+            <TextField label={t('admin.forum.categoryDialog.descriptionLabel')} value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })}
+              placeholder={t('admin.forum.categoryDialog.descriptionPlaceholder')} multiline minRows={2} fullWidth />
+            <TextField label={t('admin.forum.categoryDialog.orderLabel')} type="number" value={catForm.sortOrder} onChange={(e) => setCatForm({ ...catForm, sortOrder: e.target.value })}
               fullWidth />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setCatDialog(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setCatDialog(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={saveCategory}>
-            {editingCatId ? 'Guardar cambios' : 'Crear categoría'}
+            {editingCatId ? t('admin.forum.categoryDialog.saveChanges') : t('admin.forum.categoryDialog.create')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

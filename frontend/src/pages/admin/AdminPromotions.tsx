@@ -34,6 +34,7 @@ import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface SellerOption {
   id: number;
@@ -62,6 +63,7 @@ interface SelectedProduct {
 const EMPTY = { title: '', description: '', discountType: 'PERCENTAGE', discountValue: '10', startDate: '', endDate: '' };
 
 export default function AdminPromotions() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [promotions, setPromotions] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -123,11 +125,11 @@ export default function AdminPromotions() {
 
   const save = async () => {
     if (!form.title.trim()) {
-      toast.error('Escribe el nombre de la promoción');
+      toast.error(t('admin.promotions.toast.titleRequired'));
       return;
     }
     if (selectedProducts.length === 0) {
-      toast.error('Agrega al menos un producto');
+      toast.error(t('admin.promotions.toast.productRequired'));
       return;
     }
     try {
@@ -141,7 +143,7 @@ export default function AdminPromotions() {
         productIds: selectedProducts.map((sp) => sp.product.id),
       };
       await api.post('/admin/promotions', payload);
-      toast.success('Promoción creada con ' + selectedProducts.length + ' producto(s)');
+      toast.success(t('admin.promotions.toast.created', { count: selectedProducts.length }));
       setDialogOpen(false);
       setForm(EMPTY);
       setSelectedProducts([]);
@@ -156,7 +158,7 @@ export default function AdminPromotions() {
     <Box>
       <Box sx={{ mb: 2 }}>
         <PrimaryButton startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-          Nueva promoción
+          {t('admin.promotions.newPromotion')}
         </PrimaryButton>
       </Box>
 
@@ -164,11 +166,11 @@ export default function AdminPromotions() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Promoción</TableCell>
-              <TableCell align="center">Descuento</TableCell>
-              <TableCell>Vigencia</TableCell>
-              <TableCell align="center">Estado</TableCell>
-              <TableCell align="center">Productos</TableCell>
+              <TableCell>{t('admin.promotions.colPromotion')}</TableCell>
+              <TableCell align="center">{t('admin.promotions.colDiscount')}</TableCell>
+              <TableCell>{t('admin.promotions.colValidity')}</TableCell>
+              <TableCell align="center">{t('admin.promotions.colStatus')}</TableCell>
+              <TableCell align="center">{t('admin.promotions.colProducts')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -184,7 +186,7 @@ export default function AdminPromotions() {
                 </TableCell>
                 <TableCell align="center">
                   <Chip
-                    label={p.discountType === 'PERCENTAGE' ? `${p.discountValue}% OFF` : `${money(p.discountValue)} OFF`}
+                    label={p.discountType === 'PERCENTAGE' ? t('admin.promotions.discountPercentOff', { value: p.discountValue }) : t('admin.promotions.discountAmountOff', { amount: money(p.discountValue) })}
                     color="primary"
                     size="small"
                   />
@@ -193,7 +195,7 @@ export default function AdminPromotions() {
                   {new Date(p.startDate).toLocaleDateString('es-BO')} → {new Date(p.endDate).toLocaleDateString('es-BO')}
                 </TableCell>
                 <TableCell align="center">
-                  <Chip label={p.isActive ? 'Activa' : 'Inactiva'} size="small" color={p.isActive ? 'success' : 'default'} />
+                  <Chip label={p.isActive ? t('admin.promotions.status.active') : t('admin.promotions.status.inactive')} size="small" color={p.isActive ? 'success' : 'default'} />
                 </TableCell>
                 <TableCell align="center">
                   <Box display="flex" gap={0.5} justifyContent="center" flexWrap="wrap" maxWidth={180}>
@@ -209,7 +211,7 @@ export default function AdminPromotions() {
                       ) : null
                     )}
                     <Typography variant="caption" color="text.secondary" width="100%">
-                      {p.products?.length || 0} producto{(p.products?.length ?? 0) === 1 ? '' : 's'}
+                      {t('admin.promotions.productCount', { count: p.products?.length || 0 })}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -222,25 +224,25 @@ export default function AdminPromotions() {
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box display="flex" alignItems="center" gap={1}>
-            <LocalOfferIcon color="primary" /> Nueva promoción
+            <LocalOfferIcon color="primary" /> {t('admin.promotions.newPromotion')}
           </Box>
         </DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2.5}>
             <Box display="flex" gap={2} flexWrap="wrap">
               <TextField
-                label="Nombre de la promoción"
+                label={t('admin.promotions.form.nameLabel')}
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Ej: Hot Sale de Hardware"
+                placeholder={t('admin.promotions.form.namePlaceholder')}
                 sx={{ flex: 1, minWidth: 250 }}
                 required
               />
               <TextField
-                label="Descripción (opcional)"
+                label={t('admin.promotions.form.descriptionLabel')}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Ej: Descuentos en productos seleccionados"
+                placeholder={t('admin.promotions.form.descriptionPlaceholder')}
                 sx={{ flex: 1, minWidth: 250 }}
               />
             </Box>
@@ -248,7 +250,7 @@ export default function AdminPromotions() {
             <Box display="flex" gap={2} flexWrap="wrap">
               <TextField
                 select
-                label="Tipo de descuento"
+                label={t('admin.promotions.form.discountTypeLabel')}
                 value={form.discountType}
                 onChange={(e) => {
                   setForm({ ...form, discountType: e.target.value });
@@ -265,11 +267,11 @@ export default function AdminPromotions() {
                 }}
                 sx={{ width: 180 }}
               >
-                <MenuItem value="PERCENTAGE">Porcentaje (%)</MenuItem>
-                <MenuItem value="FIXED">Monto fijo (Bs)</MenuItem>
+                <MenuItem value="PERCENTAGE">{t('admin.promotions.form.discountPercentageOption')}</MenuItem>
+                <MenuItem value="FIXED">{t('admin.promotions.form.discountFixedOption')}</MenuItem>
               </TextField>
               <TextField
-                label={form.discountType === 'PERCENTAGE' ? 'Descuento (%)' : 'Descuento (Bs)'}
+                label={form.discountType === 'PERCENTAGE' ? t('admin.promotions.form.discountPercentLabel') : t('admin.promotions.form.discountFixedLabel')}
                 type="number"
                 value={form.discountValue}
                 onChange={(e) => {
@@ -287,14 +289,14 @@ export default function AdminPromotions() {
                 sx={{ width: 160 }}
               />
               <TextField
-                label="Inicio"
+                label={t('admin.promotions.form.startLabel')}
                 type="datetime-local"
                 value={form.startDate}
                 onChange={(e) => setForm({ ...form, startDate: e.target.value })}
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
-                label="Fin"
+                label={t('admin.promotions.form.endLabel')}
                 type="datetime-local"
                 value={form.endDate}
                 onChange={(e) => setForm({ ...form, endDate: e.target.value })}
@@ -307,13 +309,12 @@ export default function AdminPromotions() {
             {/* ===== SELECCIÓN DE PRODUCTOS ===== */}
             <Box>
               <Typography variant="subtitle1" fontWeight={700} mb={1}>
-                Productos incluidos ({selectedProducts.length})
+                {t('admin.promotions.form.includedProducts', { count: selectedProducts.length })}
               </Typography>
 
               <Alert severity="info" sx={{ mb: 2 }}>
                 <Typography variant="body2">
-                  Elige la <strong>tienda</strong> y busca el <strong>producto</strong> por nombre o código (SKU). Puedes
-                  agregar varios.
+                  {t('admin.promotions.form.selectHintPrefix')} <strong>{t('admin.promotions.form.store')}</strong> {t('admin.promotions.form.selectHintMid')} <strong>{t('admin.promotions.form.product')}</strong> {t('admin.promotions.form.selectHintSuffix')}
                 </Typography>
               </Alert>
 
@@ -330,8 +331,8 @@ export default function AdminPromotions() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="1. Elige la tienda"
-                      placeholder="Buscar tienda..."
+                      label={t('admin.promotions.form.selectStoreLabel')}
+                      placeholder={t('admin.promotions.form.selectStorePlaceholder')}
                       InputProps={{
                         ...params.InputProps,
                         startAdornment: (
@@ -346,17 +347,17 @@ export default function AdminPromotions() {
                 />
 
                 <TextField
-                  label="2. Buscar producto por nombre o código"
+                  label={t('admin.promotions.form.searchProductLabel')}
                   value={searchTerm}
                   onChange={(e) => searchProducts(e.target.value)}
                   disabled={!selectedSeller}
-                  placeholder={selectedSeller ? 'Ej: RTX 4090, o el SKU' : 'Primero elige la tienda'}
+                  placeholder={selectedSeller ? t('admin.promotions.form.searchProductPlaceholderReady') : t('admin.promotions.form.searchProductPlaceholderNoStore')}
                   InputProps={{
                     startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />,
                   }}
                 />
 
-                {searching && <Typography variant="caption">Buscando...</Typography>}
+                {searching && <Typography variant="caption">{t('admin.common.searching')}</Typography>}
 
                 {productResults.length > 0 && (
                   <Paper variant="outlined" sx={{ maxHeight: 200, overflow: 'auto' }}>
@@ -389,7 +390,7 @@ export default function AdminPromotions() {
                         <Typography variant="body2" fontWeight={600}>
                           {money(p.price)}
                         </Typography>
-                        <Chip label="Agregar" size="small" color="primary" />
+                        <Chip label={t('admin.common.add')} size="small" color="primary" />
                       </Box>
                     ))}
                   </Paper>
@@ -400,7 +401,7 @@ export default function AdminPromotions() {
               {selectedProducts.length > 0 && (
                 <Stack spacing={1}>
                   <Typography variant="subtitle2" fontWeight={700}>
-                    Productos seleccionados:
+                    {t('admin.promotions.form.selectedProducts')}
                   </Typography>
                   {selectedProducts.map((sp) => (
                     <Paper key={sp.product.id} variant="outlined" sx={{ p: 1 }}>
@@ -417,7 +418,7 @@ export default function AdminPromotions() {
                             {sp.product.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {sp.product.sku} · Precio: {money(sp.product.price)}
+                            {t('admin.promotions.form.skuPrice', { sku: sp.product.sku, price: money(sp.product.price) })}
                           </Typography>
                         </Box>
                         <Box textAlign="right">
@@ -425,7 +426,7 @@ export default function AdminPromotions() {
                             {money(sp.finalPrice)}
                           </Typography>
                           <Chip
-                            label={sp.discountType === 'PERCENTAGE' ? `-${sp.discountValue}%` : `-${money(sp.discountValue)}`}
+                            label={sp.discountType === 'PERCENTAGE' ? t('admin.promotions.discountPercentValue', { value: sp.discountValue }) : t('admin.promotions.discountAmountValue', { amount: money(sp.discountValue) })}
                             size="small"
                             color="success"
                           />
@@ -445,7 +446,7 @@ export default function AdminPromotions() {
               <Box>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                  Vista previa del artículo en la tienda
+                  {t('admin.promotions.form.previewTitle')}
                 </Typography>
                 <Paper variant="outlined" sx={{ p: 2, maxWidth: 260, mx: 'auto' }}>
                   <Box className="image-container" sx={{ aspectRatio: '1/1', borderRadius: 2, mb: 1 }}>
@@ -464,7 +465,7 @@ export default function AdminPromotions() {
                       {money(selectedProducts[0].finalPrice)}
                     </Typography>
                     <Chip
-                      label={selectedProducts[0].discountType === 'PERCENTAGE' ? `-${selectedProducts[0].discountValue}%` : `-${money(selectedProducts[0].discountValue)}`}
+                      label={selectedProducts[0].discountType === 'PERCENTAGE' ? t('admin.promotions.discountPercentValue', { value: selectedProducts[0].discountValue }) : t('admin.promotions.discountAmountValue', { amount: money(selectedProducts[0].discountValue) })}
                       size="small"
                       color="success"
                     />
@@ -485,16 +486,16 @@ export default function AdminPromotions() {
                   )}
                 </Paper>
                 <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={1}>
-                  Así se verá el primer producto agregado en la página de promociones.
+                  {t('admin.promotions.form.previewHint')}
                 </Typography>
               </Box>
             )}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialogOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialogOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={save} disabled={selectedProducts.length === 0}>
-            Crear promoción
+            {t('admin.promotions.createPromotion')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

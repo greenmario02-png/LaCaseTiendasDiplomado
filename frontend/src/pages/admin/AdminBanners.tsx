@@ -34,6 +34,7 @@ import { api } from '../../services/api';
 import { getErrorMessage, resolveImageUrl } from '../../services/api';
 import ImageCropDialog from '../../components/ui/ImageCropDialog';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 // Dimensiones recomendadas del banner (relaciones de aspecto)
 const BANNER_ASPECT = {
@@ -53,6 +54,7 @@ const EMPTY = {
 };
 
 export default function AdminBanners() {
+  const { t } = useTranslation();
   const [banners, setBanners] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(EMPTY);
@@ -104,7 +106,7 @@ export default function AdminBanners() {
       fd.append('image', file);
       const { data } = await api.post('/admin/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm((f) => ({ ...f, [field]: data.data.url }));
-      toast.success('Imagen subida');
+      toast.success(t('admin.banners.toast.imageUploaded'));
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -131,7 +133,7 @@ export default function AdminBanners() {
   // Derivar tablet/mobile de la imagen desktop (recortes automáticos a las dimensiones)
   const deriveFromDesktop = () => {
     if (!form.imageDesktop) {
-      toast.error('Primero sube la imagen principal (desktop)');
+      toast.error(t('admin.banners.toast.desktopImageRequiredForDerive'));
       return;
     }
     // Reutilizamos la misma imagen para tablet/mobile si no las tienen
@@ -140,12 +142,12 @@ export default function AdminBanners() {
       imageTablet: f.imageTablet || f.imageDesktop,
       imageMobile: f.imageMobile || f.imageDesktop,
     }));
-    toast.success('Imágenes derivadas de la principal. Usa "Recortar" para ajustarlas.');
+    toast.success(t('admin.banners.toast.imagesDerived'));
   };
 
   const save = async () => {
     if (!form.imageDesktop) {
-      toast.error('La imagen principal (desktop) es obligatoria');
+      toast.error(t('admin.banners.toast.desktopImageRequired'));
       return;
     }
     try {
@@ -160,10 +162,10 @@ export default function AdminBanners() {
       };
       if (editingId) {
         await api.put(`/admin/banners/${editingId}`, payload);
-        toast.success('Banner actualizado');
+        toast.success(t('admin.banners.toast.updated'));
       } else {
         await api.post('/admin/banners', payload);
-        toast.success('Banner creado');
+        toast.success(t('admin.banners.toast.created'));
       }
       setDialogOpen(false);
       load();
@@ -173,10 +175,10 @@ export default function AdminBanners() {
   };
 
   const remove = async (id: number) => {
-    if (!confirm('¿Eliminar banner?')) return;
+    if (!confirm(t('admin.banners.deleteConfirm'))) return;
     try {
       await api.delete(`/admin/banners/${id}`);
-      toast.success('Banner eliminado');
+      toast.success(t('admin.banners.toast.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -196,7 +198,7 @@ export default function AdminBanners() {
     <Box>
       <Box sx={{ mb: 2 }}>
         <PrimaryButton startIcon={<AddIcon />} onClick={openNew}>
-          Nuevo banner
+          {t('admin.banners.newBanner')}
         </PrimaryButton>
       </Box>
 
@@ -204,10 +206,10 @@ export default function AdminBanners() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Banner</TableCell>
-              <TableCell align="center">Activo</TableCell>
-              <TableCell align="right">Orden</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell>{t('admin.banners.colBanner')}</TableCell>
+              <TableCell align="center">{t('admin.banners.colActive')}</TableCell>
+              <TableCell align="right">{t('admin.banners.colOrder')}</TableCell>
+              <TableCell align="center">{t('admin.banners.colActions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -221,7 +223,7 @@ export default function AdminBanners() {
                       <Box sx={{ width: 100, height: 32, borderRadius: 4, bgcolor: b.backgroundColor || '#eee' }} />
                     )}
                     <Typography variant="body2" fontWeight={600}>
-                      {b.title || 'Sin título'}
+                      {b.title || t('admin.banners.noTitle')}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -230,10 +232,10 @@ export default function AdminBanners() {
                 </TableCell>
                 <TableCell align="right">{b.order}</TableCell>
                 <TableCell align="center">
-                  <IconButton onClick={() => openEdit(b)} title="Editar">
+                  <IconButton onClick={() => openEdit(b)} title={t('admin.common.edit')}>
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton color="error" onClick={() => remove(b.id)} title="Eliminar">
+                  <IconButton color="error" onClick={() => remove(b.id)} title={t('admin.common.delete')}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -245,18 +247,18 @@ export default function AdminBanners() {
 
       {/* ============ DIALOG ============ */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{editingId ? 'Editar banner' : 'Nuevo banner'}</DialogTitle>
+        <DialogTitle>{editingId ? t('admin.banners.editBanner') : t('admin.banners.newBanner')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2.5}>
-            <TextField label="Título del banner" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ej: Hot Sale, Nuevo ingreso" />
+            <TextField label={t('admin.banners.form.titleLabel')} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t('admin.banners.form.titlePlaceholder')} />
 
             {/* IMAGEN PRINCIPAL (desktop) */}
             <Box>
               <Typography variant="subtitle2" fontWeight={600} mb={1}>
-                Imagen principal (Desktop) — obligatoria
+                {t('admin.banners.form.desktopImageLabel')}
               </Typography>
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                Tamaño recomendado: <strong>1920 × 400 px</strong>. Usa el editor para recortar a medida.
+                {t('admin.banners.form.desktopImageHintPrefix')} <strong>1920 × 400 px</strong>. {t('admin.banners.form.desktopImageHintSuffix')}
               </Typography>
               <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
                 <Avatar variant="rounded" sx={{ width: 120, height: 50 }}>
@@ -265,11 +267,11 @@ export default function AdminBanners() {
                   ) : null}
                 </Avatar>
                 <SecondaryButton size="small" startIcon={<UploadFileIcon />} onClick={() => fileInputRef.current?.click()}>
-                  Subir imagen
+                  {t('admin.banners.form.uploadImage')}
                 </SecondaryButton>
                 {form.imageDesktop && (
                   <SecondaryButton size="small" color="primary" startIcon={<CropIcon />} onClick={() => { setPendingCropUrl(resolveImageUrl(form.imageDesktop)); setCropTarget('desktop'); }}>
-                    Recortar
+                    {t('admin.banners.form.crop')}
                   </SecondaryButton>
                 )}
               </Box>
@@ -277,18 +279,18 @@ export default function AdminBanners() {
 
             <Box>
               <GhostButton size="small" onClick={deriveFromDesktop}>
-                Usar la principal para tablet y mobile (auto)
+                {t('admin.banners.form.deriveFromDesktop')}
               </GhostButton>
             </Box>
 
             {/* TABLET y MOBILE (opcionales) */}
             {(['tablet', 'mobile'] as const).map((mode) => {
               const field = mode === 'tablet' ? 'imageTablet' : 'imageMobile';
-              const label = mode === 'tablet' ? 'Tablet (1024 × 400 px)' : 'Mobile (600 × 400 px)';
+              const label = mode === 'tablet' ? t('admin.banners.form.tabletLabel') : t('admin.banners.form.mobileLabel');
               return (
                 <Box key={mode}>
                   <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                    Imagen {label} — opcional
+                    {t('admin.banners.form.optionalImageLabel', { label })}
                   </Typography>
                   <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
                     <Avatar variant="rounded" sx={{ width: 100, height: 40 }}>
@@ -310,11 +312,11 @@ export default function AdminBanners() {
                         input.click();
                       }}
                     >
-                      Subir
+                      {t('admin.banners.form.upload')}
                     </SecondaryButton>
                     {form[field] && (
                       <SecondaryButton size="small" startIcon={<CropIcon />} onClick={() => { setPendingCropUrl(resolveImageUrl(form[field])); setCropTarget(mode); }}>
-                        Recortar
+                        {t('admin.banners.form.crop')}
                       </SecondaryButton>
                     )}
                   </Box>
@@ -325,16 +327,16 @@ export default function AdminBanners() {
             <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp" style={{ display: 'none' }} onChange={handleFileSelect} />
 
             <Box display="flex" gap={2} flexWrap="wrap">
-              <TextField label="Link al hacer clic" value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="Ej: /productos?tag=oferta" sx={{ flex: 1, minWidth: 200 }} InputProps={{ startAdornment: <InputAdornment position="start"><LinkIcon fontSize="small" /></InputAdornment> }} />
-              <TextField label="Color de fondo" value={form.backgroundColor} onChange={(e) => setForm({ ...form, backgroundColor: e.target.value })} placeholder="#f0320a" sx={{ width: 160 }} />
-              <TextField label="Orden" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} sx={{ width: 100 }} helperText="Bajo = primero" />
+              <TextField label={t('admin.banners.form.linkLabel')} value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder={t('admin.banners.form.linkPlaceholder')} sx={{ flex: 1, minWidth: 200 }} InputProps={{ startAdornment: <InputAdornment position="start"><LinkIcon fontSize="small" /></InputAdornment> }} />
+              <TextField label={t('admin.banners.form.backgroundColorLabel')} value={form.backgroundColor} onChange={(e) => setForm({ ...form, backgroundColor: e.target.value })} placeholder="#f0320a" sx={{ width: 160 }} />
+              <TextField label={t('admin.banners.colOrder')} type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} sx={{ width: 100 }} helperText={t('admin.banners.form.orderHelper')} />
             </Box>
 
             {/* PREVIEW */}
             {form.imageDesktop && (
               <Box>
                 <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                  Vista previa (Desktop)
+                  {t('admin.banners.preview.title')}
                 </Typography>
                 <Box
                   sx={{
@@ -362,9 +364,9 @@ export default function AdminBanners() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialogOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialogOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={save} disabled={!form.imageDesktop}>
-            {editingId ? 'Guardar cambios' : 'Crear banner'}
+            {editingId ? t('admin.common.saveChanges') : t('admin.banners.createBanner')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
@@ -374,7 +376,7 @@ export default function AdminBanners() {
         open={Boolean(cropTarget)}
         imageUrl={pendingCropUrl}
         aspect={BANNER_ASPECT[cropTarget ?? 'desktop']}
-        title={`Recortar imagen ${cropTarget ?? ''}`}
+        title={t('admin.banners.cropDialogTitle', { target: cropTarget ?? '' })}
         onClose={() => setCropTarget(null)}
         onUploaded={onCropped}
       />

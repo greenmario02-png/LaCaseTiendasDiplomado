@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { TriangleAlert } from 'lucide-react';
 import { Grid, Typography, Box, CircularProgress, Chip } from '@mui/material';
@@ -33,13 +34,13 @@ import { vision } from '../../theme/vision';
 
 const CHART_COLORS = ['#4318ff', '#6ad2ff', '#00d12a', '#ffb800', '#f857a6', '#00b09b', '#8a2be2', '#ff5858'];
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: 'Pendiente',
-  CONFIRMED: 'Confirmada',
-  PREPARING: 'En preparación',
-  SHIPPED: 'Enviada',
-  DELIVERED: 'Entregada',
-  CANCELLED: 'Cancelada',
+const STATUS_KEY: Record<string, string> = {
+  PENDING: 'admin.dashboard.status.pending',
+  CONFIRMED: 'admin.dashboard.status.confirmed',
+  PREPARING: 'admin.dashboard.status.preparing',
+  SHIPPED: 'admin.dashboard.status.shipped',
+  DELIVERED: 'admin.dashboard.status.delivered',
+  CANCELLED: 'admin.dashboard.status.cancelled',
 };
 
 const KPI_GRADIENTS: Record<string, string> = {
@@ -50,6 +51,7 @@ const KPI_GRADIENTS: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [kpis, setKpis] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
@@ -92,33 +94,33 @@ export default function AdminDashboard() {
   const s = stats;
 
   const kpiCards = [
-    { label: 'Productos', value: k.totalProducts, sub: `${k.pendingProducts} pendientes`, icon: <InventoryIcon />, color: '#4318ff', to: '/admin/productos' },
-    { label: 'Vendedores', value: k.totalSellers, sub: `${k.pendingSellers} pendientes`, icon: <StorefrontIcon />, color: '#6ad2ff', to: '/admin/vendedores' },
-    { label: 'Clientes', value: k.totalUsers, icon: <PeopleIcon />, color: '#00d12a', to: '/admin/usuarios' },
-    { label: 'Órdenes', value: k.totalOrders, sub: `${k.pendingOrders} pendientes`, icon: <ReceiptLongIcon />, color: '#ffb800', to: '/admin' },
+    { label: t('admin.dashboard.kpi.products'), value: k.totalProducts, sub: t('admin.dashboard.kpi.pendingCount', { count: k.pendingProducts }), icon: <InventoryIcon />, color: '#4318ff', to: '/admin/productos' },
+    { label: t('admin.dashboard.kpi.sellers'), value: k.totalSellers, sub: t('admin.dashboard.kpi.pendingCount', { count: k.pendingSellers }), icon: <StorefrontIcon />, color: '#6ad2ff', to: '/admin/vendedores' },
+    { label: t('admin.dashboard.kpi.customers'), value: k.totalUsers, icon: <PeopleIcon />, color: '#00d12a', to: '/admin/usuarios' },
+    { label: t('admin.dashboard.kpi.orders'), value: k.totalOrders, sub: t('admin.dashboard.kpi.pendingCount', { count: k.pendingOrders }), icon: <ReceiptLongIcon />, color: '#ffb800', to: '/admin' },
   ];
 
   const revenueCards = [
-    { label: 'Ingresos totales', value: money(k.totalRevenue), color: '#00d12a' },
-    { label: 'Ingresos del mes', value: money(k.monthRevenue), color: '#6ad2ff' },
-    { label: 'Ventas de la semana', value: money(s?.weekRevenue ?? 0), color: '#ffb800' },
+    { label: t('admin.dashboard.revenue.total'), value: money(k.totalRevenue), color: '#00d12a' },
+    { label: t('admin.dashboard.revenue.month'), value: money(k.monthRevenue), color: '#6ad2ff' },
+    { label: t('admin.dashboard.revenue.week'), value: money(s?.weekRevenue ?? 0), color: '#ffb800' },
     {
-      label: 'Crecimiento semanal',
+      label: t('admin.dashboard.revenue.weeklyGrowth'),
       value: `${s?.weekGrowth ?? 0}%`,
       color: (s?.weekGrowth ?? 0) >= 0 ? '#00d12a' : '#ff5858',
     },
   ];
 
   const auctionCards = [
-    { label: 'Activas', value: s?.auctions?.activeAuctions ?? 0, color: '#4318ff' },
-    { label: 'Totales', value: s?.auctions?.totalAuctions ?? 0, color: '#6ad2ff' },
-    { label: 'Cerradas', value: s?.auctions?.closedAuctions ?? 0, color: '#00d12a' },
+    { label: t('admin.dashboard.auctions.active'), fullLabel: t('admin.dashboard.auctions.activeFull'), value: s?.auctions?.activeAuctions ?? 0, color: '#4318ff' },
+    { label: t('admin.dashboard.auctions.total'), fullLabel: t('admin.dashboard.auctions.totalFull'), value: s?.auctions?.totalAuctions ?? 0, color: '#6ad2ff' },
+    { label: t('admin.dashboard.auctions.closed'), fullLabel: t('admin.dashboard.auctions.closedFull'), value: s?.auctions?.closedAuctions ?? 0, color: '#00d12a' },
   ];
 
   const salesChart = (s?.salesByDay ?? []).map((d: any) => ({ ...d, revenue: Math.round(Number(d.revenue)) }));
-  const statusChart = (s?.ordersByStatus ?? []).map((o: any) => ({ name: STATUS_LABEL[o.status] || o.status, value: o._count }));
+  const statusChart = (s?.ordersByStatus ?? []).map((o: any) => ({ name: STATUS_KEY[o.status] ? t(STATUS_KEY[o.status]) : o.status, value: o._count }));
   const roleChart = (s?.usersByRole ?? []).map((u: any) => ({
-    name: u.role === 'ADMIN' ? 'Admins' : u.role === 'SELLER' ? 'Vendedores' : 'Clientes',
+    name: u.role === 'ADMIN' ? t('admin.dashboard.role.admin') : u.role === 'SELLER' ? t('admin.dashboard.role.seller') : t('admin.dashboard.role.customer'),
     value: u._count,
   }));
   const topSellerChart = (s?.topSellers ?? []).map((t: any) => ({
@@ -164,16 +166,16 @@ export default function AdminDashboard() {
         <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} mb={3}>
           <Box>
             <Typography variant="h5" fontWeight={800} sx={{ fontFamily: vision.font, color: vision.text.primary }}>
-              Panel de administración
+              {t('admin.dashboard.title')}
             </Typography>
             <Typography variant="body2" sx={{ color: vision.text.secondary }}>
-              Métricas y tendencias del marketplace en tiempo real
+              {t('admin.dashboard.subtitle')}
             </Typography>
           </Box>
           <Box display="flex" gap={1}>
             <Box>
               <PrimaryButton to="/admin/reportes" size="small">
-                Ver reportes
+                {t('admin.dashboard.viewReports')}
               </PrimaryButton>
             </Box>
           </Box>
@@ -193,15 +195,15 @@ export default function AdminDashboard() {
             <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
               <Box>
                 <Typography fontWeight={800} sx={{ color: '#ffc837' }}>
-                  Copias masivas detectadas
+                  {t('admin.dashboard.copyAlerts.title')}
                 </Typography>
                 <Typography variant="body2" sx={{ color: vision.text.secondary }}>
-                  Se detectaron muchas copias de productos en los últimos 30 días. Puedes pausar las tiendas sospechosas.
+                  {t('admin.dashboard.copyAlerts.body')}
                 </Typography>
               </Box>
               <Box>
                 <PrimaryButton to="/admin/vendedores" size="small" color="warning">
-                  Revisar tiendas
+                  {t('admin.dashboard.copyAlerts.reviewStores')}
                 </PrimaryButton>
               </Box>
             </Box>
@@ -209,8 +211,8 @@ export default function AdminDashboard() {
               {copyAlerts.map((a: any) => (
                 <li key={a.actorId}>
                   <Typography variant="body2" sx={{ color: vision.text.secondary }}>
-                    {a.actor?.storeName || `${a.actor?.firstName} ${a.actor?.lastName}`} ({a.actor?.email}) — {a.count} copia(s)
-                    {a.actor?.storePaused ? ' · Pausada' : ''}
+                    {a.actor?.storeName || `${a.actor?.firstName} ${a.actor?.lastName}`} ({a.actor?.email}) — {t('admin.dashboard.copyAlerts.copiesCount', { count: a.count })}
+                    {a.actor?.storePaused ? ` · ${t('admin.dashboard.copyAlerts.paused')}` : ''}
                   </Typography>
                 </li>
               ))}
@@ -305,7 +307,7 @@ export default function AdminDashboard() {
                   {item.value}
                 </Typography>
                 <Typography variant="caption" sx={{ color: vision.text.muted }}>
-                  Subastas {item.label.toLowerCase()}
+                  {item.fullLabel}
                 </Typography>
               </Box>
             </Grid>
@@ -315,7 +317,7 @@ export default function AdminDashboard() {
         {/* Gráfico principal: ventas 30 días */}
         <Box sx={{ ...vision.card, p: 3, mb: 3 }}>
           <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-            Ventas — últimos 30 días
+            {t('admin.dashboard.chart.salesTitle')}
           </Typography>
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={salesChart}>
@@ -332,8 +334,8 @@ export default function AdminDashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: vision.text.muted }} tickFormatter={(d: string) => d.slice(5)} />
               <YAxis tick={{ fontSize: 10, fill: vision.text.muted }} />
-              <Tooltip {...darkTooltip} formatter={(v: any) => money(v)} labelFormatter={(l) => 'Día: ' + l} />
-              <Area type="monotone" dataKey="revenue" stroke="url(#revGrad)" strokeWidth={3} fill="url(#revFill)" name="Ingresos" />
+              <Tooltip {...darkTooltip} formatter={(v: any) => money(v)} labelFormatter={(l) => t('admin.dashboard.chart.dayLabel', { day: l })} />
+              <Area type="monotone" dataKey="revenue" stroke="url(#revGrad)" strokeWidth={3} fill="url(#revFill)" name={t('admin.dashboard.chart.revenueSeries')} />
             </AreaChart>
           </ResponsiveContainer>
         </Box>
@@ -343,7 +345,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} md={6}>
             <Box sx={{ ...vision.card, p: 3, height: '100%' }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Top tiendas por ingresos
+                {t('admin.dashboard.chart.topStores')}
               </Typography>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={topSellerChart} layout="vertical" margin={{ left: 10 }}>
@@ -367,7 +369,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} md={6}>
             <Box sx={{ ...vision.card, p: 3, height: '100%' }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Ventas por categoría
+                {t('admin.dashboard.chart.salesByCategory')}
               </Typography>
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
@@ -396,7 +398,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} md={6}>
             <Box sx={{ ...vision.card, p: 3, height: '100%' }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Órdenes por estado
+                {t('admin.dashboard.chart.ordersByStatus')}
               </Typography>
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
@@ -416,7 +418,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} md={6}>
             <Box sx={{ ...vision.card, p: 3, height: '100%' }}>
               <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-                Usuarios por rol
+                {t('admin.dashboard.chart.usersByRole')}
               </Typography>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={roleChart}>
@@ -430,7 +432,7 @@ export default function AdminDashboard() {
                       <stop offset="100%" stopColor="#00b09b" />
                     </linearGradient>
                   </defs>
-                  <Bar dataKey="value" name="Usuarios" fill="url(#roleGrad)" radius={[6, 6, 0, 0]} barSize={26} />
+                  <Bar dataKey="value" name={t('admin.dashboard.chart.usersSeries')} fill="url(#roleGrad)" radius={[6, 6, 0, 0]} barSize={26} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -440,7 +442,7 @@ export default function AdminDashboard() {
         {/* Top productos */}
         <Box sx={{ ...vision.card, p: 3, mt: 3 }}>
           <Typography variant="h6" fontWeight={800} sx={{ color: vision.text.primary, mb: 2, fontFamily: vision.font }}>
-            Productos más vendidos
+            {t('admin.dashboard.topProducts.title')}
           </Typography>
           <Box>
             {(s?.topProducts ?? []).map((p: any, i: number) => (
@@ -482,7 +484,7 @@ export default function AdminDashboard() {
                   </Typography>
                 </Box>
                 <Chip
-                  label={`${p.totalSold} vendidos`}
+                  label={t('admin.dashboard.topProducts.soldCount', { count: p.totalSold })}
                   size="small"
                   sx={vision.chipGhost('#00d12a')}
                 />
