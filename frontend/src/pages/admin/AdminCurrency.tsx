@@ -16,8 +16,10 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminCurrency() {
+  const { t } = useTranslation();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -46,7 +48,7 @@ export default function AdminCurrency() {
     try {
       const res = await api.post('/admin/currencies/refresh');
       setManualRate(String(res.data.data.rates.USD));
-      toast.success('Tasa actualizada desde la API oficial');
+      toast.success(t('admin.currency.rateUpdatedFromApi'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -59,7 +61,7 @@ export default function AdminCurrency() {
     setSavingRate(true);
     try {
       await api.post('/admin/currencies/manual-rate', { usdToBob: Number(manualRate) });
-      toast.success('Tasa manual guardada');
+      toast.success(t('admin.currency.manualRateSaved'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -71,7 +73,7 @@ export default function AdminCurrency() {
   const setDefault = async (code: string) => {
     try {
       await api.post('/admin/currencies/default', { code });
-      toast.success(`Moneda por defecto: ${code}`);
+      toast.success(t('admin.currency.defaultCurrencySet', { code }));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -83,13 +85,13 @@ export default function AdminCurrency() {
   return (
     <Box>
       <Typography variant="h6" fontWeight={700} mb={2}>
-        Moneda del sistema
+        {t('admin.currency.title')}
       </Typography>
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          El sistema usa <strong>Bs (Boliviano)</strong> como moneda base: todos los precios se guardan en bolivianos.
-          Los usuarios pueden elegir ver los precios en dólares (US$), que se calculan con la tasa de cambio.
+          {t('admin.currency.baseCurrencyInfoPart1')} <strong>{t('admin.currency.baseCurrencyLabel')}</strong>{' '}
+          {t('admin.currency.baseCurrencyInfoPart2')}
         </Typography>
       </Alert>
 
@@ -97,7 +99,7 @@ export default function AdminCurrency() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Monedas disponibles
+              {t('admin.currency.availableCurrencies')}
             </Typography>
             {data.currencies.map((c: any) => (
               <Box key={c.code} display="flex" justifyContent="space-between" alignItems="center" py={1} borderBottom={1} borderColor="divider">
@@ -110,16 +112,18 @@ export default function AdminCurrency() {
                   </Typography>
                 </Box>
                 {c.isDefault ? (
-                  <Chip label="Por defecto" size="small" color="primary" />
+                  <Chip label={t('admin.currency.default')} size="small" color="primary" />
                 ) : (
                   <GhostButton size="small" onClick={() => setDefault(c.code)}>
-                    Hacer por defecto
+                    {t('admin.currency.makeDefault')}
                   </GhostButton>
                 )}
               </Box>
             ))}
             <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-              Última actualización de tasas: {data.ratesUpdatedAt ? new Date(data.ratesUpdatedAt).toLocaleString('es-BO') : 'nunca'}
+              {t('admin.currency.lastRatesUpdate', {
+                date: data.ratesUpdatedAt ? new Date(data.ratesUpdatedAt).toLocaleString('es-BO') : t('admin.currency.never'),
+              })}
             </Typography>
           </Paper>
         </Grid>
@@ -127,27 +131,26 @@ export default function AdminCurrency() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={700} mb={2}>
-              Tasa USD → Bs
+              {t('admin.currency.usdToBobRate')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              El valor se obtiene automáticamente de APIs públicas de tasas de cambio (ej: open.er-api.com). Como hay
-              devaluación frecuente, puedes actualizarla manualmente en cualquier momento.
+              {t('admin.currency.rateSourceInfo')}
             </Typography>
 
             <Box display="flex" gap={1} mb={2}>
               <PrimaryButton startIcon={<RefreshIcon />} onClick={refresh} disabled={refreshing}>
-                {refreshing ? <CircularProgress size={20} color="inherit" /> : 'Actualizar desde API'}
+                {refreshing ? <CircularProgress size={20} color="inherit" /> : t('admin.currency.updateFromApi')}
               </PrimaryButton>
             </Box>
 
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="subtitle2" fontWeight={600} mb={1}>
-              Tasa manual
+              {t('admin.currency.manualRate')}
             </Typography>
             <Box display="flex" gap={1}>
               <TextField
-                label="1 USD en Bs"
+                label={t('admin.currency.usdInBobLabel')}
                 type="number"
                 value={manualRate}
                 onChange={(e) => setManualRate(e.target.value)}
@@ -155,11 +158,11 @@ export default function AdminCurrency() {
                 size="small"
               />
               <SecondaryButton onClick={saveManualRate} disabled={savingRate}>
-                {savingRate ? <CircularProgress size={18} /> : 'Guardar manual'}
+                {savingRate ? <CircularProgress size={18} /> : t('admin.currency.saveManual')}
               </SecondaryButton>
             </Box>
             <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-              Ej: si 1 USD = 6.96 Bs, escribe 6.96. Los precios en dólares se calculan como precio_Bs / 6.96.
+              {t('admin.currency.manualRateHelp')}
             </Typography>
           </Paper>
         </Grid>
@@ -167,17 +170,16 @@ export default function AdminCurrency() {
 
       <Paper sx={{ p: 3, mt: 3 }}>
         <Typography variant="subtitle1" fontWeight={700} mb={1} display="flex" alignItems="center" gap={1}>
-          <MonetizationOnIcon color="primary" /> ¿Cómo funciona?
+          <MonetizationOnIcon color="primary" /> {t('admin.currency.howItWorksTitle')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          <strong>1.</strong> Los vendedores publican sus precios en <strong>Bs</strong>.
+          <strong>1.</strong> {t('admin.currency.howItWorksStep1Part1')} <strong>{t('admin.currency.bsLabel')}</strong>.
           <br />
-          <strong>2.</strong> El sistema guarda siempre el precio en Bs (moneda base).
+          <strong>2.</strong> {t('admin.currency.howItWorksStep2')}
           <br />
-          <strong>3.</strong> Cada usuario elige su moneda (Bs o US$) en el selector de la barra superior.
+          <strong>3.</strong> {t('admin.currency.howItWorksStep3')}
           <br />
-          <strong>4.</strong> Si elige US$, el precio se muestra como precio_Bs ÷ tasa. La tasa se actualiza desde la API
-          o manualmente desde este panel.
+          <strong>4.</strong> {t('admin.currency.howItWorksStep4')}
         </Typography>
       </Paper>
     </Box>

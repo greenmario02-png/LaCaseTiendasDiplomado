@@ -7,17 +7,19 @@ import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { EmptyState, LoadingState, ErrorState } from '../../components/redesign/States';
 import { FadeIn } from '../../components/motion/FadeIn';
+import { useTranslation } from 'react-i18next';
 
-const STATUS: Record<string, { label: string; color: any }> = {
-  PENDING: { label: 'Pendiente', color: 'warning' },
-  APPROVED: { label: 'Aprobada', color: 'info' },
-  REJECTED: { label: 'Rechazada', color: 'error' },
-  COMPLETED: { label: 'Completada', color: 'success' },
-  CANCELLED: { label: 'Cancelada', color: 'default' },
+const STATUS_COLOR: Record<string, any> = {
+  PENDING: 'warning',
+  APPROVED: 'info',
+  REJECTED: 'error',
+  COMPLETED: 'success',
+  CANCELLED: 'default',
 };
 
 export default function AdminReturnsPage() {
-  const t = useUnifiedTokens();
+  const tokens = useUnifiedTokens();
+  const { t } = useTranslation();
   const [returns, setReturns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -71,11 +73,11 @@ export default function AdminReturnsPage() {
 
   return (
     <Box p={3} maxWidth={1000} mx="auto">
-      <PageHeader title="Devoluciones (administración)" icon={<AssignmentReturnIcon />} />
+      <PageHeader title={t('admin.returns.title')} icon={<AssignmentReturnIcon />} />
       {error && <ErrorState message={error} onRetry={() => setError('')} />}
 
       {returns.length === 0 ? (
-        <EmptyState message="No hay solicitudes de devolución." />
+        <EmptyState message={t('admin.returns.empty')} />
       ) : (
         <FadeIn>
         <Stack spacing={2}>
@@ -85,11 +87,15 @@ export default function AdminReturnsPage() {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} md={8}>
                     <Typography fontWeight={700}>{r.orderItem?.product?.name}</Typography>
-                    <Typography variant="body2" color={t.onSurfaceVariant}>
-                      Comprador: {r.buyer?.firstName} {r.buyer?.lastName} · Tienda: {r.seller?.storeName}
+                    <Typography variant="body2" color={tokens.onSurfaceVariant}>
+                      {t('admin.returns.buyerLine', {
+                        firstName: r.buyer?.firstName,
+                        lastName: r.buyer?.lastName,
+                        storeName: r.seller?.storeName,
+                      })}
                     </Typography>
                     <Typography variant="body2" mt={0.5}>
-                      Motivo: {r.reason}
+                      {t('admin.returns.reasonLine', { reason: r.reason })}
                     </Typography>
                     {r.details && (
                       <Typography variant="body2" mt={0.5}>
@@ -98,20 +104,24 @@ export default function AdminReturnsPage() {
                     )}
                     {r.refundAmount != null && (
                       <Typography variant="body2" fontWeight={700} color="success.main" mt={0.5}>
-                        Reembolso: Bs {Number(r.refundAmount).toLocaleString('es-BO')}
+                        {t('admin.returns.refundLine', { amount: Number(r.refundAmount).toLocaleString('es-BO') })}
                       </Typography>
                     )}
                     {r.adminNote && (
-                      <Typography variant="body2" color={t.onSurfaceVariant} mt={0.5}>
-                        Nota admin: {r.adminNote}
+                      <Typography variant="body2" color={tokens.onSurfaceVariant} mt={0.5}>
+                        {t('admin.returns.adminNoteLine', { note: r.adminNote })}
                       </Typography>
                     )}
                   </Grid>
                   <Grid item xs={12} md={4} sx={{ textAlign: { md: 'right' } }}>
-                    <Chip label={STATUS[r.status]?.label ?? r.status} color={STATUS[r.status]?.color ?? 'default'} size="small" />
+                    <Chip
+                      label={STATUS_COLOR[r.status] ? t(`admin.returns.status.${r.status.toLowerCase()}`) : r.status}
+                      color={STATUS_COLOR[r.status] ?? 'default'}
+                      size="small"
+                    />
                     <Box mt={1}>
                       <PrimaryButton type="button" size="small" onClick={() => openDialog(r)}>
-                        Resolver
+                        {t('admin.returns.resolve')}
                       </PrimaryButton>
                     </Box>
                   </Grid>
@@ -124,24 +134,24 @@ export default function AdminReturnsPage() {
       )}
 
       <Dialog open={Boolean(dialog)} onClose={() => setDialog(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>Resolver devolución</DialogTitle>
+        <DialogTitle>{t('admin.returns.resolveDialog.title')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" mb={2}>
-            Producto: <b>{dialog?.orderItem?.product?.name}</b>
+            {t('admin.returns.resolveDialog.product')} <b>{dialog?.orderItem?.product?.name}</b>
           </Typography>
           <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-            <InputLabel>Estado</InputLabel>
-            <Select value={status} label="Estado" onChange={(e) => setStatus(e.target.value)}>
-              <MenuItem value="COMPLETED">Completada (reembolso procesado)</MenuItem>
-              <MenuItem value="APPROVED">Aprobada</MenuItem>
-              <MenuItem value="REJECTED">Rechazada</MenuItem>
-              <MenuItem value="CANCELLED">Cancelada</MenuItem>
+            <InputLabel>{t('admin.returns.resolveDialog.statusLabel')}</InputLabel>
+            <Select value={status} label={t('admin.returns.resolveDialog.statusLabel')} onChange={(e) => setStatus(e.target.value)}>
+              <MenuItem value="COMPLETED">{t('admin.returns.resolveDialog.statusOptions.completed')}</MenuItem>
+              <MenuItem value="APPROVED">{t('admin.returns.status.approved')}</MenuItem>
+              <MenuItem value="REJECTED">{t('admin.returns.status.rejected')}</MenuItem>
+              <MenuItem value="CANCELLED">{t('admin.returns.status.cancelled')}</MenuItem>
             </Select>
           </FormControl>
           <TextField
             fullWidth
             size="small"
-            label="Monto del reembolso (Bs)"
+            label={t('admin.returns.resolveDialog.refundAmountLabel')}
             type="number"
             value={refundAmount}
             onChange={(e) => setRefundAmount(e.target.value)}
@@ -150,7 +160,7 @@ export default function AdminReturnsPage() {
           <TextField
             fullWidth
             size="small"
-            label="Nota administrativa"
+            label={t('admin.returns.resolveDialog.adminNoteLabel')}
             multiline
             rows={2}
             value={adminNote}
@@ -158,9 +168,9 @@ export default function AdminReturnsPage() {
           />
         </DialogContent>
         <DialogActions>
-          <GhostButton type="button" onClick={() => setDialog(null)}>Cancelar</GhostButton>
+          <GhostButton type="button" onClick={() => setDialog(null)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton type="button" onClick={save} disabled={saving}>
-            {saving ? 'Guardando...' : 'Guardar'}
+            {saving ? t('admin.common.saving') : t('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

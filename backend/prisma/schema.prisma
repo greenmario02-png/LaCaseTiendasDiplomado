@@ -284,6 +284,8 @@ model Product {
   taxRateId      Int?
   taxRate        TaxRate?         @relation(fields: [taxRateId], references: [id])
   warrantyInfo   String?
+  /// Traducciones opcionales de name/description por idioma: { "en": { "name": "...", "description": "..." }, "pt": {...} }
+  translations   Json?
   isActive       Boolean          @default(true)
   isApproved     Boolean          @default(false)
   isFeatured     Boolean          @default(false)

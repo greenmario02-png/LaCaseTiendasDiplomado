@@ -27,6 +27,7 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Coupon {
   id: number;
@@ -53,6 +54,7 @@ const emptyForm = {
 };
 
 export default function AdminCoupons() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,10 +108,10 @@ export default function AdminCoupons() {
       };
       if (editing) {
         await api.put(`/admin/coupons/${editing.id}`, payload);
-        toast.success('Cupón actualizado');
+        toast.success(t('admin.coupons.toasts.updated'));
       } else {
         await api.post('/admin/coupons', payload);
-        toast.success('Cupón creado');
+        toast.success(t('admin.coupons.toasts.created'));
       }
       setOpen(false);
       load();
@@ -123,7 +125,7 @@ export default function AdminCoupons() {
   const remove = async (id: number) => {
     try {
       await api.delete(`/admin/coupons/${id}`);
-      toast.success('Cupón eliminado');
+      toast.success(t('admin.coupons.toasts.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -147,11 +149,11 @@ export default function AdminCoupons() {
         <Box display="flex" alignItems="center" gap={1}>
           <LocalOfferIcon color="primary" />
           <Typography variant="h5" fontWeight={700}>
-            Cupones de descuento
+            {t('admin.coupons.title')}
           </Typography>
         </Box>
         <PrimaryButton startIcon={<AddIcon />} onClick={openNew}>
-          Nuevo cupón
+          {t('admin.coupons.newCoupon')}
         </PrimaryButton>
       </Box>
 
@@ -159,28 +161,28 @@ export default function AdminCoupons() {
         <Table size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: 'action.hover' }}>
-              <TableCell>Código</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Valor</TableCell>
-              <TableCell>Mínimo</TableCell>
-              <TableCell>Usos</TableCell>
-              <TableCell>Vence</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell align="right">Acciones</TableCell>
+              <TableCell>{t('admin.coupons.columns.code')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.type')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.value')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.minSpend')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.uses')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.expires')}</TableCell>
+              <TableCell>{t('admin.coupons.columns.status')}</TableCell>
+              <TableCell align="right">{t('admin.coupons.columns.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {coupons.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} align="center">
-                  No hay cupones. Crea uno para ofrecer descuentos.
+                  {t('admin.coupons.empty')}
                 </TableCell>
               </TableRow>
             )}
             {coupons.map((c) => (
               <TableRow key={c.id}>
                 <TableCell sx={{ fontWeight: 700 }}>{c.code}</TableCell>
-                <TableCell>{c.type === 'PERCENTAGE' ? 'Porcentaje' : 'Monto fijo'}</TableCell>
+                <TableCell>{c.type === 'PERCENTAGE' ? t('admin.coupons.type.percentage') : t('admin.coupons.type.fixed')}</TableCell>
                 <TableCell>{c.type === 'PERCENTAGE' ? `${c.value}%` : money(c.value)}</TableCell>
                 <TableCell>{c.minSpend ? money(c.minSpend) : '—'}</TableCell>
                 <TableCell>
@@ -191,7 +193,7 @@ export default function AdminCoupons() {
                 <TableCell>
                   <Chip
                     size="small"
-                    label={c.isActive ? 'Activo' : 'Inactivo'}
+                    label={c.isActive ? t('admin.common.active') : t('admin.common.inactive')}
                     color={c.isActive ? 'success' : 'default'}
                     onClick={() => toggleActive(c)}
                   />
@@ -211,51 +213,51 @@ export default function AdminCoupons() {
       </TableContainer>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? 'Editar cupón' : 'Nuevo cupón'}</DialogTitle>
+        <DialogTitle>{editing ? t('admin.coupons.editCoupon') : t('admin.coupons.newCoupon')}</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            <TextField label="Código" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} fullWidth disabled={Boolean(editing)} />
+            <TextField label={t('admin.coupons.fields.code')} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} fullWidth disabled={Boolean(editing)} />
             <TextField
-              label="Descripción"
+              label={t('admin.coupons.fields.description')}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               fullWidth
               multiline
               rows={2}
-              placeholder="Ej: 10% de descuento en la primera compra"
+              placeholder={t('admin.coupons.fields.descriptionPlaceholder')}
             />
-            <TextField select label="Tipo" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} fullWidth>
-              <MenuItem value="PERCENTAGE">Porcentaje (%)</MenuItem>
-              <MenuItem value="FIXED">Monto fijo (Bs)</MenuItem>
+            <TextField select label={t('admin.coupons.fields.type')} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} fullWidth>
+              <MenuItem value="PERCENTAGE">{t('admin.coupons.type.percentage')} (%)</MenuItem>
+              <MenuItem value="FIXED">{t('admin.coupons.type.fixed')} (Bs)</MenuItem>
             </TextField>
             <TextField
-              label={form.type === 'PERCENTAGE' ? 'Descuento (%)' : 'Descuento (Bs)'}
+              label={form.type === 'PERCENTAGE' ? t('admin.coupons.fields.discountPercentage') : t('admin.coupons.fields.discountFixed')}
               type="number"
               value={form.value}
               onChange={(e) => setForm({ ...form, value: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Pedido mínimo (Bs, opcional)"
+              label={t('admin.coupons.fields.minSpend')}
               type="number"
               value={form.minSpend}
               onChange={(e) => setForm({ ...form, minSpend: e.target.value })}
               fullWidth
             />
             <TextField
-              label="Límite de usos (opcional)"
+              label={t('admin.coupons.fields.maxUses')}
               type="number"
               value={form.maxUses}
               onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
               fullWidth
             />
-            <TextField label="Vence (opcional)" type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} fullWidth />
+            <TextField label={t('admin.coupons.fields.endDate')} type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} fullWidth />
           </Box>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={save} disabled={saving || !form.code || !form.value}>
-            {saving ? <CircularProgress size={18} /> : 'Guardar'}
+            {saving ? <CircularProgress size={18} /> : t('admin.common.save')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

@@ -46,7 +46,7 @@ import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
 
 export default function ProductDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const money = useMoney();
   const navigate = useNavigate();
@@ -114,6 +114,11 @@ export default function ProductDetailPage() {
 
   const slug = product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+  // Si el vendedor cargó una traducción para el idioma actual, se muestra en vez del español.
+  const translation = product.translations?.[i18n.language];
+  const displayName = translation?.name || product.name;
+  const displayDescription = translation?.description || product.description;
+
   const handleAddToCart = async () => {
     try {
       await addItem(product.id, quantity);
@@ -168,7 +173,7 @@ export default function ProductDetailPage() {
         <Typography component={Link} to={`/categoria/${product.category.slug}`} color="inherit" sx={{ textDecoration: 'none' }}>
           {product.category.name}
         </Typography>
-        <Typography color="text.primary">{product.name}</Typography>
+        <Typography color="text.primary">{displayName}</Typography>
       </Breadcrumbs>
 
       <Grid container spacing={3}>
@@ -177,7 +182,7 @@ export default function ProductDetailPage() {
           <Paper sx={{ p: 1 }}>
             <Box className="image-container" sx={{ aspectRatio: '1/1', borderRadius: 2 }}>
               {mainImage ? (
-                <img src={mainImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={mainImage} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <Typography color="text.disabled">{t('product.detail.noImage')}</Typography>
               )}
@@ -209,7 +214,7 @@ export default function ProductDetailPage() {
         {/* Info */}
         <Grid item xs={12} md={6}>
           <Typography variant="h5" fontWeight={700}>
-            {product.name}
+            {displayName}
           </Typography>
           <Box display="flex" alignItems="center" gap={1} mt={1}>
             {product.condition === 'NEW' && <Chip label={t('product.condition.new')} size="small" color="success" />}
@@ -393,13 +398,13 @@ export default function ProductDetailPage() {
       )}
 
       {/* Descripción */}
-      {product.description && (
+      {displayDescription && (
         <Paper sx={{ mt: 3, p: 2 }}>
           <Typography variant="h6" fontWeight={700} mb={1}>
             {t('product.detail.description')}
           </Typography>
           <Typography variant="body2" color="text.secondary" whiteSpace="pre-wrap">
-            {product.description}
+            {displayDescription}
           </Typography>
         </Paper>
       )}

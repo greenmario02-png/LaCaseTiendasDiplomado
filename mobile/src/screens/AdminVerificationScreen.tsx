@@ -1,6 +1,7 @@
 import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { BadgeCheck, MapPin, X } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -9,6 +10,7 @@ import { LoadingState, EmptyState } from '../components/redesign/States';
 export default function AdminVerificationScreen({ navigation }: any) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
   const [sellers, setSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -18,7 +20,7 @@ export default function AdminVerificationScreen({ navigation }: any) {
       const { data } = await api.get('/admin/sellers/verification');
       setSellers(data.data ?? []);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -37,7 +39,7 @@ export default function AdminVerificationScreen({ navigation }: any) {
       await api.put(`/admin/users/${id}`, { isVerified });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
@@ -46,7 +48,7 @@ export default function AdminVerificationScreen({ navigation }: any) {
       await api.put(`/admin/users/${id}`, { locationVerified });
       load();
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     }
   };
 
@@ -61,38 +63,38 @@ export default function AdminVerificationScreen({ navigation }: any) {
           {item.isVerified ? (
             <View style={[styles.chip, { backgroundColor: colors.success + '1A' }]}>
               <BadgeCheck size={12} color={colors.success} />
-              <Text style={[styles.chipText, { color: colors.success }]}>Verificada</Text>
+              <Text style={[styles.chipText, { color: colors.success }]}>{t('mobile.adminVerification.verifiedChip')}</Text>
             </View>
           ) : (
             <View style={[styles.chip, { backgroundColor: colors.warning + '1A' }]}>
-              <Text style={[styles.chipText, { color: colors.warning }]}>Sin verificar</Text>
+              <Text style={[styles.chipText, { color: colors.warning }]}>{t('mobile.adminVerification.unverifiedChip')}</Text>
             </View>
           )}
           {item.locationVerified ? (
             <View style={[styles.chip, { backgroundColor: colors.info + '1A' }]}>
               <MapPin size={12} color={colors.info} />
-              <Text style={[styles.chipText, { color: colors.info }]}>Ubicación OK</Text>
+              <Text style={[styles.chipText, { color: colors.info }]}>{t('mobile.adminVerification.locationOkChip')}</Text>
             </View>
           ) : (
             <View style={[styles.chip, { backgroundColor: colors.error + '1A' }]}>
               <X size={12} color={colors.error} />
-              <Text style={[styles.chipText, { color: colors.error }]}>Sin ubicación</Text>
+              <Text style={[styles.chipText, { color: colors.error }]}>{t('mobile.adminVerification.noLocationChip')}</Text>
             </View>
           )}
         </View>
       </View>
       <Text style={styles.meta}>
-        {[item.locationCity, item.locationState].filter(Boolean).join(', ') || 'Sin ubicación declarada'}
-        {item.nit ? ` · NIT: ${item.nit}` : ''}
+        {[item.locationCity, item.locationState].filter(Boolean).join(', ') || t('mobile.adminVerification.noLocationDeclared')}
+        {item.nit ? ` · ${t('mobile.adminVerification.nitLabel', { nit: item.nit })}` : ''}
       </Text>
       {item.verificationNote ? <Text style={styles.note}>📝 {item.verificationNote}</Text> : null}
       <View style={styles.actions}>
         <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.success }]} onPress={() => decideVerified(item.id, true)}>
-          <Text style={[styles.miniBtnText, { color: colors.success }]}>Verificar tienda</Text>
+          <Text style={[styles.miniBtnText, { color: colors.success }]}>{t('mobile.adminVerification.verifyStoreButton')}</Text>
         </TouchableOpacity>
         {!item.locationVerified && (
           <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.info }]} onPress={() => decideLocation(item.id, true)}>
-            <Text style={[styles.miniBtnText, { color: colors.info }]}>Aprobar ubicación</Text>
+            <Text style={[styles.miniBtnText, { color: colors.info }]}>{t('mobile.adminVerification.approveLocationButton')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -102,12 +104,12 @@ export default function AdminVerificationScreen({ navigation }: any) {
   return (
     <View style={styles.flex}>
       <View style={styles.header}>
-        <Text style={styles.title}>Verificación de tiendas ({sellers.length})</Text>
+        <Text style={styles.title}>{t('mobile.adminVerification.title', { count: sellers.length })}</Text>
       </View>
       {loading ? (
         <View style={styles.center}><LoadingState /></View>
       ) : sellers.length === 0 ? (
-        <View style={{ alignItems: 'center', marginTop: 60 }}><EmptyState message="No hay tiendas pendientes de verificación." /></View>
+        <View style={{ alignItems: 'center', marginTop: 60 }}><EmptyState message={t('mobile.adminVerification.emptyMessage')} /></View>
       ) : (
         <FlatList
           data={sellers}

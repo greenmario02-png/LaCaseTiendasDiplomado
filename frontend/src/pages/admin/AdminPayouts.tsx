@@ -22,6 +22,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Payout {
   id: number;
@@ -41,6 +42,7 @@ const STATUS_COLOR: Record<string, 'default' | 'warning' | 'info' | 'success' | 
 };
 
 export default function AdminPayouts() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +62,13 @@ export default function AdminPayouts() {
   const process = async (id: number, status: string) => {
     try {
       await api.put(`/admin/payouts/${id}`, { status });
-      toast.success(status === 'PAID' ? 'Payout marcado como pagado' : status === 'APPROVED' ? 'Payout aprobado' : 'Payout rechazado');
+      toast.success(
+        status === 'PAID'
+          ? t('admin.payouts.toasts.paid')
+          : status === 'APPROVED'
+          ? t('admin.payouts.toasts.approved')
+          : t('admin.payouts.toasts.rejected')
+      );
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -77,19 +85,19 @@ export default function AdminPayouts() {
       <Table size="small">
         <TableHead>
           <TableRow sx={{ bgcolor: 'action.hover' }}>
-            <TableCell>Tienda</TableCell>
-            <TableCell>Monto</TableCell>
-            <TableCell>Método</TableCell>
-            <TableCell>Estado</TableCell>
-            <TableCell>Fecha</TableCell>
-            <TableCell align="right">Acciones</TableCell>
+            <TableCell>{t('admin.payouts.columns.store')}</TableCell>
+            <TableCell>{t('admin.payouts.columns.amount')}</TableCell>
+            <TableCell>{t('admin.payouts.columns.method')}</TableCell>
+            <TableCell>{t('admin.payouts.columns.status')}</TableCell>
+            <TableCell>{t('admin.payouts.columns.date')}</TableCell>
+            <TableCell align="right">{t('admin.payouts.columns.actions')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {items.length === 0 && (
             <TableRow>
               <TableCell colSpan={6} align="center">
-                No hay solicitudes.
+                {t('admin.payouts.empty')}
               </TableCell>
             </TableRow>
           )}
@@ -106,7 +114,7 @@ export default function AdminPayouts() {
               <TableCell sx={{ fontWeight: 700 }}>{money(p.amount)}</TableCell>
               <TableCell>{p.method}</TableCell>
               <TableCell>
-                <Chip size="small" label={p.status} color={STATUS_COLOR[p.status]} />
+                <Chip size="small" label={t(`admin.payouts.status.${p.status.toLowerCase()}`)} color={STATUS_COLOR[p.status]} />
               </TableCell>
               <TableCell>{new Date(p.createdAt).toLocaleDateString('es-BO')}</TableCell>
               <TableCell align="right">
@@ -115,16 +123,16 @@ export default function AdminPayouts() {
                     {p.status === 'PENDING' && (
                       <>
                         <PrimaryButton size="small" color="warning" startIcon={<CheckCircleIcon />} onClick={() => process(p.id, 'APPROVED')}>
-                          Aprobar
+                          {t('admin.payouts.actions.approve')}
                         </PrimaryButton>
                         <SecondaryButton size="small" color="error" startIcon={<CancelIcon />} onClick={() => process(p.id, 'REJECTED')}>
-                          Rechazar
+                          {t('admin.payouts.actions.reject')}
                         </SecondaryButton>
                       </>
                     )}
                     {p.status === 'APPROVED' && (
                       <PrimaryButton size="small" color="success" startIcon={<PaidIcon />} onClick={() => process(p.id, 'PAID')}>
-                        Marcar pagado
+                        {t('admin.payouts.actions.markPaid')}
                       </PrimaryButton>
                     )}
                   </Box>
@@ -146,13 +154,13 @@ export default function AdminPayouts() {
       <Box display="flex" alignItems="center" gap={1} mb={2}>
         <PaymentsIcon color="primary" />
         <Typography variant="h5" fontWeight={700}>
-          Payouts a vendedores
+          {t('admin.payouts.title')}
         </Typography>
       </Box>
 
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label={`Por procesar (${pending.length})`} />
-        <Tab label={`Historial (${done.length})`} />
+        <Tab label={t('admin.payouts.tabs.pending', { count: pending.length })} />
+        <Tab label={t('admin.payouts.tabs.history', { count: done.length })} />
       </Tabs>
 
       {tab === 0 && renderTable(pending, true)}

@@ -27,6 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 type ContentType = 'faqs' | 'warranties' | 'reaches';
 
@@ -35,26 +36,26 @@ interface ContentItem {
   [key: string]: any;
 }
 
-const FIELD_LABELS: Record<ContentType, { title: string; fields: Array<{ key: string; label: string; multiline?: boolean }> }> = {
+const FIELD_LABELS: Record<ContentType, { titleKey: string; fields: Array<{ key: string; labelKey: string; multiline?: boolean }> }> = {
   faqs: {
-    title: 'Preguntas frecuentes',
+    titleKey: 'admin.content.titleFaqs',
     fields: [
-      { key: 'question', label: 'Pregunta' },
-      { key: 'answer', label: 'Respuesta', multiline: true },
+      { key: 'question', labelKey: 'admin.content.fieldQuestion' },
+      { key: 'answer', labelKey: 'admin.content.fieldAnswer', multiline: true },
     ],
   },
   warranties: {
-    title: 'Garantías',
+    titleKey: 'admin.content.titleWarranties',
     fields: [
-      { key: 'title', label: 'Título' },
-      { key: 'content', label: 'Contenido', multiline: true },
+      { key: 'title', labelKey: 'admin.content.fieldTitle' },
+      { key: 'content', labelKey: 'admin.content.fieldContent', multiline: true },
     ],
   },
   reaches: {
-    title: 'Alcances',
+    titleKey: 'admin.content.titleReaches',
     fields: [
-      { key: 'title', label: 'Título' },
-      { key: 'content', label: 'Contenido', multiline: true },
+      { key: 'title', labelKey: 'admin.content.fieldTitle' },
+      { key: 'content', labelKey: 'admin.content.fieldContent', multiline: true },
     ],
   },
 };
@@ -62,6 +63,7 @@ const FIELD_LABELS: Record<ContentType, { title: string; fields: Array<{ key: st
 const EMPTY_FORM: Record<string, string> = { title: '', content: '', question: '', answer: '' };
 
 export default function AdminContent() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<ContentType>('faqs');
   const [items, setItems] = useState<ContentItem[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -102,10 +104,10 @@ export default function AdminContent() {
       for (const field of FIELD_LABELS[tab].fields) payload[field.key] = form[field.key];
       if (editingId) {
         await api.put(`/admin/content/${tab}/${editingId}`, payload);
-        toast.success('Actualizado');
+        toast.success(t('admin.content.updated'));
       } else {
         await api.post(`/admin/content/${tab}`, payload);
-        toast.success('Creado');
+        toast.success(t('admin.content.created'));
       }
       setDialogOpen(false);
       load();
@@ -115,10 +117,10 @@ export default function AdminContent() {
   };
 
   const remove = async (id: number) => {
-    if (!confirm('¿Eliminar?')) return;
+    if (!confirm(t('admin.content.confirmDelete'))) return;
     try {
       await api.delete(`/admin/content/${tab}/${id}`);
-      toast.success('Eliminado');
+      toast.success(t('admin.content.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -132,11 +134,11 @@ export default function AdminContent() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
         <Tabs value={tab} onChange={(_, v) => setTab(v as ContentType)}>
           <Tab label="FAQs" value="faqs" />
-          <Tab label="Garantías" value="warranties" />
-          <Tab label="Alcances" value="reaches" />
+          <Tab label={t('admin.content.tabWarranties')} value="warranties" />
+          <Tab label={t('admin.content.tabReaches')} value="reaches" />
         </Tabs>
         <PrimaryButton startIcon={<AddIcon />} onClick={openNew}>
-          Nuevo
+          {t('admin.content.new')}
         </PrimaryButton>
       </Box>
 
@@ -144,10 +146,10 @@ export default function AdminContent() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{fields[0].label}</TableCell>
-              {fields.length > 1 && <TableCell>{fields[1].label}</TableCell>}
-              <TableCell align="center">Orden</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell>{t(fields[0].labelKey)}</TableCell>
+              {fields.length > 1 && <TableCell>{t(fields[1].labelKey)}</TableCell>}
+              <TableCell align="center">{t('admin.content.order')}</TableCell>
+              <TableCell align="center">{t('admin.content.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,7 +177,9 @@ export default function AdminContent() {
             {items.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  <Typography color="text.secondary">Sin {fields[0].label.toLowerCase()} registradas</Typography>
+                  <Typography color="text.secondary">
+                    {t('admin.content.emptyState', { item: t(fields[0].labelKey).toLowerCase() })}
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -184,14 +188,16 @@ export default function AdminContent() {
       </TableContainer>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? 'Editar' : 'Nuevo'} — {FIELD_LABELS[tab].title}</DialogTitle>
+        <DialogTitle>
+          {t(editingId ? 'admin.common.edit' : 'admin.content.new')} — {t(FIELD_LABELS[tab].titleKey)}
+        </DialogTitle>
         <DialogContent dividers>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           <Stack spacing={2}>
             {fields.map((f) => (
               <TextField
                 key={f.key}
-                label={f.label}
+                label={t(f.labelKey)}
                 value={form[f.key]}
                 onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
                 multiline={f.multiline}
@@ -200,13 +206,20 @@ export default function AdminContent() {
                 required
               />
             ))}
-            <TextField label="Orden" type="number" value={order} onChange={(e) => setOrder(e.target.value)} fullWidth helperText="Número bajo = aparece primero" />
+            <TextField
+              label={t('admin.content.order')}
+              type="number"
+              value={order}
+              onChange={(e) => setOrder(e.target.value)}
+              fullWidth
+              helperText={t('admin.content.orderHelper')}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setDialogOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setDialogOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={save}>
-            {editingId ? 'Guardar' : 'Crear'}
+            {editingId ? t('admin.common.save') : t('admin.content.create')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>

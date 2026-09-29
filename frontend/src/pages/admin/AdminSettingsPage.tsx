@@ -27,6 +27,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { api } from '../../services/api';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 
 interface SettingRow {
@@ -38,6 +39,7 @@ interface SettingRow {
 const EMPTY_FORM: SettingRow = { key: '', value: '' };
 
 export default function AdminSettingsPage() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<SettingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -79,12 +81,12 @@ export default function AdminSettingsPage() {
   const save = async () => {
     const key = form.key.trim();
     if (!key) {
-      setError('La clave es obligatoria.');
+      setError(t('admin.settings.keyRequired'));
       return;
     }
     try {
       await api.put(`/admin/settings/${encodeURIComponent(key)}`, { key, value: form.value });
-      toast.success(editing ? 'Ajuste actualizado' : 'Ajuste creado');
+      toast.success(editing ? t('admin.settings.updated') : t('admin.settings.created'));
       setDialogOpen(false);
       load();
     } catch (err) {
@@ -93,10 +95,10 @@ export default function AdminSettingsPage() {
   };
 
   const remove = async (row: SettingRow) => {
-    if (!confirm(`¿Eliminar el ajuste "${row.key}"?`)) return;
+    if (!confirm(t('admin.settings.confirmDelete', { key: row.key }))) return;
     try {
       await api.delete(`/admin/settings/${encodeURIComponent(row.key)}`);
-      toast.success('Ajuste eliminado');
+      toast.success(t('admin.settings.deleted'));
       load();
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -108,34 +110,34 @@ export default function AdminSettingsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap" gap={1}>
         <Box>
           <Typography variant="h6" fontWeight={700}>
-            Configuración global
+            {t('admin.settings.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Pares clave/valor usados por la plataforma (maintenance, comisiones, textos, flags).
+            {t('admin.settings.subtitle')}
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={openNew}>
-          Nuevo ajuste
+          {t('admin.settings.newSetting')}
         </Button>
       </Box>
 
       <Alert severity="info" sx={{ mb: 2 }}>
-        Estos ajustes se guardan en la tabla <Chip label="settings" size="small" /> y están disponibles vía{' '}
-        <code>GET /api/admin/settings</code>. Edítalos con cuidado: el frontend y el backend pueden depender de ellos.
+        {t('admin.settings.infoBanner')} <Chip label="settings" size="small" /> {t('admin.settings.infoBannerEndpoint')}{' '}
+        <code>GET /api/admin/settings</code>. {t('admin.settings.infoBannerWarning')}
       </Alert>
 
       {loading ? (
         <LoadingState />
       ) : settings.length === 0 ? (
-        <EmptyState message="No hay ajustes guardados todavía." />
+        <EmptyState message={t('admin.settings.emptyState')} />
       ) : (
         <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Clave</TableCell>
-                <TableCell>Valor</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.settings.columnKey')}</TableCell>
+                <TableCell>{t('admin.settings.columnValue')}</TableCell>
+                <TableCell align="center">{t('admin.settings.columnActions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -166,20 +168,20 @@ export default function AdminSettingsPage() {
       )}
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? `Editar ajuste: ${editing.key}` : 'Nuevo ajuste'}</DialogTitle>
+        <DialogTitle>{editing ? t('admin.settings.editDialogTitle', { key: editing.key }) : t('admin.settings.newDialogTitle')}</DialogTitle>
         <DialogContent dividers>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           <Stack spacing={2}>
             <TextField
-              label="Clave (key)"
+              label={t('admin.settings.keyLabel')}
               value={form.key}
               onChange={(e) => setForm({ ...form, key: e.target.value })}
               fullWidth
               disabled={!!editing}
-              helperText="Ej: maintenance_mode, default_commission, site_title"
+              helperText={t('admin.settings.keyHelperText')}
             />
             <TextField
-              label="Valor (value)"
+              label={t('admin.settings.valueLabel')}
               value={form.value}
               onChange={(e) => setForm({ ...form, value: e.target.value })}
               fullWidth
@@ -189,9 +191,9 @@ export default function AdminSettingsPage() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)}>{t('admin.common.cancel')}</Button>
           <Button variant="contained" onClick={save}>
-            {editing ? 'Guardar' : 'Crear'}
+            {editing ? t('admin.common.save') : t('admin.settings.create')}
           </Button>
         </DialogActions>
       </Dialog>

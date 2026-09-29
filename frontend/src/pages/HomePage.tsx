@@ -15,6 +15,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { JobCard, type Job } from '../components/redesign/JobCard';
+import { AdSlotCard } from '../components/redesign/AdSlotCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -263,6 +264,9 @@ export default function HomePage() {
                 <JobCard job={job} onClick={() => navigate('/empleos')} />
               </Grid>
             ))}
+            <Grid item xs={12} sm={6} md={4}>
+              <AdSlotCard />
+            </Grid>
           </Grid>
         </Container>
       )}

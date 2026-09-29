@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, RefreshControl } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { BadgeCheck } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -8,30 +9,36 @@ import { LoadingState, EmptyState, ErrorState } from '../components/redesign/Sta
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 
-const TABS: { key: string; label: string }[] = [
-  { key: 'PENDING', label: 'Pendientes' },
-  { key: 'APPROVED', label: 'Aprobados' },
-  { key: 'REJECTED', label: 'Rechazados' },
-  { key: 'CLOSED', label: 'Cerrados' },
-];
-const PERIOD_LABEL: Record<string, string> = { DAILY: 'Diario', WEEKLY: 'Semanal', MONTHLY: 'Mensual' };
-
 function fmt(v: any) {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 });
-}
-function salaryText(j: any) {
-  const p = PERIOD_LABEL[j.payPeriod] ?? '';
-  const hasMin = j.salaryMin != null && j.salaryMin !== '';
-  const hasMax = j.salaryMax != null && j.salaryMax !== '';
-  if (!hasMin && !hasMax) return `Sueldo a convenir · ${p}`;
-  if (hasMin && hasMax) return `${fmt(j.salaryMin)} - ${fmt(j.salaryMax)} Bs · ${p}`;
-  return `${hasMin ? 'Desde' : 'Hasta'} ${fmt(hasMin ? j.salaryMin : j.salaryMax)} Bs · ${p}`;
 }
 
 export default function AdminJobsScreen() {
   const navigation = useNavigation<any>();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const TABS: { key: string; label: string }[] = [
+    { key: 'PENDING', label: t('mobile.adminJobs.tabPending') },
+    { key: 'APPROVED', label: t('mobile.adminJobs.tabApproved') },
+    { key: 'REJECTED', label: t('mobile.adminJobs.tabRejected') },
+    { key: 'CLOSED', label: t('mobile.adminJobs.tabClosed') },
+  ];
+  const PERIOD_LABEL: Record<string, string> = {
+    DAILY: t('mobile.adminJobs.periodDaily'),
+    WEEKLY: t('mobile.adminJobs.periodWeekly'),
+    MONTHLY: t('mobile.adminJobs.periodMonthly'),
+  };
+  const salaryText = (j: any) => {
+    const p = PERIOD_LABEL[j.payPeriod] ?? '';
+    const hasMin = j.salaryMin != null && j.salaryMin !== '';
+    const hasMax = j.salaryMax != null && j.salaryMax !== '';
+    if (!hasMin && !hasMax) return t('mobile.adminJobs.salaryToAgree', { period: p });
+    if (hasMin && hasMax) return t('mobile.adminJobs.salaryRange', { min: fmt(j.salaryMin), max: fmt(j.salaryMax), period: p });
+    return hasMin
+      ? t('mobile.adminJobs.salaryFrom', { value: fmt(j.salaryMin), period: p })
+      : t('mobile.adminJobs.salaryUpTo', { value: fmt(j.salaryMax), period: p });
+  };
   const [tab, setTab] = useState('PENDING');
   const [jobs, setJobs] = useState<any[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
@@ -77,16 +84,16 @@ export default function AdminJobsScreen() {
   };
 
   const approve = (j: any) => {
-    Alert.alert('Aprobar empleo', `¿Publicar «${j.title}»? Estará visible por 30 días.`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('mobile.adminJobs.approveConfirmTitle'), t('mobile.adminJobs.approveConfirmMessage', { title: j.title }), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
       {
-        text: 'Aprobar',
+        text: t('mobile.common.approve'),
         onPress: async () => {
           try {
             await api.put(`/admin/jobs/${j.id}/moderate`, { action: 'approve' });
             load(tab);
           } catch (e) {
-            Alert.alert('Error', getErrorMessage(e));
+            Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
           }
         },
       },
@@ -94,7 +101,7 @@ export default function AdminJobsScreen() {
   };
 
   const confirmReject = async () => {
-    if (reason.trim().length < 5) return Alert.alert('Falta información', 'El motivo debe tener al menos 5 caracteres.');
+    if (reason.trim().length < 5) return Alert.alert(t('mobile.common.missingInfoTitle'), t('mobile.adminJobs.reasonTooShortMessage'));
     setBusy(true);
     try {
       await api.put(`/admin/jobs/${rejectJob.id}/moderate`, { action: 'reject', reason: reason.trim() });
@@ -102,7 +109,7 @@ export default function AdminJobsScreen() {
       setReason('');
       load(tab);
     } catch (e) {
-      Alert.alert('Error', getErrorMessage(e));
+      Alert.alert(t('mobile.common.errorTitle'), getErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -114,18 +121,18 @@ export default function AdminJobsScreen() {
       <View style={styles.storeRow}>
         <Text style={styles.meta}>{item.store?.storeName}</Text>
         {item.store?.isVerified && <BadgeCheck size={14} color={colors.success} />}
-        {item.store?.isVerified && <Text style={[styles.meta, { color: colors.success }]}>Verificada</Text>}
+        {item.store?.isVerified && <Text style={[styles.meta, { color: colors.success }]}>{t('mobile.adminJobs.verifiedLabel')}</Text>}
       </View>
       <Text style={styles.meta}>{item.category?.name} · {item.city}</Text>
       <Text style={styles.salary}>{salaryText(item)}</Text>
       <Text style={styles.desc} numberOfLines={4}>{item.description}</Text>
       {item.status === 'REJECTED' && item.rejectionReason ? (
-        <Text style={[styles.meta, { color: colors.error }]}>Motivo: {item.rejectionReason}</Text>
+        <Text style={[styles.meta, { color: colors.error }]}>{t('mobile.adminJobs.rejectionReasonLabel', { reason: item.rejectionReason })}</Text>
       ) : null}
       {item.status === 'PENDING' && (
         <View style={styles.actions}>
-          <View style={styles.flex1}><NeoButton title="Aprobar" onPress={() => approve(item)} /></View>
-          <View style={styles.flex1}><NeoButton title="Rechazar" variant="ghost" onPress={() => { setReason(''); setRejectJob(item); }} /></View>
+          <View style={styles.flex1}><NeoButton title={t('mobile.common.approve')} onPress={() => approve(item)} /></View>
+          <View style={styles.flex1}><NeoButton title={t('mobile.common.reject')} variant="ghost" onPress={() => { setReason(''); setRejectJob(item); }} /></View>
         </View>
       )}
     </View>
@@ -133,7 +140,7 @@ export default function AdminJobsScreen() {
 
   return (
     <View style={styles.flex}>
-      <Text style={styles.title}>Moderar empleos</Text>
+      <Text style={styles.title}>{t('mobile.adminJobs.title')}</Text>
       <View style={styles.tabs}>
         {TABS.map((t) => {
           const active = tab === t.key;
@@ -146,7 +153,7 @@ export default function AdminJobsScreen() {
           );
         })}
         <TouchableOpacity style={styles.chip} onPress={() => navigation.navigate('AdminJobCategories')}>
-          <Text style={styles.chipText}>Categorías de trabajo</Text>
+          <Text style={styles.chipText}>{t('mobile.adminJobs.jobCategoriesLink')}</Text>
         </TouchableOpacity>
       </View>
       {loading ? (
@@ -160,19 +167,19 @@ export default function AdminJobsScreen() {
           contentContainerStyle={{ padding: 12, gap: 10, paddingBottom: 32 }}
           renderItem={renderItem}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(tab); }} tintColor={colors.primary} colors={[colors.primary]} />}
-          ListEmptyComponent={<EmptyState message="No hay empleos en este estado." />}
+          ListEmptyComponent={<EmptyState message={t('mobile.adminJobs.emptyMessage')} />}
         />
       )}
 
       <Modal visible={!!rejectJob} transparent animationType="fade" onRequestClose={() => setRejectJob(null)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Rechazar empleo</Text>
+            <Text style={styles.modalTitle}>{t('mobile.adminJobs.rejectModalTitle')}</Text>
             <Text style={styles.meta}>{rejectJob?.title}</Text>
-            <Text style={styles.label}>Motivo * (mín. 5 caracteres)</Text>
-            <NeoInput value={reason} onChangeText={setReason} multiline placeholder="Ej: Falta información del sueldo" />
-            <NeoButton title="Confirmar rechazo" onPress={confirmReject} disabled={busy} />
-            <NeoButton title="Cancelar" variant="ghost" onPress={() => setRejectJob(null)} style={{ marginTop: 8 }} />
+            <Text style={styles.label}>{t('mobile.adminJobs.reasonFieldLabel')}</Text>
+            <NeoInput value={reason} onChangeText={setReason} multiline placeholder={t('mobile.adminJobs.reasonPlaceholder')} />
+            <NeoButton title={t('mobile.adminJobs.confirmRejectButton')} onPress={confirmReject} disabled={busy} />
+            <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setRejectJob(null)} style={{ marginTop: 8 }} />
           </View>
         </View>
       </Modal>

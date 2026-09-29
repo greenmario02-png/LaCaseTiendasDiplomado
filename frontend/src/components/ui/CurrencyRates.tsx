@@ -145,7 +145,7 @@ export default function CurrencyRates() {
               <Chip size="small" variant="outlined" sx={{ color: 'inherit', borderColor: 'rgba(255,255,255,0.5)', fontWeight: 700 }} label={`USD Bs ${rates.rates.usd.toFixed(2)}`} />
               {/* El resto circula como letrero LED */}
               <Box sx={{ overflow: 'hidden', width: { md: 150, lg: 230 }, maskImage: 'linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)' }}>
-                <Box sx={{ display: 'flex', gap: 1, width: 'max-content', animation: 'ledTicker 28s linear infinite' }}>
+                <Box sx={{ display: 'flex', gap: 1, width: 'max-content', animation: 'ledTicker 40s linear infinite' }}>
                   {[...LED_RATES, ...LED_RATES].map((m, i) => (
                     <Chip key={`${m.key}-${i}`} size="small" variant="outlined" sx={{ color: 'inherit', borderColor: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }} label={`${m.label} Bs ${rates.rates[m.key].toFixed(m.dec)}`} />
                   ))}

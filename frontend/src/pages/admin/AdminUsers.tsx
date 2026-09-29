@@ -34,10 +34,12 @@ import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const EMPTY = { email: '', password: '', firstName: '', lastName: '', phone: '', role: 'CUSTOMER', storeName: '' };
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const money = useMoney();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function AdminUsers() {
   const update = async (userId: number, data: Record<string, unknown>) => {
     try {
       await api.put(`/admin/users/${userId}`, data);
-      toast.success('Usuario actualizado');
+      toast.success(t('admin.users.toast.updated'));
       load(tab === 1 ? 'SELLER' : tab === 2 ? 'ADMIN' : undefined);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -79,13 +81,13 @@ export default function AdminUsers() {
 
   const createUser = async () => {
     if (!form.email || !form.password || !form.firstName || !form.lastName) {
-      toast.error('Completa email, contraseña, nombre y apellido');
+      toast.error(t('admin.users.toast.createValidation'));
       return;
     }
     setCreating(true);
     try {
       await api.post('/admin/users', form);
-      toast.success('Usuario creado');
+      toast.success(t('admin.users.toast.created'));
       setCreateOpen(false);
       setForm(EMPTY);
       load();
@@ -128,7 +130,7 @@ export default function AdminUsers() {
     setInviting(true);
     try {
       await api.put(`/admin/users/${inviteUser.id}`, { role: inviteRole });
-      toast.success(`Invitación enviada a ${inviteUser.firstName} ${inviteUser.lastName} como ${inviteRole.toLowerCase()}`);
+      toast.success(t('admin.users.toast.inviteSent', { name: `${inviteUser.firstName} ${inviteUser.lastName}`, role: inviteRole.toLowerCase() }));
       setInviteOpen(false);
       setInviteUser(null);
       setInviteRole('CUSTOMER');
@@ -142,22 +144,22 @@ export default function AdminUsers() {
     }
   };
 
-  const roleFilter = tab === 0 ? 'Clientes' : tab === 1 ? 'Vendedores' : 'Admins';
+  const emptyLabel = tab === 0 ? t('admin.users.emptyCustomers') : tab === 1 ? t('admin.users.emptySellers') : t('admin.users.emptyAdmins');
 
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab label="Clientes" />
-          <Tab label="Vendedores" />
-          <Tab label="Admins" />
+          <Tab label={t('admin.users.tabs.customers')} />
+          <Tab label={t('admin.users.tabs.sellers')} />
+          <Tab label={t('admin.users.tabs.admins')} />
         </Tabs>
         <Box display="flex" gap={1}>
           <SecondaryButton startIcon={<PersonAddIcon />} onClick={() => setInviteOpen(true)}>
-            Invitar usuario
+            {t('admin.users.inviteUserButton')}
           </SecondaryButton>
           <PrimaryButton startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
-            Nuevo usuario
+            {t('admin.users.newUserButton')}
           </PrimaryButton>
         </Box>
       </Box>
@@ -169,19 +171,19 @@ export default function AdminUsers() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Usuario</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell align="center">Rol</TableCell>
-                <TableCell align="center">Estado</TableCell>
-                <TableCell align="right">Puntos</TableCell>
-                <TableCell align="center">Acciones</TableCell>
+                <TableCell>{t('admin.users.table.user')}</TableCell>
+                <TableCell>{t('admin.users.table.email')}</TableCell>
+                <TableCell align="center">{t('admin.users.table.role')}</TableCell>
+                <TableCell align="center">{t('admin.users.table.status')}</TableCell>
+                <TableCell align="right">{t('admin.users.table.points')}</TableCell>
+                <TableCell align="center">{t('admin.users.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
-                    <Typography color="text.secondary">Sin {roleFilter.toLowerCase()}</Typography>
+                    <Typography color="text.secondary">{emptyLabel}</Typography>
                   </TableCell>
                 </TableRow>
               )}
@@ -205,14 +207,14 @@ export default function AdminUsers() {
                       onChange={(e) => update(u.id, { role: e.target.value })}
                       disabled={u.role === 'ADMIN' && u.email === 'admin@pctienda.com'}
                     >
-                      <MenuItem value="CUSTOMER">Cliente</MenuItem>
-                      <MenuItem value="SELLER">Vendedor</MenuItem>
-                      <MenuItem value="ADMIN">Admin</MenuItem>
+                      <MenuItem value="CUSTOMER">{t('admin.users.role.customer')}</MenuItem>
+                      <MenuItem value="SELLER">{t('admin.users.role.seller')}</MenuItem>
+                      <MenuItem value="ADMIN">{t('admin.users.role.admin')}</MenuItem>
                     </Select>
                   </TableCell>
                   <TableCell align="center">
                     <Chip
-                      label={u.isActive ? 'Activo' : 'Bloqueado'}
+                      label={u.isActive ? t('admin.common.active') : t('admin.users.status.blocked')}
                       size="small"
                       color={u.isActive ? 'success' : 'error'}
                       onClick={() => update(u.id, { isActive: !u.isActive })}
@@ -221,7 +223,7 @@ export default function AdminUsers() {
                   </TableCell>
                   <TableCell align="right">{u.gamerCoins}</TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => openDetail(u.id)} title="Ver detalle">
+                    <IconButton onClick={() => openDetail(u.id)} title={t('admin.common.viewDetail')}>
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
@@ -234,7 +236,7 @@ export default function AdminUsers() {
 
       {/* ===== DIALOG INVITAR USUARIO ===== */}
       <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Invitar usuario</DialogTitle>
+        <DialogTitle>{t('admin.users.inviteUserButton')}</DialogTitle>
         <DialogContent dividers>
           <Box mb={2}>
             <Autocomplete
@@ -248,8 +250,8 @@ export default function AdminUsers() {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Buscar usuario por email o nombre"
-                  placeholder="Escribe al menos 2 letras..."
+                  label={t('admin.users.searchUserLabel')}
+                  placeholder={t('admin.users.searchPlaceholder')}
                   fullWidth
                 />
               )}
@@ -260,73 +262,73 @@ export default function AdminUsers() {
               )}
             />
             <Typography variant="caption" color="text.secondary">
-              Busca un usuario ya registrado para invitarlo a la plataforma con el rol que elijas.
+              {t('admin.users.searchHelperText')}
             </Typography>
           </Box>
           <TextField
             select
-            label="Rol"
+            label={t('admin.users.roleSelectLabel')}
             value={inviteRole}
             onChange={(e) => setInviteRole(e.target.value)}
             fullWidth
           >
-            <MenuItem value="CUSTOMER">Cliente</MenuItem>
-            <MenuItem value="SELLER">Vendedor</MenuItem>
-            <MenuItem value="ADMIN">Admin</MenuItem>
+            <MenuItem value="CUSTOMER">{t('admin.users.role.customer')}</MenuItem>
+            <MenuItem value="SELLER">{t('admin.users.role.seller')}</MenuItem>
+            <MenuItem value="ADMIN">{t('admin.users.role.admin')}</MenuItem>
           </TextField>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setInviteOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setInviteOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={handleInvite} disabled={!inviteUser || inviting}>
-            {inviting ? <CircularProgress size={20} /> : 'Invitar'}
+            {inviting ? <CircularProgress size={20} /> : t('admin.users.inviteConfirmButton')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
 
       {/* ===== DIALOG CREAR USUARIO ===== */}
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Nuevo usuario</DialogTitle>
+        <DialogTitle>{t('admin.users.newUserButton')}</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <TextField label="Nombre" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} fullWidth required />
+              <TextField label={t('admin.users.form.firstName')} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Apellido" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} fullWidth required />
+              <TextField label={t('admin.users.form.lastName')} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} fullWidth required />
+              <TextField label={t('admin.users.form.email')} type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} fullWidth required />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Contraseña" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} fullWidth required helperText="Mínimo 8 caracteres" />
+              <TextField label={t('admin.users.form.password')} type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} fullWidth required helperText={t('admin.users.form.passwordHelper')} />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Teléfono" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} fullWidth />
+              <TextField label={t('admin.users.form.phone')} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={6}>
               <TextField
                 select
-                label="Rol"
+                label={t('admin.users.roleSelectLabel')}
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
                 fullWidth
               >
-                <MenuItem value="CUSTOMER">Cliente</MenuItem>
-                <MenuItem value="SELLER">Vendedor</MenuItem>
-                <MenuItem value="ADMIN">Admin</MenuItem>
+                <MenuItem value="CUSTOMER">{t('admin.users.role.customer')}</MenuItem>
+                <MenuItem value="SELLER">{t('admin.users.role.seller')}</MenuItem>
+                <MenuItem value="ADMIN">{t('admin.users.role.admin')}</MenuItem>
               </TextField>
             </Grid>
             {form.role === 'SELLER' && (
               <Grid item xs={12}>
-                <TextField label="Nombre de la tienda" value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} fullWidth />
+                <TextField label={t('admin.users.form.storeName')} value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} fullWidth />
               </Grid>
             )}
           </Grid>
         </DialogContent>
         <DialogActions>
-          <GhostButton onClick={() => setCreateOpen(false)}>Cancelar</GhostButton>
+          <GhostButton onClick={() => setCreateOpen(false)}>{t('admin.common.cancel')}</GhostButton>
           <PrimaryButton onClick={createUser} disabled={creating}>
-            {creating ? <CircularProgress size={20} /> : 'Crear usuario'}
+            {creating ? <CircularProgress size={20} /> : t('admin.users.createUserButton')}
           </PrimaryButton>
         </DialogActions>
       </Dialog>
@@ -343,47 +345,47 @@ export default function AdminUsers() {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body2">
-                    <strong>Email:</strong> {detail.user.email}
+                    <strong>{t('admin.users.detail.email')}</strong> {detail.user.email}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Teléfono:</strong> {detail.user.phone || '—'}
+                    <strong>{t('admin.users.detail.phone')}</strong> {detail.user.phone || '—'}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Registro:</strong> {new Date(detail.user.createdAt).toLocaleDateString('es-BO')}
+                    <strong>{t('admin.users.detail.registered')}</strong> {new Date(detail.user.createdAt).toLocaleDateString('es-BO')}
                   </Typography>
                   {detail.user.storeName && (
                     <Typography variant="body2">
-                      <strong>Tienda:</strong> {detail.user.storeName}
+                      <strong>{t('admin.users.detail.store')}</strong> {detail.user.storeName}
                     </Typography>
                   )}
                   {detail.user.storeCategory && (
                     <Typography variant="body2">
-                      <strong>Categoría:</strong> {detail.user.storeCategory}
+                      <strong>{t('admin.users.detail.category')}</strong> {detail.user.storeCategory}
                     </Typography>
                   )}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box display="flex" gap={1} flexWrap="wrap">
-                    <Chip label={`Gasto: ${money(detail.totalSpent)}`} color="primary" variant="outlined" />
-                    <Chip label={`Pedidos: ${detail.orders.length}`} variant="outlined" />
-                    <Chip label={`Direcciones: ${detail.addresses.length}`} variant="outlined" />
-                    <Chip label={`Reseñas: ${detail.reviewCount}`} variant="outlined" />
-                    <Chip label={`Favoritos: ${detail.wishlistCount}`} variant="outlined" />
+                    <Chip label={t('admin.users.detail.spent', { amount: money(detail.totalSpent) })} color="primary" variant="outlined" />
+                    <Chip label={t('admin.users.detail.orders', { count: detail.orders.length })} variant="outlined" />
+                    <Chip label={t('admin.users.detail.addresses', { count: detail.addresses.length })} variant="outlined" />
+                    <Chip label={t('admin.users.detail.reviews', { count: detail.reviewCount })} variant="outlined" />
+                    <Chip label={t('admin.users.detail.favorites', { count: detail.wishlistCount })} variant="outlined" />
                   </Box>
                   {detail.user.role === 'SELLER' && (
                     <Box mt={1}>
                       <Chip label={`${detail.user.rating}`} variant="outlined" />
-                      <Chip label={`Ventas: ${detail.user.totalSales}`} variant="outlined" sx={{ ml: 1 }} />
+                      <Chip label={t('admin.users.detail.sales', { count: detail.user.totalSales })} variant="outlined" sx={{ ml: 1 }} />
                     </Box>
                   )}
                 </Grid>
               </Grid>
 
               <Typography variant="subtitle2" fontWeight={700} mt={3} mb={1}>
-                Pedidos recientes
+                {t('admin.users.detail.recentOrders')}
               </Typography>
               {detail.orders.length === 0 ? (
-                <Typography color="text.secondary">Sin pedidos.</Typography>
+                <Typography color="text.secondary">{t('admin.users.detail.noOrders')}</Typography>
               ) : (
                 detail.orders.map((o: any) => (
                   <Box key={o.id} py={1} borderBottom={1} borderColor="divider">
@@ -410,7 +412,7 @@ export default function AdminUsers() {
               )}
             </DialogContent>
             <DialogActions>
-              <GhostButton onClick={() => setDetailOpen(false)}>Cerrar</GhostButton>
+              <GhostButton onClick={() => setDetailOpen(false)}>{t('admin.users.closeButton')}</GhostButton>
             </DialogActions>
           </>
         )}
