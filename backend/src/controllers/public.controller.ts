@@ -4,6 +4,16 @@ import { AuthRequest } from '../middlewares/auth';
 import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { ok, created } from '../utils/response';
+import { APP_VERSION_INFO } from '../config/appVersion';
+
+/** Consultado por la app móvil al iniciar para avisar si hay una actualización disponible. */
+export async function appVersion(_req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    return ok(res, APP_VERSION_INFO);
+  } catch (error) {
+    next(error);
+  }
+}
 
 /** Etiquetas estilo Couchsurfing permitidas en las reseñas (tienda y producto). */
 export const REVIEW_TAGS = [

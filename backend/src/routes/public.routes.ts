@@ -8,6 +8,8 @@ import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 
+router.get('/app-version', asyncHandler(publicController.appVersion));
+
 // Promociones de regalo de una tienda (público)
 router.get('/sellers/:id/gifts', asyncHandler(giftController.listBySeller));
 
