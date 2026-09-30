@@ -12,6 +12,7 @@ import { useNotificationsStore } from './src/stores/notificationsStore';
 import { registerPushToken, clearPushToken } from './src/services/notifications';
 import { ThemeProvider, useAppTheme } from './src/theme/ThemeContext';
 import { loadPersistedLanguage } from './src/i18n';
+import UpdateChecker from './src/components/UpdateChecker';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
@@ -207,6 +208,7 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AppNavigator />
+        <UpdateChecker />
       </ThemeProvider>
     </SafeAreaProvider>
   );
