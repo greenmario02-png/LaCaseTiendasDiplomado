@@ -74,6 +74,19 @@ export function uploadSingleAuthenticated(field: string) {
   }];
 }
 
+// Imágenes curadas y reutilizables del seed (una por categoría + avatares genéricos) — se
+// commitean al repo (no son contenido subido por usuarios) para no depender de un servicio
+// externo de imágenes aleatorias al armar los datos de ejemplo.
+const SEED_ASSETS_DIR = path.resolve(__dirname, '..', '..', 'prisma', 'seed-assets');
+
+export function serveSeedAssets(app: import('express').Express) {
+  app.use('/seed-assets', (req, res, next) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('Access-Control-Allow-Origin', '*');
+    next();
+  }, express.static(SEED_ASSETS_DIR, { maxAge: '30d', immutable: true }));
+}
+
 export function serveUploads(app: import('express').Express) {
   // CORP cross-origin + ACAO para que las <img> de la web/móvil (localhost:5173/:19006) puedan mostrar los /uploads
   app.use('/uploads', (req, res, next) => {

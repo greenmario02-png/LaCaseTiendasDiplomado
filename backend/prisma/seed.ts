@@ -3,6 +3,7 @@ import { fakerES as faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
 
 import { BOLIVIANISMOS } from '../src/data/bolivianismos';
+import { env } from '../src/config/env';
 
 const prisma = new PrismaClient();
 
@@ -169,6 +170,50 @@ function flickrImage(keyword: string, width = 800, height = width): string {
 function categoryImage(categoryName: string, width = 800, height = width): string {
   const keyword = CATEGORY_KEYWORDS[categoryName] ?? 'store';
   return flickrImage(keyword, width, height);
+}
+
+// Imágenes curadas y reutilizables (prisma/seed-assets/), una foto real por categoría de nivel
+// superior — en vez de depender de un servicio externo de fotos aleatorias (LoremFlickr, poco
+// confiable). Se sirven desde el propio backend en /seed-assets (ver serveSeedAssets en
+// middlewares/upload.ts), tanto en local como en producción (BACKEND_URL).
+const CATEGORY_IMAGE_FILES: Record<string, string> = {
+  hardware: 'hardware.jpg',
+  perifericos: 'perifericos.jpg',
+  ropa: 'ropa.jpg',
+  celulares: 'celulares.png',
+  electrodomesticos: 'electrodomesticos.jpg',
+  antiguedades: 'antiguedades.jpg',
+  'bar-y-bebidas': 'bar-y-bebidas.jpg',
+  juguetes: 'juguetes.jpg',
+  deportes: 'deportes.jpg',
+  'hogar-y-muebles': 'hogar-y-muebles.jpg',
+  'salud-y-belleza': 'salud-y-belleza.jpg',
+  mascotas: 'mascotas.jpg',
+  'musica-e-instrumentos': 'musica-e-instrumentos.jpg',
+  videojuegos: 'videojuegos.jpg',
+  'libros-y-papeleria': 'libros-y-papeleria.jpg',
+  artesanias: 'artesanias.jpg',
+  herramientas: 'herramientas.jpg',
+};
+
+/** URL absoluta de la imagen local de una categoría de nivel superior, por su slug. */
+function localCategoryImage(topLevelSlug: string): string {
+  const file = CATEGORY_IMAGE_FILES[topLevelSlug] ?? CATEGORY_IMAGE_FILES.hardware;
+  return `${env.BACKEND_URL}/seed-assets/categories/${file}`;
+}
+
+/** Resuelve el slug de la categoría de nivel superior a la que pertenece un nombre de
+ * categoría (de nivel superior o hija) — para elegir la imagen local correspondiente. */
+function topSlugForCategoryName(name: string): string {
+  const top = CATEGORY_TREE.find((t) => t.name === name || (t.children as string[]).includes(name));
+  return top?.slug ?? 'hardware';
+}
+
+const AVATAR_COUNT = 5;
+/** URL absoluta de un avatar genérico local, rotando entre los disponibles. */
+function localAvatarImage(index: number): string {
+  const n = (index % AVATAR_COUNT) + 1;
+  return `${env.BACKEND_URL}/seed-assets/avatars/avatar-${n}.jpg`;
 }
 
 const CATEGORY_TREE = [
@@ -983,6 +1028,11 @@ async function main() {
   await prisma.privilegedBuyer.deleteMany();
   await prisma.jobPosting.deleteMany();
   await prisma.jobCategory.deleteMany();
+  await prisma.conoMatchVote.deleteMany();
+  await prisma.conoMatch.deleteMany();
+  await prisma.conoVote.deleteMany();
+  await prisma.conoEntry.deleteMany();
+  await prisma.conoTheme.deleteMany();
   await prisma.user.deleteMany();
   await prisma.faq.deleteMany();
   await prisma.warranty.deleteMany();
@@ -999,6 +1049,7 @@ async function main() {
       passwordHash: adminHash,
       firstName: 'Admin',
       lastName: 'Principal',
+      profileImage: localAvatarImage(0),
       role: Role.ADMIN,
       isVerified: true,
       isApproved: true,
@@ -1026,11 +1077,13 @@ async function main() {
       firstName: 'Mateo',
       lastName: 'Quispe',
       phone: boliviaPhone(),
+      profileImage: localAvatarImage(1),
       role: Role.SELLER,
       storeName: 'TecnoCase Cochabamba',
       storeDescription: 'Tienda de tecnología y electrodomésticos en Cochabamba.',
-      storeLogo: flickrImage('electronics-store', 200),
-      storeBanner: flickrImage('electronics-store', 1200, 300),
+      storeCategory: 'Hardware',
+      storeLogo: localCategoryImage('hardware'),
+      storeBanner: localCategoryImage('hardware'),
       locationCity: 'Cochabamba',
       locationState: 'Cochabamba',
       locationPostalCode: '3000',
@@ -1049,6 +1102,9 @@ async function main() {
     const loc = cities[i % cities.length];
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
+    // Cada tienda "vive" en un rubro (categoría de nivel superior) — su logo/banner es
+    // contextual a eso, en vez de una foto genérica de "storefront".
+    const sellerCategory = CATEGORY_TREE[i % CATEGORY_TREE.length];
     const seller = await prisma.user.create({
       data: {
         email: lacaseEmail(firstName, lastName),
@@ -1056,11 +1112,13 @@ async function main() {
         firstName,
         lastName,
         phone: boliviaPhone(),
+        profileImage: localAvatarImage(i + 2),
         role: Role.SELLER,
         storeName: faker.company.name(),
         storeDescription: storeTagline(),
-        storeLogo: flickrImage('storefront', 200),
-        storeBanner: flickrImage('storefront', 1200, 300),
+        storeCategory: sellerCategory.name,
+        storeLogo: localCategoryImage(sellerCategory.slug),
+        storeBanner: localCategoryImage(sellerCategory.slug),
         locationCity: loc.city,
         locationState: loc.state,
         locationPostalCode: loc.cp,
@@ -1084,6 +1142,7 @@ async function main() {
       firstName: 'Valeria',
       lastName: 'Mamani',
       phone: boliviaPhone(),
+      profileImage: localAvatarImage(0),
       role: Role.CUSTOMER,
       locationCity: 'La Paz',
       locationState: 'La Paz',
@@ -1115,6 +1174,7 @@ async function main() {
         firstName,
         lastName,
         phone: boliviaPhone(),
+        profileImage: localAvatarImage(i + 1),
         role: Role.CUSTOMER,
         locationCity: loc.city,
         locationState: loc.state,
@@ -1146,7 +1206,7 @@ async function main() {
         name: parent.name,
         slug: parent.slug,
         icon: (parent as any).icon ?? null,
-        imageUrl: categoryImage(parent.name, 800, 600),
+        imageUrl: localCategoryImage(parent.slug),
         order: 0,
       },
     });
@@ -1234,12 +1294,10 @@ async function main() {
           isFeatured: faker.datatype.boolean(0.2),
           viewCount: faker.number.int({ min: 0, max: 5000 }),
           saleCount: faker.number.int({ min: 0, max: 300 }),
+          // Una sola imagen real por producto (la de su categoría) — mostrar la misma foto
+          // repetida varias veces en la galería sería peor que no tener galería.
           images: {
-            create: Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map((_, imgIdx) => ({
-              url: categoryImage(categoryName),
-              order: imgIdx,
-              isPrimary: imgIdx === 0,
-            })),
+            create: [{ url: localCategoryImage(topSlugForCategoryName(categoryName)), order: 0, isPrimary: true }],
           },
         },
       });

@@ -34,7 +34,7 @@ import storeTeamRoutes from './routes/storeTeam.routes';
 import rbacRoutes from './routes/rbac.routes';
 import jobRoutes from './routes/job.routes';
 import { assertPublicHttpUrl, fetchPublicImage } from './utils/safeFetch';
-import { serveUploads } from './middlewares/upload';
+import { serveUploads, serveSeedAssets } from './middlewares/upload';
 import { setupSwagger } from './config/swagger';
 
 export function createApp() {
@@ -141,6 +141,7 @@ export function createApp() {
   app.use('/api', contentRoutes);
 
   serveUploads(app);
+  serveSeedAssets(app);
   setupSwagger(app);
 
   app.use(notFoundHandler);
