@@ -27,3 +27,14 @@ export const proofUrlSchema = z
 export const paymentProofSchema = z.object({
   body: z.object({ proofUrl: proofUrlSchema }),
 });
+
+export const createOrderSchema = z.object({
+  body: z.object({
+    shippingAddressId: z.number().int().positive().optional(),
+    notes: z.string().trim().max(1000).optional(),
+    paymentQrUrl: z.string().trim().max(2000).optional(),
+    couponCode: z.string().trim().max(50).optional(),
+    fulfillmentType: z.enum(['SHIPPING', 'PICKUP']).optional(),
+    pickupAddress: z.string().trim().max(500).optional(),
+  }),
+});

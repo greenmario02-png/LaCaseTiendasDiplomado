@@ -99,7 +99,8 @@ export default function NotificationBell() {
       .finally(() => setLoading(false));
   };
 
-  // Socket en vivo: actualiza badge al recibir notificación
+  // Socket en vivo: actualiza badge al recibir notificación; en reconexión (tras un corte)
+  // reconcilia con el backend por si se perdió algún evento mientras estuvo desconectado.
   useEffect(() => {
     if (!user) return;
     const token = localStorage.getItem('accessToken');
@@ -108,18 +109,23 @@ export default function NotificationBell() {
     socket.on('notification:new', (payload: any) => {
       setUnread(payload.unreadCount ?? ((n: number) => n + 1));
     });
+    socket.on('connect', loadUnread);
     return () => {
       socket.off('notification:new');
+      socket.off('connect', loadUnread);
     };
   }, [user]);
 
-  // Cargar al montar y cuando el usuario cambia
+  // Cargar al montar/cambiar de usuario, y reconciliar al volver a la pestaña. Ya no pollea
+  // cada 60s indefinidamente: el socket mantiene el badge al día en vivo mientras está conectado.
   useEffect(() => {
     loadUnread();
-    if (user) {
-      const interval = setInterval(loadUnread, 60000);
-      return () => clearInterval(interval);
-    }
+    if (!user) return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') loadUnread();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
   }, [user]);
 
   const handleNavigate = (n: Notification) => {

@@ -24,7 +24,10 @@ export interface ProductFilters {
   featured?: boolean;
 }
 
-const PRODUCT_INCLUDE = {
+// Include liviano para catálogo/carruseles/relacionados: la grilla (ProductCard) solo pinta
+// seller/category/imagen/tags — attributes (con join a attributeDefinition) y variants solo
+// los usa la página de detalle, así que no vale la pena traerlos en listados de 20+ productos.
+const PRODUCT_LIST_INCLUDE = {
   seller: {
     select: {
       id: true,
@@ -43,6 +46,13 @@ const PRODUCT_INCLUDE = {
     orderBy: { order: 'asc' as const },
     select: { id: true, url: true, isPrimary: true },
   },
+  tags: {
+    include: { tag: { select: { id: true, name: true, slug: true } } },
+  },
+};
+
+const PRODUCT_INCLUDE = {
+  ...PRODUCT_LIST_INCLUDE,
   attributes: {
     include: {
       attributeDefinition: {
@@ -52,9 +62,6 @@ const PRODUCT_INCLUDE = {
   },
   variants: {
     select: { id: true, sku: true, priceModifier: true, stock: true, attributesJson: true },
-  },
-  tags: {
-    include: { tag: { select: { id: true, name: true, slug: true } } },
   },
 };
 
@@ -185,7 +192,7 @@ export async function listProducts(filters: ProductFilters) {
         where: cursorWhere,
         take: limit,
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        include: PRODUCT_INCLUDE,
+        include: PRODUCT_LIST_INCLUDE,
       }),
       prisma.product.count({ where }),
     ]);
@@ -196,7 +203,7 @@ export async function listProducts(filters: ProductFilters) {
         skip: (page - 1) * limit,
         take: limit,
         orderBy,
-        include: PRODUCT_INCLUDE,
+        include: PRODUCT_LIST_INCLUDE,
       }),
       prisma.product.count({ where }),
     ]);
@@ -245,7 +252,7 @@ export async function getFeaturedProducts() {
     where: { isActive: true, isApproved: true, isFeatured: true },
     take: 12,
     orderBy: { saleCount: 'desc' },
-    include: PRODUCT_INCLUDE,
+    include: PRODUCT_LIST_INCLUDE,
   });
 }
 
@@ -260,7 +267,7 @@ export async function getRelatedProducts(productId: number, categoryId: number, 
     },
     take: 8,
     orderBy: { saleCount: 'desc' },
-    include: PRODUCT_INCLUDE,
+    include: PRODUCT_LIST_INCLUDE,
   });
 }
 

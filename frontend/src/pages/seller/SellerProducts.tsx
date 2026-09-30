@@ -180,7 +180,7 @@ export default function SellerProducts() {
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={1}>
                     {p.images?.[0] && (
-                      <img src={p.images[0].url} alt="" style={{ width: 36, height: 36, borderRadius: 4, objectFit: 'cover' }} />
+                      <img src={p.images[0].url} alt="" loading="lazy" style={{ width: 36, height: 36, borderRadius: 4, objectFit: 'cover' }} />
                     )}
                     <Typography variant="body2" fontWeight={600}>
                       {p.name}

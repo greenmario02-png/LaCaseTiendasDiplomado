@@ -3,7 +3,7 @@ import { Router } from 'express';
 import * as orderController from '../controllers/order.controller';
 import { validate } from '../middlewares/validate';
 import { requireSeller } from '../middlewares/roles';
-import { paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
+import { createOrderSchema, paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
 import { authenticate } from '../middlewares/auth';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -13,7 +13,7 @@ router.get('/recent-sales', asyncHandler(orderController.recentSales));
 
 router.use(authenticate);
 
-router.post('/', asyncHandler(orderController.createOrders));
+router.post('/', validate(createOrderSchema), asyncHandler(orderController.createOrders));
 router.post('/calculate-shipping', asyncHandler(orderController.shippingQuotes));
 router.get('/buyer', asyncHandler(orderController.buyerOrders));
 router.get('/buyer/:id', asyncHandler(orderController.buyerOrderDetail));

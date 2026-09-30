@@ -1,6 +1,7 @@
 ﻿import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import compression from 'compression';
 
 import { corsOptions } from './config/cors';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
@@ -39,6 +40,10 @@ import { setupSwagger } from './config/swagger';
 export function createApp() {
   const app = express();
 
+  // Desplegado detrás de un proxy inverso (Render): sin esto, express-rate-limit
+  // no puede distinguir IPs reales y limita a todos los usuarios como si fueran uno solo.
+  app.set('trust proxy', 1);
+
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -55,6 +60,7 @@ export function createApp() {
     })
   );
   app.use(cors(corsOptions));
+  app.use(compression());
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
   app.use(generalLimiter);
@@ -97,7 +103,9 @@ export function createApp() {
       }
       const { buffer, contentType } = await fetchPublicImage(url);
       res.set('Content-Type', contentType);
-      res.set('Cache-Control', 'no-cache');
+      // La URL codificada en :encoded identifica el contenido de forma estable, así que cachear
+      // agresivamente es seguro (si la imagen origen cambia, cambia también su URL).
+      res.set('Cache-Control', 'public, max-age=604800, immutable');
       res.send(buffer);
     } catch {
       res.status(502).json({ error: { code: 'BAD_GATEWAY', message: 'No se pudo cargar la imagen' } });

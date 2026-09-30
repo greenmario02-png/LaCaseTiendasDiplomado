@@ -452,6 +452,7 @@ export async function getWishlist(req: AuthRequest, res: Response, next: NextFun
     const items = await prisma.wishlistItem.findMany({
       where: { userId: req.user!.id },
       orderBy: { createdAt: 'desc' },
+      take: 200,
       include: {
         product: {
           include: {

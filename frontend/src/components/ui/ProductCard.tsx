@@ -17,17 +17,18 @@ import PriceDisplay from './PriceDisplay';
 import { useAuthStore } from '../../stores/authStore';
 import { useWishlistStore } from '../../stores/wishlistStore';
 import type { Product } from '../../types/domain';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
-export default function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: Product }) {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
-  const wishlist = useWishlistStore((s) => s.wishlist);
+  // Selector puntual (no el array completo): togglear un favorito solo re-renderiza esa card,
+  // no toda la grilla.
+  const inWishlist = useWishlistStore((s) => s.wishlist.includes(product.id));
   const toggle = useWishlistStore((s) => s.toggle);
   const [imgFailed, setImgFailed] = useState(false);
 
   const image = product.images?.find((i) => i.isPrimary)?.url || product.images?.[0]?.url;
-  const inWishlist = wishlist.includes(product.id);
   const outOfStock = product.stock <= 0;
   const lowStock = product.stock > 0 && product.stock <= 5;
 
@@ -139,3 +140,5 @@ export default function ProductCard({ product }: { product: Product }) {
     </Card>
   );
 }
+
+export default memo(ProductCard);

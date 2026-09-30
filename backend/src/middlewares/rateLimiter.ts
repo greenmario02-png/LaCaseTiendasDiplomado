@@ -23,6 +23,9 @@ export const generalLimiter = rateLimit({
   max: isTest ? 100000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
+  // El proxy de imágenes (/api/img) puede recibir varias decenas de pedidos por una sola
+  // página de catálogo; no tiene sentido que compita por el mismo cupo que el resto de la API.
+  skip: (req) => req.path.startsWith('/api/img'),
 });
 
 export const forumPostLimiter = rateLimit({

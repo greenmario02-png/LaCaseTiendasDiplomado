@@ -174,6 +174,7 @@ whatsappPhone      String?
   payouts               Payout[]
   knownProducts         KnownProduct[]
 
+  @@index([role, isApproved])
   @@map("users")
 }
 
@@ -321,6 +322,7 @@ model Product {
   @@index([sellerId])
   @@index([isApproved])
   @@index([name])
+  @@index([isActive, createdAt])
   @@map("products")
 }
 
@@ -462,6 +464,7 @@ model Order {
 
   @@index([buyerId])
   @@index([sellerId])
+  @@index([status, createdAt])
   @@map("orders")
 }
 

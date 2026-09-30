@@ -364,14 +364,17 @@ export async function getSellerDashboard(req: AuthRequest, res: Response, next: 
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
     });
-    const topProducts = [];
-    for (const t of topProductsRaw) {
-      const p = await prisma.product.findUnique({
-        where: { id: t.productId },
-        select: { id: true, name: true, price: true, stock: true, images: { take: 1, select: { url: true } } },
-      });
-      if (p) topProducts.push({ ...p, totalSold: t._sum.quantity ?? 0 });
-    }
+    const topProductsFound = await prisma.product.findMany({
+      where: { id: { in: topProductsRaw.map((t) => t.productId) } },
+      select: { id: true, name: true, price: true, stock: true, images: { take: 1, select: { url: true } } },
+    });
+    const topProductsMap = new Map(topProductsFound.map((p) => [p.id, p]));
+    const topProducts = topProductsRaw
+      .map((t) => {
+        const p = topProductsMap.get(t.productId);
+        return p ? { ...p, totalSold: t._sum.quantity ?? 0 } : null;
+      })
+      .filter((p): p is NonNullable<typeof p> => p !== null);
 
     // Ventas de la semana y mes para comparación
     const weekStart = new Date(Date.now() - 7 * 86400000);

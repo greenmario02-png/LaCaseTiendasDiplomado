@@ -81,6 +81,10 @@ export async function getCart(req: AuthRequest) {
 }
 
 export async function addItem(req: AuthRequest, productId: number, quantity: number, variantId?: number) {
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    throw ApiError.badRequest('La cantidad debe ser un entero mayor a 0');
+  }
+
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
 
