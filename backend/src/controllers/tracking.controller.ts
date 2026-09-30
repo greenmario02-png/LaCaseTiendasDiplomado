@@ -228,146 +228,178 @@ export async function personalizedFeed(req: AuthRequest, res: Response, next: Ne
       userCity = user?.locationCity?.trim()?.toLowerCase() || user?.locationState?.trim()?.toLowerCase() || null;
     }
 
-    // Cercanía real por GPS: vendedores con coordenadas dentro del radio, del más cercano al más lejano.
     const origin = parseCoords(req.query);
-    let geoNear: any[] = [];
-    if (origin) {
-      const cand = await prisma.product.findMany({
-        where: { isActive: true, isApproved: true },
-        orderBy: { createdAt: 'desc' },
-        take: 300,
-        include: { ...FEED_PRODUCT_INCLUDE, seller: { select: { ...FEED_PRODUCT_INCLUDE.seller.select, latitude: true, longitude: true } } },
-      });
-      const mapa = await cityCoordsMap();
-      geoNear = nearestFirst(
-        cand.map((p) => withCityFallback({ ...p, latitude: p.seller.latitude, longitude: p.seller.longitude }, p.seller.locationCity, mapa)),
-        origin,
-        origin.radiusKm,
-      ).slice(0, 10);
-      if (!userCity) {
-        const found = await nearestCity(origin.lat, origin.lng);
-        userCity = found?.city.name.toLowerCase() ?? null;
-      }
-    }
 
-    // 1) Productos cerca de ti (misma ciudad, isActive, recientes) — fallback: destacados
-    const nearYou = geoNear.length > 0 ? geoNear : await prisma.product.findMany({
-      where: {
-        isActive: true,
-        isApproved: true,
-        ...(userCity
-          ? { OR: [
-              { seller: { locationCity: { contains: userCity, mode: 'insensitive' as const } } },
-              { seller: { locationState: { contains: userCity, mode: 'insensitive' as const } } },
-            ] }
-          : { isFeatured: true }),
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      include: FEED_PRODUCT_INCLUDE,
-    });
-
-    // 2) Carruseles por categoría (productos agregados recientemente)
-    const categories = await prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: { order: 'asc' as const },
-      take: 8,
-      select: { id: true, name: true, slug: true },
-    });
-    const categoryFeeds = await Promise.all(
-      categories.map(async (cat) => {
-        const products = await prisma.product.findMany({
-          where: { isActive: true, isApproved: true, categoryId: cat.id },
-          orderBy: { createdAt: 'desc' },
-          take: 6,
-          include: FEED_PRODUCT_INCLUDE,
-        });
-        return { category: cat, products };
-      }),
-    );
-    const categoryCarousels = categoryFeeds.filter((c) => c.products.length > 0);
-
-    // 3) Para ti (recomendaciones personalizadas)
-    let forYou: any[] = [];
-    try {
-      if (userId || sessionId) {
-        const identity = { userId, sessionId };
-        const viewedIds = await getRecentProductIds(identity, 20);
-        let interestCategoryIds: number[] = [];
-        if (viewedIds.length > 0) {
-          const viewedProducts = await prisma.product.findMany({
-            where: { id: { in: viewedIds } },
-            select: { categoryId: true },
+    // Los 4 bloques del feed no dependen entre sí (solo "cerca de ti" depende de userCity/origin,
+    // resueltos arriba) — corren en paralelo en vez de uno detrás del otro.
+    const [nearYouBlock, categoryCarousels, forYou, trending] = await Promise.all([
+      (async () => {
+        // Cercanía real por GPS: vendedores con coordenadas dentro del radio, del más cercano al más lejano.
+        let geoNear: any[] = [];
+        let resolvedUserCity = userCity;
+        if (origin) {
+          // Paso 1: solo id + coords para calcular distancia — nada de include pesado todavía,
+          // se paga ese join únicamente para los 10 ganadores (paso 2), no para los 300 candidatos.
+          const candLight = await prisma.product.findMany({
+            where: { isActive: true, isApproved: true },
+            orderBy: { createdAt: 'desc' },
+            take: 300,
+            select: { id: true, seller: { select: { locationCity: true, latitude: true, longitude: true } } },
           });
-          interestCategoryIds = Array.from(new Set(viewedProducts.map((p) => p.categoryId)));
+          const mapa = await cityCoordsMap();
+          const nearestIds = nearestFirst(
+            candLight.map((p) => withCityFallback({ id: p.id, latitude: p.seller.latitude, longitude: p.seller.longitude }, p.seller.locationCity, mapa)),
+            origin,
+            origin.radiusKm,
+          )
+            .slice(0, 10)
+            .map((p) => p.id);
+
+          if (nearestIds.length > 0) {
+            const winners = await prisma.product.findMany({
+              where: { id: { in: nearestIds } },
+              include: FEED_PRODUCT_INCLUDE,
+            });
+            const winnersMap = new Map(winners.map((w) => [w.id, w]));
+            geoNear = nearestIds.map((id) => winnersMap.get(id)).filter((p): p is NonNullable<typeof p> => p != null);
+          }
+
+          if (!resolvedUserCity) {
+            const found = await nearestCity(origin.lat, origin.lng);
+            resolvedUserCity = found?.city.name.toLowerCase() ?? null;
+          }
         }
-        const searches = await prisma.searchHistory.findMany({
+
+        // Productos cerca de ti (misma ciudad, isActive, recientes) — fallback: destacados
+        const nearYou = geoNear.length > 0 ? geoNear : await prisma.product.findMany({
           where: {
-            ...(userId ? { userId } : { sessionId }),
-            createdAt: { gte: new Date(Date.now() - 30 * 86400000) },
+            isActive: true,
+            isApproved: true,
+            ...(resolvedUserCity
+              ? { OR: [
+                  { seller: { locationCity: { contains: resolvedUserCity, mode: 'insensitive' as const } } },
+                  { seller: { locationState: { contains: resolvedUserCity, mode: 'insensitive' as const } } },
+                ] }
+              : { isFeatured: true }),
           },
           orderBy: { createdAt: 'desc' },
-          take: 20,
-          select: { term: true },
-        });
-        const terms = searches.map((s) => s.term);
-        const forYouWhere: any = { isActive: true, isApproved: true };
-        if (interestCategoryIds.length > 0 || terms.length > 0) {
-          forYouWhere.OR = [
-            ...(interestCategoryIds.length > 0 ? [{ categoryId: { in: interestCategoryIds } }] : []),
-            ...(terms.length > 0 ? [{ name: { contains: terms[0], mode: 'insensitive' } }] : []),
-          ];
-        }
-        forYou = await prisma.product.findMany({
-          where: forYouWhere,
-          orderBy: { saleCount: 'desc' },
-          take: 12,
+          take: 10,
           include: FEED_PRODUCT_INCLUDE,
         });
-      }
-      if (forYou.length === 0) {
-        forYou = await prisma.product.findMany({
-          where: { isActive: true, isApproved: true, isFeatured: true },
-          take: 12,
-          include: FEED_PRODUCT_INCLUDE,
-        });
-      }
-    } catch {
-      forYou = [];
-    }
 
-    // 4) Destacados por vistas (semana, orden por viewCount)
-    const weekAgo = new Date(Date.now() - 7 * 86400000);
-    const trendingViews = await prisma.productView.groupBy({
-      by: ['productId'],
-      where: { createdAt: { gte: weekAgo } },
-      _count: { _all: true },
-      orderBy: { _count: { productId: 'desc' as const } },
-      take: 10,
-    });
-    const trendingIds = trendingViews.map((v) => v.productId);
-    let trending: any[] = [];
-    if (trendingIds.length > 0) {
-      trending = await prisma.product.findMany({
-        where: { id: { in: trendingIds }, isActive: true, isApproved: true },
-        include: FEED_PRODUCT_INCLUDE,
-      });
-    }
-    if (trending.length === 0) {
-      trending = await prisma.product.findMany({
-        where: { isActive: true, isApproved: true },
-        orderBy: { viewCount: 'desc' },
-        take: 10,
-        include: FEED_PRODUCT_INCLUDE,
-      });
-    }
+        return { nearYou, userCity: resolvedUserCity };
+      })(),
+
+      // Carruseles por categoría (productos agregados recientemente)
+      (async () => {
+        const categories = await prisma.category.findMany({
+          where: { isActive: true },
+          orderBy: { order: 'asc' as const },
+          take: 8,
+          select: { id: true, name: true, slug: true },
+        });
+        const categoryFeeds = await Promise.all(
+          categories.map(async (cat) => {
+            const products = await prisma.product.findMany({
+              where: { isActive: true, isApproved: true, categoryId: cat.id },
+              orderBy: { createdAt: 'desc' },
+              take: 6,
+              include: FEED_PRODUCT_INCLUDE,
+            });
+            return { category: cat, products };
+          }),
+        );
+        return categoryFeeds.filter((c) => c.products.length > 0);
+      })(),
+
+      // Para ti (recomendaciones personalizadas)
+      (async () => {
+        let forYou: any[] = [];
+        try {
+          if (userId || sessionId) {
+            const identity = { userId, sessionId };
+            const viewedIds = await getRecentProductIds(identity, 20);
+            let interestCategoryIds: number[] = [];
+            if (viewedIds.length > 0) {
+              const viewedProducts = await prisma.product.findMany({
+                where: { id: { in: viewedIds } },
+                select: { categoryId: true },
+              });
+              interestCategoryIds = Array.from(new Set(viewedProducts.map((p) => p.categoryId)));
+            }
+            const searches = await prisma.searchHistory.findMany({
+              where: {
+                ...(userId ? { userId } : { sessionId }),
+                createdAt: { gte: new Date(Date.now() - 30 * 86400000) },
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 20,
+              select: { term: true },
+            });
+            const terms = searches.map((s) => s.term);
+            const forYouWhere: any = { isActive: true, isApproved: true };
+            if (interestCategoryIds.length > 0 || terms.length > 0) {
+              forYouWhere.OR = [
+                ...(interestCategoryIds.length > 0 ? [{ categoryId: { in: interestCategoryIds } }] : []),
+                ...(terms.length > 0 ? [{ name: { contains: terms[0], mode: 'insensitive' } }] : []),
+              ];
+            }
+            forYou = await prisma.product.findMany({
+              where: forYouWhere,
+              orderBy: { saleCount: 'desc' },
+              take: 12,
+              include: FEED_PRODUCT_INCLUDE,
+            });
+          }
+          if (forYou.length === 0) {
+            forYou = await prisma.product.findMany({
+              where: { isActive: true, isApproved: true, isFeatured: true },
+              take: 12,
+              include: FEED_PRODUCT_INCLUDE,
+            });
+          }
+        } catch {
+          forYou = [];
+        }
+        return forYou;
+      })(),
+
+      // Destacados por vistas (semana, orden por viewCount)
+      (async () => {
+        const weekAgo = new Date(Date.now() - 7 * 86400000);
+        const trendingViews = await prisma.productView.groupBy({
+          by: ['productId'],
+          where: { createdAt: { gte: weekAgo } },
+          _count: { _all: true },
+          orderBy: { _count: { productId: 'desc' as const } },
+          take: 10,
+        });
+        const trendingIds = trendingViews.map((v) => v.productId);
+        let trending: any[] = [];
+        if (trendingIds.length > 0) {
+          trending = await prisma.product.findMany({
+            where: { id: { in: trendingIds }, isActive: true, isApproved: true },
+            include: FEED_PRODUCT_INCLUDE,
+          });
+        }
+        if (trending.length === 0) {
+          trending = await prisma.product.findMany({
+            where: { isActive: true, isApproved: true },
+            orderBy: { viewCount: 'desc' },
+            take: 10,
+            include: FEED_PRODUCT_INCLUDE,
+          });
+        }
+        return trending;
+      })(),
+    ]);
 
     return ok(res, {
-      nearYou,
+      nearYou: nearYouBlock.nearYou,
       categoryCarousels,
       forYou,
       trending,
-      userCity,
+      userCity: nearYouBlock.userCity,
     });
   } catch (error) {
     next(error);

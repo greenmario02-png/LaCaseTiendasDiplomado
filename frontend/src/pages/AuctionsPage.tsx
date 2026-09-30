@@ -210,7 +210,7 @@ export default function AuctionsPage() {
                     <CardActionArea component={Link} to={`/subasta/${a.id}`} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                       <Box className="image-container" sx={{ aspectRatio: '1/1' }}>
                         {a.imageUrl ? (
-                          <img src={a.imageUrl} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={a.imageUrl} alt={a.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                           <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: t.surface }}>
                             <GavelIcon color="disabled" sx={{ fontSize: 48 }} />

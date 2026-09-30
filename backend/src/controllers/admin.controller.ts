@@ -108,14 +108,17 @@ export async function stats(_req: AuthRequest, res: Response, next: NextFunction
       orderBy: { _sum: { quantity: 'desc' } },
       take: 10,
     });
-    const topProducts = [];
-    for (const t of topProductsRaw) {
-      const p = await prisma.product.findUnique({
-        where: { id: t.productId },
-        select: { id: true, name: true, price: true, images: { take: 1, select: { url: true } } },
-      });
-      if (p) topProducts.push({ ...p, totalSold: t._sum.quantity ?? 0 });
-    }
+    const topProductsFound = await prisma.product.findMany({
+      where: { id: { in: topProductsRaw.map((t) => t.productId) } },
+      select: { id: true, name: true, price: true, images: { take: 1, select: { url: true } } },
+    });
+    const topProductsMap = new Map(topProductsFound.map((p) => [p.id, p]));
+    const topProducts = topProductsRaw
+      .map((t) => {
+        const p = topProductsMap.get(t.productId);
+        return p ? { ...p, totalSold: t._sum.quantity ?? 0 } : null;
+      })
+      .filter((p): p is NonNullable<typeof p> => p !== null);
 
     // 3. Top 10 tiendas por ingresos
     const sellerRevenueRaw = await prisma.order.groupBy({
@@ -126,14 +129,17 @@ export async function stats(_req: AuthRequest, res: Response, next: NextFunction
       orderBy: { _sum: { total: 'desc' } },
       take: 10,
     });
-    const topSellers = [];
-    for (const s of sellerRevenueRaw) {
-      const seller = await prisma.user.findUnique({
-        where: { id: s.sellerId },
-        select: { id: true, storeName: true, storeLogo: true, rating: true, locationCity: true, country: true },
-      });
-      if (seller) topSellers.push({ ...seller, revenue: s._sum.total ?? 0, orders: s._count ?? 0 });
-    }
+    const topSellersFound = await prisma.user.findMany({
+      where: { id: { in: sellerRevenueRaw.map((s) => s.sellerId) } },
+      select: { id: true, storeName: true, storeLogo: true, rating: true, locationCity: true, country: true },
+    });
+    const topSellersMap = new Map(topSellersFound.map((s) => [s.id, s]));
+    const topSellers = sellerRevenueRaw
+      .map((s) => {
+        const seller = topSellersMap.get(s.sellerId);
+        return seller ? { ...seller, revenue: s._sum.total ?? 0, orders: s._count ?? 0 } : null;
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null);
 
     // 4. Ventas por categoría
     const ordersWithItems = await prisma.orderItem.findMany({
@@ -145,11 +151,17 @@ export async function stats(_req: AuthRequest, res: Response, next: NextFunction
       if (!oi.product.categoryId) continue;
       catSales.set(oi.product.categoryId, (catSales.get(oi.product.categoryId) ?? 0) + Number(oi.unitPrice) * oi.quantity);
     }
-    const salesByCategory = [];
-    for (const [catId, total] of catSales.entries()) {
-      const cat = await prisma.category.findUnique({ where: { id: catId }, select: { id: true, name: true } });
-      if (cat) salesByCategory.push({ id: cat.id, name: cat.name, total });
-    }
+    const categoriesFound = await prisma.category.findMany({
+      where: { id: { in: Array.from(catSales.keys()) } },
+      select: { id: true, name: true },
+    });
+    const categoriesMap = new Map(categoriesFound.map((c) => [c.id, c]));
+    const salesByCategory = Array.from(catSales.entries())
+      .map(([catId, total]) => {
+        const cat = categoriesMap.get(catId);
+        return cat ? { id: cat.id, name: cat.name, total } : null;
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null);
     salesByCategory.sort((a, b) => b.total - a.total);
 
     // 5. Distribución de órdenes por estado
@@ -503,6 +515,8 @@ export async function pendingSellers(_req: AuthRequest, res: Response, next: Nex
   try {
     const sellers = await prisma.user.findMany({
       where: { role: 'SELLER', isApproved: false },
+      orderBy: { createdAt: 'asc' },
+      take: 200,
       select: {
         id: true,
         email: true,

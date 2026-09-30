@@ -67,6 +67,8 @@ export default function ProductDetailPage() {
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'good' | 'neutral' | 'bad'>('all');
 
+  // Producto, ofertas y relacionados solo necesitan el `id` de la URL (no la respuesta del
+  // detalle), así que salen en paralelo en vez de encadenados uno detrás del otro.
   useEffect(() => {
     setLoading(true);
     api
@@ -75,29 +77,29 @@ export default function ProductDetailPage() {
         setProduct(res.data.data);
         const first = res.data.data.images?.find((i: any) => i.isPrimary)?.url || res.data.data.images?.[0]?.url;
         setMainImage(first || '');
-        // Registrar vista para recomendaciones
-        api.post(`/tracking/products/${id}/view`).catch(() => {});
-        // Ofertas del mismo producto de otros vendedores (comparación de precios)
-        api
-          .get(`/products/${id}/offers`)
-          .then((o) => setOffers(o.data.data))
-          .catch(() => {});
       })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
+
+    // Registrar vista para recomendaciones
+    api.post(`/tracking/products/${id}/view`).catch(() => {});
+    // Ofertas del mismo producto de otros vendedores (comparación de precios)
+    api
+      .get(`/products/${id}/offers`)
+      .then((o) => setOffers(o.data.data))
+      .catch(() => {});
+    api
+      .get(`/products/${id}/related`)
+      .then((res) => setRelated(res.data.data))
+      .catch(() => {});
   }, [id]);
 
   useEffect(() => {
-    if (!product) return;
     api
-      .get(`/products/${product.id}/related`)
-      .then((res) => setRelated(res.data.data))
-      .catch(() => {});
-    api
-      .get(`/products/${product.id}/reviews`)
+      .get(`/products/${id}/reviews`)
       .then((res) => setReviews(res.data.data))
       .catch(() => {});
-  }, [product, reloadReviews]);
+  }, [id, reloadReviews]);
 
   if (loading) return <ProductGridSkeleton count={3} />;
 
