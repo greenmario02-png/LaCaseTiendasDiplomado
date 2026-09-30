@@ -10,6 +10,9 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  // URL pública de este mismo backend — usada por el seed para construir URLs absolutas de
+  // las imágenes locales en prisma/seed-assets/ (ver GET /seed-assets en app.ts).
+  BACKEND_URL: z.string().default('http://localhost:3000'),
   CURRENCY_REFRESH_MIN_MINUTES: z.coerce.number().positive().default(8),
   CURRENCY_REFRESH_MAX_MINUTES: z.coerce.number().positive().default(14),
 });
