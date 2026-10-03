@@ -67,7 +67,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   init: async () => {
     try {
       const raw = await AsyncStorage.getItem(USER_KEY);
-      if (raw) set({ user: JSON.parse(raw) });
+      if (raw) {
+        const stored = JSON.parse(raw);
+        // Sesión de ADMIN guardada por una versión anterior: la administración es solo web.
+        if (stored?.role === 'ADMIN') {
+          await tokenStore.clear();
+          await refreshTokenStore.clear();
+          await AsyncStorage.removeItem(USER_KEY);
+        } else {
+          set({ user: stored });
+        }
+      }
       const token = await tokenStore.get();
       if (token && !get().user) {
         try {

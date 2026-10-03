@@ -8,6 +8,16 @@ export default async function globalSetup() {
   process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/lacase_test';
   process.env.NODE_ENV = 'test';
 
+  // Protección: el setup ejecuta `prisma db push --force-reset` (borra TODO). Nunca contra una base
+  // que no sea explícitamente de pruebas (p. ej. si la DATABASE_URL de producción quedó en el shell).
+  const dbName = new URL(process.env.DATABASE_URL).pathname.replace(/^\//, '');
+  if (!/test/i.test(dbName)) {
+    throw new Error(
+      `[globalSetup] Se rechaza ejecutar las pruebas: la base "${dbName}" no parece de pruebas (su nombre debe contener "test"). ` +
+        'Define DATABASE_URL hacia una base local como lacase_test.',
+    );
+  }
+
   console.log('\n[globalSetup] Inicializando BD de test...');
 
   execSync('npx prisma db push --force-reset --skip-generate', {

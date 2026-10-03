@@ -111,17 +111,18 @@ docker compose up -d
 
 ## Cuentas de prueba
 
-En el entorno de **desarrollo local** (`npm run db:seed`):
+Ninguna contraseña se guarda en este repositorio.
 
-| Rol | Email | Contraseña |
-|---|---|---|
-| Administrador | admin@lacase.bo | (definida en el entorno) |
-| Vendedor | vendedor@lacase.bo | (definida en el entorno) |
-| Comprador | comprador@lacase.bo | (definida en el entorno) |
-
-En la demo en vivo, las cuentas de demostración son `vendedor.demo@lacase.bo` y
-`comprador.demo@lacase.bo`. Son cuentas ficticias, solo para demostración; ningún secreto de
-producción se guarda en este repositorio.
+- **Desarrollo local** (`npm run db:seed`): el seed crea `vendedor@lacase.bo` y `comprador@lacase.bo`
+  (contraseña de ejemplo `password123`, solo local) y un administrador `admin@lacase.bo` cuya
+  contraseña se define con `SEED_ADMIN_PASSWORD` o, si no se define, se genera al azar y se muestra
+  una sola vez al terminar el seed.
+- **Producción**: el administrador se crea con `ADMIN_EMAIL`/`ADMIN_PASSWORD` y las cuentas ficticias
+  de revisión (`vendedor.revision@lacase.test`, `comprador.revision@lacase.test`) con
+  `REVIEW_PASSWORD`, todas desde variables de entorno (`backend/prisma/seed-prod.ts`).
+  Las credenciales de la revisión se entregan por el canal de la entrega, no aquí.
+- **La administración es solo web**: la app móvil no permite iniciar sesión con una cuenta de
+  administrador (el servidor responde 403 a las peticiones con la cabecera `X-Client-App: mobile`).
 
 ## Comandos de calidad
 

@@ -61,6 +61,8 @@ api.interceptors.request.use(async (config) => {
   const token = await tokenStore.get();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   config.headers['X-Session-Id'] = await getSessionId();
+  // El backend rechaza (403) las cuentas ADMIN que llegan con esta cabecera: la administración es solo web.
+  config.headers['X-Client-App'] = 'mobile';
   return config;
 });
 
@@ -98,7 +100,7 @@ api.interceptors.response.use(
       }
       if (!refreshing) {
         refreshing = axios
-          .post(`${API_URL}/auth/refresh`, { refreshToken: refresh })
+          .post(`${API_URL}/auth/refresh`, { refreshToken: refresh }, { headers: { 'X-Client-App': 'mobile' } })
           .then(async (res) => {
             const { accessToken, refreshToken: newRefresh } = res.data.data;
             await tokenStore.set(accessToken);

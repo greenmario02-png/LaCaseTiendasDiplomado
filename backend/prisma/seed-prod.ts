@@ -4,7 +4,9 @@ import bcrypt from 'bcryptjs';
 /**
  * Seed mínimo e idempotente para un entorno real: administrador (desde variables de entorno),
  * árbol base de categorías y, opcionalmente, dos cuentas demo ficticias.
- * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), DEMO_PASSWORD (opcional).
+ * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), DEMO_PASSWORD, REVIEW_PASSWORD y
+ * REVIEW_ADMIN_PASSWORD (opcionales; las dos últimas crean las cuentas ficticias *.revision@lacase.test
+ * para las pruebas de revisión: vendedor+comprador y administrador respectivamente).
  * Nunca imprime contraseñas.
  */
 const prisma = new PrismaClient();
@@ -185,6 +187,65 @@ async function seedDemo(password: string) {
   });
 }
 
+/**
+ * Cuentas ficticias exclusivas para la revisión/pruebas (dominio reservado .test, desechables).
+ * La contraseña viene SOLO de REVIEW_PASSWORD (entorno / panel de la plataforma): nunca se
+ * escribe en el repositorio. Re-ejecutar el seed con otra REVIEW_PASSWORD la rota.
+ */
+async function seedReview(password: string) {
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.upsert({
+    where: { email: 'vendedor.revision@lacase.test' },
+    update: { passwordHash, isActive: true, isApproved: true },
+    create: {
+      email: 'vendedor.revision@lacase.test',
+      passwordHash,
+      firstName: 'Revisión',
+      lastName: 'Vendedor',
+      role: Role.SELLER,
+      storeName: 'Tienda de Revisión',
+      storeDescription: 'Cuenta ficticia para pruebas de la revisión (datos de ejemplo).',
+      locationCity: 'Tarija',
+      locationState: 'Tarija',
+      country: 'BO',
+      isVerified: true,
+      isApproved: true,
+    },
+  });
+  await prisma.user.upsert({
+    where: { email: 'comprador.revision@lacase.test' },
+    update: { passwordHash, isActive: true },
+    create: {
+      email: 'comprador.revision@lacase.test',
+      passwordHash,
+      firstName: 'Revisión',
+      lastName: 'Comprador',
+      role: Role.CUSTOMER,
+      locationCity: 'Tarija',
+      locationState: 'Tarija',
+      country: 'BO',
+    },
+  });
+}
+
+/** Administrador ficticio de revisión: solo para ejecutar la moderación de productos en las pruebas. */
+async function seedReviewAdmin(password: string) {
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.upsert({
+    where: { email: 'admin.revision@lacase.test' },
+    update: { passwordHash, role: Role.ADMIN, isActive: true, isApproved: true },
+    create: {
+      email: 'admin.revision@lacase.test',
+      passwordHash,
+      firstName: 'Revisión',
+      lastName: 'Administración',
+      role: Role.ADMIN,
+      isVerified: true,
+      isApproved: true,
+    },
+  });
+}
+
 async function main() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD;
@@ -197,6 +258,14 @@ async function main() {
   await seedCategories();
   await seedAdmin(email, password);
   if (process.env.DEMO_PASSWORD) await seedDemo(process.env.DEMO_PASSWORD);
+  if (process.env.REVIEW_PASSWORD) {
+    if (process.env.REVIEW_PASSWORD.length < 10) throw new Error('REVIEW_PASSWORD debe tener al menos 10 caracteres.');
+    await seedReview(process.env.REVIEW_PASSWORD);
+  }
+  if (process.env.REVIEW_ADMIN_PASSWORD) {
+    if (process.env.REVIEW_ADMIN_PASSWORD.length < 10) throw new Error('REVIEW_ADMIN_PASSWORD debe tener al menos 10 caracteres.');
+    await seedReviewAdmin(process.env.REVIEW_ADMIN_PASSWORD);
+  }
   console.log('Seed de producción completado.');
 }
 

@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { verifyAccessToken, JwtPayload } from '../utils/jwt';
 import { ApiError } from '../utils/errors';
 import { prisma } from '../config/database';
+import { ADMIN_WEB_ONLY_MESSAGE, isMobileClient } from '../utils/client';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -33,6 +34,11 @@ export async function authenticate(req: AuthRequest, _res: Response, next: NextF
 
     if (!user || !user.isActive) {
       throw ApiError.unauthorized('Usuario no activo');
+    }
+
+    // La administración es solo web: un token de ADMIN no sirve desde la app móvil.
+    if (user.role === 'ADMIN' && isMobileClient(req)) {
+      throw ApiError.forbidden(ADMIN_WEB_ONLY_MESSAGE);
     }
 
     req.user = user;

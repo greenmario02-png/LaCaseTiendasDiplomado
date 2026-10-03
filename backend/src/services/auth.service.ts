@@ -5,6 +5,7 @@ import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { env } from '../config/env';
+import { ADMIN_WEB_ONLY_MESSAGE } from '../utils/client';
 
 interface RegisterInput {
   email: string;
@@ -99,7 +100,7 @@ export async function registerSeller(input: SellerRegisterInput) {
   return { ...user, inviteCode };
 }
 
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string, opts: { mobile?: boolean } = {}) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw ApiError.unauthorized('Credenciales inválidas');
 
@@ -107,6 +108,9 @@ export async function login(email: string, password: string) {
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) throw ApiError.unauthorized('Credenciales inválidas');
+
+  // Se comprueba después de validar la contraseña para no revelar qué correos son de admin.
+  if (user.role === 'ADMIN' && opts.mobile) throw ApiError.forbidden(ADMIN_WEB_ONLY_MESSAGE);
 
   const refreshToken = signRefreshToken(user.id);
   await prisma.refreshToken.create({
@@ -141,7 +145,7 @@ export async function login(email: string, password: string) {
   };
 }
 
-export async function refresh(refreshToken: string) {
+export async function refresh(refreshToken: string, opts: { mobile?: boolean } = {}) {
   let payload: { userId: number };
   try {
     payload = verifyRefreshToken(refreshToken);
@@ -166,6 +170,7 @@ export async function refresh(refreshToken: string) {
   });
 
   if (!user || !user.isActive) throw ApiError.unauthorized('Usuario no activo');
+  if (user.role === 'ADMIN' && opts.mobile) throw ApiError.forbidden(ADMIN_WEB_ONLY_MESSAGE);
 
   return signAccessToken({ userId: user.id, role: user.role });
 }

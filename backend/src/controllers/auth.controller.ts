@@ -6,6 +6,7 @@ import * as coinsController from './coins.controller';
 import { AuthRequest } from '../middlewares/auth';
 import { ok, created } from '../utils/response';
 import { ApiError } from '../utils/errors';
+import { isMobileClient } from '../utils/client';
 
 export async function register(req: Request, res: Response) {
   const user = await authService.registerUser(req.body);
@@ -28,12 +29,12 @@ export async function registerSeller(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-  const result = await authService.login(req.body.email, req.body.password);
+  const result = await authService.login(req.body.email, req.body.password, { mobile: isMobileClient(req) });
   return ok(res, result);
 }
 
 export async function refresh(req: Request, res: Response) {
-  const accessToken = await authService.refresh(req.body.refreshToken);
+  const accessToken = await authService.refresh(req.body.refreshToken, { mobile: isMobileClient(req) });
   return ok(res, { accessToken });
 }
 

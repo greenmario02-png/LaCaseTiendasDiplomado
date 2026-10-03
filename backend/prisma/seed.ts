@@ -1,6 +1,7 @@
 ﻿import { PrismaClient, Role, ProductCondition, SlotType } from '@prisma/client';
 import { fakerES as faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
+import { randomBytes } from 'crypto';
 
 import { BOLIVIANISMOS } from '../src/data/bolivianismos';
 import { env } from '../src/config/env';
@@ -1041,7 +1042,11 @@ async function main() {
 
   // ---------- USERS ----------
   const passwordHash = await bcrypt.hash('password123', 10);
-  const adminHash = await bcrypt.hash('admin123', 10);
+  // La contraseña del admin de desarrollo no se publica: viene de SEED_ADMIN_PASSWORD o se genera
+  // aleatoria y se muestra una sola vez al terminar el seed.
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString('base64url');
+  const adminGenerated = !process.env.SEED_ADMIN_PASSWORD;
+  const adminHash = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.create({
     data: {
@@ -1664,6 +1669,9 @@ async function main() {
   console.log(`  Tags: ${tagIds.length}`);
   console.log(`  Subastas activas: ${auctionsCreated}`);
   console.log(`  Chats: ${conversationsCreated}`);
+  if (adminGenerated) {
+    console.log(`  Admin de desarrollo: admin@lacase.bo / ${adminPassword}  (generada; se muestra solo ahora)`);
+  }
 }
 
 main()

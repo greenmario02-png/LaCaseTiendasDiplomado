@@ -8,7 +8,7 @@ import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useRbacStore } from '../stores/rbacStore';
 import { CoinChip } from '../components/redesign/CoinChip';
-import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MapPin, MessageSquareWarning, Briefcase } from 'lucide-react-native';
+import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MessageSquareWarning, Briefcase } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
@@ -147,13 +147,9 @@ export default function ProfileScreen({ navigation }: any) {
             <MenuItem icon={<Wrench size={17} color={colors.textSecondary} />} label={t('mobile.profile.editStore')} onPress={() => navigation.navigate('EditStore')} />
           </>
         )}
-        {(user?.role === 'ADMIN' || hasPermission('admin.dashboard')) && (
+        {/* La administración (panel, tiendas, empleos) es solo web; en la app queda únicamente la moderación del foro. */}
+        {hasPermission('admin.dashboard') && user?.role !== 'ADMIN' && (
           <>
-            <MenuItem icon={<ShieldCheck size={17} color={colors.primary} />} label={t('mobile.profile.adminPanel')} onPress={() => navigation.navigate('AdminDashboard')} />
-            <MenuItem icon={<Store size={17} color={colors.primary} />} label={t('mobile.profile.sellers')} onPress={() => navigation.navigate('AdminSellers')} />
-            <MenuItem icon={<MapPin size={17} color={colors.primary} />} label={t('mobile.profile.storeVerification')} onPress={() => navigation.navigate('AdminVerification')} />
-            <MenuItem icon={<Briefcase size={17} color={colors.warning} />} label={t('mobile.profile.moderateJobs')} onPress={() => navigation.navigate('AdminJobs')} />
-            <MenuItem icon={<Users size={17} color={colors.warning} />} label={t('mobile.profile.applications')} onPress={() => navigation.navigate('AdminJobApplications')} />
             <MenuItem icon={<MessageSquareWarning size={17} color={colors.warning} />} label={t('mobile.profile.forumModeration')} onPress={() => navigation.navigate('ForumModeration')} />
           </>
         )}
