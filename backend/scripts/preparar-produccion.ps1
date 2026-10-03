@@ -17,7 +17,8 @@ function Leer-Secreto($mensaje) {
 }
 
 $env:DATABASE_URL = Leer-Secreto "DATABASE_URL de produccion (Render > lacase-diplomado-api > Environment)"
-$env:ADMIN_EMAIL = Read-Host -Prompt "Correo del administrador de produccion (el que ya usas)"
+$env:ADMIN_PREVIOUS_EMAIL = Read-Host -Prompt "Correo ACTUAL del administrador de produccion (ej. admin@lacase.bo)"
+$env:ADMIN_EMAIL = Read-Host -Prompt "Correo NUEVO del administrador (ej. admin@lacase.test; igual al actual si no quieres cambiarlo)"
 $env:ADMIN_PASSWORD = Leer-Secreto "NUEVA contrasena del administrador (min. 10 caracteres)"
 $env:REVIEW_PASSWORD = Leer-Secreto "Contrasena para vendedor.revision@ y comprador.revision@ (min. 10)"
 $env:REVIEW_ADMIN_PASSWORD = Leer-Secreto "Contrasena para admin.revision@ (min. 10)"
@@ -44,5 +45,5 @@ try {
 
   Write-Host "`nListo. Avisame para cambiar la rama de Render/Netlify y desplegar." -ForegroundColor Green
 } finally {
-  Remove-Item Env:DATABASE_URL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD, Env:REVIEW_ADMIN_PASSWORD -ErrorAction SilentlyContinue
+  Remove-Item Env:DATABASE_URL, Env:ADMIN_PREVIOUS_EMAIL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD, Env:REVIEW_ADMIN_PASSWORD -ErrorAction SilentlyContinue
 }

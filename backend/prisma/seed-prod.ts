@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 /**
  * Seed mínimo e idempotente para un entorno real: administrador (desde variables de entorno),
  * árbol base de categorías y, opcionalmente, dos cuentas demo ficticias.
- * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), DEMO_PASSWORD, REVIEW_PASSWORD y
+ * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), ADMIN_PREVIOUS_EMAIL (opcional: renombra al admin existente), DEMO_PASSWORD, REVIEW_PASSWORD y
  * REVIEW_ADMIN_PASSWORD (opcionales; las dos últimas crean las cuentas ficticias *.revision@lacase.test
  * para las pruebas de revisión: vendedor+comprador y administrador respectivamente).
  * Nunca imprime contraseñas.
@@ -134,6 +134,16 @@ async function seedCategories() {
   }
 }
 
+/** Si el admin existente tiene otro correo (ADMIN_PREVIOUS_EMAIL), se RENOMBRA en su sitio: no se crea un segundo admin. */
+async function renameAdminEmail(previousEmail: string, email: string) {
+  if (previousEmail === email) return;
+  const existing = await prisma.user.findUnique({ where: { email: previousEmail } });
+  if (!existing) return;
+  if (existing.role !== Role.ADMIN) throw new Error('ADMIN_PREVIOUS_EMAIL no corresponde a un administrador.');
+  if (await prisma.user.findUnique({ where: { email } })) throw new Error('El correo nuevo ya está en uso por otra cuenta.');
+  await prisma.user.update({ where: { id: existing.id }, data: { email } });
+}
+
 async function seedAdmin(email: string, password: string) {
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.upsert({
@@ -256,6 +266,8 @@ async function main() {
     throw new Error('ADMIN_PASSWORD debe tener al menos 10 caracteres.');
   }
   await seedCategories();
+  const previousEmail = process.env.ADMIN_PREVIOUS_EMAIL?.trim().toLowerCase();
+  if (previousEmail) await renameAdminEmail(previousEmail, email);
   await seedAdmin(email, password);
   if (process.env.DEMO_PASSWORD) await seedDemo(process.env.DEMO_PASSWORD);
   if (process.env.REVIEW_PASSWORD) {
