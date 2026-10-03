@@ -4,9 +4,8 @@ import bcrypt from 'bcryptjs';
 /**
  * Seed mínimo e idempotente para un entorno real: administrador (desde variables de entorno),
  * árbol base de categorías y, opcionalmente, dos cuentas demo ficticias.
- * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), ADMIN_PREVIOUS_EMAIL (opcional: renombra al admin existente), DEMO_PASSWORD, REVIEW_PASSWORD y
- * REVIEW_ADMIN_PASSWORD (opcionales; las dos últimas crean las cuentas ficticias *.revision@lacase.test
- * para las pruebas de revisión: vendedor+comprador y administrador respectivamente).
+ * Variables: ADMIN_EMAIL, ADMIN_PASSWORD (obligatorias), ADMIN_PREVIOUS_EMAIL (opcional: renombra al admin existente),
+ * DEMO_PASSWORD (opcional: cuentas demo .bo) y REVIEW_PASSWORD (opcional: vendedor@/comprador@lacase.test).
  * Nunca imprime contraseñas.
  */
 const prisma = new PrismaClient();
@@ -197,24 +196,39 @@ async function seedDemo(password: string) {
   });
 }
 
+/** Renombra en su sitio la primera cuenta existente de `previos` (mismo rol) a `email`, sin duplicar usuarios. */
+async function renameAccount(previos: string[], email: string, role: Role) {
+  if (await prisma.user.findUnique({ where: { email } })) return;
+  for (const previo of previos) {
+    const existing = await prisma.user.findUnique({ where: { email: previo } });
+    if (existing && existing.role === role) {
+      await prisma.user.update({ where: { id: existing.id }, data: { email } });
+      return;
+    }
+  }
+}
+
 /**
- * Cuentas ficticias exclusivas para la revisión/pruebas (dominio reservado .test, desechables).
- * La contraseña viene SOLO de REVIEW_PASSWORD (entorno / panel de la plataforma): nunca se
- * escribe en el repositorio. Re-ejecutar el seed con otra REVIEW_PASSWORD la rota.
+ * Una cuenta ficticia por rol con dominio reservado .test (vendedor@ y comprador@lacase.test).
+ * Si ya existían las cuentas demo (vendedor.demo@/comprador.demo@lacase.bo) se RENOMBRAN en su sitio:
+ * conservan su tienda y sus datos. La contraseña viene SOLO de REVIEW_PASSWORD (entorno): nunca se
+ * escribe en el repositorio. Re-ejecutar con otra REVIEW_PASSWORD la rota.
  */
 async function seedReview(password: string) {
   const passwordHash = await bcrypt.hash(password, 10);
+  await renameAccount(['vendedor.demo@lacase.bo', 'vendedor.revision@lacase.test'], 'vendedor@lacase.test', Role.SELLER);
+  await renameAccount(['comprador.demo@lacase.bo', 'comprador.revision@lacase.test'], 'comprador@lacase.test', Role.CUSTOMER);
   await prisma.user.upsert({
-    where: { email: 'vendedor.revision@lacase.test' },
+    where: { email: 'vendedor@lacase.test' },
     update: { passwordHash, isActive: true, isApproved: true },
     create: {
-      email: 'vendedor.revision@lacase.test',
+      email: 'vendedor@lacase.test',
       passwordHash,
-      firstName: 'Revisión',
-      lastName: 'Vendedor',
+      firstName: 'Mateo',
+      lastName: 'Quispe',
       role: Role.SELLER,
-      storeName: 'Tienda de Revisión',
-      storeDescription: 'Cuenta ficticia para pruebas de la revisión (datos de ejemplo).',
+      storeName: 'TecnoCase Demo',
+      storeDescription: 'Tienda de demostración (datos ficticios).',
       locationCity: 'Tarija',
       locationState: 'Tarija',
       country: 'BO',
@@ -223,35 +237,17 @@ async function seedReview(password: string) {
     },
   });
   await prisma.user.upsert({
-    where: { email: 'comprador.revision@lacase.test' },
+    where: { email: 'comprador@lacase.test' },
     update: { passwordHash, isActive: true },
     create: {
-      email: 'comprador.revision@lacase.test',
+      email: 'comprador@lacase.test',
       passwordHash,
-      firstName: 'Revisión',
-      lastName: 'Comprador',
+      firstName: 'Valeria',
+      lastName: 'Mamani',
       role: Role.CUSTOMER,
       locationCity: 'Tarija',
       locationState: 'Tarija',
       country: 'BO',
-    },
-  });
-}
-
-/** Administrador ficticio de revisión: solo para ejecutar la moderación de productos en las pruebas. */
-async function seedReviewAdmin(password: string) {
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.upsert({
-    where: { email: 'admin.revision@lacase.test' },
-    update: { passwordHash, role: Role.ADMIN, isActive: true, isApproved: true },
-    create: {
-      email: 'admin.revision@lacase.test',
-      passwordHash,
-      firstName: 'Revisión',
-      lastName: 'Administración',
-      role: Role.ADMIN,
-      isVerified: true,
-      isApproved: true,
     },
   });
 }
@@ -273,10 +269,6 @@ async function main() {
   if (process.env.REVIEW_PASSWORD) {
     if (process.env.REVIEW_PASSWORD.length < 10) throw new Error('REVIEW_PASSWORD debe tener al menos 10 caracteres.');
     await seedReview(process.env.REVIEW_PASSWORD);
-  }
-  if (process.env.REVIEW_ADMIN_PASSWORD) {
-    if (process.env.REVIEW_ADMIN_PASSWORD.length < 10) throw new Error('REVIEW_ADMIN_PASSWORD debe tener al menos 10 caracteres.');
-    await seedReviewAdmin(process.env.REVIEW_ADMIN_PASSWORD);
   }
   console.log('Seed de producción completado.');
 }

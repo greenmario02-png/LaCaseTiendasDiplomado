@@ -681,8 +681,8 @@ async function main() {
   console.log('[seed-content] Creando usuarios adicionales...');
   const { sellers: extraSellers, customers: extraCustomers } = await seedExtraUsers(demoPassword);
 
-  const demoSeller = await prisma.user.findUnique({ where: { email: 'vendedor.demo@lacase.bo' } });
-  const demoBuyer = await prisma.user.findUnique({ where: { email: 'comprador.demo@lacase.bo' } });
+  const demoSeller = await prisma.user.findFirst({ where: { email: { in: ['vendedor.demo@lacase.bo', 'vendedor@lacase.test'] } } });
+  const demoBuyer = await prisma.user.findFirst({ where: { email: { in: ['comprador.demo@lacase.bo', 'comprador@lacase.test'] } } });
   const admin = await prisma.user.findFirst({ where: { role: Role.ADMIN } });
   if (!demoSeller || !demoBuyer || !admin) {
     throw new Error('Faltan las cuentas base (admin/vendedor.demo/comprador.demo). Corre primero npm run db:seed:prod.');
