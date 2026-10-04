@@ -63,6 +63,7 @@ tr.fail td:nth-child(7){color:#b00020;font-weight:600}</style></head><body>
 
 export default defineConfig({
   video: false,
+  trashAssetsBeforeRuns: false, // las capturas de ejecuciones anteriores son evidencia: no se borran al correr de nuevo
   screenshotsFolder: path.join(EVIDENCIA_DIR, 'capturas-ui'),
   e2e: {
     specPattern: 'cypress/e2e/**/*.cy.ts',
