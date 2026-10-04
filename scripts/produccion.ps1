@@ -10,7 +10,11 @@
 #
 # Uso (desde la raiz del proyecto):  powershell -ExecutionPolicy Bypass -File scripts\produccion.ps1
 
-param([switch]$SoloCypress)   # -SoloCypress: solo repite la suite contra produccion (sin base de datos ni push)
+param([switch]$SoloCypress, [switch]$Capturas, [switch]$Limpiar)
+# -SoloCypress: repite la suite contra produccion (sin base de datos ni push)
+# -Capturas:    deja datos ficticios visibles (pedido confirmado con QR y producto en el carrito) para las capturas
+# -Limpiar:     deshace esos datos (carrito vacio, pedidos cancelados, productos [REVISION] dados de baja)
+if ($Capturas -or $Limpiar) { $SoloCypress = $true }
 
 $ErrorActionPreference = "Stop"
 $raiz = Split-Path -Parent $PSScriptRoot
@@ -136,7 +140,9 @@ try {
   $env:CYPRESS_REVIEW_BUYER_PASSWORD = $claveResto
   $env:CYPRESS_REVIEW_ADMIN_PASSWORD = $claveAdmin
   Set-Location (Join-Path $raiz "frontend")
-  npx cypress run
+  if ($Capturas) { npx cypress run --spec cypress/e2e/06-datos-capturas.cy.ts }
+  elseif ($Limpiar) { npx cypress run --spec cypress/e2e/07-limpiar-capturas.cy.ts }
+  else { npx cypress run --spec "cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/99-*.cy.ts" }
   Write-Host "`nReporte en: $raiz\evidencia\produccion\ (un archivo por ejecucion). Avisame para revisarlo." -ForegroundColor Green
 } finally {
   Remove-Item Env:DATABASE_URL, Env:ADMIN_PREVIOUS_EMAIL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD -ErrorAction SilentlyContinue
