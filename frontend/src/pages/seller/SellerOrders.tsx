@@ -26,11 +26,15 @@ import { useUnifiedTokens } from '../../theme';
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 const PAYMENT_STATUSES = ['PENDING', 'PROOF_SUBMITTED', 'VERIFIED', 'REJECTED'];
+// Claves de traducción de cada estado (los códigos del servidor están en inglés; la interfaz nunca debe mostrarlos).
+const PAYMENT_KEY: Record<string, string> = { PENDING: 'pending', PROOF_SUBMITTED: 'proofSubmitted', VERIFIED: 'verified', REJECTED: 'rejected' };
 
 export default function SellerOrders() {
   const { t } = useTranslation();
   const money = useMoney();
   const t2 = useUnifiedTokens();
+  const statusLabel = (s: string) => t(`orders.status.${s.toLowerCase()}`);
+  const paymentLabel = (s: string) => t(`orders.paymentStatus.${PAYMENT_KEY[s] ?? s.toLowerCase()}`);
   const [orders, setOrders] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<any>(null);
@@ -80,7 +84,7 @@ export default function SellerOrders() {
             <MenuItem value="">{t('seller.orders.allStatuses')}</MenuItem>
             {STATUSES.map((s) => (
               <MenuItem key={s} value={s}>
-                {s}
+                {statusLabel(s)}
               </MenuItem>
             ))}
           </Select>
@@ -131,7 +135,7 @@ export default function SellerOrders() {
                   <Select size="small" value={o.status} onChange={(e) => changeStatus(o.id, e.target.value)}>
                     {STATUSES.map((s) => (
                       <MenuItem key={s} value={s}>
-                        {s}
+                        {statusLabel(s)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -139,7 +143,7 @@ export default function SellerOrders() {
                 <TableCell>
                   {o.paymentProofUrl ? (
                     <Box>
-                      <Chip label={o.paymentStatus} size="small" color={o.paymentStatus === 'VERIFIED' ? 'success' : 'warning'} />
+                      <Chip label={paymentLabel(o.paymentStatus)} size="small" color={o.paymentStatus === 'VERIFIED' ? 'success' : 'warning'} />
                       <Box mt={0.5}>
                         <a href={o.paymentProofUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12 }}>
                           {t('seller.orders.viewProofLink')}
@@ -152,14 +156,14 @@ export default function SellerOrders() {
                           </MenuItem>
                           {PAYMENT_STATUSES.filter((s) => s !== 'PROOF_SUBMITTED').map((s) => (
                             <MenuItem key={s} value={s}>
-                              {s}
+                              {paymentLabel(s)}
                             </MenuItem>
                           ))}
                         </Select>
                       )}
                     </Box>
                   ) : (
-                    <Chip label={o.paymentStatus} size="small" variant="outlined" />
+                    <Chip label={paymentLabel(o.paymentStatus)} size="small" variant="outlined" />
                   )}
                 </TableCell>
               </TableRow>

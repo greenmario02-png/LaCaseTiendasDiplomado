@@ -398,7 +398,7 @@ export default function AdminUsers() {
                       </Typography>
                     </Box>
                     <Typography variant="caption" color="text.secondary">
-                      {new Date(o.createdAt).toLocaleString('es-BO')} · {o.status}
+                      {new Date(o.createdAt).toLocaleString('es-BO')} · {t(`orders.status.${String(o.status).toLowerCase()}`)}
                     </Typography>
                     <Box mt={0.5}>
                       {o.items?.map((it: any) => (

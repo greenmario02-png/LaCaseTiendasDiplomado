@@ -341,7 +341,7 @@ export default function AccountPage() {
                   <Typography variant="body2" fontWeight={700}>
                     {money(o.total)}
                   </Typography>
-                  <Chip label={o.status} size="small" variant="outlined" />
+                  <Chip label={t(`orders.status.${String(o.status).toLowerCase()}`)} size="small" variant="outlined" />
                 </Box>
               </Box>
             ))}

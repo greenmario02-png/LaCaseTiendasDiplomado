@@ -295,7 +295,7 @@ export default function AdminSellers() {
                       </Typography>
                     </Box>
                     <Typography variant="caption" color="text.secondary">
-                      {new Date(o.createdAt).toLocaleString('es-BO')} · {o.status}
+                      {new Date(o.createdAt).toLocaleString('es-BO')} · {t(`orders.status.${String(o.status).toLowerCase()}`)}
                     </Typography>
                   </Box>
                 ))
