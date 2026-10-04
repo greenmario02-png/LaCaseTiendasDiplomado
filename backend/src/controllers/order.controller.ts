@@ -119,7 +119,7 @@ export async function recentSales(req: Request, res: Response, next: NextFunctio
       include: {
         items: {
           take: 1,
-          include: { product: { select: { id: true, name: true } } },
+          include: { product: { select: { id: true, name: true, slug: true, images: { take: 1, orderBy: { order: 'asc' }, select: { url: true } } } } },
         },
         seller: { select: { storeName: true, locationCity: true } },
         buyer: { select: { locationCity: true } },
@@ -127,6 +127,9 @@ export async function recentSales(req: Request, res: Response, next: NextFunctio
     });
     const sales = orders.map((o) => ({
       id: o.id,
+      productId: o.items[0]?.product?.id ?? null,
+      slug: o.items[0]?.product?.slug ?? '',
+      image: o.items[0]?.product?.images?.[0]?.url ?? null,
       productName: o.items[0]?.product?.name ?? 'Producto',
       storeName: o.seller?.storeName ?? 'Tienda',
       city: o.buyer?.locationCity ?? o.seller?.locationCity ?? 'Bolivia',

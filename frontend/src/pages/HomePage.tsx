@@ -53,6 +53,9 @@ interface Category {
 
 interface Sale {
   id: number;
+  productId?: number | null;
+  slug?: string;
+  image?: string | null;
   productName: string;
   storeName: string;
   city: string;
@@ -173,14 +176,41 @@ export default function HomePage() {
 
   const openProduct = (p: any) => navigate(`/producto/${p.id}/${p.slug ?? ''}`);
 
+  const tickerItems = [
+    ...(Array.isArray(sales) ? sales : []).map((sl) => ({
+      key: `venta-${sl.id}`,
+      tag: t('home.ticker.sold'),
+      title: sl.productName,
+      detail: t('home.ticker.soldIn', { store: sl.storeName, city: sl.city, amount: money(sl.amount) }),
+      image: sl.image ?? null,
+      to: sl.productId ? `/producto/${sl.productId}/${sl.slug ?? ''}` : '/productos',
+    })),
+    ...(Array.isArray(auctions) ? auctions : []).slice(0, 6).map((a) => ({
+      key: `subasta-${a.id}`,
+      tag: t('home.ticker.auction'),
+      title: a.title,
+      detail: t('home.ticker.currentBid', { amount: money(Number(a.currentPrice)) }),
+      image: a.imageUrl ?? null,
+      to: `/subasta/${a.id}`,
+    })),
+    ...(Array.isArray(jobs) ? jobs : []).slice(0, 6).map((j) => ({
+      key: `empleo-${j.id}`,
+      tag: t('home.ticker.job'),
+      title: j.title,
+      detail: [j.city, j.salaryMin ? `Bs ${Number(j.salaryMin).toLocaleString('es-BO')}` : null].filter(Boolean).join(' · '),
+      image: null as string | null,
+      to: '/empleos',
+    })),
+  ];
+
   return (
     <Box>
-      {/* LETRERO DE COMPRAS EN TIEMPO REAL */}
-      {sales.length > 0 && (
+      {/* LETRERO EN TIEMPO REAL: compras recientes, subastas activas y empleos; cada elemento lleva a su página */}
+      {tickerItems.length > 0 && (
         <Box
           sx={{
-            bgcolor: 'tertiary.main',
-            color: 'white',
+            bgcolor: 'primary.dark',
+            color: 'common.white',
             overflow: 'hidden',
             position: 'relative',
             py: 0.75,
@@ -193,19 +223,33 @@ export default function HomePage() {
               display: 'flex',
               gap: 4,
               width: 'max-content',
-              animation: 'saleTicker 40s linear infinite',
+              animation: 'saleTicker 60s linear infinite',
+              '&:hover': { animationPlayState: 'paused' },
               whiteSpace: 'nowrap',
               '@keyframes saleTicker': { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
             }}
           >
-            {[...sales, ...sales].map((s, i) => (
-              <Box key={`${s.id}-${i}`} display="flex" alignItems="center" gap={1} sx={{ minWidth: 'max-content' }}>
-                <Typography variant="body2" fontWeight={700} component="span" display="inline-flex" alignItems="center" gap={0.5}>
-                  <LocalFireDepartmentIcon fontSize="small" />
-                  {s.productName}
+            {[...tickerItems, ...tickerItems].map((it, i) => (
+              <Box
+                key={`${it.key}-${i}`}
+                component={Link}
+                to={it.to}
+                display="flex"
+                alignItems="center"
+                gap={1}
+                sx={{ minWidth: 'max-content', color: 'inherit', textDecoration: 'none', '&:hover .ticker-title': { textDecoration: 'underline' } }}
+              >
+                {it.image && (
+                  <Box component="img" src={it.image} alt="" loading="lazy" sx={{ width: 26, height: 26, borderRadius: 0.75, objectFit: 'cover', bgcolor: 'rgba(255,255,255,0.2)' }} />
+                )}
+                <Typography variant="caption" component="span" sx={{ px: 0.75, py: 0.1, borderRadius: 0.75, bgcolor: 'rgba(255,255,255,0.22)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                  {it.tag}
+                </Typography>
+                <Typography className="ticker-title" variant="body2" fontWeight={700} component="span">
+                  {it.title}
                 </Typography>
                 <Typography variant="body2" component="span" sx={{ opacity: 0.9 }}>
-                  {t('home.ticker.soldIn', { store: s.storeName, city: s.city, amount: money(s.amount) })}
+                  {it.detail}
                 </Typography>
               </Box>
             ))}

@@ -1882,7 +1882,11 @@
       "viewAllFeminine": "Ehecha opavave →"
     },
     "ticker": {
-      "soldIn": "{{store}}-pe · {{city}} · {{amount}}"
+      "soldIn": "{{store}}-pe · {{city}} · {{amount}}",
+      "sold": "Vendido",
+      "auction": "Subasta",
+      "job": "Empleo",
+      "currentBid": "oferta actual {{amount}}"
     }
   },
   "jobs": {

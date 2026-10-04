@@ -1882,7 +1882,11 @@
       "viewAllFeminine": "Ver todas →"
     },
     "ticker": {
-      "soldIn": "em {{store}} · {{city}} · {{amount}}"
+      "soldIn": "em {{store}} · {{city}} · {{amount}}",
+      "sold": "Vendido",
+      "auction": "Leilão",
+      "job": "Vaga",
+      "currentBid": "lance atual {{amount}}"
     }
   },
   "jobs": {

@@ -1882,7 +1882,11 @@
       "viewAllFeminine": "Llapanta qhaway →"
     },
     "ticker": {
-      "soldIn": "{{store}} · {{city}} · {{amount}}-pi"
+      "soldIn": "{{store}} · {{city}} · {{amount}}-pi",
+      "sold": "Vendido",
+      "auction": "Subasta",
+      "job": "Empleo",
+      "currentBid": "oferta actual {{amount}}"
     }
   },
   "jobs": {
