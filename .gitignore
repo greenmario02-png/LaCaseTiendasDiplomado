@@ -30,3 +30,5 @@ mobile/ios/build/
 backend/private-uploads/
 private-uploads/
 *.aab
+# Los reportes de Newman incluyen cuerpos de petición y tokens: no se versionan
+evidencia/produccion/newman-*
