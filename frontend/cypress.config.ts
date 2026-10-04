@@ -24,7 +24,7 @@ const horaLaPaz = () =>
 const esc = (v: unknown) =>
   String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
 
-function escribirReportes(baseUrl: string, apiUrl: string) {
+function escribirReportes(baseUrl: string, apiUrl: string, commit: string | null) {
   fs.mkdirSync(EVIDENCIA_DIR, { recursive: true });
   const fecha = fechaLaPaz();
   const sufijo = `${fecha}-${horaLaPaz()}`; // cada ejecución conserva su propio reporte (los fallos previos son evidencia)
@@ -35,6 +35,7 @@ function escribirReportes(baseUrl: string, apiUrl: string) {
     fecha,
     frontend: baseUrl,
     api: apiUrl,
+    commit,
     total: casos.length,
     aprobados,
     noAplica,
@@ -86,8 +87,16 @@ export default defineConfig({
           return null;
         },
       });
-      on('after:run', () => {
-        if (casos.length) escribirReportes(String(config.baseUrl ?? ''), String(config.env.API_URL ?? ''));
+      on('after:run', async () => {
+        if (!casos.length) return;
+        let commit: string | null = null;
+        try {
+          const r = await fetch(`${String(config.env.API_URL ?? '').replace(/\/$/, '')}/salud`);
+          commit = ((await r.json()) as { commit?: string | null }).commit ?? null;
+        } catch {
+          /* sin red o sin campo commit: se deja null */
+        }
+        escribirReportes(String(config.baseUrl ?? ''), String(config.env.API_URL ?? ''), commit);
       });
       return config;
     },
