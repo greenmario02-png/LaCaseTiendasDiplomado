@@ -293,7 +293,8 @@
       "title": "Editar tienda",
       "updateSuccessMessage": "Tienda actualizada correctamente.",
       "whatsappLabel": "WhatsApp",
-      "whatsappPlaceholder": "Ej: 59170000000"
+      "whatsappPlaceholder": "Ej: 59170000000",
+      "identityNotice": "The store name and location can only be changed once every 30 days (anti-abuse measure). Other details can be edited at any time."
     },
     "forumCategories": {
       "ciudadesTitle": "Ciudades",

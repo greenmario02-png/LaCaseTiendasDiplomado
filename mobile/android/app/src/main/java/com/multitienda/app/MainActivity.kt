@@ -3,6 +3,10 @@ package com.multitienda.app
 import android.os.Build
 import android.os.Bundle
 
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -17,6 +21,19 @@ class MainActivity : ReactActivity() {
     // This is required for expo-splash-screen.
     setTheme(R.style.AppTheme);
     super.onCreate(null)
+  }
+
+  /**
+   * Oculta la barra de navegación del sistema (inicio, cambiar de aplicación y retroceder) para que no tape la pantalla,
+   * como hacen otras aplicaciones: se vuelve a mostrar un momento al deslizar desde el borde inferior.
+   */
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    if (hasFocus) {
+      val controller = WindowCompat.getInsetsController(window, window.decorView)
+      controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+      controller.hide(WindowInsetsCompat.Type.navigationBars())
+    }
   }
 
   /**

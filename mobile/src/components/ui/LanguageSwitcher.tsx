@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Languages, Check } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SUPPORTED_LANGUAGES, setLanguage } from '../../i18n';
 import { useAppTheme } from '../../theme/ThemeContext';
 
@@ -14,6 +15,7 @@ export function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
   const { colors } = useAppTheme();
   const [open, setOpen] = useState(false);
+  const insets = useSafeAreaInsets();
   const styles = makeStyles(colors);
 
   const current = SUPPORTED_LANGUAGES[i18n.language] ?? SUPPORTED_LANGUAGES.es;
@@ -27,9 +29,11 @@ export function LanguageSwitcher() {
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { paddingBottom: 16 + insets.bottom + 24 }]}>
             <Text style={styles.title}>{t('common.language', 'Idioma')}</Text>
             <FlatList
+              style={styles.list}
+              contentContainerStyle={{ paddingBottom: 8 }}
               data={Object.entries(SUPPORTED_LANGUAGES)}
               keyExtractor={([code]) => code}
               renderItem={({ item: [code, lang] }) => (
@@ -60,7 +64,8 @@ function makeStyles(colors: any) {
     trigger: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8, paddingVertical: 4 },
     triggerLabel: { color: colors.text, fontSize: 13, fontWeight: '600' },
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-    sheet: { backgroundColor: colors.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, maxHeight: '60%' },
+    sheet: { backgroundColor: colors.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16, maxHeight: '75%' },
+    list: { flexGrow: 0 },
     title: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12 },
     option: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
     optionLabel: { fontSize: 15, color: colors.text },

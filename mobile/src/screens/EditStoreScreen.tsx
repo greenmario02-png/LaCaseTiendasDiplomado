@@ -95,6 +95,8 @@ export default function EditStoreScreen({ navigation }: any) {
       <Text style={styles.label}>{t('mobile.editStore.storeNameLabel')}</Text>
       <NeoInput style={styles.input} value={form.storeName} onChangeText={(v) => set('storeName', v)} placeholder={t('mobile.editStore.storeNamePlaceholder')} />
 
+      <Text style={styles.hint}>{t('mobile.editStore.identityNotice')}</Text>
+
       <Text style={styles.label}>{t('mobile.editStore.categoryLabel')}</Text>
       <NeoInput style={styles.input} value={form.storeCategory} onChangeText={(v) => set('storeCategory', v)} placeholder={t('mobile.editStore.categoryPlaceholder')} />
 
@@ -115,6 +117,8 @@ export default function EditStoreScreen({ navigation }: any) {
 
       <Text style={styles.label}>{t('mobile.common.stateProvince')}</Text>
       <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder={t('mobile.editStore.statePlaceholder')} />
+
+      <Text style={styles.hint}>{t('mobile.editStore.identityNotice')}</Text>
 
       <Text style={styles.label}>{t('mobile.editStore.freeShippingLabel')}</Text>
       <NeoInput style={styles.input} value={form.freeShippingThreshold} onChangeText={(v) => set('freeShippingThreshold', v)} placeholder={t('mobile.editStore.freeShippingPlaceholder')} keyboardType="numeric" />
@@ -145,6 +149,7 @@ const makeStyles = (colors: any) =>
   title: { fontSize: 22, fontWeight: '800', color: colors.text },
   subtitle: { fontSize: 13, color: colors.textSecondary, marginBottom: 16, marginTop: 2 },
   label: { fontSize: 12, fontWeight: '600', color: colors.textSecondary, marginTop: 12, marginBottom: 4 },
+  hint: { fontSize: 11, color: colors.textSecondary, marginTop: 4, lineHeight: 15 },
   section: { fontSize: 15, fontWeight: '800', color: colors.text, marginTop: 20 },
   input: {},
   textarea: { minHeight: 84 },

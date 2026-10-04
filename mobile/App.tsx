@@ -120,10 +120,12 @@ function MainTabs() {
 
 function AppNavigator() {
   const user = useAuthStore((s) => s.user);
+  const insets = useSafeAreaInsets();
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Con la app a pantalla completa los botones del sistema quedan encima del contenido: cada pantalla deja libre la franja inferior. */}
+      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom } }}>
         {!user ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -131,7 +133,7 @@ function AppNavigator() {
           </>
         ) : (
           <>
-            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="Main" component={MainTabs} options={{ contentStyle: { paddingBottom: 0 } }} />
             <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ headerShown: true, title: 'Producto' }} />
             <Stack.Screen name="AuctionDetail" component={AuctionDetailScreen} options={{ headerShown: true, title: 'Subasta' }} />
             <Stack.Screen name="ChatThread" component={ChatThreadScreen} options={{ headerShown: false }} />

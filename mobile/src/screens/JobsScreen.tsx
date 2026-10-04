@@ -1,3 +1,4 @@
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
@@ -28,6 +29,7 @@ import { JobCard, formatSalary, timeAgo, type Job, type PayPeriod } from '../com
 const LIMIT = 10;
 
 export default function JobsScreen({ navigation }: any) {
+  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { colors, raised, pressed } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -318,7 +320,7 @@ export default function JobsScreen({ navigation }: any) {
 
       <Modal visible={!!selected} animationType="slide" transparent onRequestClose={() => setSelected(null)}>
         <View style={styles.overlay}>
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { paddingBottom: 20 + insets.bottom + 16 }]}>
             {selected ? (
               <>
                 <View style={styles.sheetHead}>
@@ -417,7 +419,7 @@ export default function JobsScreen({ navigation }: any) {
 
       <Modal visible={applyOpen} animationType="slide" transparent onRequestClose={() => setApplyOpen(false)}>
         <View style={styles.overlay}>
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { paddingBottom: 20 + insets.bottom + 16 }]}>
             <View style={styles.sheetHead}>
               <Text style={[styles.sheetTitle, { flex: 1 }]}>{t('mobile.jobs.applyButton')}</Text>
               <Pressable onPress={() => setApplyOpen(false)} hitSlop={10}>

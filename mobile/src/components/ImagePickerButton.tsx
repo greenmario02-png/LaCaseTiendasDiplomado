@@ -1,9 +1,9 @@
-import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../theme';
 import { useAppTheme } from '../theme/ThemeContext';
 import { resolveImageUrl } from '../services/api';
+import { pickImageFromLibrary } from '../services/pickImage';
 
 interface Props {
   label?: string;
@@ -22,21 +22,11 @@ export default function ImagePickerButton({ label = 'Elegir imagen', currentUri,
 
   const pick = async () => {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted && !perm.canAskAgain) {
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: square ? [1, 1] : [16, 10],
-        quality: 0.8,
-      });
-      if (!result.canceled && result.assets?.[0]?.uri) {
-        onPicked(result.assets[0].uri);
-      }
+      const uri = await pickImageFromLibrary(!!square);
+      if (uri) onPicked(uri);
     } catch (e) {
       console.warn('ImagePicker error:', e);
+      Alert.alert('Error', 'No se pudo abrir la galería.');
     }
   };
 

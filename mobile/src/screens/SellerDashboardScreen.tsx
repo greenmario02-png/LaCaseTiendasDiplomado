@@ -8,6 +8,7 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { StatCard } from '../components/redesign/StatCard';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { LoadingState } from '../components/redesign/States';
+import { QuickAddFab } from '../components/redesign/QuickAddFab';
 
 const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
@@ -55,6 +56,7 @@ export default function SellerDashboardScreen({ navigation }: any) {
   ];
 
   return (
+    <View style={styles.flex}>
     <ScrollView style={styles.flex} contentContainerStyle={styles.content}>
       <View style={styles.titleRow}>
         <View style={[styles.iconBox, { backgroundColor: colors.surface }, raised]}>
@@ -127,13 +129,15 @@ export default function SellerDashboardScreen({ navigation }: any) {
         </View>
       )}
     </ScrollView>
+    <QuickAddFab label={t('mobile.sellerProducts.newProductButton')} onPress={() => navigation.navigate('SellerProductForm')} />
+    </View>
   );
 }
 
 const makeStyles = (colors: any) =>
   StyleSheet.create({
     flex: { flex: 1, backgroundColor: colors.background },
-    content: { padding: 16, paddingBottom: 32 },
+    content: { padding: 16, paddingBottom: 110 },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
     iconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
     title: { fontSize: 22, fontWeight: '900', color: colors.text },

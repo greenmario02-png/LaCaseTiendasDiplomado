@@ -5,10 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
+import { uploadImage } from '../services/upload';
+import { pickImageFromLibrary } from '../services/pickImage';
 import { useAuthStore } from '../stores/authStore';
 import { useRbacStore } from '../stores/rbacStore';
 import { CoinChip } from '../components/redesign/CoinChip';
-import { Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MessageSquareWarning, Briefcase } from 'lucide-react-native';
+import { Camera, Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, Pencil, Gift, Users, Ticket, Flame, Wrench, Bell, ClipboardList, Upload, Wallet, MessageSquareWarning, Briefcase } from 'lucide-react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
@@ -56,6 +58,7 @@ export default function ProfileScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [invite, setInvite] = useState<any>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const unread = useNotificationsStore((s) => s.unread);
   const refreshUnread = useNotificationsStore((s) => s.refreshUnread);
 
@@ -78,6 +81,22 @@ export default function ProfileScreen({ navigation }: any) {
     }, [user])
   );
 
+  // Toca la foto para cambiarla: elige una imagen, la sube y la guarda en el perfil.
+  const changePhoto = async () => {
+    try {
+      const uri = await pickImageFromLibrary(true);
+      if (!uri) return;
+      setUploadingPhoto(true);
+      const url = await uploadImage(uri, '/account/upload');
+      await api.put('/account', { profileImage: url });
+      await refreshUser();
+    } catch (e) {
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const doLogout = async () => {
     Alert.alert(t('mobile.profile.logout'), t('mobile.profile.logoutConfirmMessage'), [
       { text: t('mobile.common.cancel'), style: 'cancel' },
@@ -85,16 +104,21 @@ export default function ProfileScreen({ navigation }: any) {
     ]);
   };
 
-  return (
-    <View style={styles.flex}>
+  const encabezado = (
+    <View>
       <View style={styles.header}>
-        {user?.profileImage ? (
-          <Image source={{ uri: resolveImageUrl(user.profileImage) }} style={styles.avatar} />
-        ) : (
-          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-            <Text style={styles.avatarText}>{user?.firstName?.[0] ?? '?'}</Text>
+        <TouchableOpacity onPress={changePhoto} disabled={uploadingPhoto} accessibilityRole="button" accessibilityLabel={t('mobile.editProfile.changePhotoButton')} activeOpacity={0.8}>
+          {user?.profileImage ? (
+            <Image source={{ uri: resolveImageUrl(user.profileImage) }} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+              <Text style={styles.avatarText}>{user?.firstName?.[0] ?? '?'}</Text>
+            </View>
+          )}
+          <View style={styles.cameraBadge}>
+            {uploadingPhoto ? <ActivityIndicator size="small" color="#fff" /> : <Camera size={14} color="#fff" />}
           </View>
-        )}
+        </TouchableOpacity>
         <Text style={styles.name}>
           {user?.firstName} {user?.lastName}
         </Text>
@@ -156,39 +180,46 @@ export default function ProfileScreen({ navigation }: any) {
       </View>
 
       <Text style={styles.section}>{t('mobile.profile.myOrders')}</Text>
-      {loading ? (
-        <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
-      ) : orders.length === 0 ? (
-        <Text style={styles.empty}>{t('mobile.profile.noOrders')}</Text>
-      ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingHorizontal: 12, gap: 8, paddingBottom: 16 }}
-          ListFooterComponent={
-            <TouchableOpacity style={[styles.logout, { marginBottom: insets.bottom + 12 }]} onPress={doLogout}>
-              <Text style={styles.logoutText}>{t('mobile.profile.logout')}</Text>
-            </TouchableOpacity>
-          }
-          renderItem={({ item }) => {
-            const statusKey = STATUS_LABEL_KEYS[item.status];
-            const statusText = statusKey ? t(`mobile.profile.status.${statusKey}`) : item.status;
-            return (
-              <View style={styles.order}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.orderId}>{t('mobile.profile.orderNumber', { id: item.id })}</Text>
-                  <Text style={styles.orderStatus}>{statusText}</Text>
-                  <Text style={styles.orderMeta}>
-                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-BO') : ''}
-                    {item.items?.length ? t('mobile.profile.productsCount', { count: item.items.length }) : ''}
-                  </Text>
-                </View>
-                <Text style={styles.orderTotal}>{money(item.total)}</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.flex}>
+      <FlatList
+        data={loading ? [] : orders}
+        keyExtractor={(item) => String(item.id)}
+        ListHeaderComponent={encabezado}
+        contentContainerStyle={{ paddingBottom: 16 }}
+        ListEmptyComponent={
+          loading ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
+          ) : (
+            <Text style={styles.empty}>{t('mobile.profile.noOrders')}</Text>
+          )
+        }
+        ListFooterComponent={
+          <TouchableOpacity style={[styles.logout, { marginBottom: insets.bottom + 12 }]} onPress={doLogout}>
+            <Text style={styles.logoutText}>{t('mobile.profile.logout')}</Text>
+          </TouchableOpacity>
+        }
+        renderItem={({ item }) => {
+          const statusKey = STATUS_LABEL_KEYS[item.status];
+          const statusText = statusKey ? t(`mobile.profile.status.${statusKey}`) : item.status;
+          return (
+            <View style={[styles.order, { marginHorizontal: 12, marginBottom: 8 }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.orderId}>{t('mobile.profile.orderNumber', { id: item.id })}</Text>
+                <Text style={styles.orderStatus}>{statusText}</Text>
+                <Text style={styles.orderMeta}>
+                  {item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-BO') : ''}
+                  {item.items?.length ? t('mobile.profile.productsCount', { count: item.items.length }) : ''}
+                </Text>
               </View>
-            );
-          }}
-        />
-      )}
+              <Text style={styles.orderTotal}>{money(item.total)}</Text>
+            </View>
+          );
+        }}
+      />
       <Modal visible={inviteOpen} transparent animationType="slide" onRequestClose={() => setInviteOpen(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -241,6 +272,7 @@ const makeStyles = (colors: any) =>
   flex: { flex: 1, backgroundColor: colors.background },
   header: { backgroundColor: colors.surface, alignItems: 'center', paddingVertical: 28, borderBottomWidth: 1, borderBottomColor: colors.border },
   avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  cameraBadge: { position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primaryDark, borderWidth: 2, borderColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontSize: 30, fontWeight: '800' },
   name: { fontSize: 20, fontWeight: '800', color: colors.text, marginTop: 10 },
   email: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },

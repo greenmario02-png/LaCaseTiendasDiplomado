@@ -1,10 +1,14 @@
-import React, { useMemo,  useEffect, useState  } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import React, { useMemo, useCallback, useState } from 'react';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { LoadingState, EmptyState } from '../components/redesign/States';
-import { Store, MapPin, BadgeCheck, MessageCircle, Star } from 'lucide-react-native';
+import { Store, MapPin, BadgeCheck, MessageCircle, Star, X } from 'lucide-react-native';
+import { useAuthStore } from '../stores/authStore';
+import { NeoButton } from '../components/redesign/NeoButton';
+import { QuickAddFab } from '../components/redesign/QuickAddFab';
 import { useAppTheme } from '../theme/ThemeContext';
 
 const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 0 })} Bs`;
@@ -18,8 +22,11 @@ export default function SellerScreen({ route, navigation }: any) {
   const [products, setProducts] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const me = useAuthStore((s) => s.user);
+  const isOwn = !!me && me.id === Number(id);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     (async () => {
       try {
         const [s, p, r] = await Promise.all([
@@ -35,7 +42,7 @@ export default function SellerScreen({ route, navigation }: any) {
       }
       setLoading(false);
     })();
-  }, [id]);
+  }, [id]));
 
   if (loading) {
     return <LoadingState />;
@@ -52,8 +59,17 @@ export default function SellerScreen({ route, navigation }: any) {
   const img = seller.storeLogo || seller.profileImage;
   const header = (
     <View style={styles.header}>
-      {img ? <Image source={{ uri: resolveImageUrl(img) }} style={styles.logo} /> : <View style={[styles.logo, styles.logoFallback]}><Store size={36} color={colors.primary} /></View>}
+      {img ? (
+        <TouchableOpacity activeOpacity={0.85} onPress={() => setZoomOpen(true)} accessibilityRole="imagebutton" accessibilityLabel={seller.storeName}>
+          <Image source={{ uri: resolveImageUrl(img) }} style={styles.logo} />
+        </TouchableOpacity>
+      ) : <View style={[styles.logo, styles.logoFallback]}><Store size={36} color={colors.primary} /></View>}
       <Text style={styles.name}>{seller.storeName}</Text>
+      {isOwn ? (
+        <View style={styles.ownRow}>
+          <NeoButton title={t('mobile.sellerDashboard.editStoreButton')} variant="ghost" onPress={() => navigation.navigate('EditStore')} />
+        </View>
+      ) : null}
       <View style={styles.metaRow}>
         {seller.locationCity ? (
           <View style={styles.metaItem}>
@@ -101,13 +117,14 @@ export default function SellerScreen({ route, navigation }: any) {
   );
 
   return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
     <FlatList
       style={{ backgroundColor: colors.background }}
       data={products}
       numColumns={2}
       keyExtractor={(item) => String(item.id)}
       columnWrapperStyle={{ gap: 12, paddingHorizontal: 12, marginBottom: 12 }}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: isOwn ? 110 : 40 }}
       ListHeaderComponent={header}
       renderItem={({ item }) => (
         <View style={{ flex: 1, maxWidth: '48%' }}>
@@ -125,6 +142,16 @@ export default function SellerScreen({ route, navigation }: any) {
       )}
       ListEmptyComponent={<EmptyState message={t('mobile.seller.noProducts')} />}
     />
+    {isOwn ? <QuickAddFab label={t('mobile.sellerProducts.newProductButton')} onPress={() => navigation.navigate('SellerProductForm')} /> : null}
+    <Modal visible={zoomOpen} transparent animationType="fade" onRequestClose={() => setZoomOpen(false)}>
+      <Pressable style={styles.zoomOverlay} onPress={() => setZoomOpen(false)}>
+        {img ? <Image source={{ uri: resolveImageUrl(img) }} style={styles.zoomImage} resizeMode="contain" /> : null}
+        <View style={styles.zoomClose}>
+          <X size={22} color="#fff" />
+        </View>
+      </Pressable>
+    </Modal>
+    </View>
   );
 }
 
@@ -134,6 +161,10 @@ const makeStyles = (colors: any) =>
   error: { color: colors.error, fontSize: 16 },
   header: { padding: 16, alignItems: 'center' },
   logo: { width: 84, height: 84, borderRadius: 42, marginBottom: 8 },
+  ownRow: { marginTop: 10, alignSelf: 'stretch', paddingHorizontal: 24 },
+  zoomOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', alignItems: 'center', justifyContent: 'center' },
+  zoomImage: { width: '100%', height: '80%' },
+  zoomClose: { position: 'absolute', top: 48, right: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   logoFallback: { backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   name: { fontSize: 20, fontWeight: '900', color: colors.text, textAlign: 'center' },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
