@@ -118,8 +118,9 @@ Ninguna contraseña se guarda en este repositorio.
   contraseña se define con `SEED_ADMIN_PASSWORD` o, si no se define, se genera al azar y se muestra
   una sola vez al terminar el seed.
 - **Producción**: el administrador se crea con `ADMIN_EMAIL`/`ADMIN_PASSWORD` y las cuentas ficticias
-  de revisión (`admin@lacase.test`, `vendedor@lacase.test`, `comprador@lacase.test`: una por rol) con
-  `REVIEW_PASSWORD`, todas desde variables de entorno (`backend/prisma/seed-prod.ts`).
+  de revisión de vendedor y de comprador (`vendedor@lacase.test`, `comprador@lacase.test`) con
+  `REVIEW_PASSWORD`, todas desde variables de entorno (`backend/prisma/seed-prod.ts`). La cuenta administradora
+  de moderación es de uso interno: no se documenta ni se entrega.
   Las credenciales de la revisión se entregan por el canal de la entrega, no aquí.
 - **La administración es solo web**: la app móvil no permite iniciar sesión con una cuenta de
   administrador (el servidor responde 403 a las peticiones con la cabecera `X-Client-App: mobile`).
