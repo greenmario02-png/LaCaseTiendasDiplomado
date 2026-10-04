@@ -127,7 +127,7 @@ Ninguna contraseña se guarda en este repositorio.
 
 ## Pruebas
 
-- **Contra producción (Cypress, 60 casos):** `cd frontend && npm install && npm run test:e2e` con las variables
+- **Contra producción (Cypress, 68 casos):** `cd frontend && npm install && npm run test:e2e` con las variables
   `CYPRESS_BASE_URL`, `CYPRESS_API_URL`, `CYPRESS_REVIEW_SELLER_EMAIL/PASSWORD`, `CYPRESS_REVIEW_BUYER_EMAIL/PASSWORD` y
   `CYPRESS_REVIEW_ADMIN_EMAIL/PASSWORD`. El reporte queda en `evidencia/produccion/cypress-AAAA-MM-DD-HHMM.json` y `.html`.
   Interfaz gráfica para reproducir cada caso: `npx cypress open`.
