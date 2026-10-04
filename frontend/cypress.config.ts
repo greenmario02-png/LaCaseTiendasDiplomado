@@ -68,7 +68,7 @@ export default defineConfig({
   trashAssetsBeforeRuns: false, // las capturas de ejecuciones anteriores son evidencia: no se borran al correr de nuevo
   screenshotsFolder: path.join(EVIDENCIA_DIR, 'capturas-ui'),
   e2e: {
-    specPattern: 'cypress/e2e/**/*.cy.ts', // 06 y 07 (datos de capturas) NO son pruebas: solo corren con --spec explícito
+    specPattern: 'cypress/e2e/**/*.cy.ts', // 06 y 07 (datos de capturas y limpieza) NO son pruebas: solo corren con --spec explícito
     supportFile: 'cypress/support/e2e.ts',
     defaultCommandTimeout: 15000,
     requestTimeout: 60000, // Render (plan gratuito) puede tardar en despertar

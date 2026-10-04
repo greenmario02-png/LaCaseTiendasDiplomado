@@ -31,7 +31,7 @@ export async function getUserPermissionCodes(userId: number, primaryRole: string
     return codes;
   }
 
-  // Fallback: mapeo estático del rol primario. La moderación de foro nunca sale de acá —
+  // Fallback: mapeo estático del rol primario. La moderación de foro nunca sale de aquí —
   // siempre requiere una asignación explícita del RbacRole `MODERADOR_FORO` (ver roles.ts).
   const FALLBACK: Record<string, string[]> = {
     SELLER: ['seller.products.manage', 'seller.store.manage', 'forum.post'],

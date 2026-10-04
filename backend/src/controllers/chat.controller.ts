@@ -122,7 +122,7 @@ export async function sendMessage(req: AuthRequest, res: Response, next: NextFun
   try {
     const conversationId = Number(req.params.id);
     const { content } = req.body;
-    if (!content || !content.trim()) throw ApiError.badRequest('Escribí un mensaje');
+    if (!content || !content.trim()) throw ApiError.badRequest('Escribe un mensaje');
 
     const conversation = await prisma.conversation.findUnique({ where: { id: conversationId } });
     if (!conversation) throw ApiError.notFound('Conversación no encontrada');

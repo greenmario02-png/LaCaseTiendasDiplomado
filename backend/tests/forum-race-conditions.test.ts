@@ -178,7 +178,7 @@ describe('Condiciones de carrera del foro ', () => {
   });
 
   it('processForumTopPost no duplica el karma si corre dos veces para el mismo post', async () => {
-    // No asumimos que el post creado acá sea el "top del día" — otros tests de este mismo
+    // No asumimos que el post creado aquí sea el "top del día" — otros tests de este mismo
     // archivo también crean posts hoy y pueden ganarle en score. En vez de eso, verificamos
     // la garantía real de idempotencia contra el post que efectivamente haya ganado.
     const author = await createAgedUser('race-daily-top');

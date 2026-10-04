@@ -163,6 +163,6 @@ router.get('/rbac/users/:id/roles', requirePermission('admin.rbac.manage'), asyn
 
 // Nota: GET /rbac/me/menus y GET /rbac/me/permissions viven en /api/rbac/me/*
 // (routes/rbac.routes.ts, autenticado sin requireAdmin) para el render dinámico de
-// menús en TODOS los roles. Acá NO se duplican.
+// menús en TODOS los roles. Aquí NO se duplican.
 
 export default router;

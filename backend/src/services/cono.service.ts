@@ -17,7 +17,7 @@ import { ensureForumProfile } from './forum.service';
  * ese MISMO criterio (medianoche UTC de la fecha-calendario en Bolivia) — usar la hora local
  * del proceso (`new Date(); .setHours(0,0,0,0)`) es un bug real: según la hora del día y el
  * timezone del proceso, "hoy" y "ayer" pueden terminar siendo la misma fecha calendario y el
- * cierre de votación nunca dispara. `boliviaTodayAsUtcDate()` es la única fuente de verdad acá.
+ * cierre de votación nunca dispara. `boliviaTodayAsUtcDate()` es la única fuente de verdad aquí.
  */
 function boliviaTodayAsUtcDate(): Date {
   const boliviaDateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' }); // "YYYY-MM-DD"
@@ -33,7 +33,7 @@ async function assertHasAnyVerification(profileId: number): Promise<void> {
     throw new ApiError(
       403,
       'PROFESSIONAL_VERIFICATION_REQUIRED',
-      'Necesitás al menos una verificación profesional aprobada para crear un tema/votación.',
+      'Necesitas al menos una verificación profesional aprobada para crear un tema/votación.',
     );
   }
 }

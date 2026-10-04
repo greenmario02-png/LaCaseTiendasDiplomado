@@ -43,7 +43,7 @@ export async function assertProfessionalVerified(profileId: number, fieldId: num
     throw new ApiError(
       403,
       'PROFESSIONAL_VERIFICATION_REQUIRED',
-      'Necesitás aprobar la verificación de esta área profesional para publicar acá.',
+      'Necesitas aprobar la verificación de esta área profesional para publicar aquí.',
     );
   }
 }

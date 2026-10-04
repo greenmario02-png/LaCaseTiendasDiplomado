@@ -1337,7 +1337,7 @@
         "won": "Aún no ganaste ninguna subasta."
       },
       "level": {
-        "competing": "Competís",
+        "competing": "Compites",
         "lastHour": "¡Última hora!",
         "winning": "Vas ganando"
       },
@@ -1464,7 +1464,7 @@
       "purchases": "No tienes compras/consultas aún.",
       "purchasesHint": "Inicia una desde la ficha de un producto o de una tienda.",
       "sales": "No tienes ventas en curso.",
-      "salesHint": "Cuando un comprador te escriba o compre, aparecerá acá."
+      "salesHint": "Cuando un comprador te escriba o compre, aparecerá aquí."
     },
     "floating": {
       "noConversations": "No tienes conversaciones todavía.",
@@ -2045,7 +2045,7 @@
     "proofSentToastShort": "Comprobante enviado",
     "proofSubmittedWaiting": "Comprobante enviado. Esperando verificación del vendedor.",
     "proofSubmittedWaitingShort": "Comprobante enviado. Esperando verificación.",
-    "proofUrlPlaceholder": "URL del comprobante (o subilo en Mis pedidos)",
+    "proofUrlPlaceholder": "URL del comprobante (o súbelo en Mis pedidos)",
     "proofUrlPlaceholderLong": "URL del comprobante de transferencia",
     "qrAlt": "QR de pago",
     "qrNotAvailable": "QR no disponible",
@@ -2868,8 +2868,8 @@
       },
       "toast": {
         "auctionCreated": "Subasta creada. Aparecerá en la sección de subastas.",
-        "bulkAttributesCreated": "Se crearon {{count}} atributo(s). Asignales un valor a cada uno.",
-        "knownProductCreated": "Producto conocido creado. Asignale atributos con el botón +",
+        "bulkAttributesCreated": "Se crearon {{count}} atributo(s). Asígnales un valor a cada uno.",
+        "knownProductCreated": "Producto conocido creado. Asígnale atributos con el botón +",
         "productCreated": "Producto creado. Espera la moderación del admin.",
         "productUpdated": "Producto actualizado"
       }
@@ -3153,7 +3153,7 @@
     "noReviewsYet": "Aún no hay reseñas. Las reseñas solo aparecen después de una compra entregada — generan confianza en la comunidad.",
     "notFound": "Vendedor no encontrado",
     "privilegedBuyer": "✓ Comprador privilegiado",
-    "privilegedProductsNote": "Estos productos aún no se publican al público general. Sos de los primeros en verlos.",
+    "privilegedProductsNote": "Estos productos aún no se publican al público general. Eres de los primeros en verlos.",
     "privilegedProductsTitle": "Productos nuevos — solo para compradores privilegiados 🔑",
     "productsOf": "Productos de {{storeName}}",
     "purchasedOn": "Compró · {{date}}",

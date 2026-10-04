@@ -73,7 +73,7 @@ export async function flagIfPolemic(kind: 'post' | 'reply', id: number, text: st
       await prisma.forumReply.update({ where: { id }, data });
     }
   } catch {
-    // Señal best-effort — un fallo acá nunca debe tumbar la creación del contenido.
+    // Señal best-effort — un fallo aquí nunca debe tumbar la creación del contenido.
   }
 }
 

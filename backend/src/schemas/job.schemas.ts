@@ -4,9 +4,9 @@ const payPeriod = z.enum(['DAILY', 'WEEKLY', 'MONTHLY'], { errorMap: () => ({ me
 const money = z.coerce.number().nonnegative('El monto no puede ser negativo').max(99_999_999);
 
 const jobBody = z.object({
-  categoryId: z.coerce.number().int().positive('Elegí una categoría de trabajo'),
+  categoryId: z.coerce.number().int().positive('Elige una categoría de trabajo'),
   title: z.string().trim().min(5, 'El título debe tener al menos 5 caracteres').max(120),
-  description: z.string().trim().min(20, 'Describí el puesto con al menos 20 caracteres').max(5000),
+  description: z.string().trim().min(20, 'Describe el puesto con al menos 20 caracteres').max(5000),
   requirements: z.string().trim().max(3000).optional().nullable(),
   city: z.string().trim().min(2, 'La ciudad es obligatoria').max(80),
   locationState: z.string().trim().max(80).optional().nullable(),
@@ -52,7 +52,7 @@ export const moderateJobSchema = z.object({
       reason: z.string().trim().max(500).optional(),
     })
     .refine((v) => v.action === 'approve' || (v.reason && v.reason.length >= 5), {
-      message: 'Indicá el motivo del rechazo (mínimo 5 caracteres)',
+      message: 'Indica el motivo del rechazo (mínimo 5 caracteres)',
       path: ['reason'],
     }),
 });
@@ -68,8 +68,8 @@ export const jobCategorySchema = z.object({
 
 export const applyJobSchema = z.object({
   body: z.object({
-    message: z.string().trim().min(10, 'Contá brevemente por qué sos buen candidato (mínimo 10 caracteres)').max(2000),
-    contactPhone: z.string().trim().min(6, 'Indicá un teléfono de contacto').max(30),
+    message: z.string().trim().min(10, 'Cuenta brevemente por qué eres buen candidato (mínimo 10 caracteres)').max(2000),
+    contactPhone: z.string().trim().min(6, 'Indica un teléfono de contacto').max(30),
     expectedSalary: z.coerce.number().nonnegative().max(99_999_999).optional().nullable(),
     resumeUrl: z.string().trim().url('El enlace a tu CV no es válido').max(500).optional().nullable().or(z.literal('')),
   }),

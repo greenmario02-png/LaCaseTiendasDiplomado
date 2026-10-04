@@ -14,7 +14,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "cypress run --spec \"cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/99-*.cy.ts\"",
+    "test:e2e": "cypress run --spec \"cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/09-*.cy.ts,cypress/e2e/99-*.cy.ts\"",
     "cypress:open": "cypress open",
     "test:api": "newman run ../postman/LaCase-E3.postman_collection.json -e ../postman/LaCase-produccion.postman_environment.json"
   },

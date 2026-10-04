@@ -194,7 +194,7 @@ export async function processAuctionClosures() {
           userId: bidderId,
           type: 'AUCTION_ENDED',
           title: '¡La subasta volvió a estar activa! ⚡',
-          message: `"${auction.title}" se relistó al mismo precio (${auction.currentPrice} Bs). Volvé a pujar antes de que termine.`,
+          message: `"${auction.title}" se relistó al mismo precio (${auction.currentPrice} Bs). Vuelve a pujar antes de que termine.`,
           refType: 'auction',
           refId: auction.id,
         });

@@ -74,7 +74,7 @@ export async function createRole(req: AuthRequest, res: Response, next: NextFunc
     const exists = await prisma.rbacRole.findUnique({ where: { code: data.code } });
     if (exists) throw ApiError.badRequest('Ya existe un rol con ese código');
     if (Object.values(Role).includes(data.code as Role)) {
-      throw ApiError.badRequest('El código coincide con un rol del sistema; elegí otro');
+      throw ApiError.badRequest('El código coincide con un rol del sistema; elige otro');
     }
     const role = await prisma.rbacRole.create({
       data: {

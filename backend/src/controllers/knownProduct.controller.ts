@@ -225,9 +225,9 @@ export async function sellerDeleteKnownProduct(req: AuthRequest, res: Response, 
 export async function sellerCreateAttributes(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const raw = String(req.body.names ?? req.body.name ?? '').trim();
-    if (!raw) throw ApiError.badRequest('Escribí al menos un nombre de atributo.');
+    if (!raw) throw ApiError.badRequest('Escribe al menos un nombre de atributo.');
     const names = [...new Set(raw.split(',').map((s: string) => s.trim()).filter(Boolean))];
-    if (names.length === 0) throw ApiError.badRequest('Escribí al menos un nombre de atributo.');
+    if (names.length === 0) throw ApiError.badRequest('Escribe al menos un nombre de atributo.');
 
     const existing = await prisma.attributeDefinition.findMany({
       where: { name: { in: names, mode: 'insensitive' } },

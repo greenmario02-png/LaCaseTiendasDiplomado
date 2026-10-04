@@ -29,7 +29,7 @@ export function AdSlotCard() {
     >
       <CampaignIcon sx={{ fontSize: 32, color: 'text.disabled' }} />
       <Typography variant="subtitle2" fontWeight={700} color="text.secondary">
-        {t('home.adSlot.title', { defaultValue: 'Poné tu anuncio acá' })}
+        {t('home.adSlot.title', { defaultValue: 'Pon tu anuncio aquí' })}
       </Typography>
       <Typography variant="caption" color="text.disabled" sx={{ maxWidth: 220 }}>
         {t('home.adSlot.subtitle', { defaultValue: 'Espacio publicitario — próximamente' })}

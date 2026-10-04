@@ -46,7 +46,7 @@ export async function evaluateGiftPromotions(
     }
 
     if (triggered) {
-      // Elegir el regalo: si allowChoice, el frontend eligió; acá tomamos el primero
+      // Elegir el regalo: si allowChoice, el frontend eligió; aquí tomamos el primero
       // (el comprador podrá elegir el regalo en el checkout con la lista de items).
       const giftItems = promo.items;
       if (giftItems.length > 0) {

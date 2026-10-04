@@ -609,7 +609,7 @@ export async function moderateProduct(req: AuthRequest, res: Response, next: Nex
       title: approve ? 'Producto aprobado ✅' : 'Producto rechazado',
       message: approve
         ? `"${product.name}" fue aprobado y ya está visible en el catálogo.`
-        : `"${product.name}" fue rechazado${reason ? `: ${reason}` : '. Corregilo y volvé a enviarlo.'}`,
+        : `"${product.name}" fue rechazado${reason ? `: ${reason}` : '. Corrígelo y vuelve a enviarlo.'}`,
       refType: 'product',
       refId: productId,
     });

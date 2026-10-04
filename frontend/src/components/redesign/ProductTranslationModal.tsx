@@ -69,7 +69,7 @@ export function ProductTranslationModal({ open, onClose, productId, translations
       <DialogContent dividers>
         <Alert severity="info" sx={{ mb: 2 }}>
           {t('seller.productForm.translations.info', {
-            defaultValue: 'Completá el nombre y/o la descripción en otro idioma. Los compradores que usen ese idioma verán esta versión en vez de la de español.',
+            defaultValue: 'Completa el nombre y/o la descripción en otro idioma. Los compradores que usen ese idioma verán esta versión en vez de la de español.',
           })}
         </Alert>
         <Box display="flex" flexDirection="column" gap={2}>

@@ -91,7 +91,7 @@ export async function buyCoins(req: AuthRequest, res: Response, next: NextFuncti
   try {
     const amount = Math.floor(Number(req.body?.amount));
     if (!Number.isInteger(amount) || amount <= 0) {
-      throw ApiError.badRequest('Indicá una cantidad válida de monedas a comprar.');
+      throw ApiError.badRequest('Indica una cantidad válida de monedas a comprar.');
     }
     if (amount > 100000) {
       throw ApiError.badRequest('La cantidad máxima por compra es 100.000 monedas.');

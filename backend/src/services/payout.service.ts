@@ -90,7 +90,7 @@ export async function requestPayout(sellerId: number, amount: number, note?: str
   if (!Number.isFinite(amount) || amount <= 0) throw ApiError.badRequest('Monto inválido');
 
   const account = await prisma.payoutAccount.findUnique({ where: { sellerId } });
-  if (!account) throw ApiError.badRequest('Configurá primero tu cuenta de cobro (BNB, banco o QR)');
+  if (!account) throw ApiError.badRequest('Configura primero tu cuenta de cobro (BNB, banco o QR)');
 
   const available = await availableBalance(sellerId);
   if (amount > available + 0.01) {

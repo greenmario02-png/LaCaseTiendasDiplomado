@@ -6,7 +6,7 @@ import { ApiError } from '../utils/errors';
 /**
  * Chat para Bots. Cuentas de bot DECLARADAS (Lectura B —
  * nunca se hacen pasar por humanas), operadas en esta primera fase solo por el equipo de LaCase
- *. Cubre acá: conversación bot↔usuario ("comprenderlos mejor").
+ *. Cubre aquí: conversación bot↔usuario ("comprenderlos mejor").
  * `BotDebateSession`/turnos de debate en Zona de Debate quedan para más adelante, una vez
  * que la categoría de Zona de Debate esté probada por separado.
  */
@@ -67,7 +67,7 @@ async function assertBotActive(botAccountId: number) {
 
 /**
  * Genera la respuesta del bot. Placeholder deliberado: la decisión de producto  es que
- * el chat lo conduzca un LLM, pero conectar un proveedor real queda fuera de este alcance — acá
+ * el chat lo conduzca un LLM, pero conectar un proveedor real queda fuera de este alcance — aquí
  * queda el punto de extensión único donde enchufar esa llamada más adelante, sin tener que tocar
  * el resto del servicio (transacciones, purga, límites).
  */
@@ -119,7 +119,7 @@ export async function sendMessage(params: { conversationId: number; userId: numb
 }
 
 /**
- * Cierra la conversación y genera el resumen  — acá también con un resumen simple por
+ * Cierra la conversación y genera el resumen  — aquí también con un resumen simple por
  * truncado/concatenación como placeholder; el mismo punto de extensión que `generateBotReply`
  * puede pasar a usar un LLM para resumir de verdad sin cambiar la forma del resto del servicio.
  */
@@ -145,7 +145,7 @@ export async function endConversation(conversationId: number, userId: number) {
 /**
  * Job de purga : borra los mensajes crudos de conversaciones vencidas, dejando solo el
  * `summary`. Pensado para correr como cron, mismo patrón que los jobs de `backend/src/server.ts`
- * — no se engancha acá todavía (fuera de alcance conectar el scheduler).
+ * — no se engancha aquí todavía (fuera de alcance conectar el scheduler).
  */
 export async function purgeExpiredRawMessages(now: Date = new Date()) {
   const expired = await prisma.botConversation.findMany({

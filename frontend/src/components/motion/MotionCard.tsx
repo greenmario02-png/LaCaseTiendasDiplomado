@@ -10,7 +10,7 @@ interface Props {
 
 /**
  * Envoltorio para tarjetas clickeables (producto, post del foro, entrada de memes,
- * tema): leve elevación al hover, achique al tap. Poné esto AFUERA del `Card`
+ * tema): leve elevación al hover, achique al tap. Pon esto AFUERA del `Card`
  * de MUI (no adentro), así la animación mueve toda la tarjeta.
  */
 export function MotionCard({ children, className, style }: Props) {

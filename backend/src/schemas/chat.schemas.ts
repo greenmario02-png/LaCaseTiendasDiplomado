@@ -10,7 +10,7 @@ export const createConversationSchema = z.object({
 export const sendMessageSchema = z.object({
   params: z.object({ id: z.coerce.number().int().positive() }),
   body: z.object({
-    content: z.string().min(1, 'Escribí un mensaje').max(2000, 'Mensaje demasiado largo'),
+    content: z.string().min(1, 'Escribe un mensaje').max(2000, 'Mensaje demasiado largo'),
   }),
 });
 

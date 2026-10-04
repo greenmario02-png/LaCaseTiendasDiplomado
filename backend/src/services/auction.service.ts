@@ -271,7 +271,7 @@ export async function notifyOutbid(auctionId: number, oldWinnerId: number | null
     userId: oldWinnerId,
     type: 'OUTBID',
     title: '¡La puja se calentó! 🔥',
-    message: `Alguien superó tu oferta en "${auction.title}". Ahora está en ${newBid} Bs — volvé a pujar y no pierdas tu lugar. 💪`,
+    message: `Alguien superó tu oferta en "${auction.title}". Ahora está en ${newBid} Bs — vuelve a pujar y no pierdas tu lugar. 💪`,
     refType: 'auction',
     refId: auctionId,
   });

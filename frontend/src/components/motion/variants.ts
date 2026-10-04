@@ -3,7 +3,7 @@ import type { Variants, Transition } from 'framer-motion';
 /**
  * Sistema de animación compartido (Framer Motion) — variantes reusables para que toda la
  * app anime de forma consistente en vez de que cada página invente su propia curva/tiempo.
- * Import desde acá, no declares variants sueltas por componente salvo un caso muy puntual.
+ * Import desde aquí, no declares variants sueltas por componente salvo un caso muy puntual.
  */
 
 export const EASE = [0.16, 1, 0.3, 1] as const; // "easeOutExpo"-ish, se siente rápido y suave

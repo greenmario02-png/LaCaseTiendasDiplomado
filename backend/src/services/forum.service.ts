@@ -31,7 +31,7 @@ export async function ensureForumProfile(userId: number) {
     if ((e as { code?: string }).code !== 'P2002') throw e;
     // Carrera: dos requests concurrentes del mismo usuario (ej. dos pestañas, web+mobile a
     // la vez) que nunca había entrado al foro — ambas ven "sin perfil" y ambas intentan
-    // crear uno; ForumProfile.userId es @unique, así que la segunda choca acá. La otra ya
+    // crear uno; ForumProfile.userId es @unique, así que la segunda choca aquí. La otra ya
     // lo creó, así que solo hace falta traerlo.
     return await prisma.forumProfile.findUniqueOrThrow({ where: { userId } });
   }
@@ -852,7 +852,7 @@ export async function acceptReply(params: {
 
   await prisma.$transaction(async (tx) => {
     // Update condicional atómico: si otra respuesta ya resolvió el post entre el chequeo
-    // de arriba y acá, count === 0 y abortamos — evita que dos replies queden "aceptadas"
+    // de arriba y aquí, count === 0 y abortamos — evita que dos replies queden "aceptadas"
     // a la vez con su karma/coins duplicados.
     const updated = await tx.forumPost.updateMany({
       where: { id: reply.postId, status: { not: 'RESOLVED' } },

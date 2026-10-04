@@ -5,7 +5,7 @@ const isTest = process.env.NODE_ENV === 'test';
 export const authLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: isTest ? 10000 : 10,
-  message: { error: { code: 'RATE_LIMIT', message: 'Demasiados intentos. Esperá un minuto.' } },
+  message: { error: { code: 'RATE_LIMIT', message: 'Demasiados intentos. Espera un minuto.' } },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -13,7 +13,7 @@ export const authLimiter = rateLimit({
 export const registerLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: isTest ? 100000 : 5, // 5 registros por minuto por IP (anti creación masiva de cuentas)
-  message: { error: { code: 'RATE_LIMIT', message: 'Demasiados registros desde esta IP. Esperá un minuto.' } },
+  message: { error: { code: 'RATE_LIMIT', message: 'Demasiados registros desde esta IP. Espera un minuto.' } },
   standardHeaders: true,
   legacyHeaders: false,
 });

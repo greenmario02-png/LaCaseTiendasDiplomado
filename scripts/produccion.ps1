@@ -10,7 +10,9 @@
 #
 # Uso (desde la raiz del proyecto):  powershell -ExecutionPolicy Bypass -File scripts\produccion.ps1
 
-param([switch]$SoloCypress, [switch]$Capturas, [switch]$Limpiar, [switch]$Newman, [switch]$Gui)
+param([switch]$SoloCypress, [switch]$Capturas, [switch]$Limpiar, [switch]$Newman, [switch]$Gui, [switch]$Olvidar, [switch]$NuevasClaves, [string]$Navegador = "electron")
+# -Olvidar:     borra las contrasenas guardadas de la sesion y termina (se piden una sola vez y se reutilizan 8 horas, ver lib-claves.ps1)
+# -NuevasClaves: ignora las guardadas y las pide de nuevo
 # -SoloCypress: repite la suite contra produccion (sin base de datos ni push)
 # -Capturas:    deja datos ficticios visibles (pedido confirmado con QR y producto en el carrito) para las capturas
 # -Limpiar:     deshace esos datos (carrito vacio, pedidos cancelados, productos [REVISION] dados de baja)
@@ -25,11 +27,8 @@ $api = "https://lacase-diplomado-api.onrender.com/api/v1"
 $renderEnv = "https://dashboard.render.com/web/srv-dasncu0473hc7393pmq0/env"
 $rama = "feature/empleos-geo-rediseno"
 
-function Leer-Secreto($mensaje) {
-  $s = Read-Host -Prompt $mensaje -AsSecureString
-  $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($s)
-  try { [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
-}
+. (Join-Path $PSScriptRoot 'lib-claves.ps1')   # Leer-Secreto, Obtener-Claves, Olvidar-Claves
+if ($Olvidar) { Olvidar-Claves; exit 0 }
 
 # Prisma (db push / migrate diff) necesita conexion directa o Session pooler (5432), no el pooler transaccional (6543).
 # Quita los parametros de pgbouncer sin romper el resto de la query (p. ej. sslmode=require).
@@ -72,9 +71,10 @@ try {
 
   }
   # ---------- contrasenas (unico dato que escribes) ----------
-  $claveAdmin = Leer-Secreto "Contrasena de admin@lacase.test"
-  $claveResto = Leer-Secreto "Contrasena de vendedor@lacase.test y comprador@lacase.test"
-  if ($claveAdmin.Length -lt 10 -or $claveResto.Length -lt 10) { throw "Las contrasenas deben tener 10 o mas caracteres." }
+  # Se piden una sola vez (cifradas con DPAPI fuera del repositorio) y se reutilizan en este y en los demas scripts durante 8 horas.
+  $claves = Obtener-Claves -Nuevas:$NuevasClaves
+  $claveAdmin = $claves.Admin
+  $claveResto = $claves.Resto
   if (-not $SoloCypress) {
   $env:ADMIN_PREVIOUS_EMAIL = "admin@lacase.bo"
   $env:ADMIN_EMAIL = "admin@lacase.test"
@@ -158,10 +158,14 @@ try {
       npx newman run (Join-Path $raiz "postman\LaCase-E3.postman_collection.json") -e $envFile --reporters "cli,json,htmlextra" --reporter-json-export (Join-Path $salida "newman-$marca.json") --reporter-htmlextra-export (Join-Path $salida "newman-$marca.html") --reporter-htmlextra-title "LaCase Multitiendas - E3 - produccion"
     } finally { Remove-Item $envFile -ErrorAction SilentlyContinue }
   }
-  elseif ($Gui) { npx cypress open --e2e --browser edge }
+  elseif ($Gui) {
+    # Electron (el navegador incluido en Cypress) abre siempre; con Edge el ejecutor puede quedarse en "Opening E2E testing in Edge".
+    Write-Host "Abriendo la interfaz grafica de Cypress con $Navegador (usa -Navegador edge para probar con Edge)..." -ForegroundColor Cyan
+    npx cypress open --e2e --browser $Navegador
+  }
   elseif ($Capturas) { npx cypress run --spec cypress/e2e/06-datos-capturas.cy.ts }
   elseif ($Limpiar) { npx cypress run --spec cypress/e2e/07-limpiar-capturas.cy.ts }
-  else { npx cypress run --spec "cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/99-*.cy.ts" }
+  else { npx cypress run --spec "cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/09-*.cy.ts,cypress/e2e/99-*.cy.ts" }
   Write-Host "`nReporte en: $raiz\evidencia\produccion\ (un archivo por ejecucion). Avisame para revisarlo." -ForegroundColor Green
 } finally {
   Remove-Item Env:DATABASE_URL, Env:ADMIN_PREVIOUS_EMAIL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD -ErrorAction SilentlyContinue

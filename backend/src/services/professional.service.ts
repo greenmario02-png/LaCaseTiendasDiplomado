@@ -36,7 +36,7 @@ async function assertCanAttempt(profileId: number, fieldId: number): Promise<voi
     where: { profileId, fieldId, createdAt: { gte: since } },
   });
   if (recentAttempts >= 3) {
-    throw new ApiError(429, 'TOO_MANY_ATTEMPTS', 'Ya intentaste esta verificación varias veces hoy. Volvé a intentar en 24 h.');
+    throw new ApiError(429, 'TOO_MANY_ATTEMPTS', 'Ya intentaste esta verificación varias veces hoy. Vuelve a intentar en 24 h.');
   }
 }
 

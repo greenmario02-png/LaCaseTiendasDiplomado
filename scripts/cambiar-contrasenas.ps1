@@ -42,6 +42,8 @@ try {
   npx tsx prisma/seed-prod.ts
   if ($LASTEXITCODE -ne 0) { throw "No se pudo actualizar las contrasenas." }
   Write-Host "`nContrasenas actualizadas. Recuerda cambiarlas tambien en el entorno de Postman." -ForegroundColor Green
+  # Las contrasenas guardadas para la sesion (lib-claves.ps1) ya no sirven: se borran.
+  . (Join-Path $PSScriptRoot 'lib-claves.ps1'); Olvidar-Claves
 } finally {
   Remove-Item Env:DATABASE_URL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD -ErrorAction SilentlyContinue
   Set-Location $raiz

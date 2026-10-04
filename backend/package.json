@@ -17,6 +17,7 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "test": "jest --forceExit --detectOpenHandles --runInBand",
+    "test:unitarias": "jest -c jest.unitarias.config.js --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --forceExit --detectOpenHandles --runInBand --coverage --coverageReporters=text-summary",
     "lint": "eslint src/",
