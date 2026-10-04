@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "cypress run --spec \"cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/99-*.cy.ts\"",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "test:api": "newman run ../postman/LaCase-E3.postman_collection.json -e ../postman/LaCase-produccion.postman_environment.json"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -72,6 +73,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "jsdom": "^30.0.1",
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1",
     "postcss": "^8.4.49",
     "prettier": "^3.9.6",
     "tailwindcss": "^3.4.17",

@@ -10,11 +10,13 @@
 #
 # Uso (desde la raiz del proyecto):  powershell -ExecutionPolicy Bypass -File scripts\produccion.ps1
 
-param([switch]$SoloCypress, [switch]$Capturas, [switch]$Limpiar)
+param([switch]$SoloCypress, [switch]$Capturas, [switch]$Limpiar, [switch]$Newman, [switch]$Gui)
 # -SoloCypress: repite la suite contra produccion (sin base de datos ni push)
 # -Capturas:    deja datos ficticios visibles (pedido confirmado con QR y producto en el carrito) para las capturas
 # -Limpiar:     deshace esos datos (carrito vacio, pedidos cancelados, productos [REVISION] dados de baja)
-if ($Capturas -or $Limpiar) { $SoloCypress = $true }
+# -Newman:      corre la coleccion de Postman (postman\) contra produccion con Newman y guarda el reporte fechado
+# -Gui:         abre la interfaz grafica de Cypress (cypress open) apuntando a produccion, para reproducir los casos
+if ($Capturas -or $Limpiar -or $Newman -or $Gui) { $SoloCypress = $true }
 
 $ErrorActionPreference = "Stop"
 $raiz = Split-Path -Parent $PSScriptRoot
@@ -140,7 +142,24 @@ try {
   $env:CYPRESS_REVIEW_BUYER_PASSWORD = $claveResto
   $env:CYPRESS_REVIEW_ADMIN_PASSWORD = $claveAdmin
   Set-Location (Join-Path $raiz "frontend")
-  if ($Capturas) { npx cypress run --spec cypress/e2e/06-datos-capturas.cy.ts }
+  if ($Newman) {
+    # Entorno temporal con las contrasenas (se borra al terminar): nunca van en la coleccion ni en el repositorio.
+    $envFile = Join-Path $env:TEMP "lacase-newman-env.json"
+    $entorno = Get-Content (Join-Path $raiz "postman\LaCase-produccion.postman_environment.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($v in $entorno.values) {
+      if ($v.key -eq "sellerPassword" -or $v.key -eq "buyerPassword") { $v.value = $claveResto }
+      if ($v.key -eq "adminPassword") { $v.value = $claveAdmin }
+    }
+    $entorno | ConvertTo-Json -Depth 6 | Set-Content $envFile -Encoding UTF8
+    $marca = (Get-Date).ToString("yyyy-MM-dd-HHmm")
+    $salida = Join-Path $raiz "evidencia\produccion"
+    New-Item -ItemType Directory -Force -Path $salida | Out-Null
+    try {
+      npx newman run (Join-Path $raiz "postman\LaCase-E3.postman_collection.json") -e $envFile --reporters "cli,json,htmlextra" --reporter-json-export (Join-Path $salida "newman-$marca.json") --reporter-htmlextra-export (Join-Path $salida "newman-$marca.html") --reporter-htmlextra-title "LaCase Multitiendas - E3 - produccion"
+    } finally { Remove-Item $envFile -ErrorAction SilentlyContinue }
+  }
+  elseif ($Gui) { npx cypress open --e2e --browser edge }
+  elseif ($Capturas) { npx cypress run --spec cypress/e2e/06-datos-capturas.cy.ts }
   elseif ($Limpiar) { npx cypress run --spec cypress/e2e/07-limpiar-capturas.cy.ts }
   else { npx cypress run --spec "cypress/e2e/0[1-5]*.cy.ts,cypress/e2e/99-*.cy.ts" }
   Write-Host "`nReporte en: $raiz\evidencia\produccion\ (un archivo por ejecucion). Avisame para revisarlo." -ForegroundColor Green
