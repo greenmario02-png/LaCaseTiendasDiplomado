@@ -209,8 +209,8 @@ export default function HomePage() {
       {tickerItems.length > 0 && (
         <Box
           sx={{
-            bgcolor: 'primary.dark',
-            color: 'common.white',
+            bgcolor: '#24245c', // índigo fijo: se lee igual en tema claro y oscuro
+            color: '#ffffff',
             overflow: 'hidden',
             position: 'relative',
             py: 0.75,
