@@ -13,7 +13,8 @@ import path from 'path';
  * corrida se escriben evidencia/produccion/cypress-AAAA-MM-DD.json y .html. No se registran
  * tokens ni contraseñas.
  */
-const EVIDENCIA_DIR = path.resolve(process.cwd(), '..', 'evidencia', 'produccion');
+// EVIDENCIA_DIR permite que las corridas locales de verificación NO escriban en la carpeta de evidencia de producción.
+const EVIDENCIA_DIR = process.env.EVIDENCIA_DIR ? path.resolve(process.env.EVIDENCIA_DIR) : path.resolve(process.cwd(), '..', 'evidencia', 'produccion');
 const casos: Record<string, unknown>[] = [];
 const tokens: Record<string, string> = {}; // solo en memoria
 

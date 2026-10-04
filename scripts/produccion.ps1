@@ -10,6 +10,8 @@
 #
 # Uso (desde la raiz del proyecto):  powershell -ExecutionPolicy Bypass -File scripts\produccion.ps1
 
+param([switch]$SoloCypress)   # -SoloCypress: solo repite la suite contra produccion (sin base de datos ni push)
+
 $ErrorActionPreference = "Stop"
 $raiz = Split-Path -Parent $PSScriptRoot
 $front = "https://tiendaslacase.netlify.app"
@@ -48,6 +50,7 @@ function Con-Limite($segundos, [scriptblock]$bloque, $etiqueta) {
 }
 
 try {
+  if (-not $SoloCypress) {
   # ---------- 1) DATABASE_URL desde el portapapeles ----------
   Write-Host "`n[1/5] Abriendo Render. En la fila DATABASE_URL pulsa el icono de COPIAR (o del ojo y copia)." -ForegroundColor Cyan
   Start-Process $renderEnv
@@ -61,10 +64,12 @@ try {
   $url = Preparar-Url $url
   $env:DATABASE_URL = $url
 
+  }
   # ---------- contrasenas (unico dato que escribes) ----------
-  $claveAdmin = Leer-Secreto "Contrasena NUEVA para admin@lacase.test (10+ caracteres)"
-  $claveResto = Leer-Secreto "Contrasena para vendedor@lacase.test y comprador@lacase.test (10+ caracteres)"
+  $claveAdmin = Leer-Secreto "Contrasena de admin@lacase.test"
+  $claveResto = Leer-Secreto "Contrasena de vendedor@lacase.test y comprador@lacase.test"
   if ($claveAdmin.Length -lt 10 -or $claveResto.Length -lt 10) { throw "Las contrasenas deben tener 10 o mas caracteres." }
+  if (-not $SoloCypress) {
   $env:ADMIN_PREVIOUS_EMAIL = "admin@lacase.bo"
   $env:ADMIN_EMAIL = "admin@lacase.test"
   $env:ADMIN_PASSWORD = $claveAdmin
@@ -118,6 +123,7 @@ try {
   }
   if (-not $listo) { throw "La API no publico el commit $commitLocal a tiempo. Revisa el deploy en Render y vuelve a ejecutar." }
   Write-Host "`nAPI en vivo con el commit $commitLocal." -ForegroundColor Green
+  }
 
   # ---------- 5) Cypress contra produccion ----------
   Write-Host "`n[5/5] Ejecutando la suite Cypress contra produccion (tarda unos minutos)..." -ForegroundColor Cyan
