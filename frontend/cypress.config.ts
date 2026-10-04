@@ -18,12 +18,15 @@ const casos: Record<string, unknown>[] = [];
 const tokens: Record<string, string> = {}; // solo en memoria
 
 const fechaLaPaz = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/La_Paz' }).format(new Date());
+const horaLaPaz = () =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: 'America/La_Paz', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()).replace(':', '');
 const esc = (v: unknown) =>
   String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
 
 function escribirReportes(baseUrl: string, apiUrl: string) {
   fs.mkdirSync(EVIDENCIA_DIR, { recursive: true });
   const fecha = fechaLaPaz();
+  const sufijo = `${fecha}-${horaLaPaz()}`; // cada ejecución conserva su propio reporte (los fallos previos son evidencia)
   const aprobados = casos.filter((c) => c.estado === 'Aprobado').length;
   const noAplica = casos.filter((c) => c.estado === 'No aplica en este entorno').length;
   const resumen = {
@@ -37,7 +40,7 @@ function escribirReportes(baseUrl: string, apiUrl: string) {
     fallidos: casos.length - aprobados - noAplica,
     casos,
   };
-  fs.writeFileSync(path.join(EVIDENCIA_DIR, `cypress-${fecha}.json`), JSON.stringify(resumen, null, 2), 'utf8');
+  fs.writeFileSync(path.join(EVIDENCIA_DIR, `cypress-${sufijo}.json`), JSON.stringify(resumen, null, 2), 'utf8');
 
   const filas = casos
     .map(
@@ -55,7 +58,7 @@ tr.fail td:nth-child(7){color:#b00020;font-weight:600}</style></head><body>
 <p>Total: ${casos.length} · Aprobados: ${aprobados} · Fallidos: ${casos.length - aprobados - noAplica} · No aplican en este entorno: ${noAplica}</p>
 <table><thead><tr><th>ID</th><th>Escenario</th><th>Método y ruta</th><th>Rol</th><th>Esperado</th><th>Obtenido</th><th>Estado</th><th>Observado en</th><th>Fecha</th></tr></thead>
 <tbody>${filas}</tbody></table></body></html>`;
-  fs.writeFileSync(path.join(EVIDENCIA_DIR, `cypress-${fecha}.html`), html, 'utf8');
+  fs.writeFileSync(path.join(EVIDENCIA_DIR, `cypress-${sufijo}.html`), html, 'utf8');
 }
 
 export default defineConfig({

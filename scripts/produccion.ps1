@@ -90,6 +90,12 @@ try {
   Write-Host "`n[3/5] Renombrando/creando admin@, vendedor@ y comprador@lacase.test..." -ForegroundColor Cyan
   npx tsx prisma/seed-prod.ts
   if ($LASTEXITCODE -ne 0) { throw "seed-prod fallo." }
+
+  # ---------- 3b) Imagenes nuevas (solo UPDATE de URLs; no borra ni crea filas) ----------
+  Write-Host "`nImagenes nuevas del catalogo (categorias, productos, tiendas, avatares). Simulacion primero:" -ForegroundColor Cyan
+  npx tsx scripts/backfill-seed-images.ts
+  $img = Read-Host "Escribe SI para aplicar esas actualizaciones de imagen (otra cosa = omitir)"
+  if ($img -eq "SI") { npx tsx scripts/backfill-seed-images.ts --apply }
   Remove-Item Env:DATABASE_URL, Env:ADMIN_PREVIOUS_EMAIL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD -ErrorAction SilentlyContinue
 
   # ---------- 4) Publicar y esperar el despliegue ----------
@@ -100,14 +106,18 @@ try {
     git push origin "${rama}:main"
     if ($LASTEXITCODE -ne 0) { throw "git push fallo." }
   }
-  Write-Host "Esperando el codigo nuevo en la API (hasta 20 min; /app-version solo existe en la version nueva)..."
+  $commitLocal = (git rev-parse --short=7 HEAD).Trim()
+  Write-Host "Esperando que la API publique el commit $commitLocal (hasta 25 min; /salud informa el commit en vivo)..."
   $listo = $false
-  for ($i = 0; $i -lt 80 -and -not $listo; $i++) {
-    try { $listo = (Invoke-WebRequest -Uri "$api/app-version" -UseBasicParsing -TimeoutSec 30).StatusCode -eq 200 } catch { Start-Sleep -Seconds 15 }
-    if (-not $listo) { Write-Host -NoNewline "." }
+  for ($i = 0; $i -lt 100 -and -not $listo; $i++) {
+    try {
+      $salud = Invoke-RestMethod -Uri "$api/salud" -TimeoutSec 30
+      $listo = ($salud.commit -eq $commitLocal)
+    } catch { }
+    if (-not $listo) { Write-Host -NoNewline "."; Start-Sleep -Seconds 15 }
   }
-  if (-not $listo) { throw "La API nueva no aparecio a tiempo. Revisa el deploy en Render y vuelve a ejecutar desde el paso 5 (opcion SI omitida)." }
-  Write-Host "`nAPI nueva en vivo." -ForegroundColor Green
+  if (-not $listo) { throw "La API no publico el commit $commitLocal a tiempo. Revisa el deploy en Render y vuelve a ejecutar." }
+  Write-Host "`nAPI en vivo con el commit $commitLocal." -ForegroundColor Green
 
   # ---------- 5) Cypress contra produccion ----------
   Write-Host "`n[5/5] Ejecutando la suite Cypress contra produccion (tarda unos minutos)..." -ForegroundColor Cyan
@@ -121,7 +131,7 @@ try {
   $env:CYPRESS_REVIEW_ADMIN_PASSWORD = $claveAdmin
   Set-Location (Join-Path $raiz "frontend")
   npx cypress run
-  Write-Host "`nReporte en: $raiz\evidencia\produccion\ . Avisame para revisarlo y armar 2.7 y 2.8." -ForegroundColor Green
+  Write-Host "`nReporte en: $raiz\evidencia\produccion\ (un archivo por ejecucion). Avisame para revisarlo." -ForegroundColor Green
 } finally {
   Remove-Item Env:DATABASE_URL, Env:ADMIN_PREVIOUS_EMAIL, Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:REVIEW_PASSWORD -ErrorAction SilentlyContinue
   Remove-Item Env:CYPRESS_REVIEW_SELLER_PASSWORD, Env:CYPRESS_REVIEW_BUYER_PASSWORD, Env:CYPRESS_REVIEW_ADMIN_PASSWORD -ErrorAction SilentlyContinue

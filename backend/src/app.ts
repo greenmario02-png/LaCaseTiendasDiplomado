@@ -75,7 +75,8 @@ export function createApp() {
 
   // Ruta de salud pública
   app.get(['/api/salud', '/api/v1/salud'], (_req, res) => {
-    res.status(200).json({ estado: 'ok' });
+    // `commit` (Render lo inyecta) identifica qué versión está en vivo: evidencia de despliegue verificado.
+    res.status(200).json({ estado: 'ok', commit: process.env.RENDER_GIT_COMMIT?.slice(0, 7) ?? null });
   });
 
   app.get('/api/health', (_req, res) => {

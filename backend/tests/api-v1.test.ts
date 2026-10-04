@@ -2,11 +2,11 @@ import request from 'supertest';
 import { app, registerUser } from './helpers';
 
 describe('API versionada /api/v1 y ruta de salud', () => {
-  it('GET /api/salud y /api/v1/salud responden 200 { estado: "ok" }', async () => {
+  it('GET /api/salud y /api/v1/salud responden 200 { estado: "ok", commit }', async () => {
     for (const path of ['/api/salud', '/api/v1/salud']) {
       const res = await request(app).get(path);
       expect(res.status).toBe(200);
-      expect(res.body).toEqual({ estado: 'ok' });
+      expect(res.body).toEqual({ estado: 'ok', commit: null }); // fuera de Render no hay commit inyectado
     }
   });
 
