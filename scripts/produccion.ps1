@@ -23,6 +23,18 @@ function Leer-Secreto($mensaje) {
   try { [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
 }
 
+# Prisma (db push / migrate diff) necesita conexion directa o Session pooler (5432), no el pooler transaccional (6543).
+# Quita los parametros de pgbouncer sin romper el resto de la query (p. ej. sslmode=require).
+function Preparar-Url($u) {
+  if ($u -notmatch ":6543/") { return $u }
+  Write-Host "Aviso: URL del pooler transaccional (6543); se usa 5432 y se quitan parametros pgbouncer." -ForegroundColor Yellow
+  $u = $u -replace ":6543/", ":5432/"
+  $partes = $u -split "\?", 2
+  if ($partes.Count -lt 2) { return $u }
+  $params = $partes[1] -split "&" | Where-Object { $_ -and $_ -notmatch "^(pgbouncer|connection_limit)=" }
+  if ($params) { return $partes[0] + "?" + ($params -join "&") } else { return $partes[0] }
+}
+
 function Con-Limite($segundos, [scriptblock]$bloque, $etiqueta) {
   $dir = (Get-Location).Path
   $job = Start-Job -ScriptBlock { param($d, $b) Set-Location $d; & ([scriptblock]::Create($b)) 2>&1 | Out-String } -ArgumentList $dir, $bloque.ToString()
@@ -45,11 +57,8 @@ try {
     Write-Host "El portapapeles no tiene una URL postgresql://. La pego de forma oculta:" -ForegroundColor Yellow
     $url = Leer-Secreto "DATABASE_URL"
   }
-  Set-Clipboard -Value ""   # no dejar la credencial en el portapapeles
-  if ($url -match ":6543/") {
-    Write-Host "Aviso: URL del pooler transaccional (6543); se usa 5432 y se quitan parametros pgbouncer." -ForegroundColor Yellow
-    $url = $url -replace ":6543/", ":5432/" -replace "[?&]pgbouncer=true", "" -replace "[?&]connection_limit=\d+", ""
-  }
+  try { Set-Clipboard -Value " " } catch {}   # no dejar la credencial en el portapapeles
+  $url = Preparar-Url $url
   $env:DATABASE_URL = $url
 
   # ---------- contrasenas (unico dato que escribes) ----------
