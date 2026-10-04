@@ -30,16 +30,26 @@ const PRODUCT_INCLUDE = {
   tags: { include: { tag: { select: { id: true, name: true, slug: true } } } },
 };
 
-/** Genera el siguiente SKU secuencial con prefijo de categoría (formato: PRO-0000). */
-async function generateSku(prefix: string): Promise<string> {
-  const last = await prisma.product.findFirst({
+/**
+ * Genera el siguiente SKU secuencial con prefijo de categoría (formato: PRO-0000).
+ * Solo cuenta los SKU con ese formato exacto: el catálogo puede tener otros (p. ej. "PRO-90-1" del
+ * seed o importaciones) que antes se leían mal y hacían repetir siempre el mismo número (409).
+ */
+export async function generateSku(prefix: string): Promise<string> {
+  const existing = await prisma.product.findMany({
     where: { sku: { startsWith: `${prefix}-` } },
-    orderBy: { sku: 'desc' },
     select: { sku: true },
   });
-  const num = last ? parseInt(last.sku.split('-')[1], 10) + 1 : 1;
-  return `${prefix}-${String(num).padStart(4, '0')}`;
+  let max = 0;
+  for (const { sku } of existing) {
+    const resto = sku.slice(prefix.length + 1); // lo que sigue a "PRO-"
+    if (/^\d+$/.test(resto)) max = Math.max(max, parseInt(resto, 10));
+  }
+  return `${prefix}-${String(max + 1).padStart(4, '0')}`;
 }
+
+const isSkuConflict = (e: unknown) =>
+  e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002' && JSON.stringify(e.meta?.target ?? '').includes('sku');
 
 export async function createProduct(req: AuthRequest, res: Response, next: NextFunction) {
   try {
@@ -56,18 +66,33 @@ export async function createProduct(req: AuthRequest, res: Response, next: NextF
 
     // SKU: si no viene, se genera automáticamente a partir de la categoría
     let sku = data.sku?.trim();
+    const autoSku = !sku;
+    let prefix = 'GEN';
     if (!sku) {
       const category = await prisma.category.findUnique({ where: { id: data.categoryId }, select: { name: true } });
-      const prefix = (category?.name ?? 'GEN').substring(0, 3).toUpperCase();
+      prefix = (category?.name ?? 'GEN').substring(0, 3).toUpperCase();
       sku = await generateSku(prefix);
     }
 
-    const product = await prisma.product.create({
+    // Si dos publicaciones simultáneas generan el mismo SKU, se reintenta con el siguiente número libre.
+    let product;
+    for (let intento = 0; ; intento++) {
+      try {
+        product = await createProductRecord(sku!);
+        break;
+      } catch (e) {
+        if (!autoSku || !isSkuConflict(e) || intento >= 4) throw e;
+        sku = await generateSku(prefix);
+      }
+    }
+
+    async function createProductRecord(skuFinal: string) {
+      return prisma.product.create({
       data: {
         ...data,
         sellerId: userId,
         slug,
-        sku,
+        sku: skuFinal,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         attributes: attributes
           ? {
@@ -91,7 +116,8 @@ export async function createProduct(req: AuthRequest, res: Response, next: NextF
           : undefined,
       },
       include: PRODUCT_INCLUDE,
-    });
+      });
+    }
 
     await recordAudit({ productId: product.id, actorId: userId, action: 'CREATED', note: `Producto creado: ${product.name}` });
 
