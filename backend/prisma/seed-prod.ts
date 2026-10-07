@@ -1,5 +1,6 @@
 import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../src/config/security';
 
 /**
  * Seed mínimo e idempotente para un entorno real: administrador (desde variables de entorno),
@@ -144,7 +145,7 @@ async function renameAdminEmail(previousEmail: string, email: string) {
 }
 
 async function seedAdmin(email: string, password: string) {
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   await prisma.user.upsert({
     where: { email },
     update: { passwordHash, role: Role.ADMIN, isActive: true, isApproved: true, isVerified: true },
@@ -161,7 +162,7 @@ async function seedAdmin(email: string, password: string) {
 }
 
 async function seedDemo(password: string) {
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   await prisma.user.upsert({
     where: { email: 'vendedor.demo@lacase.bo' },
     update: {},
@@ -215,7 +216,7 @@ async function renameAccount(previos: string[], email: string, role: Role) {
  * escribe en el repositorio. Re-ejecutar con otra REVIEW_PASSWORD la rota.
  */
 async function seedReview(password: string) {
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_COST);
   await renameAccount(['vendedor.demo@lacase.bo', 'vendedor.revision@lacase.test'], 'vendedor@lacase.test', Role.SELLER);
   await renameAccount(['comprador.demo@lacase.bo', 'comprador.revision@lacase.test'], 'comprador@lacase.test', Role.CUSTOMER);
   await prisma.user.upsert({

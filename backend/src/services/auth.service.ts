@@ -5,6 +5,7 @@ import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { env } from '../config/env';
+import { BCRYPT_COST } from '../config/security';
 import { ADMIN_WEB_ONLY_MESSAGE } from '../utils/client';
 
 interface RegisterInput {
@@ -29,7 +30,7 @@ export async function registerUser(input: RegisterInput) {
   const exists = await prisma.user.findUnique({ where: { email: input.email } });
   if (exists) throw ApiError.conflict('Ya existe un usuario con ese email');
 
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
 
   const user = await prisma.user.create({
     data: {
@@ -62,7 +63,7 @@ export async function registerSeller(input: SellerRegisterInput) {
   const exists = await prisma.user.findUnique({ where: { email: input.email } });
   if (exists) throw ApiError.conflict('Ya existe un usuario con ese email');
 
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
 
   const user = await prisma.user.create({
     data: {

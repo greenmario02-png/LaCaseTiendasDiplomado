@@ -1,6 +1,7 @@
 ﻿import { PrismaClient, Role, ProductCondition, SlotType } from '@prisma/client';
 import { fakerES as faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../src/config/security';
 import { randomBytes } from 'crypto';
 
 import { BOLIVIANISMOS } from '../src/data/bolivianismos';
@@ -1041,12 +1042,12 @@ async function main() {
   await prisma.banner.deleteMany();
 
   // ---------- USERS ----------
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await bcrypt.hash('password123', BCRYPT_COST);
   // La contraseña del admin de desarrollo no se publica: viene de SEED_ADMIN_PASSWORD o se genera
   // aleatoria y se muestra una sola vez al terminar el seed.
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString('base64url');
   const adminGenerated = !process.env.SEED_ADMIN_PASSWORD;
-  const adminHash = await bcrypt.hash(adminPassword, 10);
+  const adminHash = await bcrypt.hash(adminPassword, BCRYPT_COST);
 
   const admin = await prisma.user.create({
     data: {

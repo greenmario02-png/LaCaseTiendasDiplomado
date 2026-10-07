@@ -10,6 +10,7 @@
 import { PrismaClient, Role, ProductCondition } from '@prisma/client';
 import { fakerES as faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
+import { BCRYPT_COST } from '../src/config/security';
 
 import { CATEGORY_TREE, ATTR_DEFS, PRODUCT_TEMPLATES, categoryImage, flickrImage, DESC_INTROS, DESC_CLOSERS, REVIEW_COMMENTS, FORUM_CITIES } from './seed-data/catalog';
 import { seedForum } from './seed-forum';
@@ -55,7 +56,7 @@ const EXTRA_CUSTOMERS = [
 ];
 
 async function seedExtraUsers(demoPassword: string): Promise<{ sellers: number[]; customers: number[] }> {
-  const passwordHash = await bcrypt.hash(demoPassword, 10);
+  const passwordHash = await bcrypt.hash(demoPassword, BCRYPT_COST);
   const sellers: number[] = [];
   for (const s of EXTRA_SELLERS) {
     const email = `${slugify(s.first)}.${slugify(s.last)}@lacase.bo`;
