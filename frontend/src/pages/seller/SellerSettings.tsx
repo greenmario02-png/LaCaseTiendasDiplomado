@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, BadgeCheck } from 'lucide-react';
-import { Box, Typography, Paper, TextField, Grid, Alert, CircularProgress, MenuItem, Chip, Avatar, IconButton } from '@mui/material';
+import { Box, Typography, Paper, TextField, Grid, Alert, CircularProgress, MenuItem, Chip, Avatar, IconButton, Button } from '@mui/material';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
@@ -60,7 +60,7 @@ export default function SellerSettings() {
 
   const divisions = getDivisions(form.country);
 
-  const uploadProfileImage = async (file: File) => {
+  const uploadImage = async (file: File, field: 'profileImage' | 'storeLogo' | 'storeBanner') => {
     setUploading(true);
     const fd = new FormData();
     fd.append('image', file);
@@ -70,7 +70,7 @@ export default function SellerSettings() {
       });
       const url = data.data?.url ?? data.data?.fileUrl ?? data.data?.path;
       if (url) {
-        setForm((f) => ({ ...f, profileImage: url }));
+        setForm((f) => ({ ...f, [field]: url }));
         toast.success(t('seller.settings.toasts.profileImageReady'));
       }
     } catch (err) {
@@ -79,6 +79,7 @@ export default function SellerSettings() {
       setUploading(false);
     }
   };
+  const uploadProfileImage = (file: File) => uploadImage(file, 'profileImage');
 
   useEffect(() => {
     if (user) {
@@ -174,6 +175,9 @@ export default function SellerSettings() {
           </Grid>
           <Grid item xs={12}>
             <TextField label={t('seller.settings.storeNameLabel')} value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} fullWidth />
+            <Alert severity="info" sx={{ mt: 1 }}>
+              {t('seller.settings.identityNotice')}
+            </Alert>
           </Grid>
           <Grid item xs={12}>
             <TextField label={t('seller.settings.descriptionLabel')} value={form.storeDescription} onChange={(e) => setForm({ ...form, storeDescription: e.target.value })} fullWidth multiline rows={3} />
@@ -221,9 +225,17 @@ export default function SellerSettings() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField label={t('seller.settings.logoLabel')} value={form.storeLogo} onChange={(e) => setForm({ ...form, storeLogo: e.target.value })} fullWidth />
+            <Button component="label" size="small" disabled={uploading} sx={{ mt: 0.5, textTransform: 'none' }}>
+              {t('seller.settings.uploadImage')}
+              <input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f, 'storeLogo'); e.target.value = ''; }} />
+            </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField label={t('seller.settings.bannerLabel')} value={form.storeBanner} onChange={(e) => setForm({ ...form, storeBanner: e.target.value })} fullWidth />
+            <Button component="label" size="small" disabled={uploading} sx={{ mt: 0.5, textTransform: 'none' }}>
+              {t('seller.settings.uploadImage')}
+              <input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f, 'storeBanner'); e.target.value = ''; }} />
+            </Button>
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField label={t('seller.settings.cityLabel')} value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />

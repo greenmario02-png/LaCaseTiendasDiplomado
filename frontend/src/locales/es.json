@@ -3088,6 +3088,8 @@
       "stateLabel": "Departamento/Provincia",
       "storeLocationLabel": "Ubicación de la tienda",
       "storeNameLabel": "Nombre de la tienda",
+      "identityNotice": "El nombre y la ubicación de la tienda solo se pueden cambiar una vez cada 30 días (medida contra abusos). Los demás datos se editan cuando quieras.",
+      "uploadImage": "Subir imagen",
       "tiktokLabel": "TikTok (URL)",
       "title": "Configuración de tu tienda",
       "toasts": {
