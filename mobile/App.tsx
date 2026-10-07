@@ -13,6 +13,8 @@ import { registerPushToken, clearPushToken } from './src/services/notifications'
 import { ThemeProvider, useAppTheme } from './src/theme/ThemeContext';
 import { loadPersistedLanguage } from './src/i18n';
 import UpdateChecker from './src/components/UpdateChecker';
+import ServidorDespertando from './src/components/ServidorDespertando';
+import { iniciarCalentamiento } from './src/services/warmup';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
@@ -182,6 +184,7 @@ export default function App() {
   const theme = useAppTheme();
 
   useEffect(() => {
+    iniciarCalentamiento();
     init();
     loadPersistedLanguage();
   }, []);
@@ -200,9 +203,12 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
+      <SafeAreaProvider>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background }}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+        <ServidorDespertando />
+      </SafeAreaProvider>
     );
   }
 
@@ -211,6 +217,7 @@ export default function App() {
       <ThemeProvider>
         <AppNavigator />
         <UpdateChecker />
+        <ServidorDespertando />
       </ThemeProvider>
     </SafeAreaProvider>
   );

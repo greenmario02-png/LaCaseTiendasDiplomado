@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../config/env';
 import { cacheGet, cacheSet, isCacheable } from './offlineCache';
+import { esReintentable, esperaDeReintento } from './warmup';
 
 const TOKEN_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
@@ -54,7 +55,7 @@ export async function getSessionId(): Promise<string> {
 
 export const api = axios.create({
   baseURL: API_URL,
-  timeout: 20000,
+  timeout: 30000,
 });
 
 api.interceptors.request.use(async (config) => {
@@ -78,6 +79,12 @@ api.interceptors.response.use(
   },
   async (error) => {
     const original = error.config;
+    // Arranque en frío del servidor (sin respuesta, tiempo agotado o 502/503/504): repetir la lectura antes de rendirse
+    if (esReintentable(error)) {
+      original.__intentos = (original.__intentos ?? 0) + 1;
+      await esperaDeReintento(original.__intentos);
+      return api(original);
+    }
     // Sin conexión o backend caído: devolver caché de GET si existe
     if (
       (!error.response || error.response?.status >= 500) &&

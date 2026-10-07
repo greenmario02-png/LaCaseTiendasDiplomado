@@ -5,6 +5,7 @@ import Footer from './Footer';
 import ReturnToTop from '../ui/ReturnToTop';
 import FloatingChat from '../chat/FloatingChat';
 import { LaCaseDiceBanner } from '../ui/LaCaseDiceBanner';
+import ServidorDespertando from './ServidorDespertando';
 
 export default function Layout() {
   return (
@@ -17,6 +18,7 @@ export default function Layout() {
       <Footer />
       <ReturnToTop />
       <FloatingChat />
+      <ServidorDespertando />
     </Box>
   );
 }

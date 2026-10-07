@@ -1,0 +1,31 @@
+name: Calentamiento
+
+# La API gratuita de Render se duerme tras 15 minutos sin tráfico y la primera petición tarda ~50 s.
+# Esta tarea consulta la ruta de salud cada 10 minutos (GitHub puede retrasarla unos minutos), lo que
+# mantiene despierta la API y activa la base. Complementa al monitor externo (UptimeRobot).
+# Las tareas programadas solo corren desde la rama por defecto (main).
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  salud:
+    name: Consultar /api/v1/salud
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Despertar API y base de datos
+        run: |
+          for intento in 1 2 3 4; do
+            codigo=$(curl -s -o respuesta.json -w '%{http_code}' --max-time 60 https://lacase-diplomado-api.onrender.com/api/v1/salud || true)
+            echo "Intento $intento: HTTP $codigo"
+            [ "$codigo" = "200" ] && cat respuesta.json && exit 0
+            sleep 15
+          done
+          exit 1
+      - name: Consultar el frontend
+        run: curl -s -o /dev/null -w 'Frontend: HTTP %{http_code}\n' --max-time 30 https://tiendaslacase.netlify.app

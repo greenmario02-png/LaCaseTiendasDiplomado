@@ -1008,6 +1008,9 @@
       "emptyMessage": "No tienes favoritos todavía",
       "exploreButton": "Explorar productos",
       "title": "Mis favoritos"
+    },
+    "server": {
+      "waking": "Conectando con el servidor… la primera vez del día puede tardar hasta un minuto."
     }
   }
 }

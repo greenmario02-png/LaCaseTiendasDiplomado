@@ -6,6 +6,7 @@ import compression from 'compression';
 import { corsOptions } from './config/cors';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 import { generalLimiter } from './middlewares/rateLimiter';
+import { prisma } from './config/database';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import sellerRoutes from './routes/seller.routes';
@@ -74,9 +75,21 @@ export function createApp() {
   });
 
   // Ruta de salud pública
-  app.get(['/api/salud', '/api/v1/salud'], (_req, res) => {
+  // Disponibilidad real: además de que el proceso responda, comprueba la base (SELECT 1 con tope de 4 s).
+  // Es la ruta que vigilan el monitor externo y la tarea programada de calentamiento; al consultar la base
+  // también evitan que el proveedor la ponga en pausa por inactividad. Render usa `/api/health` (solo proceso).
+  app.get(['/api/salud', '/api/v1/salud'], async (_req, res) => {
     // `commit` (Render lo inyecta) identifica qué versión está en vivo: evidencia de despliegue verificado.
-    res.status(200).json({ estado: 'ok', commit: process.env.RENDER_GIT_COMMIT?.slice(0, 7) ?? null });
+    const commit = process.env.RENDER_GIT_COMMIT?.slice(0, 7) ?? null;
+    try {
+      await Promise.race([
+        prisma.$queryRaw`SELECT 1`,
+        new Promise((_, rechazar) => setTimeout(() => rechazar(new Error('timeout')), 4000).unref()),
+      ]);
+      res.status(200).json({ estado: 'ok', base: 'ok', commit });
+    } catch {
+      res.status(503).json({ estado: 'degradado', base: 'sin respuesta', commit });
+    }
   });
 
   app.get('/api/health', (_req, res) => {

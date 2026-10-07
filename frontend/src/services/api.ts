@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { cacheGet, cacheSet, isCacheable } from './offlineCache';
+import { esReintentable, esperaDeReintento } from './warmup';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -58,6 +59,12 @@ api.interceptors.response.use(
   },
   async (error) => {
     const original = error.config;
+    // Arranque en frío del servidor (sin respuesta o 502/503/504): repetir la lectura unas veces antes de rendirse
+    if (esReintentable(error)) {
+      original.__intentos = (original.__intentos ?? 0) + 1;
+      await esperaDeReintento(original.__intentos);
+      return api(original);
+    }
     // Sin conexión o backend caído: devolver caché de GET si existe
     if (
       (!error.response || error.response?.status >= 500) &&

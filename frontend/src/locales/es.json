@@ -3196,5 +3196,9 @@
     },
     "viewAllReviews": "Ver todas las reseñas",
     "whatsappMessage": "Hola {{storeName}}, vi tu tienda en LaCase Multi Tiendas y quiero hacer una consulta."
+  },
+  "servidor": {
+    "despertando": "Conectando con el servidor… la primera visita del día puede tardar hasta un minuto.",
+    "listo": "Servidor listo"
   }
 }

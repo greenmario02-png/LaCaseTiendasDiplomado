@@ -12,10 +12,12 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useThemeStore } from './stores/themeStore';
 import { ensureSessionId } from './stores/cartStore';
+import { iniciarCalentamiento } from './services/warmup';
 import { buildTheme } from './theme';
 import './index.css';
 
 ensureSessionId();
+iniciarCalentamiento();
 
 function Root() {
   const darkMode = useThemeStore((s) => s.darkMode);
