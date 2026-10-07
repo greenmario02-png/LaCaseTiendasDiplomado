@@ -13,6 +13,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:prod": "tsx prisma/seed-prod.ts",
     "db:seed:content": "tsx prisma/seed-content.ts",
+    "db:seed:tarija": "tsx prisma/seed-tarija.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
