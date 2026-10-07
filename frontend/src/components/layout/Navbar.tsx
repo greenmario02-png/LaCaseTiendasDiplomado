@@ -124,7 +124,7 @@ export default function Navbar() {
           <Box sx={{ fontWeight: 800, fontSize: '1.2rem' }}>LaCase Multi Tiendas</Box>
         </Box>
 
-        <Box component="form" onSubmit={handleSearch} sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <Box component="form" onSubmit={handleSearch} sx={{ flex: { xs: '1 1 100%', md: 1 }, minWidth: 0, display: 'flex', justifyContent: 'center' }}>
           <SearchBox>
             <SearchIconWrapper>
               <SearchIcon />
@@ -137,7 +137,7 @@ export default function Navbar() {
           </SearchBox>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-end' }, width: { xs: '100%', md: 'auto' } }}>
           <LanguageSwitcher />
           <CurrencyRates />
           {currencies.length > 0 && (

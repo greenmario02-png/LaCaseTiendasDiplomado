@@ -504,7 +504,7 @@ export default function ProductsPage() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* ===== BUSCADOR SUPERIOR ===== */}
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Tabs value={searchMode} onChange={(_, v) => { setSearchMode(v); setSellerResults([]); }} sx={{ mb: 1 }}>
+        <Tabs value={searchMode} onChange={(_, v) => { setSearchMode(v); setSellerResults([]); }} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile sx={{ mb: 1 }}>
           <Tab value="productos" label={t('product.search.tabs.products')} />
           <Tab value="marcas" label={t('product.search.tabs.brands')} />
           <Tab value="vendedores" label={t('product.search.tabs.sellers')} />
