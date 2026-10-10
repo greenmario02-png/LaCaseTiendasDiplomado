@@ -1,0 +1,102 @@
+{
+  "proyecto": "LaCase Multitiendas",
+  "generado": "2026-10-04T19:21:13.494Z",
+  "frontend": "https://tiendaslacase.netlify.app",
+  "api": "https://lacase-diplomado-api.onrender.com/api/v1",
+  "ejecuciones": [
+    {
+      "reporte": "cypress-2026-10-03-2016.json",
+      "html": null,
+      "reconstruido": true,
+      "commit": "b568ecd",
+      "total": 34,
+      "aprobados": 27,
+      "fallidos": 7
+    },
+    {
+      "reporte": "cypress-2026-10-03-2121.json",
+      "html": "cypress-2026-10-03-2121.html",
+      "reconstruido": false,
+      "commit": "7ae10aa",
+      "total": 34,
+      "aprobados": 34,
+      "fallidos": 0
+    },
+    {
+      "reporte": "cypress-2026-10-03-2129.json",
+      "html": "cypress-2026-10-03-2129.html",
+      "reconstruido": false,
+      "commit": "7ae10aa",
+      "total": 34,
+      "aprobados": 34,
+      "fallidos": 0
+    },
+    {
+      "reporte": "cypress-2026-10-04-0729.json",
+      "html": "cypress-2026-10-04-0729.html",
+      "reconstruido": false,
+      "commit": "219ef0d",
+      "total": 34,
+      "aprobados": 34,
+      "fallidos": 0
+    },
+    {
+      "reporte": "cypress-2026-10-04-1237.json",
+      "html": "cypress-2026-10-04-1237.html",
+      "reconstruido": false,
+      "commit": "219ef0d",
+      "total": 41,
+      "aprobados": 41,
+      "fallidos": 0
+    },
+    {
+      "reporte": "cypress-2026-10-04-1355.json",
+      "html": "cypress-2026-10-04-1355.html",
+      "reconstruido": false,
+      "commit": "8e4691d",
+      "total": 41,
+      "aprobados": 41,
+      "fallidos": 0
+    }
+  ],
+  "casos": 68,
+  "estados": {
+    "Aprobado": 59,
+    "Aprobado tras corrección": 9,
+    "Fallido": 0
+  },
+  "capturasRunner": [
+    "UI-01-catalogo-produccion-2026-10-04.png",
+    "UI-03-login-invalido-401-produccion-2026-10-03.png",
+    "UI-04-reautenticacion-panel-vendedor-produccion-2026-10-03.png",
+    "UI-05-panel-vendedor-produccion-2026-10-03.png",
+    "UI-06-formulario-producto-produccion-2026-10-03.png",
+    "API-01-salud-200-produccion-2026-10-03.png",
+    "API-02-ruta-protegida-401-produccion-2026-10-03.png",
+    "UI-07-productos-vendedor-con-imagen-2026-10-04.png",
+    "UI-11-pedidos-recibidos-vendedor-estados-en-espanol-2026-10-04.png",
+    "UI-08-carrito-comprador-con-imagen-2026-10-04.png",
+    "UI-09-mis-pedidos-estados-en-espanol-2026-10-04.png",
+    "UI-10-detalle-pedido-con-imagen-2026-10-04.png",
+    "UI-12-letrero-portada-tema-oscuro-2026-10-04.png",
+    "UI-13-letrero-portada-tema-claro-2026-10-04.png",
+    "UI-14-letrero-compra-con-miniatura-2026-10-04.png",
+    "UI-15-letrero-clic-lleva-al-producto-2026-10-04.png",
+    "MOVIL-01-inicio-emulador-2026-10-04.png",
+    "MOVIL-02-productos-con-imagen-emulador-2026-10-04.png",
+    "MOVIL-03-detalle-producto-emulador-2026-10-04.png",
+    "MOVIL-04-producto-agregado-al-carrito-emulador-2026-10-04.png",
+    "MOVIL-05-carrito-con-producto-emulador-2026-10-04.png",
+    "MOVIL-06-perfil-comprador-pedidos-emulador-2026-10-04.png",
+    "UI-02-login-valido-panel-vendedor-produccion-2026-10-04.png",
+    "MOVIL-07-panel-vendedor-emulador-2026-10-04.png",
+    "MOVIL-08-perfil-vendedor-emulador-2026-10-04.png",
+    "MOVIL-09-mis-productos-vendedor-emulador-2026-10-04.png",
+    "CYPRESS-13-ejecutor-09-tiempo-de-respuesta-2026-10-04.png",
+    "CAJA-BLANCA-01-unit-envio-paginacion-tokens-2026-10-04.png",
+    "CAJA-BLANCA-02-unit-tokens-y-errores-2026-10-04.png",
+    "CAJA-BLANCA-03-integracion-sku-2026-10-04.png",
+    "CAJA-BLANCA-04-integracion-admin-solo-web-2026-10-04.png",
+    "CAJA-BLANCA-05-integracion-carrito-2026-10-04.png"
+  ]
+}

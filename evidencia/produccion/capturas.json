@@ -1,0 +1,290 @@
+[
+  {
+    "archivo": "UI-01-catalogo-produccion-2026-10-04.png",
+    "titulo": "Catálogo público de LaCase Multitiendas en producción (158 productos con sus imágenes)",
+    "demuestra": "El catálogo se sirve en la URL pública con datos reales de la API y las imágenes nuevas",
+    "url": "https://tiendaslacase.netlify.app/productos",
+    "requisito": "Catálogo",
+    "seccion": "Capítulo 2, implementación (catálogo)",
+    "anexo": "Anexo de pantallas de catálogo"
+  },
+  {
+    "archivo": "UI-03-login-invalido-401-produccion-2026-10-03.png",
+    "titulo": "Inicio de sesión con credenciales inválidas: mensaje «Credenciales inválidas» (HTTP 401)",
+    "demuestra": "La API responde 401 con un mensaje genérico (no revela si el correo existe) y la interfaz lo muestra; la contraseña se ve oculta",
+    "url": "https://tiendaslacase.netlify.app/login",
+    "requisito": "Autenticación (caso CP-12 y UI-03)",
+    "seccion": "Capítulo 2, seguridad (2.7)",
+    "anexo": "Anexo de evidencia 401 y 403"
+  },
+  {
+    "archivo": "UI-04-reautenticacion-panel-vendedor-produccion-2026-10-03.png",
+    "titulo": "Verificación de seguridad: el panel del vendedor pide confirmar la contraseña",
+    "demuestra": "Control adicional de autenticación antes de entrar al panel de la tienda",
+    "url": "https://tiendaslacase.netlify.app/seller",
+    "requisito": "Autenticación y autorización por rol",
+    "seccion": "Capítulo 2, seguridad (2.7)",
+    "anexo": "Anexo de evidencia 401 y 403"
+  },
+  {
+    "archivo": "UI-05-panel-vendedor-produccion-2026-10-03.png",
+    "titulo": "Panel del vendedor (dashboard) en producción",
+    "demuestra": "Acceso del vendedor a su tienda: productos totales, ventas e ingresos",
+    "url": "https://tiendaslacase.netlify.app/seller",
+    "requisito": "Gestión de productos y pedidos por el vendedor",
+    "seccion": "Capítulo 2, implementación (vendedor)",
+    "anexo": "Anexo de paneles del vendedor"
+  },
+  {
+    "archivo": "UI-06-formulario-producto-produccion-2026-10-03.png",
+    "titulo": "Formulario «Nuevo producto» del vendedor",
+    "demuestra": "Publicación de producto con validación en el cliente (campos obligatorios), SKU automático y asistente en 4 pasos",
+    "url": "https://tiendaslacase.netlify.app/seller/productos/nuevo",
+    "requisito": "Publicación de productos",
+    "seccion": "Capítulo 2, implementación (vendedor)",
+    "anexo": "Anexo de paneles del vendedor"
+  },
+  {
+    "archivo": "API-01-salud-200-produccion-2026-10-03.png",
+    "titulo": "Ruta de salud de la API: HTTP 200 con el commit desplegado",
+    "demuestra": "La API pública responde 200 e informa qué commit está en vivo (despliegue verificado)",
+    "url": "https://lacase-diplomado-api.onrender.com/api/v1/salud",
+    "requisito": "Disponibilidad (CP-10)",
+    "seccion": "Capítulo 2, pruebas (2.8)",
+    "anexo": "Anexo de endpoints"
+  },
+  {
+    "archivo": "API-02-ruta-protegida-401-produccion-2026-10-03.png",
+    "titulo": "Ruta protegida sin token: HTTP 401 UNAUTHORIZED con el formato de error único",
+    "demuestra": "El servidor rechaza una ruta de vendedor sin cabecera Authorization (error.code UNAUTHORIZED, «Token no provisto»)",
+    "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products",
+    "requisito": "Autenticación (CP-13)",
+    "seccion": "Capítulo 2, seguridad (2.7) y pruebas (2.8)",
+    "anexo": "Anexo de evidencia 401 y 403"
+  },
+  {
+    "archivo": "UI-07-productos-vendedor-con-imagen-2026-10-04.png",
+    "titulo": "Mis productos del vendedor: productos de Tarija publicados con imagen y estado Aprobado",
+    "demuestra": "El panel del vendedor lista los productos creados por la prueba con su foto, categoría, precio, stock y estado en español",
+    "url": "https://tiendaslacase.netlify.app/seller/productos",
+    "requisito": "Gestión de productos (Must)",
+    "seccion": "Capítulo 2, implementación (vendedor)",
+    "anexo": "Anexo de pantallas del vendedor"
+  },
+  {
+    "archivo": "UI-11-pedidos-recibidos-vendedor-estados-en-espanol-2026-10-04.png",
+    "titulo": "Pedidos recibidos del vendedor: estado del pedido y del pago en español",
+    "demuestra": "El vendedor ve los pedidos de sus compradores con los estados traducidos (Confirmada, Cancelada, Comprobante enviado) y la entrega en Tarija",
+    "url": "https://tiendaslacase.netlify.app/seller/pedidos",
+    "requisito": "Gestión del pedido por el vendedor (Must)",
+    "seccion": "Capítulo 2, implementación (pedidos)",
+    "anexo": "Anexo de pantallas del flujo de compra"
+  },
+  {
+    "archivo": "UI-08-carrito-comprador-con-imagen-2026-10-04.png",
+    "titulo": "Carrito del comprador con un producto de Tarija con imagen (tema oscuro)",
+    "demuestra": "El comprador autenticado tiene un producto en el carrito con su foto; se muestran el subtotal, el total en bolivianos y el botón Finalizar compra",
+    "url": "https://tiendaslacase.netlify.app/carrito",
+    "requisito": "Carrito (Must)",
+    "seccion": "Capítulo 2, implementación (carrito)",
+    "anexo": "Anexo de pantallas del flujo de compra"
+  },
+  {
+    "archivo": "UI-09-mis-pedidos-estados-en-espanol-2026-10-04.png",
+    "titulo": "Mis pedidos: estados del pedido y del pago en español (Confirmada, Cancelada, Comprobante enviado)",
+    "demuestra": "El listado del comprador muestra los estados traducidos al español, sin textos en inglés",
+    "url": "https://tiendaslacase.netlify.app/cuenta/pedidos",
+    "requisito": "Pedido y seguimiento de estado (Must)",
+    "seccion": "Capítulo 2, implementación (pedidos)",
+    "anexo": "Anexo de pantallas del flujo de compra"
+  },
+  {
+    "archivo": "UI-10-detalle-pedido-con-imagen-2026-10-04.png",
+    "titulo": "Detalle del pedido #8: producto con imagen, total y pago por QR con comprobante enviado",
+    "demuestra": "El detalle muestra el estado Confirmada, el retiro en tienda, el producto con su foto, el total y el pago por QR esperando verificación",
+    "url": "https://tiendaslacase.netlify.app/cuenta/pedidos/8",
+    "requisito": "Pedido con pago QR (Must)",
+    "seccion": "Capítulo 2, implementación (pedidos)",
+    "anexo": "Anexo de pantallas del flujo de compra"
+  },
+  {
+    "archivo": "UI-12-letrero-portada-tema-oscuro-2026-10-04.png",
+    "titulo": "Letrero en tiempo real de la portada en tema oscuro: compras recientes y empleos",
+    "demuestra": "El letrero tiene fondo índigo fijo y texto blanco; cada elemento es un enlace a la compra (producto) o a los empleos",
+    "url": "https://tiendaslacase.netlify.app",
+    "requisito": "Portada (extra)",
+    "seccion": "Capítulo 2, implementación (portada)",
+    "anexo": "Anexo de pantallas de la portada"
+  },
+  {
+    "archivo": "UI-13-letrero-portada-tema-claro-2026-10-04.png",
+    "titulo": "Letrero en tiempo real de la portada en tema claro",
+    "demuestra": "El mismo letrero se ve con buen contraste en tema claro; etiqueta, título y detalle legibles",
+    "url": "https://tiendaslacase.netlify.app",
+    "requisito": "Portada (extra)",
+    "seccion": "Capítulo 2, implementación (portada)",
+    "anexo": "Anexo de pantallas de la portada"
+  },
+  {
+    "archivo": "UI-14-letrero-compra-con-miniatura-2026-10-04.png",
+    "titulo": "Letrero de la portada detenido con el mouse: la compra reciente muestra miniatura, etiqueta VENDIDO y título subrayado",
+    "demuestra": "Al pasar el mouse el letrero se detiene y el elemento se resalta como enlace; la compra lleva la foto del producto",
+    "url": "https://tiendaslacase.netlify.app",
+    "requisito": "Portada (extra)",
+    "seccion": "Capítulo 2, implementación (portada)",
+    "anexo": "Anexo de pantallas de la portada"
+  },
+  {
+    "archivo": "UI-15-letrero-clic-lleva-al-producto-2026-10-04.png",
+    "titulo": "Al hacer clic en la compra del letrero se abre el producto vendido con su imagen",
+    "demuestra": "El clic navega a /producto/175/..., la página del producto con su foto, precio y botón Agregar al carrito",
+    "url": "https://tiendaslacase.netlify.app/producto/175/singani-rujero-doble-destilado-750-ml-prueba-pedido-de-ejemplo--1791089075826",
+    "requisito": "Portada (extra)",
+    "seccion": "Capítulo 2, implementación (portada)",
+    "anexo": "Anexo de pantallas de la portada"
+  },
+  {
+    "archivo": "MOVIL-01-inicio-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: pantalla de inicio con cotizaciones, categorías, empleos y destacados",
+    "demuestra": "La app móvil instalada en un emulador de Android muestra el inicio con datos de la API de producción",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Aplicación móvil",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-02-productos-con-imagen-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: listado de productos con imagen, precio y stock",
+    "demuestra": "El catálogo móvil lista los productos de Tarija de la prueba con su foto, vendedor, precio en bolivianos y stock",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Catálogo (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-03-detalle-producto-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: detalle de un producto de Tarija",
+    "demuestra": "El detalle muestra imagen, precio, descripción, vendedor y el botón Agregar al carrito",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Catálogo (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-04-producto-agregado-al-carrito-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: confirmación «Producto agregado al carrito»",
+    "demuestra": "Al agregar el producto, la app confirma la operación realizada con la cuenta del comprador",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Carrito (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-05-carrito-con-producto-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: carrito del comprador con el producto, el total y Finalizar compra",
+    "demuestra": "El carrito muestra el producto con su imagen, la cantidad, el total en bolivianos y el botón Finalizar compra",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Carrito (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-06-perfil-comprador-pedidos-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: perfil del comprador y sus pedidos con estados en español",
+    "demuestra": "El perfil muestra la cuenta ficticia del comprador, el menú de opciones y los pedidos con su estado (por ejemplo, Cancelado)",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Pedido y seguimiento de estado (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "UI-02-login-valido-panel-vendedor-produccion-2026-10-04.png",
+    "titulo": "Inicio de sesión válido: panel del vendedor tras iniciar sesión con la cuenta ficticia",
+    "demuestra": "Con el correo ficticio vendedor@lacase.test, el inicio de sesión (y la confirmación de contraseña del panel) permite entrar al panel del vendedor en producción",
+    "url": "https://tiendaslacase.netlify.app/seller",
+    "requisito": "Autenticación (login válido)",
+    "seccion": "Capítulo 2, seguridad (2.7)",
+    "anexo": "Anexo A.5"
+  },
+  {
+    "archivo": "MOVIL-07-panel-vendedor-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: panel del vendedor con las cifras de la tienda y los últimos pedidos",
+    "demuestra": "El vendedor ve productos, pedidos, ventas y los últimos pedidos de sus compradores; la franja inferior registra la fecha y la hora",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Gestión del pedido por el vendedor (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-08-perfil-vendedor-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: perfil del vendedor con las opciones Mi tienda, Mis productos y Mis empleos",
+    "demuestra": "La cuenta de vendedor muestra el menú de su tienda; no aparece ningún acceso a la administración, que solo es válida en la web",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Roles y administración solo web (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "MOVIL-09-mis-productos-vendedor-emulador-2026-10-04.png",
+    "titulo": "Aplicación móvil: mis productos del vendedor con imagen, precio, stock y estado",
+    "demuestra": "El listado muestra los productos de Tarija con su foto y el estado Aprobado o Eliminado (baja lógica), con las acciones Editar, Eliminar y Reactivar",
+    "url": "Aplicación móvil (APK release, com.multitienda.app) conectada a https://lacase-diplomado-api.onrender.com/api",
+    "requisito": "Gestión de productos (móvil)",
+    "seccion": "Anexo D, capturas de funcionamiento móvil",
+    "anexo": "Anexo D. Instalación móvil o demostración"
+  },
+  {
+    "archivo": "CYPRESS-13-ejecutor-09-tiempo-de-respuesta-2026-10-04.png",
+    "titulo": "Ejecutor de Cypress: CP-09, tiempo de respuesta del listado",
+    "demuestra": "El caso CP-09 mide cinco pedidos en caliente al listado público (GET /api/v1/products) con HTTP 200 y un promedio de 1.74 s, menor al límite de 2 s",
+    "url": "Ejecutor gráfico de Cypress 13.17.0 con Electron 118; la web bajo prueba es https://tiendaslacase.netlify.app",
+    "requisito": "Pruebas automatizadas (Cypress)",
+    "seccion": "Anexo G, evidencias de las pruebas en producción",
+    "anexo": "Anexo G"
+  },
+  {
+    "archivo": "CAJA-BLANCA-01-unit-envio-paginacion-tokens-2026-10-04.png",
+    "titulo": "Prueba de caja blanca: cálculo de envío, paginación, tokens y errores de la API",
+    "demuestra": "A la izquierda, el archivo unit.test.ts abierto en Visual Studio Code con las pruebas del cálculo de envío; a la derecha, la terminal con la orden de Jest y el resultado: 20 casos aprobados",
+    "url": "Visual Studio Code con backend/tests/unit.test.ts y terminal con `npx jest -c jest.unitarias.config.js tests/unit.test.ts --verbose` (sin red ni base de datos)",
+    "requisito": "Pruebas de caja blanca (Jest)",
+    "seccion": "2.8.5 Casos de caja blanca",
+    "anexo": "Anexo G"
+  },
+  {
+    "archivo": "CAJA-BLANCA-02-unit-tokens-y-errores-2026-10-04.png",
+    "titulo": "Prueba de caja blanca: tokens de sesión y códigos de error de la API",
+    "demuestra": "El código de las pruebas de firma y verificación de tokens en Visual Studio Code y, en la terminal, la ejecución de esos grupos con 8 casos aprobados",
+    "url": "Visual Studio Code con backend/tests/unit.test.ts (línea 68) y terminal con `npx jest ... -t \"JWT utils|ApiError\"` (sin red ni base de datos)",
+    "requisito": "Pruebas de caja blanca (Jest)",
+    "seccion": "Anexo G, sección G.5",
+    "anexo": "Anexo G"
+  },
+  {
+    "archivo": "CAJA-BLANCA-03-integracion-sku-2026-10-04.png",
+    "titulo": "Prueba de caja blanca de integración: SKU automático al publicar productos",
+    "demuestra": "El código de sku-generation.test.ts en Visual Studio Code y, en la terminal, su resultado (2 casos aprobados) tomado del reporte de la ejecución de integración del 04/10/2026",
+    "url": "Visual Studio Code con backend/tests/sku-generation.test.ts y terminal con el resultado de la suite (reporte jest-integracion-2026-10-04-1453.json)",
+    "requisito": "Pruebas de caja blanca (Jest, integración)",
+    "seccion": "Anexo G, sección G.5",
+    "anexo": "Anexo G"
+  },
+  {
+    "archivo": "CAJA-BLANCA-04-integracion-admin-solo-web-2026-10-04.png",
+    "titulo": "Prueba de caja blanca de integración: administración solo en la web",
+    "demuestra": "El código de admin-web-only.test.ts y su resultado (6 casos aprobados): el administrador entra desde la web (200) y es rechazado desde la app móvil (403) al iniciar sesión, al renovar el token y en cualquier ruta",
+    "url": "Visual Studio Code con backend/tests/admin-web-only.test.ts y terminal con el resultado de la suite (reporte jest-integracion-2026-10-04-1453.json)",
+    "requisito": "Pruebas de caja blanca (Jest, integración)",
+    "seccion": "Anexo G, sección G.5",
+    "anexo": "Anexo G"
+  },
+  {
+    "archivo": "CAJA-BLANCA-05-integracion-carrito-2026-10-04.png",
+    "titulo": "Prueba de caja blanca de integración: carrito de compras",
+    "demuestra": "El código de cart.test.ts y su resultado (7 casos aprobados), incluida la validación de cantidades no válidas",
+    "url": "Visual Studio Code con backend/tests/cart.test.ts y terminal con el resultado de la suite (reporte jest-integracion-2026-10-04-1453.json)",
+    "requisito": "Pruebas de caja blanca (Jest, integración)",
+    "seccion": "Anexo G, sección G.5",
+    "anexo": "Anexo G"
+  }
+]

@@ -1,0 +1,971 @@
+{
+  "info": {
+    "name": "LaCase Multitiendas · E3 · Pruebas de API en producción",
+    "description": "Colección con aserciones del flujo Must, 401/403 y validaciones. Se ejecuta con Newman (scripts/produccion.ps1 -Newman) o desde Postman (Run collection). Cada solicitud lleva su URL completa de producción. Variables de entorno: credenciales de las cuentas ficticias *.test (las contraseñas se escriben en el entorno, nunca en la colección).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "sellerToken",
+      "value": ""
+    },
+    {
+      "key": "buyerToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "productA",
+      "value": ""
+    },
+    {
+      "key": "productB",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "stamp",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('stamp')) pm.collectionVariables.set('stamp', String(Math.floor(Date.now() / 60000) % 100000));",
+          "const marcadores = { 'ID-PRODUCTO-A': 'productA', 'ID-PRODUCTO-B': 'productB', 'ID-PEDIDO': 'orderId' };",
+          "let destino = pm.request.url.toString();",
+          "Object.keys(marcadores).forEach((m) => { destino = destino.split(m).join(String(pm.collectionVariables.get(marcadores[m]))); });",
+          "pm.request.url.update(destino);"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Caja negra · API en producción",
+      "description": "Pruebas funcionales, de autenticación y de validación de la API publicada: solo observan entradas y salidas. Las pruebas de caja blanca (Jest) están en backend/tests.",
+      "item": [
+        {
+          "name": "1 · Disponibilidad",
+          "item": [
+            {
+              "name": "CP-10 · Salud 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/salud"
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"CP-10 · Salud 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('Informa el commit en vivo', () => pm.expect(j).to.have.property('commit'));\npm.test('Responde en menos de 3 s', () => pm.expect(pm.response.responseTime).to.be.below(3000));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2 · Autenticación y roles",
+          "item": [
+            {
+              "name": "CP-11 · Login válido (vendedor)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"{{sellerEmail}}\",\"password\":\"{{sellerPassword}}\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Login válido (comprador)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"{{buyerEmail}}\",\"password\":\"{{buyerPassword}}\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Login válido (administrador, solo web)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"{{adminPassword}}\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-12 · Login inválido 401",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"{{sellerEmail}}\",\"password\":\"clave-incorrecta-123\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-13 · Ruta protegida sin token 401",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products"
+              }
+            },
+            {
+              "name": "CP-15 · Comprador en ruta de vendedor 403",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products"
+              }
+            },
+            {
+              "name": "CP-18 · Registro inválido 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/register",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"no-es-correo\",\"password\":\"123\",\"firstName\":\"X\",\"lastName\":\"Y\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-21 · Admin desde la app móvil 403",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Client-App",
+                    "value": "mobile"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/auth/login",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"{{adminPassword}}\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"CP-11 · Login válido (vendedor)\": () => {\npm.test('CP-11 · Login válido (vendedor): HTTP 200', () => pm.response.to.have.status(200));\npm.test('El token vence en 900 s (15 min)', () => { const p = JSON.parse(atob(j.data.accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); pm.expect(p.exp - p.iat).to.eql(900); });\npm.test('La respuesta no expone passwordHash', () => pm.expect(JSON.stringify(j)).to.not.match(/passwordHash/));\npm.collectionVariables.set('sellerToken', j.data.accessToken);\n},",
+                  "\"Login válido (comprador)\": () => {\npm.test('Login válido (comprador): HTTP 200', () => pm.response.to.have.status(200));\npm.test('El token vence en 900 s (15 min)', () => { const p = JSON.parse(atob(j.data.accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); pm.expect(p.exp - p.iat).to.eql(900); });\npm.test('La respuesta no expone passwordHash', () => pm.expect(JSON.stringify(j)).to.not.match(/passwordHash/));\npm.collectionVariables.set('buyerToken', j.data.accessToken);\n},",
+                  "\"Login válido (administrador, solo web)\": () => {\npm.test('Login válido (administrador, solo web): HTTP 200', () => pm.response.to.have.status(200));\npm.test('El token vence en 900 s (15 min)', () => { const p = JSON.parse(atob(j.data.accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); pm.expect(p.exp - p.iat).to.eql(900); });\npm.test('La respuesta no expone passwordHash', () => pm.expect(JSON.stringify(j)).to.not.match(/passwordHash/));\npm.collectionVariables.set('adminToken', j.data.accessToken);\n},",
+                  "\"CP-12 · Login inválido 401\": () => {\npm.test('HTTP 401', () => pm.response.to.have.status(401));\npm.test('Formato de error único: error.code = UNAUTHORIZED', () => pm.expect(j.error.code).to.eql('UNAUTHORIZED'));\n},",
+                  "\"CP-13 · Ruta protegida sin token 401\": () => {\npm.test('HTTP 401', () => pm.response.to.have.status(401));\npm.test('Formato de error único: error.code = UNAUTHORIZED', () => pm.expect(j.error.code).to.eql('UNAUTHORIZED'));\n},",
+                  "\"CP-15 · Comprador en ruta de vendedor 403\": () => {\npm.test('HTTP 403', () => pm.response.to.have.status(403));\npm.test('Formato de error único: error.code = FORBIDDEN', () => pm.expect(j.error.code).to.eql('FORBIDDEN'));\n},",
+                  "\"CP-18 · Registro inválido 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\npm.test('Formato de error único: error.code = BAD_REQUEST', () => pm.expect(j.error.code).to.eql('BAD_REQUEST'));\npm.test('Detalle por campo', () => pm.expect(j.error.details).to.be.an('array').that.is.not.empty);\n},",
+                  "\"CP-21 · Admin desde la app móvil 403\": () => {\npm.test('HTTP 403', () => pm.response.to.have.status(403));\npm.test('Formato de error único: error.code = FORBIDDEN', () => pm.expect(j.error.code).to.eql('FORBIDDEN'));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3 · Publicación y catálogo",
+          "item": [
+            {
+              "name": "Categorías (elige una hoja)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/products/categories"
+              }
+            },
+            {
+              "name": "CP-22 · Vendedor publica un producto 201",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\":\"Singani Rujero Doble Destilado 750 ml (prueba: publicar producto)\",\"categoryId\":{{categoryId}},\"description\":\"Singani de altura de los valles de Tarija. Dato ficticio de la revisión.\",\"condition\":\"NEW\",\"price\":150,\"stock\":5,\"images\":[{\"url\":\"https://picsum.photos/seed/singani-tarija/800/800\",\"isPrimary\":true}]}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-23 · Producto inválido 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\":\"ab\",\"categoryId\":{{categoryId}},\"condition\":\"NEW\",\"price\":-5,\"stock\":1}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-24 · Comprador no publica 403",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\":\"Chicha Morada Artesanal de Tarija (prueba: comprador sin permiso)\",\"categoryId\":{{categoryId}},\"condition\":\"NEW\",\"price\":10,\"stock\":1}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-25 · Sin aprobar no se lista",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/products?search=Singani Rujero"
+              }
+            },
+            {
+              "name": "Preparación · la moderación aprueba el producto",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/admin/products/ID-PRODUCTO-A/moderate",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"approve\":true}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-28 · Aprobado aparece en el catálogo",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/products?search=Singani Rujero"
+              }
+            },
+            {
+              "name": "CP-29 · Editar precio 200",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products/ID-PRODUCTO-A",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"price\":175}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-30 · Comprador no edita 403",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products/ID-PRODUCTO-A",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"price\":1}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-31 · Baja lógica 200",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products/ID-PRODUCTO-A"
+              }
+            },
+            {
+              "name": "CP-20 · Recurso inexistente 404",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/products/999999999"
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"Categorías (elige una hoja)\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\nconst hojas = (n) => n.flatMap((x) => (x.children && x.children.length ? hojas(x.children) : [x]));\nconst bar = j.data.filter((c) => c.slug === 'bar-y-bebidas'); pm.collectionVariables.set('categoryId', hojas(bar.length ? bar : j.data)[0].id);\n},",
+                  "\"CP-22 · Vendedor publica un producto 201\": () => {\npm.test('HTTP 201', () => pm.response.to.have.status(201));\npm.collectionVariables.set('productA', j.data.id);\n},",
+                  "\"CP-23 · Producto inválido 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\npm.test('Formato de error único: error.code = BAD_REQUEST', () => pm.expect(j.error.code).to.eql('BAD_REQUEST'));\n},",
+                  "\"CP-24 · Comprador no publica 403\": () => {\npm.test('HTTP 403', () => pm.response.to.have.status(403));\npm.test('Formato de error único: error.code = FORBIDDEN', () => pm.expect(j.error.code).to.eql('FORBIDDEN'));\n},",
+                  "\"CP-25 · Sin aprobar no se lista\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('El producto nuevo NO aparece', () => pm.expect(j.data.map((p) => p.id)).to.not.include(Number(pm.collectionVariables.get('productA'))));\n},",
+                  "\"Preparación · la moderación aprueba el producto\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\n},",
+                  "\"CP-28 · Aprobado aparece en el catálogo\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('El producto aparece', () => pm.expect(j.data.map((p) => p.id)).to.include(Number(pm.collectionVariables.get('productA'))));\n},",
+                  "\"CP-29 · Editar precio 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('Precio 175', () => pm.expect(Number(j.data.price)).to.eql(175));\n},",
+                  "\"CP-30 · Comprador no edita 403\": () => {\npm.test('HTTP 403', () => pm.response.to.have.status(403));\npm.test('Formato de error único: error.code = FORBIDDEN', () => pm.expect(j.error.code).to.eql('FORBIDDEN'));\n},",
+                  "\"CP-31 · Baja lógica 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\n},",
+                  "\"CP-20 · Recurso inexistente 404\": () => {\npm.test('HTTP 404', () => pm.response.to.have.status(404));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4 · Carrito, pedido y pago QR",
+          "item": [
+            {
+              "name": "CP-32a · Publica producto B 201",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\":\"Vino Tinto Reserva de Tarija 750 ml (prueba: flujo de compra)\",\"categoryId\":{{categoryId}},\"description\":\"Vino tinto de los viñedos de Santa Ana, Tarija. Dato ficticio de la revisión.\",\"condition\":\"NEW\",\"price\":99,\"stock\":3,\"images\":[{\"url\":\"https://picsum.photos/seed/vino-tarija/800/800\",\"isPrimary\":true}]}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Preparación · la moderación aprueba el producto B",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/admin/products/ID-PRODUCTO-B/moderate",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"approve\":true}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Vaciar carrito",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/cart"
+              }
+            },
+            {
+              "name": "CP-33 · Agregar al carrito 201",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/cart/items",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":{{productB}},\"quantity\":2}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-34 · Cantidad negativa 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/cart/items",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":{{productB}},\"quantity\":-5}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-35 · Stock insuficiente 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/cart/items",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":{{productB}},\"quantity\":50}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-36 · Crear pedido 201",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"fulfillmentType\":\"PICKUP\",\"pickupAddress\":\"Retiro en tienda: calle Bolívar esquina Sucre, Tarija\",\"notes\":\"Pedido ficticio para entrega cerca de la plaza Luis de Fuentes, Tarija\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-37 · Pedido con carrito vacío 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"fulfillmentType\":\"PICKUP\",\"pickupAddress\":\"Retiro en tienda: calle Ingavi, Tarija\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-38 · Comprobante QR 200",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/ID-PEDIDO/payment-proof",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"proofUrl\":\"https://tiendaslacase.netlify.app/comprobante-revision.png\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-39 · Comprobante javascript: 400",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/ID-PEDIDO/payment-proof",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"proofUrl\":\"javascript:alert(1)\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"CP-32a · Publica producto B 201\": () => {\npm.test('HTTP 201', () => pm.response.to.have.status(201));\npm.collectionVariables.set('productB', j.data.id);\n},",
+                  "\"Preparación · la moderación aprueba el producto B\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\n},",
+                  "\"Vaciar carrito\": () => {\npm.test('Carrito vaciado', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));\n},",
+                  "\"CP-33 · Agregar al carrito 201\": () => {\npm.test('HTTP 201', () => pm.response.to.have.status(201));\n},",
+                  "\"CP-34 · Cantidad negativa 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\npm.test('Formato de error único: error.code = BAD_REQUEST', () => pm.expect(j.error.code).to.eql('BAD_REQUEST'));\n},",
+                  "\"CP-35 · Stock insuficiente 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\n},",
+                  "\"CP-36 · Crear pedido 201\": () => {\npm.test('HTTP 201', () => pm.response.to.have.status(201));\npm.collectionVariables.set('orderId', j.data[0].id);\npm.test('Estado PENDING y pago PENDING', () => { pm.expect(j.data[0].status).to.eql('PENDING'); pm.expect(j.data[0].paymentStatus).to.eql('PENDING'); });\n},",
+                  "\"CP-37 · Pedido con carrito vacío 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\n},",
+                  "\"CP-38 · Comprobante QR 200\": () => {\npm.test('HTTP 200/201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));\npm.test('Pago en PROOF_SUBMITTED', () => pm.expect(j.data.paymentStatus).to.eql('PROOF_SUBMITTED'));\n},",
+                  "\"CP-39 · Comprobante javascript: 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5 · Gestión del pedido por el vendedor",
+          "item": [
+            {
+              "name": "CP-40 · El vendedor ve el pedido 200",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/seller"
+              }
+            },
+            {
+              "name": "CP-41 · Comprador no cambia estado 403",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/seller/ID-PEDIDO/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"status\":\"CONFIRMED\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-42 · Estado fuera del dominio 400",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/seller/ID-PEDIDO/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"status\":\"ENVIADO_A_MARTE\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-43 · Vendedor confirma 200",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/seller/ID-PEDIDO/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"status\":\"CONFIRMED\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "CP-44 · Comprador ve CONFIRMED 200",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{buyerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/buyer/ID-PEDIDO"
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"CP-40 · El vendedor ve el pedido 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('Pedido presente', () => pm.expect(j.data.map((o) => o.id)).to.include(Number(pm.collectionVariables.get('orderId'))));\n},",
+                  "\"CP-41 · Comprador no cambia estado 403\": () => {\npm.test('HTTP 403', () => pm.response.to.have.status(403));\npm.test('Formato de error único: error.code = FORBIDDEN', () => pm.expect(j.error.code).to.eql('FORBIDDEN'));\n},",
+                  "\"CP-42 · Estado fuera del dominio 400\": () => {\npm.test('HTTP 400', () => pm.response.to.have.status(400));\n},",
+                  "\"CP-43 · Vendedor confirma 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('Estado CONFIRMED', () => pm.expect(j.data.status).to.eql('CONFIRMED'));\n},",
+                  "\"CP-44 · Comprador ve CONFIRMED 200\": () => {\npm.test('HTTP 200', () => pm.response.to.have.status(200));\npm.test('Estado CONFIRMED', () => pm.expect(j.data.status).to.eql('CONFIRMED'));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6 · Limpieza",
+          "item": [
+            {
+              "name": "Cancelar el pedido de prueba",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/orders/seller/ID-PEDIDO/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"status\":\"CANCELLED\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Baja del producto B",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{sellerToken}}"
+                  }
+                ],
+                "url": "https://lacase-diplomado-api.onrender.com/api/v1/seller/products/ID-PRODUCTO-B"
+              }
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = (()=>{ try { return pm.response.json(); } catch(e) { return {}; } })();",
+                  "const __m = {",
+                  "\"Cancelar el pedido de prueba\": () => {\npm.test('Pedido cancelado', () => pm.expect(pm.response.code).to.eql(200));\n},",
+                  "\"Baja del producto B\": () => {\npm.test('Producto B dado de baja', () => pm.expect(pm.response.code).to.eql(200));\n},",
+                  "};",
+                  "(__m[pm.info.requestName] || (() => {}))();"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

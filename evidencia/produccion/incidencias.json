@@ -1,0 +1,37 @@
+{
+  "CP-32": {
+    "descripcion": "Al publicar el segundo producto de un vendedor en la misma categoría, POST /seller/products responde 409 porque el generador automático de SKU repite el mismo número cuando el catálogo ya tiene SKU de otro formato (p. ej. PRO-90-1)",
+    "correccion": "generateSku solo cuenta SKU con formato PREFIJO-0000 y la creación reintenta con el siguiente número libre ante un conflicto de SKU; prueba de regresión backend/tests/sku-generation.test.ts (falla con el código anterior y pasa con la corrección)",
+    "commit": "b55dba2"
+  },
+  "CP-33": {
+    "descripcion": "Efecto en cadena de CP-32 (no existía el segundo producto para agregar al carrito)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  },
+  "CP-36": {
+    "descripcion": "Efecto en cadena de CP-32 (carrito vacío: no se pudo crear el pedido)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  },
+  "CP-38": {
+    "descripcion": "Efecto en cadena de CP-32 (no existía el pedido para registrar el comprobante QR)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  },
+  "CP-40": {
+    "descripcion": "Efecto en cadena de CP-32 (no existía el pedido para que el vendedor lo viera)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  },
+  "CP-43": {
+    "descripcion": "Efecto en cadena de CP-32 (no existía el pedido para cambiar su estado)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  },
+  "CP-44": {
+    "descripcion": "Efecto en cadena de CP-32 (no existía el pedido para consultarlo)",
+    "correccion": "La misma de CP-32",
+    "commit": "b55dba2"
+  }
+}

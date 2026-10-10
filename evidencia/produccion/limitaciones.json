@@ -1,0 +1,32 @@
+[
+  {
+    "que": "La suite completa de Jest del backend (npm test) no se ejecutó dentro de esta sesión",
+    "porque": "globalSetup ejecuta prisma db push --force-reset sobre la base de pruebas y la herramienta de IA tiene bloqueada esa acción sin consentimiento explícito de quien está frente al teclado",
+    "existe": "Suites nuevas ejecutadas de forma aislada contra la base de pruebas: admin-web-only (6/6), sku-generation (2/2) y api-v1 (4/4); y la suite Cypress contra producción"
+  },
+  {
+    "que": "Las pruebas de la app móvil (Jest de mobile/) no corren en este equipo",
+    "porque": "jest-expo falla al resolver la ruta de la carpeta del proyecto (contiene paréntesis); el fallo es idéntico sin los cambios de esta entrega",
+    "existe": "tsc --noEmit del móvil sin errores y el 403 a ADMIN desde móvil probado en el servidor (admin-web-only.test.ts)"
+  },
+  {
+    "que": "OWASP A09 (registro y monitoreo de seguridad)",
+    "porque": "No hay alertas ni panel de monitoreo configurados; corresponde al E4 (monitoreo)",
+    "existe": "Un monitor externo de disponibilidad sobre /api/v1/salud y los registros de error del servidor en Render"
+  },
+  {
+    "que": "En la primera ejecución en producción (cypress-2026-10-03-2016) los casos aprobados quedaron con el campo \"obtenido\" vacío",
+    "porque": "Defecto del arnés de pruebas: el soporte y cada spec cargaban copias separadas del módulo de evidencia y el estado no se compartía; se detectó al revisar el reporte y se corrigió (estado en globalThis)",
+    "existe": "En esa ejecución sí constan id, escenario, esperado, estado, URL y fecha de cada caso, y el resultado obtenido de los casos fallidos; la reejecución posterior registra el obtenido de todos los casos"
+  },
+  {
+    "que": "El archivo original del reporte de la primera ejecución en producción (cypress-2026-10-03-2016.json/.html) y sus capturas de fallo del runner ya no existen",
+    "porque": "Se borraron por error al limpiar un reporte de una ejecución local (patrón de borrado demasiado amplio) y Cypress vació la carpeta de capturas antes de otra corrida local; no estaban aún en git",
+    "existe": "cypress-2026-10-03-2016.json se reconstruyó (campo reconstruido: true) desde endpoints.md, paquete-evidencia.md y tabla-2.8-generada.md, que se habían generado del original; el commit en vivo de esa ejecución (b568ecd) consta en el historial de despliegues de Render; los fallos se reprodujeron y corrigieron con commit y prueba de regresión, y la reejecución posterior queda en un reporte nuevo íntegro"
+  },
+  {
+    "que": "El reporte de la segunda ejecución en producción (60 de 60 casos aprobados, vista en consola) se perdió y se repitió la suite",
+    "porque": "Una corrida local de verificación escribía en la misma carpeta de evidencia y mi limpieza de reportes locales borró también el de producción; se corrigió con la variable EVIDENCIA_DIR para que las verificaciones locales no escriban en la evidencia",
+    "existe": "La reejecución posterior con el modo -SoloCypress genera un reporte íntegro, con commit en vivo y capturas del runner, que queda versionado"
+  }
+]
