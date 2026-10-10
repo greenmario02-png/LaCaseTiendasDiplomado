@@ -4,7 +4,7 @@
 #   3) Renombra/crea una cuenta por rol: admin@ , vendedor@ y comprador@lacase.test (rotando contrasenas).
 #   4) Con tu confirmacion, publica la rama en main (Render y Netlify despliegan solos) y espera a que
 #      el codigo nuevo este en vivo.
-#   5) Ejecuta toda la suite Cypress (flujo Must, seguridad, OWASP Top 10, interfaz, 429) y deja el reporte
+#   5) Ejecuta la suite Cypress (flujo Must, autenticación, validación e interfaz) y deja el reporte
 #      en evidencia\produccion\.
 # Los secretos nunca se guardan: solo viven en variables de entorno del proceso y se borran al terminar.
 #
