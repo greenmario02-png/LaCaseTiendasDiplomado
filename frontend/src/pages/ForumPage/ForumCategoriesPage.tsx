@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { listCategories, getCitiesStats } from '../../services/forum.api';
 import { useForumStore } from '../../stores/forumStore';
-import { MapPin } from 'lucide-react';
+import { MapPin, FolderOpen } from 'lucide-react';
+import { CategoryIcon } from '../../theme/forumIcons';
 import { LoadingState, EmptyState } from '../../components/redesign/States';
 import { FilterBar } from '../../components/redesign/FilterBar';
 import { useUnifiedTokens } from '../../theme';
@@ -33,8 +34,8 @@ export function ForumCategoriesPage() {
 
   return (
     <Box>
-      <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mb: 2 }}>
-        📂 {t('forum.categories.title')}
+      <Typography variant="h6" fontWeight={800} sx={{ color: tokens.onSurface, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <FolderOpen size={22} /> {t('forum.categories.title')}
       </Typography>
       {categories.filter((c) => c.isActive).length === 0 ? (
         <EmptyState message={t('forum.categories.emptySubforums')} />
@@ -56,7 +57,7 @@ export function ForumCategoriesPage() {
                   '&:hover': { borderColor: tokens.primary },
                 }}
               >
-                <Typography sx={{ fontSize: '1.8rem' }}>{c.icon}</Typography>
+                <CategoryIcon slug={c.slug} size={28} color={tokens.primary} />
                 <Typography sx={{ color: tokens.onSurface, fontWeight: 600, fontSize: '0.85rem' }}>{c.name}</Typography>
                 <Typography sx={{ color: tokens.onSurfaceVariant, fontSize: '0.7rem' }}>{t('forum.categories.postsCount', { count: c._count?.posts ?? 0 })}</Typography>
               </Box>

@@ -128,6 +128,7 @@ export function ForumFeedPage() {
                 body: post.body,
                 city: post.city,
                 category: {
+                  slug: post.category?.slug,
                   icon: post.category?.icon ?? '💬',
                   name: post.category?.name ?? t('forum.feed.defaultCategory'),
                   color: post.category?.color ?? '#FF6B35',

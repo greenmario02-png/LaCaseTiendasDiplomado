@@ -180,7 +180,7 @@ export function ForumProfilePage() {
           {posts.map((p) => (
             <ForumPostCard key={p.id} post={{
               id: p.id, title: p.title, body: p.body, city: p.city,
-              category: { icon: p.category?.icon ?? '💬', name: p.category?.name ?? t('forum.feed.defaultCategory'), color: p.category?.color ?? '#FF6B35' },
+              category: { slug: p.category?.slug, icon: p.category?.icon ?? '💬', name: p.category?.name ?? t('forum.feed.defaultCategory'), color: p.category?.color ?? '#FF6B35' },
               author: { forumUsername: p.author?.forumUsername ?? t('forum.feed.defaultUsername') },
               status: (p.status as 'OPEN' | 'RESOLVED' | 'CLOSED') ?? 'OPEN',
               replyCount: p.replyCount, positives: p.score ?? 0, createdAt: p.createdAt,

@@ -11,6 +11,9 @@ import { listCategories, createPost, uploadPostImages } from '../../services/for
 import { getErrorMessage } from '../../services/api';
 import type { ForumCategory, GifResult } from '../../services/forum.api';
 import { PencilLine } from 'lucide-react';
+import GifBoxOutlinedIcon from '@mui/icons-material/GifBoxOutlined';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import { CategoryIcon } from '../../theme/forumIcons';
 import { useTranslation } from 'react-i18next';
 import GifPicker from './GifPicker';
 
@@ -128,7 +131,7 @@ export default function NewPostModal({ open, onClose }: Props) {
               <InputLabel>{t('forum.newPostModal.subforumLabel')}</InputLabel>
               <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} label={t('forum.newPostModal.subforumLabel')}>
                 {categories.map((c) => (
-                  <MenuItem key={c.id} value={c.id}>{c.icon} {c.name}</MenuItem>
+                  <MenuItem key={c.id} value={c.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><CategoryIcon slug={c.slug} size={16} />{c.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -194,7 +197,7 @@ export default function NewPostModal({ open, onClose }: Props) {
               disabled={images.length + gifUrls.length >= 4}
               sx={{ color: forumPalette.accent, borderColor: forumPalette.accent }}
             >
-              🎞 {t('forum.newPostModal.gifCount', { count: gifUrls.length })}
+              <GifBoxOutlinedIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('forum.newPostModal.gifCount', { count: gifUrls.length })}
             </Button>
             {images.length > 0 && (
               <Button size="small" color="error" onClick={() => setImages([])}>{t('forum.newPostModal.removeAllImages')}</Button>
@@ -224,8 +227,8 @@ export default function NewPostModal({ open, onClose }: Props) {
             ))}
           </Stack>
           {(type === 'PRECIO' || type === 'EXISTENCIA') && (
-            <Alert severity="info" sx={{ fontSize: '0.8rem' }}>
-              🤖 {t('forum.newPostModal.botNotice')}
+            <Alert severity="info" icon={<SmartToyOutlinedIcon fontSize="inherit" />} sx={{ fontSize: '0.8rem' }}>
+              {t('forum.newPostModal.botNotice')}
             </Alert>
           )}
         </Stack>

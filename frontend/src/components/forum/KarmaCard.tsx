@@ -1,5 +1,6 @@
 import { Box, Typography, LinearProgress, Button } from '@mui/material';
 import RedeemIcon from '@mui/icons-material/Redeem';
+import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import { useTranslation } from 'react-i18next';
 import { useForumPalette } from '../../theme/forumTheme';
 
@@ -28,8 +29,8 @@ export function KarmaCard({ karma, karmaSpent, tag, onRedeem }: Props) {
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Typography fontWeight={700} sx={{ color: forumPalette.textPrimary }}>
-          🎖️ {t('forum.karmaCard.karma')}
+        <Typography fontWeight={700} sx={{ color: forumPalette.textPrimary, display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+          <WorkspacePremiumOutlinedIcon fontSize="small" /> {t('forum.karmaCard.karma')}
         </Typography>
         <Typography fontWeight={700} sx={{ color: forumPalette.karmaGold }}>
           {tag}

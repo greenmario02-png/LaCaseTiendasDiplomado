@@ -4,6 +4,7 @@ import {
   Box, CircularProgress, Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import GifBoxOutlinedIcon from '@mui/icons-material/GifBoxOutlined';
 import { useForumPalette } from '../../theme/forumTheme';
 import { searchGifs, type GifResult } from '../../services/forum.api';
 
@@ -52,8 +53,8 @@ export default function GifPicker({ open, onClose, onPick }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ bgcolor: forumPalette.bgCard, color: forumPalette.textPrimary, fontWeight: 700 }}>
-        🎞 {t('forum.gifPicker.title')}
+      <DialogTitle sx={{ bgcolor: forumPalette.bgCard, color: forumPalette.textPrimary, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <GifBoxOutlinedIcon /> {t('forum.gifPicker.title')}
       </DialogTitle>
       <DialogContent sx={{ bgcolor: forumPalette.bgCard }}>
         <TextField

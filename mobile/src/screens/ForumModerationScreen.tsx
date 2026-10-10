@@ -4,7 +4,8 @@ import {
   Alert, RefreshControl, Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { ShieldCheck } from 'lucide-react-native';
+import { ShieldCheck, CircleQuestionMark, MessageCircle, Users, Flag } from 'lucide-react-native';
+import { colors as forumColors } from '../theme';
 import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -107,16 +108,16 @@ export default function ForumModerationScreen({ navigation }: any) {
       {/* Stats compactas */}
       <View style={styles.statsRow}>
         <View style={{ flex: 1 }}>
-          <StatCard title={t('mobile.forumModeration.statQuestions')} value={st.totalPosts ?? 0} icon="❓" />
+          <StatCard title={t('mobile.forumModeration.statQuestions')} value={st.totalPosts ?? 0} icon={<CircleQuestionMark size={20} color={forumColors.forumAccent} />} />
         </View>
         <View style={{ flex: 1 }}>
-          <StatCard title={t('mobile.forumModeration.statReplies')} value={st.totalReplies ?? 0} icon="💬" />
+          <StatCard title={t('mobile.forumModeration.statReplies')} value={st.totalReplies ?? 0} icon={<MessageCircle size={20} color={forumColors.forumAccent} />} />
         </View>
         <View style={{ flex: 1 }}>
-          <StatCard title={t('mobile.forumModeration.statUsers')} value={st.totalUsers ?? 0} icon="👥" />
+          <StatCard title={t('mobile.forumModeration.statUsers')} value={st.totalUsers ?? 0} icon={<Users size={20} color={forumColors.forumAccent} />} />
         </View>
         <View style={{ flex: 1 }}>
-          <StatCard title={t('mobile.forumModeration.statPending')} value={reports.length} icon="🚩" />
+          <StatCard title={t('mobile.forumModeration.statPending')} value={reports.length} icon={<Flag size={20} color={forumColors.forumAccent} />} />
         </View>
       </View>
 

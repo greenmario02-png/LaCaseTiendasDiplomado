@@ -201,6 +201,7 @@ export default function ForumFeedScreen({ navigation }: any) {
                 body: item.body,
                 city: item.city,
                 category: {
+                  slug: item.category?.slug,
                   icon: item.category?.icon ?? '💬',
                   name: item.category?.name ?? 'General',
                   color: item.category?.color ?? '#6366F1',

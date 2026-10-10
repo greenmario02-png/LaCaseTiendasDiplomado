@@ -1,5 +1,6 @@
 import { Card, Box, Typography, Chip, Button, Stack, Avatar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import { useTranslation } from 'react-i18next';
 import { useForumPalette, formatTimeAgo } from '../../theme/forumTheme';
 import { useAuthStore } from '../../stores/authStore';
@@ -34,7 +35,8 @@ export default function ReplyCard({ reply, canAccept, onAccept, onVote }: Props)
         <Stack direction="row" spacing={1} flexWrap="wrap" mb={1} alignItems="center">
           {reply.isBotReply ? (
             <Chip
-              label={`🤖 ${t('forum.replyCard.botLabel')}`}
+              icon={<SmartToyOutlinedIcon />}
+              label={t('forum.replyCard.botLabel')}
               size="small"
               sx={{ bgcolor: forumPalette.accentMuted, color: forumPalette.accent, fontWeight: 700 }}
             />

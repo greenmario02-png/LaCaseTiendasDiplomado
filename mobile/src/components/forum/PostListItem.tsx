@@ -4,6 +4,7 @@ import { MapPin, MessageCircle, Check } from 'lucide-react-native';
 import { colors } from '../../theme';
 import VoteBar from './VoteBar';
 import KarmaBadge from './KarmaBadge';
+import { CategoryIcon } from '../../theme/forumIcons';
 
 interface Props {
   post: any;
@@ -27,9 +28,10 @@ export default function PostListItem({ post, onPress, onVote }: Props) {
         <VoteBar score={post.score} userVote={post.userVote ?? 0} onVote={onVote} compact />
         <View style={styles.body}>
           <View style={styles.metaRow}>
-            <Text style={styles.subforo}>
-              {post.category?.icon} {post.category?.name}
-            </Text>
+            <View style={styles.subforo}>
+              <CategoryIcon slug={post.category?.slug} size={12} color={colors.forumAccent} />
+              <Text style={styles.subforoText}>{post.category?.name}</Text>
+            </View>
             <View style={styles.city}>
               <MapPin size={11} color={colors.warning} />
               <Text style={styles.cityText}>{post.city}</Text>
@@ -78,15 +80,16 @@ const styles = StyleSheet.create({
   body: { flex: 1, padding: 12, paddingLeft: 8 },
   metaRow: { flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' },
   subforo: {
-    fontSize: 11,
-    color: colors.forumAccent,
-    fontWeight: '700',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: 'rgba(255,107,53,0.12)',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
     overflow: 'hidden',
   },
+  subforoText: { fontSize: 11, color: colors.forumAccent, fontWeight: '700' },
   city: {
     flexDirection: 'row',
     alignItems: 'center',

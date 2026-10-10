@@ -31,6 +31,7 @@ import { tokenStore, getErrorMessage, resolveImageUrl } from '../../services/api
 import { SOCKET_URL } from '../../config/env';
 import { useAppTheme } from '../../theme/ThemeContext';
 import { MapPin, CheckCircle2, Flag, MessageCircle, ThumbsUp } from 'lucide-react-native';
+import { CategoryIcon } from '../../theme/forumIcons';
 
 function formatTimeAgo(dateStr: string, t: (key: string, opts?: any) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -265,9 +266,10 @@ export default function ForumPostScreen({ route, navigation }: any) {
 
         <View style={styles.card}>
           <View style={styles.metaRow}>
-            <Text style={styles.subforo}>
-              {post.category?.icon} {post.category?.name}
-            </Text>
+            <View style={styles.subforo}>
+              <CategoryIcon slug={post.category?.slug} size={12} color={colors.forumAccent} />
+              <Text style={styles.subforoText}>{post.category?.name}</Text>
+            </View>
             <View style={styles.metaItemRow}>
               <MapPin size={11} color={colors.warning} />
               <Text style={styles.city}>{post.city}</Text>
@@ -416,14 +418,15 @@ const makeStyles = (colors: any) =>
     alignItems: 'center',
   },
   subforo: {
-    fontSize: 11,
-    color: colors.forumAccent,
-    fontWeight: '700',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: 'rgba(255,107,53,0.12)',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
   },
+  subforoText: { fontSize: 11, color: colors.forumAccent, fontWeight: '700' },
   city: {
     fontSize: 11,
     color: colors.warning,

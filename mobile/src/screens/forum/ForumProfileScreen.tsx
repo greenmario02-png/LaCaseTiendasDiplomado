@@ -8,6 +8,8 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Star, FileText, MessageCircle, Flame } from 'lucide-react-native';
+import { colors as forumColors } from '../../theme';
 import {
   getPublicProfile,
   getProfilePosts,
@@ -136,16 +138,16 @@ export default function ForumProfileScreen({ route, navigation }: any) {
         </View>
         <View style={styles.statsGrid}>
           <View style={styles.statCol}>
-            <StatCard title={t('mobile.forumProfile.statKarma')} value={profile.karma} icon="⭐" />
+            <StatCard title={t('mobile.forumProfile.statKarma')} value={profile.karma} icon={<Star size={20} color={forumColors.forumAccent} />} />
           </View>
           <View style={styles.statCol}>
-            <StatCard title={t('mobile.forumProfile.statQuestions')} value={profile._count?.posts ?? 0} icon="📝" />
+            <StatCard title={t('mobile.forumProfile.statQuestions')} value={profile._count?.posts ?? 0} icon={<FileText size={20} color={forumColors.forumAccent} />} />
           </View>
           <View style={styles.statCol}>
-            <StatCard title={t('mobile.forumProfile.statReplies')} value={profile._count?.replies ?? 0} icon="💬" />
+            <StatCard title={t('mobile.forumProfile.statReplies')} value={profile._count?.replies ?? 0} icon={<MessageCircle size={20} color={forumColors.forumAccent} />} />
           </View>
           <View style={styles.statCol}>
-            <StatCard title={t('mobile.forumProfile.statStreak')} value={profile.streakDays ?? 0} icon="🔥" />
+            <StatCard title={t('mobile.forumProfile.statStreak')} value={profile.streakDays ?? 0} icon={<Flame size={20} color={forumColors.forumAccent} />} />
           </View>
         </View>
         <View style={styles.reputationRow}>
@@ -235,6 +237,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
             body: p.body ?? '',
             city: p.city,
             category: {
+              slug: p.category?.slug,
               icon: p.category?.icon ?? '💬',
               name: p.category?.name ?? 'General',
               color: p.category?.color ?? '#6366F1',

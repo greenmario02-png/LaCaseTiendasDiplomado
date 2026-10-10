@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Chip, Typography, Box, Button, Stack } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { getUnifiedTokens } from '../../theme';
 import { useThemeStore } from '../../stores/themeStore';
+import { CategoryIcon } from '../../theme/forumIcons';
 
 export type ForumPostCardData = {
   id: number;
   title: string;
   body: string;
   city: string;
-  category: { icon: string; name: string; color: string };
+  category: { slug?: string; icon: string; name: string; color: string };
   author: { forumUsername: string };
   status: 'OPEN' | 'RESOLVED' | 'CLOSED';
   replyCount: number;
@@ -52,12 +56,13 @@ export function ForumPostCard({ post, onOpen, onPositive }: Props) {
               fontSize: 18,
             }}
           >
-            {post.category.icon}
+            <CategoryIcon slug={post.category.slug} size={18} color={post.category.color} />
           </Box>
           <Chip label={post.category.name} size="small" sx={{ bgcolor: `${tokens.primary}14`, color: tokens.primary }} />
-          <Chip label={`📍 ${post.city}`} size="small" variant="outlined" />
+          <Chip icon={<PlaceOutlinedIcon />} label={post.city} size="small" variant="outlined" />
           <Chip
-            label={isResolved ? 'Resuelta ✓' : 'Abierta'}
+            icon={isResolved ? <CheckCircleOutlineIcon /> : undefined}
+            label={isResolved ? 'Resuelta' : 'Abierta'}
             size="small"
             sx={{
               bgcolor: isResolved ? `${tokens.tertiaryContainer}1A` : `${tokens.secondaryContainer}26`,
@@ -83,7 +88,7 @@ export function ForumPostCard({ post, onOpen, onPositive }: Props) {
         </Typography>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="caption" color="text.secondary">
-            por {post.author.forumUsername} · 💬 {post.replyCount}
+            por {post.author.forumUsername} · <ChatBubbleOutlineIcon sx={{ fontSize: 14, verticalAlign: 'text-bottom' }} /> {post.replyCount}
           </Typography>
           <Button
             size="small"

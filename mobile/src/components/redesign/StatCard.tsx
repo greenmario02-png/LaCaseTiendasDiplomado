@@ -5,7 +5,8 @@ import { useAppTheme } from '../../theme/ThemeContext';
 type Props = {
   title: string;
   value: number | string;
-  icon?: string;
+  /** Texto corto o un icono (p. ej. de lucide-react-native). */
+  icon?: React.ReactNode;
   trend?: number;
 };
 
@@ -17,7 +18,7 @@ export function StatCard({ title, value, icon, trend }: Props) {
       style={[styles.card, { backgroundColor: c.surface }, raised]}
       testID={`stat-${title}`}
     >
-      {icon ? <Text style={styles.icon}>{icon}</Text> : null}
+      {icon ? (typeof icon === 'string' ? <Text style={styles.icon}>{icon}</Text> : <View style={styles.iconBox}>{icon}</View>) : null}
       <Text style={[styles.title, { color: c.textSecondary }]}>{title}</Text>
       <Text style={[styles.value, { color: c.text }]}>{value}</Text>
       {hasTrend ? (
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: { fontSize: 20, marginBottom: 4 },
+  iconBox: { marginBottom: 4 },
   title: { fontSize: 12, fontWeight: '600', marginBottom: 2 },
   value: { fontSize: 22, fontWeight: '800' },
   trend: { fontSize: 13, fontWeight: '700', marginTop: 2 },
