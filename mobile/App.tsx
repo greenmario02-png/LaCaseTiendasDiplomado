@@ -80,8 +80,11 @@ const iconMap: Record<string, IconComponent> = {
 };
 
 function ForumStack() {
+  const { colors } = useAppTheme();
   return (
-    <ForumStackNav.Navigator>
+    <ForumStackNav.Navigator
+      screenOptions={{ headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text, headerTitleStyle: { color: colors.text }, contentStyle: { backgroundColor: colors.background } }}
+    >
       <ForumStackNav.Screen name="ForumFeed" component={ForumFeedScreen} options={{ title: 'LaCASE' }} />
       <ForumStackNav.Screen name="ForumPost" component={ForumPostScreen} options={{ title: 'Pregunta' }} />
       <ForumStackNav.Screen name="ForumCategories" component={ForumCategoriesScreen} options={{ title: 'Categorías' }} />
@@ -129,7 +132,13 @@ function AppNavigator() {
   return (
     <NavigationContainer>
       {/* Con la app a pantalla completa los botones del sistema quedan encima del contenido: cada pantalla deja libre la franja inferior. */}
-      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom, backgroundColor: colors.background } }}>
+      <Stack.Navigator screenOptions={{
+          headerShown: false,
+          contentStyle: { paddingBottom: insets.bottom, backgroundColor: colors.background },
+          headerStyle: { backgroundColor: colors.surface },
+          headerTintColor: colors.text,
+          headerTitleStyle: { color: colors.text },
+        }}>
         {!user ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} options={{ contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top, backgroundColor: colors.background } }} />
