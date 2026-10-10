@@ -127,11 +127,11 @@ Ninguna contraseña se guarda en este repositorio.
 
 ## Pruebas
 
-- **Contra producción (Cypress, 68 casos):** `cd frontend && npm install && npm run test:e2e` con las variables
+- **Contra producción (Cypress, 41 casos):** `cd frontend && npm install && npm run test:e2e` con las variables
   `CYPRESS_BASE_URL`, `CYPRESS_API_URL`, `CYPRESS_REVIEW_SELLER_EMAIL/PASSWORD`, `CYPRESS_REVIEW_BUYER_EMAIL/PASSWORD` y
   `CYPRESS_REVIEW_ADMIN_EMAIL/PASSWORD`. El reporte queda en `evidencia/produccion/cypress-AAAA-MM-DD-HHMM.json` y `.html`.
   Interfaz gráfica para reproducir cada caso: `npx cypress open`.
-- **API (Postman/Newman, 49 solicitudes):** colección en `postman/`; en Postman, *Run collection* con el entorno de producción
+- **API (Postman/Newman, 37 solicitudes):** colección en `postman/`; en Postman, *Run collection* con el entorno de producción
   (las contraseñas se escriben solo en el entorno).
 - **Unitarias e integración:** `cd backend && npm test` (usa una base `lacase_test`; se niega a correr contra otra).
 - Todo el flujo (cuentas, esquema, despliegue y Cypress) se automatiza con `scripts/produccion.ps1`.
