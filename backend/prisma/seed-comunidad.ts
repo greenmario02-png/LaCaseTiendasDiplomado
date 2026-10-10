@@ -19,118 +19,146 @@ import { BCRYPT_COST } from '../src/config/security';
 const prisma = new PrismaClient();
 
 const IMAGENES: Record<string, string> = {
-  ropa: 'ropa.jpg',
-  herramientas: 'herramientas.jpg',
+  antiguedades: 'antiguedades.jpg',
+  artesanias: 'artesanias.jpg',
+  'bar-y-bebidas': 'bar-y-bebidas.jpg',
+  celulares: 'celulares.png',
+  deportes: 'deportes.jpg',
   electrodomesticos: 'electrodomesticos.jpg',
+  hardware: 'hardware.jpg',
+  herramientas: 'herramientas.jpg',
+  'hogar-y-muebles': 'hogar-y-muebles.jpg',
   juguetes: 'juguetes.jpg',
+  'libros-y-papeleria': 'libros-y-papeleria.jpg',
   mascotas: 'mascotas.jpg',
+  'musica-e-instrumentos': 'musica-e-instrumentos.jpg',
+  perifericos: 'perifericos.jpg',
+  ropa: 'ropa.jpg',
+  'salud-y-belleza': 'salud-y-belleza.jpg',
   videojuegos: 'videojuegos.jpg',
 };
-const imagen = (slug: string) => `${env.BACKEND_URL}/seed-assets/categories/${IMAGENES[slug]}`;
+/** Imagen de la categoría de nivel superior a la que pertenece el slug (p. ej. «ropa-camperas» → ropa.jpg). */
+const imagenDe = (slugCategoria: string) => {
+  const clave = Object.keys(IMAGENES).find((k) => slugCategoria === k || slugCategoria.startsWith(k + '-'));
+  if (!clave) throw new Error(`Sin imagen para la categoría ${slugCategoria}`);
+  return `${env.BACKEND_URL}/seed-assets/categories/${IMAGENES[clave]}`;
+};
 const avatar = (n: number) => `${env.BACKEND_URL}/seed-assets/avatars/avatar-${(n % 5) + 1}.jpg`;
 
 interface ProductoSeed { nombre: string; categoria: string; precio: number; stock: number; descripcion: string; marca?: string; destacado?: boolean }
 interface VendedorSeed {
-  correo: string; nombre: string; apellido: string; tienda: string; descripcion: string; rubro: string; slugSuperior: string;
-  prefijoSku: string; zona: string; latitud: number; longitud: number; telefono: string; productos: ProductoSeed[];
+  correo: string; nombre: string; apellido: string; tienda: string; descripcion: string; rubro: string; categoriaLogo: string;
+  prefijoSku: string; latitud: number; longitud: number; telefono: string; productos: ProductoSeed[];
 }
 interface SubastaSeed {
-  titulo: string; descripcion: string; correo: string; categoria: string; slugSuperior: string;
-  inicial: number; reserva?: number; compraYa?: number; incremento: number;
+  titulo: string; descripcion: string; correo: string; categoria: string; inicial: number; reserva?: number; compraYa?: number; incremento: number;
 }
 
+// Precios en bolivianos, siempre enteros (sin centavos).
 const VENDEDORES: VendedorSeed[] = [
   {
-    correo: 'lucia.mendoza@correo.example', nombre: 'Lucía', apellido: 'Mendoza', tienda: 'Moda Chapaca',
-    descripcion: 'Ropa de abrigo y de diario para toda la familia, con prendas de tejido local y confección en Tarija.',
-    rubro: 'Ropa', slugSuperior: 'ropa', prefijoSku: 'MCH', zona: 'Barrio Moto Méndez', latitud: -21.5389, longitud: -64.7311, telefono: '+59171234501',
+    correo: 'lucia.mamani@correo.example', nombre: 'Lucía', apellido: 'Mamani', tienda: 'Tejidos y Moda Los Andes',
+    descripcion: 'Ropa de abrigo, tejidos de lana y artesanías andinas para toda la familia, con prendas hechas por tejedoras de los valles de Tarija.',
+    rubro: 'Ropa', categoriaLogo: 'ropa', prefijoSku: 'TMA', latitud: -21.5389, longitud: -64.7311, telefono: '+59171234501',
     productos: [
       { nombre: 'Chompa de lana de alpaca', categoria: 'ropa-camperas', precio: 220, stock: 14, descripcion: 'Chompa tejida en lana de alpaca, abrigada y liviana, en tonos tierra.' },
+      { nombre: 'Chullo andino tejido a mano', categoria: 'ropa-accesorios', precio: 65, stock: 30, descripcion: 'Gorro con orejeras tejido en lana de oveja, con guardas tradicionales.' },
       { nombre: 'Campera de abrigo para invierno', categoria: 'ropa-camperas', precio: 320, stock: 10, descripcion: 'Campera con relleno sintético y capucha desmontable.', destacado: true },
+      { nombre: 'Aguayo multicolor tejido', categoria: 'artesanias-tejidos', precio: 180, stock: 16, descripcion: 'Manta andina de colores vivos, usada para cargar o decorar.', destacado: true },
+      { nombre: 'Manta de lana de oveja', categoria: 'hogar-y-muebles-blanquer-a', precio: 260, stock: 12, descripcion: 'Manta gruesa tejida a telar, de 1,60 por 2 metros.' },
       { nombre: 'Pantalón de jean clásico', categoria: 'ropa-pantalones', precio: 180, stock: 25, descripcion: 'Jean de corte recto en tela resistente, tallas 28 a 38.' },
-      { nombre: 'Polera de algodón básica', categoria: 'ropa-remeras', precio: 65, stock: 40, descripcion: 'Polera de algodón de manga corta, varios colores.' },
       { nombre: 'Zapatillas urbanas', categoria: 'ropa-calzado', precio: 260, stock: 18, descripcion: 'Zapatillas livianas con suela antideslizante para uso diario.' },
     ],
   },
   {
-    correo: 'jorge.calizaya@correo.example', nombre: 'Jorge', apellido: 'Calizaya', tienda: 'Ferretería Santa Anita',
-    descripcion: 'Herramientas manuales y eléctricas, materiales de construcción pequeños y artículos de jardinería.',
-    rubro: 'Herramientas', slugSuperior: 'herramientas', prefijoSku: 'FSA', zona: 'Mercado Campesino', latitud: -21.5471, longitud: -64.7240, telefono: '+59171234502',
+    correo: 'jorge.condori@correo.example', nombre: 'Jorge', apellido: 'Condori', tienda: 'Ferretería Santa Anita',
+    descripcion: 'Herramientas manuales y eléctricas, artículos de jardinería, iluminación para el hogar y bicicletas.',
+    rubro: 'Herramientas', categoriaLogo: 'herramientas', prefijoSku: 'FSA', latitud: -21.5471, longitud: -64.7240, telefono: '+59171234502',
     productos: [
       { nombre: 'Taladro percutor de 650 W', categoria: 'herramientas-el-ctricas', precio: 380, stock: 9, descripcion: 'Taladro con velocidad variable y maletín con brocas.', marca: 'Bosch', destacado: true },
       { nombre: 'Juego de destornilladores (12 piezas)', categoria: 'herramientas-manuales', precio: 75, stock: 30, descripcion: 'Puntas planas y de estrella con mango antideslizante.' },
-      { nombre: 'Martillo de carpintero', categoria: 'herramientas-manuales', precio: 55, stock: 22, descripcion: 'Cabeza de acero forjado y mango de madera.' },
       { nombre: 'Manguera de jardín de 15 metros', categoria: 'herramientas-jardiner-a', precio: 110, stock: 16, descripcion: 'Manguera reforzada con conectores incluidos.' },
       { nombre: 'Candado de seguridad de 50 mm', categoria: 'herramientas-seguridad', precio: 48, stock: 35, descripcion: 'Candado de acero con tres llaves.' },
+      { nombre: 'Lámpara LED de mesa', categoria: 'hogar-y-muebles-iluminaci-n', precio: 85, stock: 20, descripcion: 'Lámpara con brazo flexible y luz cálida de bajo consumo.' },
+      { nombre: 'Silla plegable de madera', categoria: 'hogar-y-muebles-muebles-para-hogar', precio: 145, stock: 14, descripcion: 'Silla plegable de madera de pino barnizada.' },
+      { nombre: 'Bicicleta de montaña rodado 26', categoria: 'deportes-bicicletas', precio: 1650, stock: 5, descripcion: 'Bicicleta de 21 velocidades con frenos de disco y suspensión delantera.', destacado: true },
     ],
   },
   {
-    correo: 'marcela.torrez@correo.example', nombre: 'Marcela', apellido: 'Torrez', tienda: 'ElectroHogar Tarija',
-    descripcion: 'Electrodomésticos de cocina y pequeños equipos para el hogar, con garantía de la tienda.',
-    rubro: 'Electrodomésticos', slugSuperior: 'electrodomesticos', prefijoSku: 'EHT', zona: 'Avenida Las Américas', latitud: -21.5297, longitud: -64.7349, telefono: '+59171234503',
+    correo: 'marcela.quispe@correo.example', nombre: 'Marcela', apellido: 'Quispe', tienda: 'ElectroHogar Tarija',
+    descripcion: 'Electrodomésticos de cocina, cuidado personal y artículos para el hogar, con garantía de la tienda.',
+    rubro: 'Electrodomésticos', categoriaLogo: 'electrodomesticos', prefijoSku: 'EHT', latitud: -21.5297, longitud: -64.7349, telefono: '+59171234503',
     productos: [
       { nombre: 'Licuadora de 1,5 litros', categoria: 'electrodomesticos-peque-os', precio: 240, stock: 12, descripcion: 'Licuadora de vaso de vidrio con tres velocidades.' },
       { nombre: 'Horno microondas de 20 litros', categoria: 'electrodomesticos-microondas', precio: 780, stock: 6, descripcion: 'Microondas con panel digital y descongelado rápido.', destacado: true },
-      { nombre: 'Plancha a vapor', categoria: 'electrodomesticos-peque-os', precio: 160, stock: 15, descripcion: 'Plancha con suela antiadherente y tanque de 300 ml.' },
-      { nombre: 'Hervidor eléctrico de 1,7 litros', categoria: 'electrodomesticos-peque-os', precio: 130, stock: 20, descripcion: 'Hervidor de acero con apagado automático.' },
       { nombre: 'Cocina a gas de 4 hornallas', categoria: 'electrodomesticos-cocinas', precio: 1450, stock: 4, descripcion: 'Cocina con horno y encendido eléctrico.' },
+      { nombre: 'Secador de pelo de 2000 W', categoria: 'salud-y-belleza-cuidado-personal', precio: 150, stock: 18, descripcion: 'Secador con dos velocidades y boquilla concentradora.' },
+      { nombre: 'Perfume floral de 100 ml', categoria: 'salud-y-belleza-perfumes', precio: 190, stock: 15, descripcion: 'Fragancia floral de larga duración.' },
+      { nombre: 'Juego de ollas de aluminio (5 piezas)', categoria: 'hogar-y-muebles-decoraci-n', precio: 310, stock: 10, descripcion: 'Set de cocina con tapas de vidrio, apto para gas y eléctrica.' },
+      { nombre: 'Smartwatch con monitor de ritmo cardíaco', categoria: 'celulares-smartwatches', precio: 330, stock: 13, descripcion: 'Reloj inteligente con notificaciones, podómetro y batería de cinco días.' },
     ],
   },
   {
-    correo: 'veronica.rios@correo.example', nombre: 'Verónica', apellido: 'Ríos', tienda: 'Juguetería Pequeños Pasos',
-    descripcion: 'Juguetes didácticos, juegos de mesa y peluches seleccionados por edades.',
-    rubro: 'Juguetes', slugSuperior: 'juguetes', prefijoSku: 'JPP', zona: 'Plaza Luis de Fuentes', latitud: -21.5340, longitud: -64.7290, telefono: '+59171234504',
+    correo: 'veronica.choque@correo.example', nombre: 'Verónica', apellido: 'Choque', tienda: 'Librería y Juguetería El Arlequín',
+    descripcion: 'Libros, útiles escolares, juguetes didácticos e instrumentos andinos para niños y jóvenes.',
+    rubro: 'Libros y Papelería', categoriaLogo: 'libros-y-papeleria', prefijoSku: 'LJA', latitud: -21.5340, longitud: -64.7290, telefono: '+59171234504',
     productos: [
+      { nombre: 'Cuaderno universitario de 100 hojas', categoria: 'libros-y-papeleria-papeler-a', precio: 18, stock: 80, descripcion: 'Cuaderno cuadriculado con tapa dura, pack de tres unidades.' },
+      { nombre: 'Atlas geográfico de Bolivia', categoria: 'libros-y-papeleria-educativos', precio: 95, stock: 20, descripcion: 'Atlas escolar con mapas departamentales y datos de cada región.', destacado: true },
+      { nombre: 'Novela boliviana de bolsillo', categoria: 'libros-y-papeleria-novelas', precio: 60, stock: 25, descripcion: 'Novela de autor boliviano en edición de bolsillo.' },
       { nombre: 'Bloques de construcción (120 piezas)', categoria: 'juguetes-construcci-n', precio: 130, stock: 20, descripcion: 'Bloques de colores compatibles entre sí, para mayores de 4 años.' },
-      { nombre: 'Juego de mesa familiar', categoria: 'juguetes-juegos-de-mesa', precio: 95, stock: 24, descripcion: 'Juego de estrategia y azar para 2 a 6 jugadores.' },
-      { nombre: 'Peluche oso grande', categoria: 'juguetes-peluches', precio: 150, stock: 12, descripcion: 'Peluche suave de 60 cm, lavable.', destacado: true },
       { nombre: 'Rompecabezas de 500 piezas', categoria: 'juguetes-juegos-de-mesa', precio: 70, stock: 28, descripcion: 'Rompecabezas con paisaje de los valles de Tarija.' },
-      { nombre: 'Muñeca articulada con accesorios', categoria: 'juguetes-mu-ecos', precio: 110, stock: 16, descripcion: 'Muñeca de 30 cm con ropa intercambiable.' },
+      { nombre: 'Zampoña de caña de 13 tubos', categoria: 'musica-e-instrumentos-instrumentos-de-viento', precio: 160, stock: 10, descripcion: 'Zampoña andina afinada, con funda de tela.' },
+      { nombre: 'Charango de madera para estudio', categoria: 'musica-e-instrumentos-guitarras', precio: 420, stock: 6, descripcion: 'Charango de diez cuerdas con caja de madera, ideal para aprender.', destacado: true },
     ],
   },
   {
     correo: 'pablo.ustarez@correo.example', nombre: 'Pablo', apellido: 'Ustárez', tienda: 'Mundo Mascotas Tarija',
-    descripcion: 'Alimento, camas y accesorios para perros y gatos, con entrega en la ciudad.',
-    rubro: 'Mascotas', slugSuperior: 'mascotas', prefijoSku: 'MMT', zona: 'Barrio San Jerónimo', latitud: -21.5421, longitud: -64.7388, telefono: '+59171234505',
+    descripcion: 'Alimento, camas y accesorios para perros y gatos, además de equipos de camping y cuidado personal.',
+    rubro: 'Mascotas', categoriaLogo: 'mascotas', prefijoSku: 'MMT', latitud: -21.5421, longitud: -64.7388, telefono: '+59171234505',
     productos: [
       { nombre: 'Alimento para perro adulto (15 kg)', categoria: 'mascotas-alimento', precio: 310, stock: 18, descripcion: 'Alimento balanceado con proteínas y fibra, bolsa de 15 kg.', destacado: true },
       { nombre: 'Alimento para gato (3 kg)', categoria: 'mascotas-alimento', precio: 120, stock: 25, descripcion: 'Croquetas con pescado para gatos adultos.' },
       { nombre: 'Cama acolchada mediana', categoria: 'mascotas-accesorios-para-mascotas', precio: 140, stock: 10, descripcion: 'Cama lavable con base antideslizante.' },
-      { nombre: 'Correa retráctil de 5 metros', categoria: 'mascotas-accesorios-para-mascotas', precio: 85, stock: 20, descripcion: 'Correa con freno y mango ergonómico.' },
       { nombre: 'Pelota de goma para perros', categoria: 'mascotas-juguetes-para-mascotas', precio: 25, stock: 50, descripcion: 'Pelota resistente que rebota y flota.' },
+      { nombre: 'Carpa para 4 personas', categoria: 'deportes-camping', precio: 520, stock: 7, descripcion: 'Carpa impermeable de armado rápido, ideal para una salida al Valle de la Concepción.', destacado: true },
+      { nombre: 'Linterna recargable de camping', categoria: 'deportes-camping', precio: 90, stock: 24, descripcion: 'Linterna LED con tres modos y carga por USB.' },
+      { nombre: 'Shampoo para mascotas de 500 ml', categoria: 'salud-y-belleza-cuidado-personal', precio: 45, stock: 30, descripcion: 'Shampoo hipoalergénico con aroma suave.' },
     ],
   },
   {
     correo: 'diego.cuellar@correo.example', nombre: 'Diego', apellido: 'Cuéllar', tienda: 'Bit Tarija Gaming',
-    descripcion: 'Videojuegos, controles y accesorios gamer para consolas y computadora.',
-    rubro: 'Videojuegos', slugSuperior: 'videojuegos', prefijoSku: 'BTG', zona: 'Calle Bolívar', latitud: -21.5333, longitud: -64.7282, telefono: '+59171234506',
+    descripcion: 'Videojuegos, componentes de computadora, periféricos y accesorios para celular.',
+    rubro: 'Videojuegos', categoriaLogo: 'videojuegos', prefijoSku: 'BTG', latitud: -21.5333, longitud: -64.7282, telefono: '+59171234506',
     productos: [
       { nombre: 'Control inalámbrico para consola', categoria: 'videojuegos-accesorios-gaming', precio: 350, stock: 11, descripcion: 'Control con vibración y batería recargable.', destacado: true },
-      { nombre: 'Auriculares gamer con micrófono', categoria: 'videojuegos-accesorios-gaming', precio: 220, stock: 15, descripcion: 'Auriculares con sonido envolvente y almohadillas suaves.' },
-      { nombre: 'Teclado mecánico retroiluminado', categoria: 'videojuegos-accesorios-gaming', precio: 410, stock: 8, descripcion: 'Teclado con interruptores mecánicos y luces de colores.' },
       { nombre: 'Juego de fútbol para consola', categoria: 'videojuegos-juegos', precio: 290, stock: 14, descripcion: 'Edición del año con ligas y selecciones.' },
-      { nombre: 'Mouse gamer de 6 botones', categoria: 'videojuegos-accesorios-gaming', precio: 130, stock: 22, descripcion: 'Mouse óptico de 7200 DPI con peso ajustable.' },
+      { nombre: 'Disco sólido SSD de 480 GB', categoria: 'hardware-almacenamiento', precio: 330, stock: 16, descripcion: 'Unidad SSD SATA de alta velocidad para laptop o computadora de escritorio.' },
+      { nombre: 'Memoria RAM DDR4 de 8 GB', categoria: 'hardware-memorias-ram', precio: 260, stock: 20, descripcion: 'Módulo de 3200 MHz compatible con la mayoría de las placas.' },
+      { nombre: 'Teclado mecánico retroiluminado', categoria: 'perifericos-teclados', precio: 410, stock: 8, descripcion: 'Teclado con interruptores mecánicos y luces de colores.' },
+      { nombre: 'Mouse gamer de 6 botones', categoria: 'perifericos-mouse', precio: 130, stock: 22, descripcion: 'Mouse óptico de 7200 DPI con peso ajustable.' },
+      { nombre: 'Cargador rápido de 25 W', categoria: 'celulares-cargadores', precio: 90, stock: 35, descripcion: 'Cargador de pared con salida USB-C y cable de 1 m incluido.' },
     ],
   },
 ];
 
 const COMPRADORES = [
-  { correo: 'camila.vargas@correo.example', nombre: 'Camila', apellido: 'Vargas', zona: 'Barrio Luis Espinal' },
-  { correo: 'rodrigo.paz@correo.example', nombre: 'Rodrigo', apellido: 'Paz', zona: 'Barrio Aeropuerto' },
-  { correo: 'sofia.guzman@correo.example', nombre: 'Sofía', apellido: 'Guzmán', zona: 'Barrio El Molino' },
-  { correo: 'mauricio.rojas@correo.example', nombre: 'Mauricio', apellido: 'Rojas', zona: 'Barrio Juan Pablo II' },
+  { correo: 'camila.ayala@correo.example', nombre: 'Camila', apellido: 'Ayala' },
+  { correo: 'rodrigo.mendieta@correo.example', nombre: 'Rodrigo', apellido: 'Mendieta' },
+  { correo: 'sofia.aguirre@correo.example', nombre: 'Sofía', apellido: 'Aguirre' },
+  { correo: 'mauricio.tapia@correo.example', nombre: 'Mauricio', apellido: 'Tapia' },
 ];
 
 const DIAS_SUBASTA = 30;
 const SUBASTAS: SubastaSeed[] = [
-  { titulo: 'Chompa tejida a mano (pieza única)', descripcion: 'Chompa de lana tejida a mano por una artesana de San Lorenzo, talla M, sin uso.', correo: 'lucia.mendoza@correo.example', categoria: 'ropa-camperas', slugSuperior: 'ropa', inicial: 120, reserva: 200, compraYa: 420, incremento: 10 },
-  { titulo: 'Taladro de banco de segunda mano', descripcion: 'Taladro de banco de columna, funcionando, con mandril nuevo. Se entrega probado.', correo: 'jorge.calizaya@correo.example', categoria: 'herramientas-el-ctricas', slugSuperior: 'herramientas', inicial: 300, reserva: 450, incremento: 20 },
-  { titulo: 'Microondas usado en buen estado', descripcion: 'Horno microondas de 25 litros, dos años de uso, con plato giratorio original.', correo: 'marcela.torrez@correo.example', categoria: 'electrodomesticos-microondas', slugSuperior: 'electrodomesticos', inicial: 250, reserva: 350, compraYa: 600, incremento: 15 },
-  { titulo: 'Juego de ajedrez de madera tallada', descripcion: 'Tablero y piezas de madera tallada a mano, caja incluida.', correo: 'veronica.rios@correo.example', categoria: 'juguetes-juegos-de-mesa', slugSuperior: 'juguetes', inicial: 90, reserva: 150, incremento: 10 },
-  { titulo: 'Transportadora para mascotas grande', descripcion: 'Transportadora rígida para perro mediano, con seguro de puerta y bandeja removible.', correo: 'pablo.ustarez@correo.example', categoria: 'mascotas-accesorios-para-mascotas', slugSuperior: 'mascotas', inicial: 100, reserva: 170, incremento: 10 },
-  { titulo: 'Consola retro con 2 controles', descripcion: 'Consola retro de colección con dos controles y cables originales, funcionando.', correo: 'diego.cuellar@correo.example', categoria: 'videojuegos-consolas', slugSuperior: 'videojuegos', inicial: 400, reserva: 600, compraYa: 950, incremento: 25 },
-  { titulo: 'Abrigo de invierno talla L', descripcion: 'Abrigo largo de paño, talla L, usado una temporada, en perfecto estado.', correo: 'lucia.mendoza@correo.example', categoria: 'ropa-camperas', slugSuperior: 'ropa', inicial: 150, reserva: 220, incremento: 10 },
-  { titulo: 'Juego de llaves combinadas (14 piezas)', descripcion: 'Llaves combinadas de acero cromo vanadio de 8 a 24 mm, con estuche.', correo: 'jorge.calizaya@correo.example', categoria: 'herramientas-manuales', slugSuperior: 'herramientas', inicial: 80, reserva: 120, incremento: 5 },
+  { titulo: 'Poncho tejido a mano (pieza única)', descripcion: 'Poncho de lana de oveja tejido a mano por una artesana de San Lorenzo, talla única, sin uso.', correo: 'lucia.mamani@correo.example', categoria: 'ropa-camperas', inicial: 180, reserva: 280, compraYa: 520, incremento: 10 },
+  { titulo: 'Taladro de banco de segunda mano', descripcion: 'Taladro de banco de columna, funcionando, con mandril nuevo. Se entrega probado.', correo: 'jorge.condori@correo.example', categoria: 'herramientas-el-ctricas', inicial: 300, reserva: 450, incremento: 20 },
+  { titulo: 'Microondas usado en buen estado', descripcion: 'Horno microondas de 25 litros, dos años de uso, con plato giratorio original.', correo: 'marcela.quispe@correo.example', categoria: 'electrodomesticos-microondas', inicial: 250, reserva: 350, compraYa: 600, incremento: 15 },
+  { titulo: 'Charango de colección de madera de nogal', descripcion: 'Charango artesanal de nogal con clavijero tallado, afinado y con funda.', correo: 'veronica.choque@correo.example', categoria: 'musica-e-instrumentos-guitarras', inicial: 350, reserva: 550, compraYa: 900, incremento: 20 },
+  { titulo: 'Transportadora para mascotas grande', descripcion: 'Transportadora rígida para perro mediano, con seguro de puerta y bandeja removible.', correo: 'pablo.ustarez@correo.example', categoria: 'mascotas-accesorios-para-mascotas', inicial: 100, reserva: 170, incremento: 10 },
+  { titulo: 'Consola retro con 2 controles', descripcion: 'Consola retro de colección con dos controles y cables originales, funcionando.', correo: 'diego.cuellar@correo.example', categoria: 'videojuegos-consolas', inicial: 400, reserva: 600, compraYa: 950, incremento: 25 },
+  { titulo: 'Bicicleta de ruta usada rodado 28', descripcion: 'Bicicleta de ruta de aluminio, 18 velocidades, recién revisada, lista para usar.', correo: 'jorge.condori@correo.example', categoria: 'deportes-bicicletas', inicial: 700, reserva: 1000, compraYa: 1500, incremento: 30 },
+  { titulo: 'Colección de cuentos bolivianos (3 tomos)', descripcion: 'Tres tomos de cuentos de autores bolivianos, tapa blanda, en buen estado.', correo: 'veronica.choque@correo.example', categoria: 'libros-y-papeleria-novelas', inicial: 80, reserva: 130, incremento: 5 },
 ];
 
 async function categoriaPorSlug(slug: string) {
@@ -152,7 +180,7 @@ async function crearVendedor(v: VendedorSeed, passwordHash: string, indice: numb
       email: v.correo, passwordHash, firstName: v.nombre, lastName: v.apellido, role: Role.SELLER,
       phone: v.telefono, whatsappPhone: v.telefono, profileImage: avatar(indice),
       storeName: v.tienda, storeDescription: v.descripcion, storeCategory: v.rubro,
-      storeLogo: imagen(v.slugSuperior), storeBanner: imagen(v.slugSuperior),
+      storeLogo: imagenDe(v.categoriaLogo), storeBanner: imagenDe(v.categoriaLogo),
       locationCity: 'Tarija', locationState: 'Tarija', country: 'BO',
       latitude: v.latitud, longitude: v.longitud, locationVerified: false,
       isApproved: true, isVerified: false, isActive: true,
@@ -170,7 +198,7 @@ async function crearVendedor(v: VendedorSeed, passwordHash: string, indice: numb
         sku: `${v.prefijoSku}-${String(i + 1).padStart(4, '0')}`,
         deliveryTypes: [DeliveryType.PRESENCIAL, DeliveryType.RETIRO, DeliveryType.DELIVERY],
         isActive: true, isApproved: true, isFeatured: !!p.destacado,
-        images: { create: [{ url: imagen(v.slugSuperior), order: 0, isPrimary: true }] },
+        images: { create: [{ url: imagenDe(p.categoria), order: 0, isPrimary: true }] },
       },
     });
     creados++;
@@ -185,7 +213,7 @@ async function crearSubasta(s: SubastaSeed, vendedores: Map<string, number>) {
   const categoria = await categoriaPorSlug(s.categoria);
   await prisma.auction.create({
     data: {
-      sellerId, title: s.titulo, description: s.descripcion, categoryId: categoria.id, imageUrl: imagen(s.slugSuperior),
+      sellerId, title: s.titulo, description: s.descripcion, categoryId: categoria.id, imageUrl: imagenDe(s.categoria),
       startingPrice: s.inicial, currentPrice: s.inicial, reservePrice: s.reserva ?? null, buyNowPrice: s.compraYa ?? null,
       minIncrement: s.incremento, maxIncrement: s.incremento * 10,
       endDate: new Date(Date.now() + DIAS_SUBASTA * 24 * 60 * 60 * 1000), isActive: true,

@@ -28,11 +28,14 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/base_lacase_test
-      JWT_SECRET: solo-para-pruebas-en-ci
-      JWT_REFRESH_SECRET: solo-para-pruebas-en-ci-refresh
       NODE_ENV: test
 
     steps:
+      - name: Secretos de prueba efímeros
+        run: |
+          echo "JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "JWT_REFRESH_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4

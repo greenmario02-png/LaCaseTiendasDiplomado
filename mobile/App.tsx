@@ -100,6 +100,7 @@ function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        sceneStyle: { paddingTop: insets.top },
         tabBarIcon: ({ color, size }) => {
           const TabIcon = iconMap[route.name];
           return TabIcon ? <TabIcon color={color} size={size} /> : null;
@@ -115,7 +116,7 @@ function MainTabs() {
       <Tab.Screen name="Chat" component={ChatScreen} options={{ tabBarLabel: 'Mensajes' }} />
       <Tab.Screen name="Cart" component={CartScreen} options={{ tabBarLabel: 'Carrito' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Perfil' }} />
-      <Tab.Screen name="Forum" component={ForumStack} options={{ tabBarLabel: 'Foro' }} />
+      <Tab.Screen name="Forum" component={ForumStack} options={{ tabBarLabel: 'Foro', sceneStyle: { paddingTop: 0 } }} />
     </Tab.Navigator>
   );
 }
@@ -130,17 +131,17 @@ function AppNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom } }}>
         {!user ? (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} options={{ contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
+            <Stack.Screen name="Register" component={RegisterScreen} options={{ contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
           </>
         ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} options={{ contentStyle: { paddingBottom: 0 } }} />
             <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ headerShown: true, title: 'Producto' }} />
             <Stack.Screen name="AuctionDetail" component={AuctionDetailScreen} options={{ headerShown: true, title: 'Subasta' }} />
-            <Stack.Screen name="ChatThread" component={ChatThreadScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Wishlist" component={WishlistScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Addresses" component={AddressesScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="ChatThread" component={ChatThreadScreen} options={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
+            <Stack.Screen name="Wishlist" component={WishlistScreen} options={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
+            <Stack.Screen name="Addresses" component={AddressesScreen} options={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
             <Stack.Screen name="Seller" component={SellerScreen} options={{ headerShown: true, title: 'Tienda' }} />
             <Stack.Screen name="SellerDashboard" component={SellerDashboardScreen} options={{ headerShown: true, title: 'Panel de vendedor' }} />
             <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ headerShown: true, title: 'Panel admin' }} />
@@ -152,7 +153,7 @@ function AppNavigator() {
             <Stack.Screen name="SellerCoupons" component={SellerCouponsScreen} options={{ headerShown: true, title: 'Mis cupones' }} />
             <Stack.Screen name="SellerPromotions" component={SellerPromotionsScreen} options={{ headerShown: true, title: 'Mis promociones' }} />
             <Stack.Screen name="AdminSellers" component={AdminSellersScreen} options={{ headerShown: true, title: 'Vendedores' }} />
-            <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false, contentStyle: { paddingBottom: insets.bottom, paddingTop: insets.top } }} />
             <Stack.Screen name="Orders" component={OrdersScreen} options={{ headerShown: true, title: 'Mis pedidos' }} />
             <Stack.Screen name="OrderDetail" component={OrderDetailScreen} options={{ headerShown: true, title: 'Detalle del pedido' }} />
             <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ headerShown: true, title: 'Finalizar compra' }} />

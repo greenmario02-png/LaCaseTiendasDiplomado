@@ -114,7 +114,7 @@ docker compose up -d
 Ninguna contraseña se guarda en este repositorio.
 
 - **Desarrollo local** (`npm run db:seed`): el seed crea `vendedor@lacase.bo` y `comprador@lacase.bo`
-  (contraseñas de ejemplo solo locales, definidas en `backend/prisma/seed.ts`) y un administrador `admin@lacase.bo` cuya
+  (contraseña definida con `SEED_USER_PASSWORD` o, si no se define, generada al azar y mostrada una sola vez) y un administrador `admin@lacase.bo` cuya
   contraseña se define con `SEED_ADMIN_PASSWORD` o, si no se define, se genera al azar y se muestra
   una sola vez al terminar el seed.
 - **Producción**: el administrador se crea con `ADMIN_EMAIL`/`ADMIN_PASSWORD` y las cuentas ficticias

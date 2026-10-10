@@ -1042,7 +1042,10 @@ async function main() {
   await prisma.banner.deleteMany();
 
   // ---------- USERS ----------
-  const passwordHash = await bcrypt.hash('password123', BCRYPT_COST);
+  // Las cuentas de ejemplo locales usan SEED_USER_PASSWORD o una contraseña aleatoria que se muestra una sola vez.
+  const userPassword = process.env.SEED_USER_PASSWORD || randomBytes(9).toString('base64url');
+  const userGenerated = !process.env.SEED_USER_PASSWORD;
+  const passwordHash = await bcrypt.hash(userPassword, BCRYPT_COST);
   // La contraseña del admin de desarrollo no se publica: viene de SEED_ADMIN_PASSWORD o se genera
   // aleatoria y se muestra una sola vez al terminar el seed.
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || randomBytes(9).toString('base64url');
@@ -1670,6 +1673,9 @@ async function main() {
   console.log(`  Tags: ${tagIds.length}`);
   console.log(`  Subastas activas: ${auctionsCreated}`);
   console.log(`  Chats: ${conversationsCreated}`);
+  if (userGenerated) {
+    console.log(`  Cuentas de ejemplo (vendedor@ y comprador@lacase.bo): contraseña ${userPassword}  (generada; se muestra solo ahora)`);
+  }
   if (adminGenerated) {
     console.log(`  Admin de desarrollo: admin@lacase.bo / ${adminPassword}  (generada; se muestra solo ahora)`);
   }
