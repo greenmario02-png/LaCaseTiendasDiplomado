@@ -14,6 +14,7 @@
     "db:seed:prod": "tsx prisma/seed-prod.ts",
     "db:seed:content": "tsx prisma/seed-content.ts",
     "db:seed:tarija": "tsx prisma/seed-tarija.ts",
+    "db:seed:comunidad": "tsx prisma/seed-comunidad.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
