@@ -28,4 +28,5 @@ jobs:
           done
           exit 1
       - name: Consultar el frontend
-        run: curl -s -o /dev/null -w 'Frontend: HTTP %{http_code}\n' --max-time 30 https://tiendaslacase.netlify.app
+        run: |
+          curl -s -o /dev/null -w 'Frontend: HTTP %{http_code}\n' --max-time 30 https://tiendaslacase.netlify.app
