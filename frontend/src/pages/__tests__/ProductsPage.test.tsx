@@ -17,6 +17,7 @@ vi.mock('../../services/api', () => ({
 
 vi.mock('../../hooks/useMoney', () => ({
   useMoney: () => (n: number) => `${Number(n).toFixed(2)} Bs`,
+  useCurrencyLabel: () => ({ code: 'BOB', symbol: 'Bs' }),
 }));
 
 vi.mock('../../stores/currencyStore', async (importOriginal) => ({
