@@ -27,9 +27,17 @@ import { connectSocket, disconnectSocket, joinChat, leaveChat, sendTyping } from
 import { useAuthStore } from '../../stores/authStore';
 import { productUrl } from '../../utils/format';
 import toast from 'react-hot-toast';
+import MessageTicks from './MessageTicks';
+import { mergeMessages, statusOf, type ChatMessage } from '../../lib/chat/chatModel';
+import { previewOf, timeOf, useC } from '../../lib/chat/i18n';
 
 interface Message {
   id: number;
+  conversationId?: number;
+  kind?: ChatMessage['kind'];
+  deleted?: boolean;
+  deliveredAt?: string | null;
+  clientId?: string | null;
   content: string;
   senderId: number;
   createdAt: string;
@@ -46,7 +54,9 @@ interface Conversation {
   seller?: { id: number; storeName: string } | null;
   buyer?: { id: number; firstName: string; lastName: string } | null;
   updatedAt: string;
-  messages?: Array<{ id: number; content: string; senderId: number; createdAt: string; readAt?: string | null }>;
+  messages?: Array<{ id: number; content: string; senderId: number; createdAt: string; readAt?: string | null; kind?: ChatMessage['kind']; deleted?: boolean }>;
+  lastMessage?: { id: number; content: string; senderId: number; createdAt: string; readAt?: string | null; kind?: ChatMessage['kind']; deleted?: boolean } | null;
+  unreadCount?: number;
   _count?: { messages: number };
 }
 
@@ -55,6 +65,7 @@ const PANEL_H = 540;
 
 export default function FloatingChat() {
   const { t: tr } = useTranslation();
+  const c = useC();
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
   const navigate = useNavigate();
@@ -120,33 +131,34 @@ export default function FloatingChat() {
     if (!token) return;
     const socket = connectSocket(token);
 
-    socket.on('chat:message', (payload: any) => {
+    // Manejadores con nombre: al limpiar se quitan solo estos (la página de Mensajes usa el mismo socket).
+    const onMessage = (payload: { conversationId: number; message: Message }) => {
       if (payload.conversationId === activeIdRef.current) {
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === payload.message.id)) return prev;
-          return [...prev, payload.message];
-        });
+        setMessages((prev) => mergeMessages(prev as ChatMessage[], [payload.message as ChatMessage]) as Message[]);
       }
       loadConversations();
       loadUnread();
-    });
-    socket.on('chat:unread', () => {
+    };
+    const onUnread = () => {
       loadUnread();
       loadConversations();
-    });
-    socket.on('chat:typing', (payload: any) => {
+    };
+    const onTyping = (payload: { conversationId: number; userId: number; isTyping: boolean }) => {
       if (payload.conversationId === activeIdRef.current && payload.userId !== user.id) {
         setOtherTyping(payload.isTyping);
       }
-    });
+    };
+    socket.on('chat:message', onMessage);
+    socket.on('chat:unread', onUnread);
+    socket.on('chat:typing', onTyping);
 
     loadUnread();
     loadConversations();
 
     return () => {
-      socket.off('chat:message');
-      socket.off('chat:unread');
-      socket.off('chat:typing');
+      socket.off('chat:message', onMessage);
+      socket.off('chat:unread', onUnread);
+      socket.off('chat:typing', onTyping);
       disconnectSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,10 +180,7 @@ export default function FloatingChat() {
     setSending(true);
     try {
       const { data } = await api.post(`/chat/${active.id}/messages`, { content: text.trim() });
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === data.data.id)) return prev;
-        return [...prev, data.data];
-      });
+      setMessages((prev) => mergeMessages(prev as ChatMessage[], [data.data as ChatMessage]) as Message[]);
       setText('');
       loadConversations();
     } catch (err) {
@@ -191,13 +200,18 @@ export default function FloatingChat() {
     return (c.seller?.storeName?.[0] ?? tr('chat.sellerInitial')).toUpperCase();
   };
 
-  const unreadOf = (c: Conversation): number => {
-    const last = c.messages?.[0];
+  const unreadOf = (conv: Conversation): number => {
+    if (typeof conv.unreadCount === 'number') return conv.unreadCount;
+    const last = conv.messages?.[0];
     if (last && last.senderId !== user?.id && !last.readAt) return 1;
     return 0;
   };
 
-  const lastMsg = (c: Conversation) => c.messages?.[0]?.content || tr('chat.messagesCount', { count: c._count?.messages ?? 0 });
+  // Fotos, PDF, QR y comprobantes se ven completos en /mensajes; aquí va su descripción.
+  const lastMsg = (conv: Conversation) => {
+    const last = conv.lastMessage ?? conv.messages?.[0];
+    return (last ? previewOf(last, c) : '') || tr('chat.messagesCount', { count: conv._count?.messages ?? 0 });
+  };
 
   // El "otro" participante es un vendedor cuando YO soy el comprador de la conversación
   const otherIsSeller = active ? isBuyer(active) : false;
@@ -325,16 +339,12 @@ export default function FloatingChat() {
                     boxShadow: 1,
                   }}
                 >
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-                    {m.content}
+                  <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', fontStyle: m.deleted ? 'italic' : undefined }}>
+                    {m.deleted || (m.kind && m.kind !== 'TEXT') ? previewOf(m, c) : m.content}
                   </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', textAlign: 'right', mt: 0.25 }}>
-                    {new Date(m.createdAt).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}
-                    {mine && (
-                      <Box component="span" ml={0.5} color={m.readAt ? '#4caf50' : 'inherit'}>
-                        {m.readAt ? '✓✓' : '✓'}
-                      </Box>
-                    )}
+                  <Typography variant="caption" component="div" sx={{ opacity: 0.85, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 0.25 }}>
+                    {timeOf(m.createdAt)}
+                    {mine && <MessageTicks status={statusOf(m as ChatMessage, user?.id) ?? 'sent'} readColor="#A7F3D0" />}
                   </Typography>
                 </Box>
               </Box>
