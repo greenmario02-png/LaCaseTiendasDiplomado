@@ -115,7 +115,7 @@
       "pauseButton": "Embopyta",
       "resumeButton": "Embojevy",
       "statusSuspended": "Oñembopytáma",
-      "storePausedNotice": "⏸ Tienda opyta (jejapo vai ikatúva)",
+      "storePausedNotice": "Tienda opyta (jejapo vai ikatúva)",
       "suspendButton": "Embopyta",
       "title": "Vendehárakuéra ({{count}})"
     },
@@ -173,9 +173,9 @@
       "title": "Ñe'ẽnguéra"
     },
     "chatThread": {
-      "inactiveSuggestions": "⏰ Mbohovái'ỹre gueteri — jehechauka ({{region}}):",
+      "inactiveSuggestions": "Mbohovái'ỹre gueteri — jehechauka ({{region}}):",
       "inputPlaceholder": "Ehai peteĩ ñe'ẽ...",
-      "startSuggestions": "💬 Jehechauka ñepyrũ hağua ({{region}}):"
+      "startSuggestions": "Jehechauka ñepyrũ hağua ({{region}}):"
     },
     "checkout": {
       "addressFallback": "Diresiõ",
@@ -350,7 +350,7 @@
     "forumModeration": {
       "approveButton": "Emoneĩ (emboguete mba'e + emongera)",
       "contentUpdatedMessage": "Mba'e oñemoambuéma.",
-      "noPendingReportsMessage": "Ndaipóri reporte ohaarõhína 🎉",
+      "noPendingReportsMessage": "Ndaipóri reporte ohaarõhína",
       "reasons": {
         "acoso": "Ñemongyhyje",
         "contenidoFalso": "Mba'e japu / ñembotavy",

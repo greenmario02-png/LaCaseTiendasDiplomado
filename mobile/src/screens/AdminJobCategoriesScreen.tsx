@@ -8,6 +8,7 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState, ErrorState } from '../components/redesign/States';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
+import { CatalogIcon, JOB_CATEGORY_ICON_KEYS, catalogIconKey } from '../components/ui/CatalogIcon';
 
 interface JobCategory {
   id: number;
@@ -59,7 +60,7 @@ export default function AdminJobCategoriesScreen() {
 
   const openEdit = (c: JobCategory) => {
     setName(c.name);
-    setIcon(c.icon ?? '');
+    setIcon(catalogIconKey(c.icon, '') ?? '');
     setEditing(c);
   };
 
@@ -115,7 +116,7 @@ export default function AdminJobCategoriesScreen() {
 
   const renderItem = ({ item }: { item: JobCategory }) => (
     <View style={[styles.card, !item.isActive && { opacity: 0.6 }]}>
-      <Text style={styles.emoji}>{item.icon || '💼'}</Text>
+      <CatalogIcon value={item.icon} fallback="work" size={24} color={colors.primary} />
       <View style={styles.flex1}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={[styles.meta, { color: item.isActive ? colors.success : colors.textSecondary }]}>
@@ -165,7 +166,21 @@ export default function AdminJobCategoriesScreen() {
             <Text style={styles.label}>{t('mobile.adminJobCategories.nameFieldLabel')}</Text>
             <NeoInput value={name} onChangeText={setName} placeholder={t('mobile.adminJobCategories.namePlaceholder')} />
             <Text style={styles.label}>{t('mobile.adminJobCategories.iconFieldLabel')}</Text>
-            <NeoInput value={icon} onChangeText={setIcon} placeholder="🛍️" />
+            <View style={styles.iconGrid} accessibilityRole="radiogroup">
+              {JOB_CATEGORY_ICON_KEYS.map((k) => (
+                <TouchableOpacity
+                  key={k}
+                  testID={`icon-${k}`}
+                  accessibilityRole="radio"
+                  accessibilityLabel={k}
+                  accessibilityState={{ checked: icon === k }}
+                  onPress={() => setIcon(k)}
+                  style={[styles.iconOption, icon === k && { borderColor: colors.primary, backgroundColor: `${colors.primary}22` }]}
+                >
+                  <CatalogIcon value={k} size={20} color={icon === k ? colors.primary : colors.textSecondary} />
+                </TouchableOpacity>
+              ))}
+            </View>
             <View style={{ marginTop: 14 }}>
               <NeoButton title={busy ? t('mobile.common.saving') : t('mobile.common.saveChanges')} onPress={save} disabled={busy} />
               <NeoButton title={t('mobile.common.cancel')} variant="ghost" onPress={() => setEditing(null)} style={{ marginTop: 8 }} />
@@ -186,7 +201,8 @@ const makeStyles = (colors: any) =>
     addBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.primary, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
     addText: { color: '#fff', fontWeight: '700', fontSize: 13 },
     card: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: 12 },
-    emoji: { fontSize: 24 },
+    iconGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    iconOption: { width: 44, height: 44, borderRadius: 10, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
     name: { fontSize: 14, fontWeight: '700', color: colors.text },
     meta: { fontSize: 12 },
     iconBtn: { padding: 6 },

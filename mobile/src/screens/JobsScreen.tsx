@@ -25,6 +25,7 @@ import { NeoButton } from '../components/redesign/NeoButton';
 import { NeoInput } from '../components/redesign/NeoInput';
 import { LoadingState, EmptyState, ErrorState } from '../components/redesign/States';
 import { JobCard, formatSalary, timeAgo, type Job, type PayPeriod } from '../components/redesign/JobCard';
+import { CatalogIcon } from '../components/ui/CatalogIcon';
 
 const LIMIT = 10;
 
@@ -271,9 +272,10 @@ export default function JobsScreen({ navigation }: any) {
         </Pressable>
         {categories.map((cat) => (
           <Pressable key={cat.id} style={chip(categoryId === cat.id)} onPress={() => setCategoryId(cat.id)}>
-            <Text style={[styles.chipText, categoryId === cat.id && styles.chipTextActive]}>
-              {`${cat.icon ?? ''} ${cat.name}`.trim()}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <CatalogIcon value={cat.icon} size={13} color={categoryId === cat.id ? '#fff' : undefined} />
+              <Text style={[styles.chipText, categoryId === cat.id && styles.chipTextActive]}>{cat.name}</Text>
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -326,9 +328,10 @@ export default function JobsScreen({ navigation }: any) {
                 <View style={styles.sheetHead}>
                   <View style={{ flex: 1 }}>
                     {selected.category ? (
-                      <Text style={styles.category}>
-                        {`${selected.category.icon ?? ''} ${selected.category.name}`.trim()}
-                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <CatalogIcon value={selected.category.icon} size={13} color={colors.primary} />
+                        <Text style={styles.category}>{selected.category.name}</Text>
+                      </View>
                     ) : null}
                     <Text style={styles.sheetTitle}>{selected.title}</Text>
                   </View>

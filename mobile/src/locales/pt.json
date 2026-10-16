@@ -115,7 +115,7 @@
       "pauseButton": "Pausar",
       "resumeButton": "Retomar",
       "statusSuspended": "Suspenso",
-      "storePausedNotice": "⏸ Loja pausada (atividade suspeita)",
+      "storePausedNotice": "Loja pausada (atividade suspeita)",
       "suspendButton": "Suspender",
       "title": "Vendedores ({{count}})"
     },
@@ -173,9 +173,9 @@
       "title": "Mensagens"
     },
     "chatThread": {
-      "inactiveSuggestions": "⏰ Sem resposta ainda — sugestões ({{region}}):",
+      "inactiveSuggestions": "Sem resposta ainda — sugestões ({{region}}):",
       "inputPlaceholder": "Escreva uma mensagem...",
-      "startSuggestions": "💬 Sugestões para começar ({{region}}):"
+      "startSuggestions": "Sugestões para começar ({{region}}):"
     },
     "checkout": {
       "addressFallback": "Endereço",
@@ -350,7 +350,7 @@
     "forumModeration": {
       "approveButton": "Aprovar (excluir conteúdo + penalizar)",
       "contentUpdatedMessage": "Conteúdo atualizado.",
-      "noPendingReportsMessage": "Não há denúncias pendentes 🎉",
+      "noPendingReportsMessage": "Não há denúncias pendentes",
       "reasons": {
         "acoso": "Assédio",
         "contenidoFalso": "Conteúdo falso / enganoso",

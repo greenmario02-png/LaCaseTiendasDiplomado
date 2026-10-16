@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, Pressable, StyleSheet, type ViewStyle } from 'react-native';
 import { BadgeCheck, MapPin, Users } from 'lucide-react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
+import { CatalogIcon } from '../ui/CatalogIcon';
 
 export type PayPeriod = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 
@@ -85,9 +86,12 @@ export function JobCard({ job, onPress, compact, style }: JobCardProps) {
       style={[styles.card, compact && styles.compact, { backgroundColor: c.surface, ...raised }, style]}
     >
       {job.category ? (
-        <Text style={[styles.category, { color: c.primary }]} numberOfLines={1}>
-          {`${job.category.icon ?? ''} ${job.category.name}`.trim()}
-        </Text>
+        <View style={styles.categoryRow}>
+          <CatalogIcon value={job.category.icon} size={13} color={c.primary} />
+          <Text style={[styles.category, { color: c.primary }]} numberOfLines={1}>
+            {job.category.name}
+          </Text>
+        </View>
       ) : null}
       <Text style={[styles.title, { color: c.text }]} numberOfLines={2}>
         {job.title}
@@ -131,7 +135,8 @@ export function JobCard({ job, onPress, compact, style }: JobCardProps) {
 const styles = StyleSheet.create({
   card: { borderRadius: 14, padding: 14, gap: 6, marginBottom: 14 },
   compact: { width: 240, marginBottom: 0 },
-  category: { fontSize: 12, fontWeight: '700' },
+  category: { fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  categoryRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   title: { fontSize: 15, fontWeight: '700' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   store: { fontSize: 13, flexShrink: 1 },

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, Image, Pressable, StyleSheet, type ViewStyle } from 'react-native';
+import { Package } from 'lucide-react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
 import { PriceDisplay } from './PriceDisplay';
 
@@ -39,7 +40,7 @@ export function ProductCard({
         <Image source={{ uri: image }} style={styles.img} resizeMode="cover" />
       ) : (
         <View style={[styles.img, styles.placeholder, { backgroundColor: c.background }]}>
-          <Text style={{ fontSize: 28 }}>📦</Text>
+          <Package size={28} color={c.textSecondary} />
         </View>
       )}
       <View style={styles.body}>

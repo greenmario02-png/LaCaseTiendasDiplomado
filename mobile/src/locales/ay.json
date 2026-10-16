@@ -115,7 +115,7 @@
       "pauseButton": "Jark'aña",
       "resumeButton": "Wasitat qalltaña",
       "statusSuspended": "Jaytayata",
-      "storePausedNotice": "⏸ Qhatu jark'ata (aktividad sospechosa)",
+      "storePausedNotice": "Qhatu jark'ata (aktividad sospechosa)",
       "suspendButton": "Jaytayaña",
       "title": "Aljirinaka ({{count}})"
     },
@@ -173,9 +173,9 @@
       "title": "Arsuwinaka"
     },
     "chatThread": {
-      "inactiveSuggestions": "⏰ Janiw kutiyawi jichhakamasa — sugerensianaka ({{region}}):",
+      "inactiveSuggestions": "Janiw kutiyawi jichhakamasa — sugerensianaka ({{region}}):",
       "inputPlaceholder": "Qillqam maya arsuwi...",
-      "startSuggestions": "💬 Sugerensianaka qalltañataki ({{region}}):"
+      "startSuggestions": "Sugerensianaka qalltañataki ({{region}}):"
     },
     "checkout": {
       "addressFallback": "Utjawi",
@@ -350,7 +350,7 @@
     "forumModeration": {
       "approveButton": "Chiqapayaña (apaqaña kuntenidu + wathiyaña)",
       "contentUpdatedMessage": "Kuntenidu machaqaptayatawa.",
-      "noPendingReportsMessage": "Janiw reportenaka suyt'ata utji 🎉",
+      "noPendingReportsMessage": "Janiw reportenaka suyt'ata utji",
       "reasons": {
         "acoso": "Wathiyawi",
         "contenidoFalso": "Kuntenidu llulla / pantjayiri",

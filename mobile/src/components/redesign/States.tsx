@@ -1,12 +1,13 @@
 import React from 'react';
 import { Text, View, ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { FolderOpen, TriangleAlert } from 'lucide-react-native';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export function EmptyState({ message }: { message: string }) {
   const { colors: c } = useAppTheme();
   return (
     <View style={styles.center}>
-      <Text style={[styles.emoji, { color: c.textSecondary }]}>🗂️</Text>
+      <FolderOpen size={34} color={c.textSecondary} />
       <Text style={[styles.message, { color: c.textSecondary }]}>{message}</Text>
     </View>
   );
@@ -25,7 +26,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
   const { colors: c } = useAppTheme();
   return (
     <View style={styles.center}>
-      <Text style={styles.emoji}>⚠️</Text>
+      <TriangleAlert size={34} color={c.error} />
       <Text style={[styles.message, { color: c.error }]}>{message}</Text>
       {onRetry ? (
         <Pressable
@@ -41,7 +42,6 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 
 const styles = StyleSheet.create({
   center: { alignItems: 'center', justifyContent: 'center', padding: 32, gap: 10 },
-  emoji: { fontSize: 34 },
   message: { fontSize: 14, textAlign: 'center' },
   retry: { minHeight: 44, borderRadius: 14, paddingHorizontal: 24, justifyContent: 'center' },
   retryText: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },

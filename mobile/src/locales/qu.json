@@ -115,7 +115,7 @@
       "pauseButton": "Pausay",
       "resumeButton": "Kutin kawsachiy",
       "statusSuspended": "Suspendisqa",
-      "storePausedNotice": "⏸ Qhatu pausasqa (mana allin kaq ruwaykuna)",
+      "storePausedNotice": "Qhatu pausasqa (mana allin kaq ruwaykuna)",
       "suspendButton": "Suspenday",
       "title": "Ranqhaqkuna ({{count}})"
     },
@@ -173,9 +173,9 @@
       "title": "Qillqakuna"
     },
     "chatThread": {
-      "inactiveSuggestions": "⏰ Manaraq kutichisqa — yuyaychaykuna ({{region}}):",
+      "inactiveSuggestions": "Manaraq kutichisqa — yuyaychaykuna ({{region}}):",
       "inputPlaceholder": "Huk qillqata qillqay...",
-      "startSuggestions": "💬 Qallarinapaq yuyaychaykuna ({{region}}):"
+      "startSuggestions": "Qallarinapaq yuyaychaykuna ({{region}}):"
     },
     "checkout": {
       "addressFallback": "Tiyasqa",
@@ -350,7 +350,7 @@
     "forumModeration": {
       "approveButton": "Chaskiy (contenidota chinkachiy + castigay)",
       "contentUpdatedMessage": "Contenido musuqchasqa.",
-      "noPendingReportsMessage": "Manam suyashaq reportekuna kanchu 🎉",
+      "noPendingReportsMessage": "Manam suyashaq reportekuna kanchu",
       "reasons": {
         "acoso": "Ñak'ariy",
         "contenidoFalso": "Llulla / pantachiq contenido",

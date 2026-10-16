@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Hourglass } from 'lucide-react-native';
 import { colors } from '../theme';
 import { useAppTheme } from '../theme/ThemeContext';
 
@@ -36,7 +37,12 @@ export default function CountdownTimer({ targetDate, compact = false }: { target
   }
 
   if (compact) {
-    return <Text style={styles.compactText}>⏳ {t.d > 0 ? `${t.d}d ` : ''}{pad(t.h)}:{pad(t.m)}:{pad(t.s)}</Text>;
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+        <Hourglass size={13} color={StyleSheet.flatten(styles.compactText).color as string | undefined} />
+        <Text style={styles.compactText}>{t.d > 0 ? `${t.d}d ` : ''}{pad(t.h)}:{pad(t.m)}:{pad(t.s)}</Text>
+      </View>
+    );
   }
 
   const boxes: { label: string; value: number }[] = [

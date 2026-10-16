@@ -238,7 +238,7 @@ export default function ForumProfileScreen({ route, navigation }: any) {
             city: p.city,
             category: {
               slug: p.category?.slug,
-              icon: p.category?.icon ?? '💬',
+              icon: p.category?.icon ?? '',
               name: p.category?.name ?? 'General',
               color: p.category?.color ?? '#6366F1',
             },

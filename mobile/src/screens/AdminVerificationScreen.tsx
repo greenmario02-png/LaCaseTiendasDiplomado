@@ -2,7 +2,7 @@ import React, { useMemo,  useCallback, useState  } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { BadgeCheck, MapPin, X } from 'lucide-react-native';
+import { BadgeCheck, MapPin, StickyNote, X } from 'lucide-react-native';
 import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState } from '../components/redesign/States';
@@ -87,7 +87,12 @@ export default function AdminVerificationScreen({ navigation }: any) {
         {[item.locationCity, item.locationState].filter(Boolean).join(', ') || t('mobile.adminVerification.noLocationDeclared')}
         {item.nit ? ` · ${t('mobile.adminVerification.nitLabel', { nit: item.nit })}` : ''}
       </Text>
-      {item.verificationNote ? <Text style={styles.note}>📝 {item.verificationNote}</Text> : null}
+      {item.verificationNote ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <StickyNote size={12} color={colors.warning} />
+          <Text style={styles.note}>{item.verificationNote}</Text>
+        </View>
+      ) : null}
       <View style={styles.actions}>
         <TouchableOpacity style={[styles.miniBtn, { borderColor: colors.success }]} onPress={() => decideVerified(item.id, true)}>
           <Text style={[styles.miniBtnText, { color: colors.success }]}>{t('mobile.adminVerification.verifyStoreButton')}</Text>
