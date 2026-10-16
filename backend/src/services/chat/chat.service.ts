@@ -18,6 +18,7 @@ import { prisma } from '../../config/database';
 import { getIO } from '../../config/socket';
 import { CHAT_FILES_DIR, chatLimits } from '../../config/chat';
 import { ApiError } from '../../utils/errors';
+import { isInternalImagePath, isPaymentQrUrl } from '../../utils/imageSafety';
 import { isForumModerator } from '../../middlewares/roles';
 import { createNotification } from '../notification.service';
 
@@ -89,17 +90,14 @@ export function previewText(m: { kind: string; content: string; deletedForAllAt?
   }
 }
 
-/** URL del QR de la tienda aceptable para mostrar: archivo propio (/uploads/...) o http(s) sin caracteres raros. */
+/**
+ * URL del QR de la tienda aceptable para mostrar: solo imagenes propias de la plataforma (QR subido o /uploads, o el
+ * almacenamiento propio). Un QR heredado con URL externa no se envia ni se muestra.
+ */
 export function safeQrUrl(raw: string | null | undefined): string | null {
   const s = (raw ?? '').trim();
-  if (!s || s.length > 2000 || /[\s"'<>`\\]/.test(s)) return null;
-  if (s.startsWith('/uploads/')) return s.includes('..') ? null : s;
-  try {
-    const u = new URL(s);
-    return u.protocol === 'https:' || u.protocol === 'http:' ? u.toString() : null;
-  } catch {
-    return null;
-  }
+  if (!s || /[\s"'<>`]/.test(s)) return null;
+  return isPaymentQrUrl(s) || isInternalImagePath(s) ? s : null;
 }
 
 function sanitizeMeta(kind: string, meta: unknown): Record<string, unknown> | null {

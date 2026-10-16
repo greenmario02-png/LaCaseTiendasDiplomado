@@ -34,6 +34,7 @@ import auditRoutes from './routes/audit.routes';
 import storeTeamRoutes from './routes/storeTeam.routes';
 import rbacRoutes from './routes/rbac.routes';
 import jobRoutes from './routes/job.routes';
+import payoutAccountRoutes from './routes/payoutAccount.routes';
 import { assertPublicHttpUrl, fetchPublicImage } from './utils/safeFetch';
 import { serveUploads, serveSeedAssets } from './middlewares/upload';
 import { setupSwagger } from './config/swagger';
@@ -130,6 +131,7 @@ export function createApp() {
   app.use('/api', publicRoutes);
   app.use('/api/products', productRoutes);
   app.use('/api/seller', sellerRoutes);
+  app.use('/api/payout-account', payoutAccountRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/cart', cartRoutes);
   app.use('/api/orders', orderRoutes);

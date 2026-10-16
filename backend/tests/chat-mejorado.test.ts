@@ -220,8 +220,10 @@ describe('Chat: adjuntos, tipos de mensaje y conversación del pedido', () => {
       expect(r.body.data.attachment).toBeNull();
     });
 
-    it('un QR configurado con javascript: no se envía', async () => {
+    it('un QR configurado con javascript: o con una URL externa heredada no se envía', async () => {
       await prisma.user.update({ where: { id: sellerId }, data: { paymentQrUrl: 'javascript:alert(1)' } });
+      expect((await request(app).post(`/api/chat/${convId}/payment-qr`).set(auth(sellerToken)).send({})).status).toBe(409);
+      await prisma.user.update({ where: { id: sellerId }, data: { paymentQrUrl: 'https://evil.example/qr.png' } });
       expect((await request(app).post(`/api/chat/${convId}/payment-qr`).set(auth(sellerToken)).send({})).status).toBe(409);
       await prisma.user.update({ where: { id: sellerId }, data: { paymentQrUrl: '/uploads/qr-tienda-test.png' } });
     });

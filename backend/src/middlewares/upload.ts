@@ -8,6 +8,7 @@ import multer from 'multer';
 import { requireAdmin } from '../middlewares/roles';
 import { ApiError } from '../utils/errors';
 import { uploadBuffer } from '../utils/storage';
+import { cleanUploadedImage } from '../utils/imageSafety';
 
 const UPLOAD_DIR = path.resolve(__dirname, '..', '..', 'uploads');
 const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.gif']; // SVG excluido: puede contener scripts (XSS)
@@ -53,8 +54,11 @@ export const forumUpload = multer({
 export function uploadSingle(field: string) {
   return [requireAdmin, upload.single(field), async (req: Request, res: Response, next: NextFunction) => {
     if (!req.file) return res.status(400).json({ error: { code: 'NO_FILE', message: 'No se recibió ninguna imagen' } });
+    // Firma real del archivo (la extensión la elige el cliente) y sin metadatos EXIF/GPS.
+    const img = cleanUploadedImage(req.file.buffer);
+    if (!img) return res.status(400).json({ error: { code: 'IMAGE_TYPE_NOT_ALLOWED', message: 'El archivo no es una imagen JPG, PNG, WebP o GIF válida' } });
     try {
-      const publicUrl = await uploadBuffer(req.file.buffer, 'general', req.file.originalname, req.file.mimetype);
+      const publicUrl = await uploadBuffer(img.buffer, 'general', req.file.originalname, req.file.mimetype);
       return res.status(201).json({ data: { url: publicUrl, filename: path.basename(publicUrl), size: req.file.size } });
     } catch (err) {
       return next(err);
@@ -65,8 +69,11 @@ export function uploadSingle(field: string) {
 export function uploadSingleAuthenticated(field: string) {
   return [upload.single(field), async (req: Request, res: Response, next: NextFunction) => {
     if (!req.file) return res.status(400).json({ error: { code: 'NO_FILE', message: 'No se recibió ninguna imagen' } });
+    // Firma real del archivo (la extensión la elige el cliente) y sin metadatos EXIF/GPS.
+    const img = cleanUploadedImage(req.file.buffer);
+    if (!img) return res.status(400).json({ error: { code: 'IMAGE_TYPE_NOT_ALLOWED', message: 'El archivo no es una imagen JPG, PNG, WebP o GIF válida' } });
     try {
-      const publicUrl = await uploadBuffer(req.file.buffer, 'general', req.file.originalname, req.file.mimetype);
+      const publicUrl = await uploadBuffer(img.buffer, 'general', req.file.originalname, req.file.mimetype);
       return res.status(201).json({ data: { url: publicUrl, filename: path.basename(publicUrl), size: req.file.size } });
     } catch (err) {
       return next(err);

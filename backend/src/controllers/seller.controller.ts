@@ -6,6 +6,10 @@ import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { ok, created } from '../utils/response';
 import { recordAudit } from './audit.controller';
+import { isInternalImagePath } from '../utils/imageSafety';
+import { assertOwnPaymentQr } from '../services/paymentQr.service';
+import { createNotification } from '../services/notification.service';
+import { logger } from '../utils/logger';
 
 const PRODUCT_INCLUDE = {
   seller: {
@@ -433,6 +437,7 @@ export async function getSellerDashboard(req: AuthRequest, res: Response, next: 
 // tantos días, para que un vendedor no pueda "resetear" su identidad justo después de una estafa.
 const STORE_IDENTITY_COOLDOWN_DAYS = 30;
 const LOCATION_FIELDS = ['locationCity', 'locationState', 'latitude', 'longitude'] as const;
+const STORE_IMAGE_FIELDS = new Set(['storeLogo', 'storeBanner', 'profileImage']);
 
 function daysLeft(changedAt: Date | null, cooldownDays: number): number {
   if (!changedAt) return 0;
@@ -469,13 +474,27 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
     ];
     const current = await prisma.user.findUnique({
       where: { id: userId },
-      select: { storeName: true, locationCity: true, locationState: true, latitude: true, longitude: true, storeNameChangedAt: true, storeLocationChangedAt: true },
+      select: {
+        storeName: true, locationCity: true, locationState: true, latitude: true, longitude: true, storeNameChangedAt: true, storeLocationChangedAt: true,
+        paymentQrUrl: true, storeLogo: true, storeBanner: true, profileImage: true,
+      },
     });
     if (!current) throw ApiError.notFound('Usuario no encontrado');
 
     const data: Prisma.UserUpdateInput = {};
     for (const key of allowed) {
       if (req.body[key] !== undefined) {
+        // Un campo que no cambia ('' y null cuentan igual) no se valida ni se reescribe.
+        if (key in current && (req.body[key] ?? '') === ((current as Record<string, unknown>)[key] ?? '')) continue;
+        // QR de cobro: solo un archivo subido por el propio usuario (POST /api/payout-account/qr-image); nunca un enlace.
+        if (key === 'paymentQrUrl') {
+          (data as any)[key] = req.body[key] ? assertOwnPaymentQr(req.body[key], userId) : null;
+          continue;
+        }
+        // Imágenes de la tienda: solo archivos subidos a la plataforma, nunca enlaces externos.
+        if (STORE_IMAGE_FIELDS.has(key) && req.body[key] && !isInternalImagePath(req.body[key])) {
+          throw new ApiError(400, 'IMAGE_URL_NOT_ALLOWED', 'Sube la imagen con el botón «Subir imagen»: no se aceptan enlaces.');
+        }
         if (key === 'freeShippingThreshold' && req.body[key] !== null && req.body[key] !== '') {
           (data as any)[key] = Number(req.body[key]);
         } else if (key === 'latitude' || key === 'longitude') {
@@ -504,6 +523,22 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
     }
 
     const user = await prisma.user.update({ where: { id: userId }, data });
+    if (data.paymentQrUrl !== undefined) {
+      // Sin aprobación previa en esta versión: se avisa al dueño de inmediato para que detecte un cambio que no hizo.
+      logger.info('QR de cobro actualizado', { userId, hasQr: !!data.paymentQrUrl });
+      try {
+        await createNotification({
+          userId,
+          type: 'SYSTEM',
+          title: data.paymentQrUrl ? 'QR de cobro actualizado' : 'QR de cobro eliminado',
+          message: 'Se cambió el QR de cobro de tu tienda. Si no fuiste tú, cambia tu contraseña y revisa tus datos de pago.',
+          refType: 'seller',
+          refId: userId,
+        });
+      } catch {
+        /* el aviso no debe impedir guardar */
+      }
+    }
     return ok(res, user);
   } catch (error) {
     next(error);

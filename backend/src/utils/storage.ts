@@ -54,3 +54,26 @@ export async function uploadBuffer(buffer: Buffer, folder: string, originalName:
   fs.writeFileSync(path.join(dir, filename), buffer);
   return `/uploads/${folder}/${filename}`;
 }
+
+/**
+ * Sube un archivo con un nombre ya elegido por el servidor (aleatorio y validado) y devuelve su URL pública. Nunca
+ * sobrescribe: si el nombre existe falla. Se usa para los QR de cobro (`payment-qr/q<dueño>-<azar>.<ext>`).
+ */
+export async function uploadNamedBuffer(buffer: Buffer, folder: string, filename: string, contentType: string): Promise<string> {
+  if (!/^[a-z0-9-]+$/.test(folder) || !/^[A-Za-z0-9._-]+$/.test(filename)) throw new Error('Nombre de archivo inválido');
+  const objectPath = `${folder}/${filename}`;
+  if (supabase) {
+    const { error } = await supabase.storage.from(SUPABASE_STORAGE_BUCKET).upload(objectPath, buffer, { contentType, upsert: false, cacheControl: '31536000' });
+    if (error) throw new Error(`Error al subir la imagen a Supabase Storage: ${error.message}`);
+    return supabase.storage.from(SUPABASE_STORAGE_BUCKET).getPublicUrl(objectPath).data.publicUrl;
+  }
+  const dir = path.join(LOCAL_UPLOAD_DIR, folder);
+  fs.mkdirSync(dir, { recursive: true });
+  await fs.promises.writeFile(path.join(dir, filename), buffer, { flag: 'wx' });
+  return `/uploads/${objectPath}`;
+}
+
+/** Ruta local de un archivo subido sin almacenamiento remoto (para comprobar que existe). */
+export function localUploadPath(folder: string, filename: string): string {
+  return path.join(LOCAL_UPLOAD_DIR, path.basename(folder), path.basename(filename));
+}
