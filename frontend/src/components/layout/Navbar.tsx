@@ -26,6 +26,10 @@ import ChatIcon from '@mui/icons-material/Chat';
 import GavelIcon from '@mui/icons-material/Gavel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ForumIcon from '@mui/icons-material/Forum';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import { styled, alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
@@ -36,6 +40,22 @@ import { api } from '../../services/api';
 import NotificationBell from './NotificationBell';
 import CurrencyRates from '../ui/CurrencyRates';
 import LanguageSwitcher from './LanguageSwitcher';
+import { usePendingPaymentCount, usePayT } from '../../lib/payments';
+
+/** Accesos directos arriba del menú de cuenta: pedidos, pago de pendientes (con contador) y mensajes. */
+export const ACCOUNT_SHORTCUTS = [
+  { id: 'orders', to: '/cuenta/pedidos', labelKey: 'menu.orders', badge: undefined },
+  { id: 'payPending', to: '/cuenta/pedidos?pago=pendiente', labelKey: 'menu.payPending', badge: 'pay' },
+  { id: 'messages', to: '/mensajes', labelKey: 'menu.messages', badge: 'chat' },
+] as const;
+
+const SHORTCUT_ICONS: Record<string, React.ReactNode> = {
+  orders: <ReceiptLongIcon fontSize="small" />,
+  payPending: <PaymentsOutlinedIcon fontSize="small" />,
+  messages: <ChatIcon fontSize="small" />,
+};
+
+const srOnly = { position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' } as const;
 
 const SearchBox = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -85,6 +105,9 @@ export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mounted, setMounted] = useState(false);
   const [unreadChat, setUnreadChat] = useState(0);
+  const pt = usePayT();
+  // Pedidos por pagar: contador del acceso directo «Pagar pedidos pendientes».
+  const pendingPay = usePendingPaymentCount(!!user);
 
   useEffect(() => {
     setMounted(true);
@@ -216,12 +239,38 @@ export default function Navbar() {
 
           {user ? (
             <>
-              <IconButton color="inherit" onClick={handleMenu} sx={{ p: 0.5 }}>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
-                  {user.firstName?.[0] ?? user.email[0].toUpperCase()}
-                </Avatar>
+              <IconButton
+                color="inherit"
+                onClick={handleMenu}
+                sx={{ p: 0.5 }}
+                aria-label={t('nav.menu.myAccount')}
+                aria-haspopup="menu"
+                aria-expanded={Boolean(anchorEl)}
+              >
+                <Badge color="error" variant="dot" invisible={unreadChat === 0 && pendingPay === 0}>
+                  <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
+                    {user.firstName?.[0] ?? user.email[0].toUpperCase()}
+                  </Avatar>
+                </Badge>
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                {ACCOUNT_SHORTCUTS.map((s) => {
+                  const count = s.badge === 'pay' ? pendingPay : s.badge === 'chat' ? unreadChat : 0;
+                  return (
+                    <MenuItem key={s.id} onClick={() => { handleClose(); navigate(s.to); }} sx={{ minHeight: 44, minWidth: 230 }}>
+                      <ListItemIcon>
+                        <Badge badgeContent={count} color="error">
+                          {SHORTCUT_ICONS[s.id]}
+                        </Badge>
+                      </ListItemIcon>
+                      <ListItemText>
+                        {pt(s.labelKey)}
+                        {count > 0 && <Box component="span" sx={srOnly}>{` (${count})`}</Box>}
+                      </ListItemText>
+                    </MenuItem>
+                  );
+                })}
+                <Divider />
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta'); }}>
                   <AccountCircleIcon sx={{ mr: 1 }} /> {t('nav.menu.myAccount')}
                 </MenuItem>

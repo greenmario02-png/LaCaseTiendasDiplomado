@@ -33,6 +33,7 @@ import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { usePayT } from '../../lib/payments';
 
 const STATUS_COLOR: Record<string, 'default' | 'warning' | 'info' | 'success' | 'error'> = {
   PENDING: 'warning',
@@ -50,6 +51,7 @@ export default function SellerPayouts() {
     REJECTED: t('seller.payouts.status.rejected'),
   };
   const money = useMoney();
+  const pt = usePayT();
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -233,6 +235,19 @@ export default function SellerPayouts() {
             {savingAccount ? <CircularProgress size={18} /> : t('seller.payouts.accountSection.saveButton')}
           </SecondaryButton>
         </Box>
+        {/* El QR de cobro que ven los compradores se sube como archivo en la configuración de la tienda. */}
+        <Alert
+          severity="info"
+          icon={<QrCodeIcon />}
+          sx={{ mt: 2 }}
+          action={
+            <GhostButton to="/seller/configuracion" size="small">
+              {pt('qr.goToSettings')}
+            </GhostButton>
+          }
+        >
+          {pt('qr.inSettings')}
+        </Alert>
       </Paper>
 
       {/* Historial */}

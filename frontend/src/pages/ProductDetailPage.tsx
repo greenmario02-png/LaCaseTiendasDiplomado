@@ -44,6 +44,7 @@ import { PriceDisplay } from '../components/redesign/PriceDisplay';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
+import StorePaymentCard from '../components/payments/StorePaymentCard';
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
@@ -309,6 +310,13 @@ export default function ProductDetailPage() {
           <Typography variant="caption" color="text.secondary">
             {t('product.detail.soldAndShippedBy', { store: product.seller.storeName })}
           </Typography>
+
+          {/* Datos de pago de la tienda, con la recomendación de seguridad para el precio del producto. */}
+          {product.seller?.id && (
+            <Box mt={2}>
+              <StorePaymentCard storeId={product.seller.id} storeName={product.seller.storeName} compact tipAmountBs={Number(product.price)} />
+            </Box>
+          )}
         </Grid>
       </Grid>
 

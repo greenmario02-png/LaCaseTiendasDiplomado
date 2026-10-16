@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Container, Typography, Box, Chip, Pagination, Skeleton } from '@mui/material';
+import { useSearchParams } from 'react-router-dom';
+import { Container, Typography, Box, Chip, Pagination, Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
@@ -9,6 +10,7 @@ import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { EmptyState } from '../../components/redesign/States';
 import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
+import { usePayT } from '../../lib/payments';
 
 const STATUS_COLOR: Record<string, any> = {
   PENDING: 'warning',
@@ -41,22 +43,40 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  // «Pagar pedidos pendientes»: /cuenta/pedidos?pago=pendiente filtra en el servidor.
+  const [params, setParams] = useSearchParams();
+  const onlyPending = params.get('pago') === 'pendiente';
+  const pt = usePayT();
 
   useEffect(() => {
     setLoading(true);
     api
-      .get('/orders/buyer', { params: { page, limit: 10 } })
+      .get('/orders/buyer', { params: { page, limit: 10, ...(onlyPending ? { payment: 'pending' } : {}) } })
       .then((res) => {
         setOrders(res.data.data);
         setMeta(res.data.meta);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, onlyPending]);
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <PageHeader title={tt('account.myOrders')} subtitle={tt('account.myOrdersSubtitle')} icon={<ReceiptLongIcon />} />
+      <ToggleButtonGroup
+        exclusive
+        size="small"
+        value={onlyPending ? 'pending' : 'all'}
+        onChange={(_e, v) => {
+          if (!v) return;
+          setPage(1);
+          setParams(v === 'pending' ? { pago: 'pendiente' } : {}, { replace: true });
+        }}
+        sx={{ mb: 2, '& .MuiToggleButton-root': { minHeight: 44, textTransform: 'none' } }}
+      >
+        <ToggleButton value="all">{pt('menu.orders')}</ToggleButton>
+        <ToggleButton value="pending">{pt('menu.payPending')}</ToggleButton>
+      </ToggleButtonGroup>
 
       {loading ? (
         <Skeleton variant="rounded" height={300} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Truck, Gift, Package } from 'lucide-react';
-import { useParams, Link } from 'react-router-dom';
+import { Truck } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -11,7 +11,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { api } from '../../services/api';
+import { api, resolveImageUrl } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -21,6 +21,9 @@ import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton } from '../../components/redesign/Buttons';
 import { LoadingState } from '../../components/redesign/States';
 import { FadeIn } from '../../components/motion/FadeIn';
+import StorePaymentCard from '../../components/payments/StorePaymentCard';
+import { openOrderChat, usePayT } from '../../lib/payments';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 
 export default function OrderDetailPage() {
   const { t: tt } = useTranslation();
@@ -38,6 +41,22 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [proofUrl, setProofUrl] = useState('');
+  const navigate = useNavigate();
+  const pt = usePayT();
+  const [openingChat, setOpeningChat] = useState(false);
+
+  // Pagar = abrir (o crear) el chat del pedido: la tienda envía su QR y el comprador sube el comprobante.
+  const payInChat = async () => {
+    setOpeningChat(true);
+    try {
+      const convId = await openOrderChat(Number(id), order?.sellerId ?? order?.seller?.id);
+      navigate(`/mensajes/${convId}`, { state: { orderId: Number(id) } });
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setOpeningChat(false);
+    }
+  };
 
   useEffect(() => {
     api
@@ -114,7 +133,7 @@ export default function OrderDetailPage() {
           <Box key={item.id} display="flex" justifyContent="space-between" py={1} borderBottom={1} borderColor={`${t.outline}33`}>
             <Box display="flex" gap={1}>
               {item.product.images?.[0] && (
-                <img src={item.product.images[0].url} alt="" style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} />
+                <img src={resolveImageUrl(item.product.images[0].url)} alt="" style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} />
               )}
               <Box>
                 <Typography variant="body2" fontWeight={600} color={t.onSurface}>
@@ -161,15 +180,19 @@ export default function OrderDetailPage() {
         ) : order.paymentStatus === 'PROOF_SUBMITTED' ? (          <Alert severity="info">{tt('orders.proofSubmittedWaitingShort')}</Alert>
         ) : (
           <>
-            <Box sx={{ textAlign: 'center', py: 2 }}>
-              <Box className="image-container" sx={{ width: 140, height: 140, borderRadius: 2, mx: 'auto' }}>
-                {order.seller?.paymentQrUrl ? (
-                  <img src={order.seller.paymentQrUrl} alt={tt('orders.qrAlt')} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                ) : (
-                  <Typography color={t.onSurfaceVariant}>{tt('orders.qrNotAvailable')}</Typography>
-                )}
+            {order.status !== 'CANCELLED' && (
+              <Box sx={{ mb: 2 }}>
+                <PrimaryButton type="button" size="large" startIcon={<ChatOutlinedIcon />} onClick={payInChat} disabled={openingChat}>
+                  {pt('order.payInChat')}
+                </PrimaryButton>
+                <Typography variant="body2" sx={{ color: t.onSurfaceVariant, mt: 1 }}>
+                  {pt('order.payHint')}
+                </Typography>
               </Box>
-            </Box>
+            )}
+            {(order.sellerId ?? order.seller?.id) && (
+              <StorePaymentCard storeId={order.sellerId ?? order.seller.id} storeName={order.seller?.storeName} tipAmountBs={Number(order.total)} />
+            )}
             <Box display="flex" gap={1}>
               <input
                 value={proofUrl}

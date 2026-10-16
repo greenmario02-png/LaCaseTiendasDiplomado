@@ -42,6 +42,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import { api, getErrorMessage } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useMoney } from '../hooks/useMoney';
+import StorePaymentCard from '../components/payments/StorePaymentCard';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { EmptyState } from '../components/redesign/States';
 import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
@@ -344,6 +345,9 @@ export default function SellerProfilePage() {
           )}
         </Box>
       </Paper>
+
+      {/* Datos de pago de la tienda (QR y cuenta), con una recomendación de seguridad antes. */}
+      <StorePaymentCard storeId={seller.id} storeName={seller.storeName} tipAmountBs={null} />
 
       {/* Mapa de la tienda */}
       <Box mt={3}>

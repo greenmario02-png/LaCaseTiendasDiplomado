@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Truck, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -24,6 +23,10 @@ import { getErrorMessage } from '../services/api';
 import toast from 'react-hot-toast';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../components/redesign/Buttons';
 import { EmptyState } from '../components/redesign/States';
+import { summarizeSelection, useCartSelection } from '../stores/cartSelectionStore';
+import { apiErrorInfo, openOrderChat, usePayT } from '../lib/payments';
+import StorePaymentCard from '../components/payments/StorePaymentCard';
+import PaymentSafetyTip from '../components/payments/PaymentSafetyTip';
 
 interface ShippingQuote {
   sellerId: number;
@@ -38,6 +41,11 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const money = useMoney();
   const { cart, fetchCart } = useCartStore();
+  const pt = usePayT();
+  // Solo se paga lo seleccionado en el carrito; lo demás se queda en el carrito.
+  const excluded = useCartSelection((s) => s.excluded);
+  const sel = summarizeSelection(cart, excluded);
+  const cartItemIds = sel.ids;
 
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
@@ -67,6 +75,17 @@ export default function CheckoutPage() {
 
   const selectedAddr = addresses.find((a) => a.id === selectedAddress);
 
+  /** 409 CART_SELECTION_STALE: el carrito cambió en otra pestaña o dispositivo; se avisa y se recarga. */
+  const handleStale = (err: unknown): boolean => {
+    const info = apiErrorInfo(err);
+    if (info.status !== 409 || info.code !== 'CART_SELECTION_STALE') return false;
+    setError(pt('cart.stale'));
+    setCheckedShipping(false);
+    setQuotes([]);
+    fetchCart();
+    return true;
+  };
+
   const checkShipping = async () => {
     if (fulfillmentType === 'PICKUP') {
       if (!pickupAddress.trim()) {
@@ -85,11 +104,11 @@ export default function CheckoutPage() {
     setCheckingShipping(true);
     setError('');
     try {
-      const { data } = await api.post('/orders/calculate-shipping', { buyerPostalCode: selectedAddr.postalCode });
+      const { data } = await api.post('/orders/calculate-shipping', { buyerPostalCode: selectedAddr.postalCode, cartItemIds });
       setQuotes(data.data);
       setCheckedShipping(true);
     } catch (err) {
-      setError(getErrorMessage(err));
+      if (!handleStale(err)) setError(getErrorMessage(err));
     } finally {
       setCheckingShipping(false);
     }
@@ -109,12 +128,25 @@ export default function CheckoutPage() {
         pickupAddress: fulfillmentType === 'PICKUP' ? pickupAddress.trim() : undefined,
         notes,
         couponCode: couponCode || undefined,
+        cartItemIds,
       });
       toast.success(t('checkout.orderSuccessToast'));
-      const firstOrder = data.data[0];
-      navigate(`/checkout/confirmacion/${firstOrder.id}`, { state: { orders: data.data } });
+      const orders = data.data as Array<{ id: number; sellerId?: number }>;
+      const firstOrder = orders[0];
+      fetchCart();
+      // Al pagar se abre (o crea) el chat de cada pedido con su tienda: ahí la tienda envía su QR y el comprador sube el
+      // comprobante. Se navega al del primero; si falla, se cae a la confirmación de siempre.
+      const convIds = await Promise.all(orders.map((o) => openOrderChat(o.id, o.sellerId).catch(() => null)));
+      const first = convIds[0];
+      if (first) {
+        toast(pt('checkout.chatOpening'));
+        navigate(`/mensajes/${first}`, { state: { orderId: firstOrder.id, orders } });
+        return;
+      }
+      toast(pt('checkout.chatFallback'));
+      navigate(`/checkout/confirmacion/${firstOrder.id}`, { state: { orders } });
     } catch (err) {
-      setError(getErrorMessage(err));
+      if (!handleStale(err)) setError(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -138,6 +170,14 @@ export default function CheckoutPage() {
           message={t('cart.emptyMessage')}
           action={<PrimaryButton to="/productos">{t('cart.exploreProducts')}</PrimaryButton>}
         />
+      </Container>
+    );
+  }
+
+  if (sel.count === 0) {
+    return (
+      <Container maxWidth="md" sx={{ py: 10 }}>
+        <EmptyState message={pt('cart.noneSelected')} action={<PrimaryButton to="/carrito">{pt('cart.backToCart')}</PrimaryButton>} />
       </Container>
     );
   }
@@ -209,6 +249,19 @@ export default function CheckoutPage() {
                 {checkingShipping ? <CircularProgress size={20} /> : fulfillmentType === 'PICKUP' ? t('checkout.continueWithoutShipping') : t('checkout.calculateShipping')}
               </SecondaryButton>
             </Box>
+          </Paper>
+
+          <Paper sx={{ p: 3, mb: 2 }} component="section" aria-label={pt('info.title')}>
+            <Typography variant="h6" component="h2" fontWeight={700} mb={1}>
+              {pt('info.title')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              {pt('cart.paying', { count: sel.count })} {pt('order.payHint')}
+            </Typography>
+            <PaymentSafetyTip amountBs={total > 0 ? total : sel.subtotal} />
+            {sel.groups.map((g) => (
+              <StorePaymentCard key={g.seller.id} storeId={g.seller.id} storeName={g.seller.storeName} compact />
+            ))}
           </Paper>
 
           <Paper sx={{ p: 3 }}>
@@ -291,18 +344,16 @@ export default function CheckoutPage() {
                     {money(total)}
                   </Typography>
                 </Box>
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  {t('checkout.paymentQrInfoPrefix')} <strong>{t('checkout.paymentQrInfoStrong')}</strong>{t('checkout.paymentQrInfoSuffix')}
-                </Alert>
+                <Alert severity="info" sx={{ mb: 2 }}>{pt('order.payHint')}</Alert>
                 <PrimaryButton size="large" fullWidth onClick={submitOrder} disabled={submitting || !checkedShipping || (fulfillmentType === 'SHIPPING' && quotes.length === 0)}>
-                  {submitting ? <CircularProgress size={22} color="inherit" /> : t('checkout.confirmPurchase')}
+                  {submitting ? <CircularProgress size={22} color="inherit" /> : pt('checkout.payAndChat')}
                 </PrimaryButton>
               </>
             ) : fulfillmentType === 'PICKUP' && checkedShipping ? (
               <>
                 <Box display="flex" justifyContent="space-between" mb={1} fontSize="body2">
                   <Typography color="text.secondary">{t('checkout.subtotal')}</Typography>
-                  <Typography>{money(cart.subtotal)}</Typography>
+                  <Typography>{money(sel.subtotal)}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" mb={1} fontSize="body2">
                   <Typography color="text.secondary">{t('checkout.shipping')}</Typography>
@@ -312,14 +363,12 @@ export default function CheckoutPage() {
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Typography variant="h6">{t('checkout.total')}</Typography>
                   <Typography variant="h6" className="price-color">
-                    {money(cart.subtotal)}
+                    {money(sel.subtotal)}
                   </Typography>
                 </Box>
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  {t('checkout.pickupPaymentInfoPrefix')} <strong>{t('checkout.paymentQrInfoStrong')}</strong>.
-                </Alert>
+                <Alert severity="info" sx={{ mb: 2 }}>{pt('order.payHint')}</Alert>
                 <PrimaryButton size="large" fullWidth onClick={submitOrder} disabled={submitting || !checkedShipping}>
-                  {submitting ? <CircularProgress size={22} color="inherit" /> : t('checkout.confirmPurchase')}
+                  {submitting ? <CircularProgress size={22} color="inherit" /> : pt('checkout.payAndChat')}
                 </PrimaryButton>
               </>
             ) : (

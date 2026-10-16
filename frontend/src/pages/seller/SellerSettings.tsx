@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, BadgeCheck } from 'lucide-react';
-import { Box, Typography, Paper, TextField, Grid, Alert, CircularProgress, MenuItem, Chip, Avatar, IconButton, Button } from '@mui/material';
+import { Box, Typography, Paper, TextField, Grid, Alert, CircularProgress, MenuItem, Chip, Avatar, IconButton } from '@mui/material';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { api } from '../../services/api';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import { api, resolveImageUrl } from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
 import { getErrorMessage } from '../../services/api';
 import { COUNTRIES, STORE_CATEGORIES, getDivisions } from '../../data/geo';
 import LocationPicker, { LocationPoint } from '../../components/ui/LocationPicker';
 import toast from 'react-hot-toast';
+import ImageUploadField from '../../components/payments/ImageUploadField';
+import { checkQrFile, uploadPaymentQr, uploadStoreImage, usePayT } from '../../lib/payments';
+
+/** Campos de imagen: se suben como archivo (nunca URL) y solo se envían si cambiaron. */
+const IMAGE_FIELDS = ['storeLogo', 'storeBanner', 'profileImage', 'paymentQrUrl'] as const;
 
 export default function SellerSettings() {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
+  const pt = usePayT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
@@ -40,7 +47,8 @@ export default function SellerSettings() {
     paymentQrUrl: '',
     freeShippingThreshold: '',
   });
-    const [loading, setLoading] = useState(false);
+  const [initialImages, setInitialImages] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
   const [verif, setVerif] = useState({ isVerified: false, isVerificationRequested: false, nit: '', note: '', sending: false });
   const requestVerification = async () => {
     if (!verif.nit.trim()) {
@@ -61,14 +69,14 @@ export default function SellerSettings() {
   const divisions = getDivisions(form.country);
 
   const uploadImage = async (file: File, field: 'profileImage' | 'storeLogo' | 'storeBanner') => {
+    const problem = checkQrFile(file);
+    if (problem) {
+      toast.error(pt(`qr.${problem}`));
+      return;
+    }
     setUploading(true);
-    const fd = new FormData();
-    fd.append('image', file);
     try {
-      const { data } = await api.post('/account/upload', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const url = data.data?.url ?? data.data?.fileUrl ?? data.data?.path;
+      const url = await uploadStoreImage(file);
       if (url) {
         setForm((f) => ({ ...f, [field]: url }));
         toast.success(t('seller.settings.toasts.profileImageReady'));
@@ -105,6 +113,12 @@ export default function SellerSettings() {
         paymentQrUrl: (user as any).paymentQrUrl || '',
         freeShippingThreshold: (user as any).freeShippingThreshold != null ? String((user as any).freeShippingThreshold) : '',
       });
+      setInitialImages({
+        storeLogo: (user as any).storeLogo || '',
+        storeBanner: (user as any).storeBanner || '',
+        profileImage: (user as any).profileImage || '',
+        paymentQrUrl: (user as any).paymentQrUrl || '',
+      });
       api
         .get('/seller/verification/status')
         .then((r) => {
@@ -124,7 +138,14 @@ export default function SellerSettings() {
   const save = async () => {
     setLoading(true);
     try {
-      await api.put('/seller/profile', form);
+      // Las imágenes solo viajan si cambiaron (una imagen antigua por enlace no se reenvía); vacío = quitarla (null).
+      const payload: Record<string, unknown> = { ...form };
+      for (const k of IMAGE_FIELDS) {
+        if (form[k] === (initialImages[k] ?? '')) delete payload[k];
+        else payload[k] = form[k] || null;
+      }
+      await api.put('/seller/profile', payload);
+      setInitialImages({ storeLogo: form.storeLogo, storeBanner: form.storeBanner, profileImage: form.profileImage, paymentQrUrl: form.paymentQrUrl });
       toast.success(t('seller.settings.toasts.settingsSaved'));
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -144,23 +165,25 @@ export default function SellerSettings() {
           <Grid item xs={12} display="flex" alignItems="center" gap={2}>
             <Box sx={{ position: 'relative', display: 'inline-block' }}>
               <Avatar
-                src={form.profileImage}
+                src={resolveImageUrl(form.profileImage) || undefined}
+                alt={t('seller.settings.profilePhotoLabel')}
                 sx={{ width: 72, height: 72, bgcolor: 'primary.main', fontSize: 28 }}
               >
-                {form.storeName?.[0]?.toUpperCase() ?? '🏪'}
+                {form.storeName?.[0]?.toUpperCase() ?? <StorefrontIcon />}
               </Avatar>
               <IconButton
                 size="small"
                 sx={{ position: 'absolute', bottom: 0, right: 0, bgcolor: 'primary.main', color: '#fff', '&:hover': { bgcolor: 'primary.dark' } }}
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
+                aria-label={t('seller.settings.profilePhotoLabel')}
               >
                 {uploading ? <CircularProgress size={14} color="inherit" /> : <PhotoCameraIcon fontSize="small" />}
               </IconButton>
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 hidden
                 onChange={(e) => {
                   const f = e.target.files?.[0];
@@ -224,18 +247,25 @@ export default function SellerSettings() {
             </TextField>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label={t('seller.settings.logoLabel')} value={form.storeLogo} onChange={(e) => setForm({ ...form, storeLogo: e.target.value })} fullWidth />
-            <Button component="label" size="small" disabled={uploading} sx={{ mt: 0.5, textTransform: 'none' }}>
-              {t('seller.settings.uploadImage')}
-              <input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f, 'storeLogo'); e.target.value = ''; }} />
-            </Button>
+            <ImageUploadField
+              label={t('seller.settings.logoLabel')}
+              help={pt('image.noLinks')}
+              value={form.storeLogo || null}
+              upload={uploadStoreImage}
+              onChange={(url) => setForm((f) => ({ ...f, storeLogo: url ?? '' }))}
+              previewAlt={t('seller.settings.logoLabel')}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField label={t('seller.settings.bannerLabel')} value={form.storeBanner} onChange={(e) => setForm({ ...form, storeBanner: e.target.value })} fullWidth />
-            <Button component="label" size="small" disabled={uploading} sx={{ mt: 0.5, textTransform: 'none' }}>
-              {t('seller.settings.uploadImage')}
-              <input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f, 'storeBanner'); e.target.value = ''; }} />
-            </Button>
+            <ImageUploadField
+              label={t('seller.settings.bannerLabel')}
+              help={pt('image.noLinks')}
+              value={form.storeBanner || null}
+              upload={uploadStoreImage}
+              onChange={(url) => setForm((f) => ({ ...f, storeBanner: url ?? '' }))}
+              previewAlt={t('seller.settings.bannerLabel')}
+              aspect="wide"
+            />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField label={t('seller.settings.cityLabel')} value={form.locationCity} onChange={(e) => setForm({ ...form, locationCity: e.target.value })} fullWidth />
@@ -319,10 +349,16 @@ export default function SellerSettings() {
             <Alert severity="info" sx={{ mb: 1 }}>
               {t('seller.settings.shippingLocationInfo')}
             </Alert>
-            <TextField label={t('seller.settings.paymentQrLabel')} value={form.paymentQrUrl} onChange={(e) => setForm({ ...form, paymentQrUrl: e.target.value })} fullWidth placeholder="https://img.example.com/mi-qr.png" />
-            <Typography variant="caption" color="text.secondary">
-              {t('seller.settings.paymentQrHelperText')}
-            </Typography>
+            <Box mb={2}>
+              <ImageUploadField
+                label={pt('qr.title')}
+                help={`${pt('qr.help')} ${pt('qr.saveHint')}`}
+                value={form.paymentQrUrl || null}
+                upload={uploadPaymentQr}
+                onChange={(url) => setForm((f) => ({ ...f, paymentQrUrl: url ?? '' }))}
+                previewAlt={pt('qr.previewAlt')}
+              />
+            </Box>
             <TextField
               label={t('seller.settings.freeShippingLabel')}
               type="number"
