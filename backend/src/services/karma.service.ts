@@ -69,7 +69,7 @@ export const karmaService = {
         await createNotification({
           userId: result.userId,
           type: 'FORUM_RANK_UP' as never,
-          title: `¡Nuevo rango: ${result.newTag}! 🏅`,
+          title: `¡Nuevo rango: ${result.newTag}!`,
           message: `Tu karma llegó a ${result.newKarma}. ¡Ahora eres ${result.newTag} en LaCASE!`,
           refType: 'FORUM_PROFILE',
           refId: profileId,

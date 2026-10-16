@@ -103,7 +103,7 @@ export const categorySchema = z.object({
     slug:        z.string().min(2).max(80).regex(/^[a-z0-9-]+$/),
     name:        z.string().min(2).max(80),
     description: z.string().max(300).optional(),
-    icon:        z.string().emoji().default('💬'),
+    icon:        z.string().trim().regex(/^[A-Za-z0-9_-]{1,40}$/, 'Ícono inválido').default('Forum'),
     color:       z.string().regex(/^#[0-9A-Fa-f]{6}$/).default('#FF6B35'),
     parentId:    z.number().int().positive().optional(),
     sortOrder:   z.number().int().default(0),

@@ -613,7 +613,7 @@ export async function createReply(userId: number, postId: number, body: string) 
         createNotification({
           userId: postAuthor.userId,
           type: 'FORUM_ANSWER' as never,
-          title: 'Nueva respuesta en tu pregunta 💬',
+          title: 'Nueva respuesta en tu pregunta',
           message: `${profile.forumUsername} respondió a "${post.title}"`,
           refType: 'FORUM_POST',
           refId: postId,
@@ -883,7 +883,7 @@ export async function acceptReply(params: {
         createNotification({
           userId: authorProfile.userId,
           type: 'FORUM_BEST' as never,
-          title: '¡Tu respuesta fue aceptada! 🏆',
+          title: '¡Tu respuesta fue aceptada!',
           message: `Tu respuesta a "${reply.post.title}" fue marcada como la mejor.`,
           refType: 'FORUM_ANSWER',
           refId: replyId,
@@ -1025,7 +1025,7 @@ export async function reportTarget(params: {
       createNotification({
         userId: mod.id,
         type: 'FORUM_REPORT' as never,
-        title: 'Contenido auto-ocultado 🚩',
+        title: 'Contenido auto-ocultado',
         message: `Un contenido acumuló ${count} reportes${isTrustReason ? ' de confiabilidad' : ''} y fue ocultado.`,
         refType: 'FORUM_REPORT',
         refId: report.id,

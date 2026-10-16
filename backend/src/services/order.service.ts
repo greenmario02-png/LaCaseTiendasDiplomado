@@ -263,7 +263,7 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
       await createNotification({
         userId: sellerId,
         type: 'NEW_ORDER',
-        title: '¡Nueva venta! 🎉',
+        title: '¡Nueva venta!',
         message: `Recibiste un pedido de ${totalItems} ítem(s) por ${order.total} Bs`,
         refType: 'order',
         refId: order.id,
@@ -512,7 +512,7 @@ export async function updateOrderStatus(sellerId: number, orderId: number, statu
   };
   const isPickup = order.fulfillmentType === 'PICKUP';
   const title = status === 'DELIVERED' && isPickup
-    ? `Tu pedido #${orderId} está listo para retirar 📦`
+    ? `Tu pedido #${orderId} está listo para retirar`
     : `Tu pedido #${orderId} ${statusLabels[status] ?? 'actualizado'}`;
   const message = status === 'DELIVERED' && isPickup
     ? `Tu pedido #${orderId} ya está listo para retirar en ${order.pickupAddress ?? 'la tienda'}.`
@@ -557,7 +557,7 @@ export async function confirmDelivery(buyerId: number, orderId: number) {
   await createNotification({
     userId: order.sellerId,
     type: 'ORDER_STATUS',
-    title: `Pedido #${orderId} confirmado 🎉`,
+    title: `Pedido #${orderId} confirmado`,
     message: 'El comprador confirmó la recepción. El pago de esta venta se liberó a tu balance.',
     refType: 'order',
     refId: orderId,
@@ -581,7 +581,7 @@ export async function updatePaymentStatus(sellerId: number, orderId: number, pay
     await createNotification({
       userId: order.buyerId,
       type: 'PAYMENT_VERIFIED',
-      title: 'Pago verificado ✅',
+      title: 'Pago verificado',
       message: `El pago de tu orden #${orderId} fue verificado. El vendedor preparará el envío.`,
       refType: 'order',
       refId: orderId,

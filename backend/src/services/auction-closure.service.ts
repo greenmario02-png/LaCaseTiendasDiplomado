@@ -114,7 +114,7 @@ export async function processAuctionClosures() {
       await createNotification({
         userId: winnerId,
         type: 'AUCTION_WON',
-        title: '¡Ganaste la subasta! 🎉',
+        title: '¡Ganaste la subasta!',
         message: `Ganaste "${auction.title}" por ${finalPrice} Bs. Tienes 48 horas para pagar la orden #${order.id} antes de que vuelva a subasta.`,
         refType: 'order',
         refId: order.id,
@@ -123,7 +123,7 @@ export async function processAuctionClosures() {
       await createNotification({
         userId: auction.sellerId,
         type: 'AUCTION_SOLD',
-        title: '¡Tu subasta se vendió! 🎉',
+        title: '¡Tu subasta se vendió!',
         message: `"${auction.title}" se vendió por ${finalPrice} Bs. El ganador tiene 48h para pagar.`,
         refType: 'auction',
         refId: auction.id,
@@ -160,7 +160,7 @@ export async function processAuctionClosures() {
         await createNotification({
           userId: auction.winnerId!,
           type: 'AUCTION_ENDED',
-          title: 'Perdiste la subasta por no pagar 😕',
+          title: 'Perdiste la subasta por no pagar',
           message: `No pagaste "${auction.title}" a tiempo. La subasta vuelve a estar activa.`,
           refType: 'auction',
           refId: auction.id,
@@ -193,7 +193,7 @@ export async function processAuctionClosures() {
         await createNotification({
           userId: bidderId,
           type: 'AUCTION_ENDED',
-          title: '¡La subasta volvió a estar activa! ⚡',
+          title: '¡La subasta volvió a estar activa!',
           message: `"${auction.title}" se relistó al mismo precio (${auction.currentPrice} Bs). Vuelve a pujar antes de que termine.`,
           refType: 'auction',
           refId: auction.id,

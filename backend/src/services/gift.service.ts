@@ -54,7 +54,7 @@ export async function evaluateGiftPromotions(
         const chosen = giftItems[0];
         gifts.push({
           productId: chosen.productId,
-          label: `🎁 Regalo: ${chosen.product.name}`,
+          label: `Regalo: ${chosen.product.name}`,
         });
       }
     }

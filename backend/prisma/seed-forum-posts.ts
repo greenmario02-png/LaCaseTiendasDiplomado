@@ -199,7 +199,7 @@ async function main() {
     });
   }
 
-  console.log(`✅ Foro poblado: ${created} preguntas nuevas, ${repliesCreated} respuestas.`);
+  console.log(`Foro poblado: ${created} preguntas nuevas, ${repliesCreated} respuestas.`);
 }
 
 main()

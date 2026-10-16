@@ -967,18 +967,19 @@ async function seedRbac() {
   }
 }
 
+// `icon`: clave semántica de ícono que dibujan la web y la app; nunca un emoji.
 const JOB_CATEGORIES = [
-  { name: 'Ventas y atención al cliente', slug: 'ventas-atencion-cliente', icon: '🛍️' },
-  { name: 'Logística y reparto', slug: 'logistica-reparto', icon: '🚚' },
-  { name: 'Administración y oficina', slug: 'administracion-oficina', icon: '🗂️' },
-  { name: 'Cocina y gastronomía', slug: 'cocina-gastronomia', icon: '🍳' },
-  { name: 'Construcción y oficios', slug: 'construccion-oficios', icon: '🔧' },
-  { name: 'Tecnología y soporte', slug: 'tecnologia-soporte', icon: '💻' },
-  { name: 'Limpieza y mantenimiento', slug: 'limpieza-mantenimiento', icon: '🧹' },
-  { name: 'Marketing y diseño', slug: 'marketing-diseno', icon: '🎨' },
-  { name: 'Educación y capacitación', slug: 'educacion-capacitacion', icon: '📚' },
-  { name: 'Seguridad', slug: 'seguridad', icon: '🛡️' },
-  { name: 'Otros', slug: 'otros-empleos', icon: '💼' },
+  { name: 'Ventas y atención al cliente', slug: 'ventas-atencion-cliente', icon: 'sales' },
+  { name: 'Logística y reparto', slug: 'logistica-reparto', icon: 'delivery' },
+  { name: 'Administración y oficina', slug: 'administracion-oficina', icon: 'office' },
+  { name: 'Cocina y gastronomía', slug: 'cocina-gastronomia', icon: 'chef' },
+  { name: 'Construcción y oficios', slug: 'construccion-oficios', icon: 'construction' },
+  { name: 'Tecnología y soporte', slug: 'tecnologia-soporte', icon: 'tech' },
+  { name: 'Limpieza y mantenimiento', slug: 'limpieza-mantenimiento', icon: 'cleaning' },
+  { name: 'Marketing y diseño', slug: 'marketing-diseno', icon: 'design' },
+  { name: 'Educación y capacitación', slug: 'educacion-capacitacion', icon: 'education' },
+  { name: 'Seguridad', slug: 'seguridad', icon: 'security' },
+  { name: 'Otros', slug: 'otros-empleos', icon: 'work' },
 ];
 
 async function seedJobCategories() {
@@ -1664,7 +1665,7 @@ async function main() {
     }
   }
 
-  console.log('✅ Seed completado');
+  console.log('Seed completado');
   console.log(`  Usuarios: ${customers.length + sellers.length + 1}`);
   console.log(`  Categorías: ${Object.keys(categoryMap).length}`);
   console.log(`  Productos: ${productIds.length}`);

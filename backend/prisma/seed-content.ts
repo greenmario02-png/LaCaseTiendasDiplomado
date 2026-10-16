@@ -333,7 +333,7 @@ async function seedUniversityCareers(profileIds: number[]) {
           slug,
           name: carrera.name,
           description: `Comunidad de estudiantes de ${carrera.name} de ${uni.name}.`,
-          icon: '🎓',
+          icon: 'School',
           color: '#6A1B9A',
           parentId: uniCategory.id,
           sortOrder: ci,

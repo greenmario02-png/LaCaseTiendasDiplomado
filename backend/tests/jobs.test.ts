@@ -349,3 +349,27 @@ describe('Vista admin de postulaciones', () => {
     expect(none.body.data.total).toBe(0);
   });
 });
+
+describe('Categorías de empleo: íconos como claves, nunca emojis', () => {
+  it('acepta una clave, rechaza texto libre y descarta un emoji heredado', async () => {
+    const admin = await getAdminToken();
+    const name = `Cat icono ${Date.now()}`;
+    const ok = await request(app).post('/api/admin/job-categories').set('Authorization', `Bearer ${admin}`).send({ name, icon: 'delivery' });
+    expect(ok.status).toBeLessThan(300);
+    const id = ok.body.data.id as number;
+    expect((await prisma.jobCategory.findUniqueOrThrow({ where: { id } })).icon).toBe('delivery');
+    const bad = await request(app).put(`/api/admin/job-categories/${id}`).set('Authorization', `Bearer ${admin}`).send({ name, icon: '<b>x</b>' });
+    expect(bad.status).toBe(400);
+    const legacy = await request(app).put(`/api/admin/job-categories/${id}`).set('Authorization', `Bearer ${admin}`).send({ name, icon: '\u{1F4BC}' });
+    expect(legacy.status).toBeLessThan(300);
+    expect((await prisma.jobCategory.findUniqueOrThrow({ where: { id } })).icon).toBeNull();
+    await prisma.jobCategory.delete({ where: { id } });
+  });
+
+  it('el seed guarda claves de ícono en las categorías de empleo y del foro', async () => {
+    const jobs = await prisma.jobCategory.findMany({ where: { slug: { in: ['logistica-reparto', 'otros-empleos'] } } });
+    expect(jobs.map((j) => j.icon).sort()).toEqual(['delivery', 'work']);
+    const forum = await prisma.forumCategory.findFirst({ where: { slug: 'general' } });
+    expect(forum?.icon).toBe('Forum');
+  });
+});

@@ -22,7 +22,7 @@ const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {
   // En producción fallamos rápido; en desarrollo mostramos los errores claramente
   const issues = parsed.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n');
-  console.error('❌ Configuración de entorno inválida:\n' + issues);
+  console.error('Configuración de entorno inválida:\n' + issues);
   process.exit(1);
 }
 

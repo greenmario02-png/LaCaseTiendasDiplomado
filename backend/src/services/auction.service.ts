@@ -216,7 +216,7 @@ export async function buyNow(auctionId: number, buyerId: number) {
     await createNotification({
       userId: auction.sellerId,
       type: 'AUCTION_SOLD',
-      title: '¡Tu subasta se vendió! 🎉',
+      title: '¡Tu subasta se vendió!',
       message: `"${auction.title}" se vendió por ${price} Bs con compra directa.`,
       refType: 'auction',
       refId: auctionId,
@@ -224,7 +224,7 @@ export async function buyNow(auctionId: number, buyerId: number) {
     await createNotification({
       userId: buyerId,
       type: 'AUCTION_WON',
-      title: '¡Compraste con Buy It Now! 🎉',
+      title: '¡Compraste con Buy It Now!',
       message: `Compraste "${auction.title}" por ${price} Bs. Coordiná con el vendedor.`,
       refType: 'auction',
       refId: auctionId,
@@ -270,8 +270,8 @@ export async function notifyOutbid(auctionId: number, oldWinnerId: number | null
   await createNotification({
     userId: oldWinnerId,
     type: 'OUTBID',
-    title: '¡La puja se calentó! 🔥',
-    message: `Alguien superó tu oferta en "${auction.title}". Ahora está en ${newBid} Bs — vuelve a pujar y no pierdas tu lugar. 💪`,
+    title: '¡La puja se calentó!',
+    message: `Alguien superó tu oferta en "${auction.title}". Ahora está en ${newBid} Bs — vuelve a pujar y no pierdas tu lugar.`,
     refType: 'auction',
     refId: auctionId,
   });

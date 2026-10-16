@@ -65,7 +65,7 @@ async function buildEvents(storeId: number | undefined, from: Date, to: Date) {
 
   const auctionEvents = auctions.map((a) => ({
     id: `auction-${a.id}`,
-    title: `🔨 ${a.title}`,
+    title: `${a.title}`,
     start: a.endDate.toISOString(),
     allDay: true,
     backgroundColor: '#9c27b0',

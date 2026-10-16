@@ -12,7 +12,7 @@ export const forumBotService = {
 
     if (!keywords.length) {
       await this.createBotReply(postId,
-        '🤖 No pude extraer palabras clave para buscar. Por favor sé más específico en tu pregunta.');
+        'No pude extraer palabras clave para buscar. Por favor sé más específico en tu pregunta.');
       return;
     }
 
@@ -40,8 +40,8 @@ export const forumBotService = {
 
     let body: string;
     if (products.length === 0) {
-      body = `🤖 **Bot LaCASE Multitienda** — No encontré "${keywords.join(', ')}" en la multitienda.\n\n`
-        + 'Quizás algún miembro de la comunidad lo sepa 🙏\n\n'
+      body = `**Bot LaCASE Multitienda** — No encontré "${keywords.join(', ')}" en la multitienda.\n\n`
+        + 'Quizás algún miembro de la comunidad lo sepa.\n\n'
         + '*[Respuesta automática — puedes reportarla si no es útil]*';
     } else {
       const lines = products.map((p) =>
@@ -50,8 +50,8 @@ export const forumBotService = {
         + (p.seller?.locationCity ? ` (${p.seller.locationCity})` : ''),
       );
       const header = type === 'PRECIO'
-        ? '🤖 **Bot LaCASE** — Encontré estos precios en la multitienda:\n\n'
-        : '🤖 **Bot LaCASE** — Estos productos tienen stock disponible:\n\n';
+        ? '**Bot LaCASE** — Encontré estos precios en la multitienda:\n\n'
+        : '**Bot LaCASE** — Estos productos tienen stock disponible:\n\n';
       body = header + lines.join('\n')
         + '\n\n*[Respuesta automática del sistema — puede no estar actualizada]*';
     }

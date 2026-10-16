@@ -60,7 +60,12 @@ export const moderateJobSchema = z.object({
 export const jobCategorySchema = z.object({
   body: z.object({
     name: z.string().trim().min(2).max(60),
-    icon: z.string().trim().max(10).optional().nullable(),
+    // Clave semántica de ícono (la dibujan la web y la app); nunca un emoji.
+    // Un emoji heredado guardado en la base se descarta (queda el ícono genérico) en vez de bloquear la edición.
+    icon: z.preprocess(
+      (v) => (typeof v === 'string' && /\p{Extended_Pictographic}/u.test(v) ? null : v),
+      z.string().trim().regex(/^[a-z0-9_-]{1,30}$/, 'Ícono inválido').optional().nullable(),
+    ),
     sortOrder: z.coerce.number().int().min(0).max(999).optional(),
     isActive: z.boolean().optional(),
   }),

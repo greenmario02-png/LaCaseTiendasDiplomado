@@ -363,7 +363,7 @@ export async function updateUser(req: AuthRequest, res: Response, next: NextFunc
       await createNotification({
         userId,
         type: 'SELLER_APPROVED',
-        title: locationVerified ? '📍 Ubicación verificada' : 'Ubicación pendiente de verificación',
+        title: locationVerified ? 'Ubicación verificada' : 'Ubicación pendiente de verificación',
         message: locationVerified
           ? 'El administrador comprobó la ubicación física de tu tienda. Ya figura como verificada.'
           : 'El administrador marcó tu ubicación como no verificada.',
@@ -377,7 +377,7 @@ export async function updateUser(req: AuthRequest, res: Response, next: NextFunc
       await createNotification({
         userId,
         type: isApproved ? 'SELLER_APPROVED' : 'SELLER_REJECTED',
-        title: isApproved ? '¡Tu tienda fue aprobada! 🎉' : 'Tu tienda fue rechazada',
+        title: isApproved ? '¡Tu tienda fue aprobada!' : 'Tu tienda fue rechazada',
         message: isApproved
           ? 'Ya puedes publicar productos en MultiTienda.'
           : 'Tu solicitud de tienda fue rechazada. Contactá al administrador.',
@@ -606,7 +606,7 @@ export async function moderateProduct(req: AuthRequest, res: Response, next: Nex
     await createNotification({
       userId: product.sellerId,
       type: approve ? 'PRODUCT_APPROVED' : 'PRODUCT_REJECTED',
-      title: approve ? 'Producto aprobado ✅' : 'Producto rechazado',
+      title: approve ? 'Producto aprobado' : 'Producto rechazado',
       message: approve
         ? `"${product.name}" fue aprobado y ya está visible en el catálogo.`
         : `"${product.name}" fue rechazado${reason ? `: ${reason}` : '. Corrígelo y vuelve a enviarlo.'}`,
@@ -667,7 +667,7 @@ export async function updateOrderStatus(req: AuthRequest, res: Response, next: N
       await createNotification({
         userId: order.buyerId,
         type: 'ORDER_STATUS',
-        title: `Tu pedido #${orderId} está listo para retirar 📦`,
+        title: `Tu pedido #${orderId} está listo para retirar`,
         message: `Tu pedido #${orderId} ya está listo para retirar en ${order.pickupAddress ?? 'la tienda'}.`,
         refType: 'order',
         refId: orderId,
