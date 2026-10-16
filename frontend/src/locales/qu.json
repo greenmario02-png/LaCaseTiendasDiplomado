@@ -1354,7 +1354,7 @@
       "timeToPay": "⏱️ {{hours}}h qhipanki pagananaykipaq",
       "title": "Subastasniykuna",
       "wonBy": "Atiparqan: {{firstName}}",
-      "wonFor": "{{price}} Bs-wan atipasqa"
+      "wonFor": "{{price}}-wan atipasqa"
     }
   },
   "auth": {
@@ -2240,7 +2240,7 @@
       "notAsDescribed": "Mana willasqawan tupanchu",
       "other": "Huk imayna"
     },
-    "refund": "Kutichiy: Bs {{amount}}",
+    "refund": "Kutichiy: {{amount}}",
     "requestNote": "Rantikuyta chaskisqayki hinaspa pago chiqapchasqa kaqtinllam kutichiyta mañakuyta atinki.",
     "sellerResponse": "Ranqhaqpa kutichiynin: {{response}}",
     "status": {
@@ -2351,7 +2351,7 @@
         "giftHint": "Rantiqqa kay chaninta qhatuykipi gastayta atin. Aswan pisita gastan chayqa, saldota efectivopi kutichinki.",
         "maxUsesLabel": "Llamk'achiykunapa hatun kaynin (mana obligatorio)",
         "minSpendLabel": "Pisi rantikuy (Bs, mana obligatorio)",
-        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productOptionLabel": "{{name}} — {{price}}",
         "productsLabel": "Llamk'ananpaq ranqhanakuna (ch'usaq = llapan)",
         "save": "Waqaychay",
         "typeLabel": "Kuponpa rikch'aqnin",
@@ -2497,7 +2497,7 @@
         "units": "Huk ranqhanapa achkanmanta"
       },
       "triggerText": {
-        "amount": "{{amount}} Bs-manta rantikuykuna",
+        "amount": "{{amount}}-manta rantikuykuna",
         "defaultProduct": "ranqhana",
         "defaultProductGeneric": "huk ranqhana",
         "product": "{{product}}-ta rantispa",
@@ -3027,7 +3027,7 @@
         "title": "Kutichiyta kutichiy"
       },
       "empty": "Manam kutichiy mañakuyniykikuna kanchu.",
-      "itemAmount": "Itempa chaninnin: Bs {{amount}}",
+      "itemAmount": "Itempa chaninnin: {{amount}}",
       "reasons": {
         "noCoincideDescripcion": "Mana willasqawan tupanchu",
         "otro": "Huk imayna",
@@ -3145,7 +3145,7 @@
     "breadcrumbHome": "Qallariy",
     "close": "Wisq'ay",
     "contact": "Rimanakuy",
-    "freeShippingFrom": "Mana qullqiyuq apachiy {{amount}} Bs-manta",
+    "freeShippingFrom": "Mana qullqiyuq apachiy {{amount}}-manta",
     "locationNotSpecified": "Tiyasqa mana willasqa",
     "locationVerified": "Administradorwan chiqapchasqa tiyasqa (qhatu allpapi kasqan chiqapchasqa)",
     "monthlySalesCount": "{{count}} ranqhaykuna kay killapi",

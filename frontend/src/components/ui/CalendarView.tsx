@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { api, getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useMoney } from '../../hooks/useMoney';
 
 interface CalendarEventData {
   id: string;
@@ -47,6 +48,7 @@ const LEGEND: Array<{ label: string; color: string }> = [
 ];
 
 export default function CalendarView({ endpoint }: CalendarViewProps) {
+  const money = useMoney();
   const calendarRef = useRef<CalendarRef | null>(null);
   const [events, setEvents] = useState<CalendarEventData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,7 +140,7 @@ export default function CalendarView({ endpoint }: CalendarViewProps) {
                     Cierre: {new Date(detail.start).toLocaleString('es-BO')}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Precio actual: Bs {Number(detail.extendedProps.current ?? 0).toLocaleString('es-BO')}
+                    Precio actual: {money(detail.extendedProps.current ?? 0)}
                   </Typography>
                 </>
               )}
@@ -149,7 +151,7 @@ export default function CalendarView({ endpoint }: CalendarViewProps) {
                     Órdenes: {detail.extendedProps.count ?? 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total: Bs {Number(detail.extendedProps.total ?? 0).toLocaleString('es-BO')}
+                    Total: {money(detail.extendedProps.total ?? 0)}
                   </Typography>
                 </>
               )}

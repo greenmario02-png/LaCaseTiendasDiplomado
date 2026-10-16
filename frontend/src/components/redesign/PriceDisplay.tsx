@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { useUnifiedTokens } from '../../theme';
-import { useCurrencyStore, convertPrice, getRate } from '../../stores/currencyStore';
+import { useCurrencyStore, convertPrice, currencySymbol, displayCurrency } from '../../stores/currencyStore';
 
 interface PriceDisplayProps {
   price: number;
@@ -28,9 +28,9 @@ export function PriceDisplay({ price, salePrice, priceUsd, currency }: PriceDisp
   const currencies = useCurrencyStore((s) => s.currencies);
   const selected = useCurrencyStore((s) => s.selected);
 
-  const target = currency ?? selected ?? 'BOB';
-  const rate = getRate(currencies, target);
-  const symbol = target === 'BOB' ? 'Bs' : (currencies.find((c) => c.code === target)?.symbol ?? target);
+  // Moneda efectiva: si la tasa aún no se conoce se muestra en Bs (nunca un símbolo ajeno sobre un monto sin convertir).
+  const { code: target, rate } = displayCurrency(currencies, currency ?? selected ?? 'BOB');
+  const symbol = currencySymbol(target, currencies);
 
   const conv = (n: number) => convertPrice(n, target, rate);
   const shown = conv(salePrice ?? price);

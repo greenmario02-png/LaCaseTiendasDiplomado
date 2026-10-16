@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import { useCurrencyStore, convertPrice, formatMoney, getRate } from '../../stores/currencyStore';
+import { useMoney } from '../../hooks/useMoney';
 
 interface Props {
   amount: string | number;
@@ -11,14 +11,10 @@ interface Props {
 
 /** Muestra un monto (guardado en Bs) en la moneda seleccionada por el usuario */
 export default function MoneyText({ amount, variant = 'body2', fontWeight, className, color }: Props) {
-  const currencies = useCurrencyStore((s) => s.currencies);
-  const selected = useCurrencyStore((s) => s.selected);
-  const rate = getRate(currencies, selected);
-  const converted = convertPrice(Number(amount), selected, rate);
-
+  const money = useMoney();
   return (
     <Typography variant={variant} fontWeight={fontWeight} className={className} color={color}>
-      {formatMoney(converted, selected)}
+      {money(amount)}
     </Typography>
   );
 }

@@ -58,9 +58,53 @@ export function convertPrice(amountBs: number, currency: string, rate: number): 
   return amountBs / rate;
 }
 
-export function formatMoney(amount: number, currency: string): string {
-  if (currency === 'USD') {
-    return `US$ ${amount.toFixed(2)}`;
-  }
-  return `Bs ${amount.toLocaleString('es-BO', { maximumFractionDigits: 2 })}`;
+/**
+ * Denominación de cada moneda (las mismas que ofrece la calculadora de divisas). Si la API trae otro símbolo, manda la API.
+ * Antes solo USD tenía denominación propia y el resto (EUR, ARS, ...) se mostraba como «Bs» aunque el monto ya estaba convertido.
+ */
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  BOB: 'Bs',
+  USD: 'US$',
+  EUR: '€',
+  JPY: '¥',
+  ARS: 'AR$',
+  PEN: 'S/',
+  CLP: 'CL$',
+  UYU: '$U',
+  BRL: 'R$',
+  CNY: '¥C',
+  PYG: '₲',
+  COP: 'CO$',
+  USDT: 'USDT',
+};
+/** Monedas sin decimales en el uso diario. */
+const ZERO_DECIMALS = new Set(['JPY', 'CLP', 'PYG']);
+const LOCALE = 'es-BO';
+
+export function currencySymbol(code: string, currencies: Currency[] = []): string {
+  return currencies.find((c) => c.code === code)?.symbol || CURRENCY_SYMBOLS[code] || code;
+}
+
+export function formatMoney(amount: number, currency: string, currencies: Currency[] = []): string {
+  const n = Number.isFinite(amount) ? amount : 0;
+  const symbol = currencySymbol(currency, currencies);
+  if (currency === 'BOB') return `${symbol} ${n.toLocaleString(LOCALE, { maximumFractionDigits: 2 })}`;
+  const digits = ZERO_DECIMALS.has(currency) ? 0 : 2;
+  return `${symbol} ${n.toLocaleString(LOCALE, { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+}
+
+/**
+ * Moneda en la que se puede mostrar: la elegida si ya conocemos su tasa; si no (catálogo de monedas aún sin cargar o moneda
+ * retirada), Bs. Así nunca se muestra «US$ 100» para un precio de Bs 100 sin convertir.
+ */
+export function displayCurrency(currencies: Currency[], selected: string): { code: string; rate: number } {
+  if (selected === 'BOB') return { code: 'BOB', rate: 1 };
+  const c = currencies.find((x) => x.code === selected);
+  return c && Number.isFinite(c.rate) && c.rate > 0 ? { code: c.code, rate: c.rate } : { code: 'BOB', rate: 1 };
+}
+
+/** Formatea un monto guardado en Bs en la moneda elegida (función pura: base de useMoney/MoneyText/PriceDisplay). */
+export function formatFromBs(amountBs: number | string, currencies: Currency[], selected: string): string {
+  const { code, rate } = displayCurrency(currencies, selected);
+  return formatMoney(convertPrice(Number(amountBs), code, rate), code, currencies);
 }

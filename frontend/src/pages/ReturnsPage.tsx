@@ -4,9 +4,11 @@ import { Package, Coins } from 'lucide-react';
 import { Box, Typography, Card, CardContent, Chip, Alert, Grid, CircularProgress, Avatar, Stack } from '@mui/material';
 import { SecondaryButton } from '../components/redesign/Buttons';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
+import { useMoney } from '../hooks/useMoney';
 
 export default function ReturnsPage() {
   const { t: tr } = useTranslation();
+  const money = useMoney();
   const STATUS: Record<string, { label: string; color: any }> = {
     PENDING: { label: tr('returns.status.pending'), color: 'warning' },
     APPROVED: { label: tr('returns.status.approved'), color: 'info' },
@@ -99,7 +101,7 @@ export default function ReturnsPage() {
                     )}
                     {r.refundAmount != null && (
                       <Typography variant="body2" fontWeight={700} color="success.main" mt={0.5}>
-                        {tr('returns.refund', { amount: Number(r.refundAmount).toLocaleString('es-BO') })}
+                        {tr('returns.refund', { amount: money(r.refundAmount) })}
                       </Typography>
                     )}
                   </Grid>

@@ -19,8 +19,12 @@ vi.mock('../../hooks/useMoney', () => ({
   useMoney: () => (n: number) => `${Number(n).toFixed(2)} Bs`,
 }));
 
-vi.mock('../../stores/currencyStore', () => ({
-  useCurrencyStore: () => ({ selected: 'Bs' }),
+vi.mock('../../stores/currencyStore', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../stores/currencyStore')>()),
+  useCurrencyStore: (sel?: (s: { selected: string; currencies: unknown[] }) => unknown) => {
+    const s = { selected: 'BOB', currencies: [] };
+    return sel ? sel(s) : s;
+  },
 }));
 
 vi.mock('../../stores/authStore', () => ({

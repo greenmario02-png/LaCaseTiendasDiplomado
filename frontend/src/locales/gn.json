@@ -1354,7 +1354,7 @@
       "timeToPay": "⏱️ Opyta ndéve {{hours}}h ehepyme'ẽ hağua",
       "title": "Che subastakuéra",
       "wonBy": "Ho'u: {{firstName}}",
-      "wonFor": "Ho'upyre {{price}} Bs reheve"
+      "wonFor": "Ho'upyre {{price}} reheve"
     }
   },
   "auth": {
@@ -2240,7 +2240,7 @@
       "notAsDescribed": "Ndojojái descripción reheve",
       "other": "Ambue mba'ére"
     },
-    "refund": "Jehepyme'ẽ jevy: Bs {{amount}}",
+    "refund": "Jehepyme'ẽ jevy: {{amount}}",
     "requestNote": "Ikatu ejerure jevyuka ehupyty rire jogua jehepyme'ẽ verificapyre reheve.",
     "sellerResponse": "Vendehára mbohovái: {{response}}",
     "status": {
@@ -2351,7 +2351,7 @@
         "giftHint": "Jogua hára ikatu oiporu ko hepy nde tienda-pe. Oiporu sa'ive ramo, embou jey saldo pirapipe.",
         "maxUsesLabel": "Jeporu papapy (ndahekotevẽiva)",
         "minSpendLabel": "Pedido michĩvéva (Bs, ndahekotevẽiva)",
-        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productOptionLabel": "{{name}} — {{price}}",
         "productsLabel": "Mba'e oñemoĩháva (nandi = opavave)",
         "save": "Ñongatu",
         "typeLabel": "Cupón mba'éichapa",
@@ -2497,7 +2497,7 @@
         "units": "Hetakue mba'e rupi"
       },
       "triggerText": {
-        "amount": "Compras desde {{amount}} Bs",
+        "amount": "Compras desde {{amount}}",
         "defaultProduct": "mba'e",
         "defaultProductGeneric": "peteĩ mba'e",
         "product": "Comprando {{product}}",
@@ -3027,7 +3027,7 @@
         "title": "Embohovái jevyuka"
       },
       "empty": "Ndereguerekói jerure jevyuka.",
-      "itemAmount": "Monto del item: Bs {{amount}}",
+      "itemAmount": "Monto del item: {{amount}}",
       "reasons": {
         "noCoincideDescripcion": "Ndojojái descripción reheve",
         "otro": "Ambue mba'ére",
@@ -3145,7 +3145,7 @@
     "breadcrumbHome": "Ñepyrũha",
     "close": "Mboty",
     "contact": "Eñemongeta",
-    "freeShippingFrom": "Ñemondo rei {{amount}} Bs guive",
+    "freeShippingFrom": "Ñemondo rei {{amount}} guive",
     "locationNotSpecified": "Renda ndojehechaukái",
     "locationVerified": "Renda oñeverifica administrador rupi (tienda ojehecha añetehápe)",
     "monthlySalesCount": "{{count}} vende ko jasýpe",

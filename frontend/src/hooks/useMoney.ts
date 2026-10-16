@@ -1,13 +1,19 @@
-import { useCurrencyStore, convertPrice, formatMoney, getRate } from '../stores/currencyStore';
+import { useCurrencyStore, displayCurrency, currencySymbol, formatFromBs } from '../stores/currencyStore';
 
-/** Hook que devuelve una función para formatear montos (guardados en Bs) en la moneda seleccionada */
+/**
+ * ÚNICO punto de formateo de montos en la web (doc 61): recibe montos guardados en Bs y los muestra convertidos y con la
+ * denominación de la moneda elegida (Bs, US$, €, ...). No usar `Bs ${...}` ni toFixed sueltos para mostrar precios.
+ */
 export function useMoney() {
   const currencies = useCurrencyStore((s) => s.currencies);
   const selected = useCurrencyStore((s) => s.selected);
-  const rate = getRate(currencies, selected);
+  return (amount: string | number | null | undefined) => formatFromBs(amount ?? 0, currencies, selected);
+}
 
-  return (amount: string | number) => {
-    const converted = convertPrice(Number(amount), selected, rate);
-    return formatMoney(converted, selected);
-  };
+/** Moneda efectiva y su denominación (para etiquetas como «Precio (US$)»). */
+export function useCurrencyLabel() {
+  const currencies = useCurrencyStore((s) => s.currencies);
+  const selected = useCurrencyStore((s) => s.selected);
+  const { code } = displayCurrency(currencies, selected);
+  return { code, symbol: currencySymbol(code, currencies) };
 }

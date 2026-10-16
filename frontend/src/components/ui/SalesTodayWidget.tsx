@@ -5,6 +5,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import { api } from '../../services/api';
 import CountdownTimer from './CountdownTimer';
 import { vision } from '../../theme/vision';
+import { useMoney } from '../../hooks/useMoney';
 
 interface SalesTodayProduct {
   productId: number;
@@ -34,6 +35,7 @@ interface SalesTodayWidgetProps {
  * y promociones activas con cuenta regresiva (C3 + C5).
  */
 export default function SalesTodayWidget({ endpoint, showPromotions = true, dark = false }: SalesTodayWidgetProps) {
+  const money = useMoney();
   const [products, setProducts] = useState<SalesTodayProduct[]>([]);
   const [promotions, setPromotions] = useState<ActivePromotion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export default function SalesTodayWidget({ endpoint, showPromotions = true, dark
   }, [endpoint]);
 
   const discountLabel = (p: ActivePromotion) =>
-    p.discountType === 'PERCENTAGE' ? `${Number(p.discountValue)}%` : `Bs ${Number(p.discountValue)}`;
+    p.discountType === 'PERCENTAGE' ? `${Number(p.discountValue)}%` : money(p.discountValue);
 
   return (
     <>

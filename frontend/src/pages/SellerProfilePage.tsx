@@ -41,6 +41,7 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import { api, getErrorMessage } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
+import { useMoney } from '../hooks/useMoney';
 import { ProductCard } from '../components/redesign/ProductCard';
 import { EmptyState } from '../components/redesign/States';
 import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
@@ -90,6 +91,7 @@ interface SellerData {
 
 export default function SellerProfilePage() {
   const { t: tr } = useTranslation();
+  const money = useMoney();
   const { id } = useParams();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
@@ -247,7 +249,7 @@ export default function SellerProfilePage() {
                 <Chip size="small" icon={<GroupIcon />} label={tr('sellerProfile.activeProductsCount', { count: seller.activeCount ?? 0 })} />
                 {seller.monthlySales > 0 && <Chip size="small" label={tr('sellerProfile.monthlySalesCount', { count: seller.monthlySales })} />}
                 {seller.freeShippingThreshold && Number(seller.freeShippingThreshold) > 0 && (
-                  <Chip size="small" color="success" label={tr('sellerProfile.freeShippingFrom', { amount: seller.freeShippingThreshold })} />
+                  <Chip size="small" color="success" label={tr('sellerProfile.freeShippingFrom', { amount: money(seller.freeShippingThreshold) })} />
                 )}
               </Stack>
             </Box>
@@ -547,7 +549,7 @@ export default function SellerProfilePage() {
                   </Box>
                   <Box display="flex" justifyContent="space-between" mt={0.5}>
                     <Typography variant="body2" color="text.secondary">{tr('sellerProfile.sales.monthRevenue')}</Typography>
-                    <Typography variant="body2" fontWeight={700}>{tr('sellerProfile.amountBs', { amount: Number(overview?.storeStats?.monthSales ?? 0).toLocaleString('es-BO') })}</Typography>
+                    <Typography variant="body2" fontWeight={700}>{money(overview?.storeStats?.monthSales ?? 0)}</Typography>
                   </Box>
                   <Typography variant="subtitle2" fontWeight={700} mt={2}>{tr('sellerProfile.sales.lastSales')}</Typography>
                   {(overview?.storeStats?.lastOrders ?? []).length === 0 ? (
@@ -556,7 +558,7 @@ export default function SellerProfilePage() {
                     (overview?.storeStats?.lastOrders ?? []).slice(0, 5).map((o: any) => (
                       <Box key={o.id} display="flex" justifyContent="space-between" alignItems="center" mt={0.5}>
                         <Typography variant="caption" noWrap sx={{ maxWidth: '60%' }}>{o.productName}</Typography>
-                        <Typography variant="caption" fontWeight={700}>{tr('sellerProfile.amountBs', { amount: Number(o.total).toLocaleString('es-BO') })}</Typography>
+                        <Typography variant="caption" fontWeight={700}>{money(o.total)}</Typography>
                       </Box>
                     ))
                   )}

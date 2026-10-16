@@ -1354,7 +1354,7 @@
       "timeToPay": "⏱️ Te quedan {{hours}}h para pagar",
       "title": "Mis subastas",
       "wonBy": "Ganó: {{firstName}}",
-      "wonFor": "Ganada por {{price}} Bs"
+      "wonFor": "Ganada por {{price}}"
     }
   },
   "auth": {
@@ -2240,7 +2240,7 @@
       "notAsDescribed": "No coincide con la descripción",
       "other": "Otro motivo"
     },
-    "refund": "Reembolso: Bs {{amount}}",
+    "refund": "Reembolso: {{amount}}",
     "requestNote": "Solo puedes solicitar una devolución después de recibir la compra con el pago verificado.",
     "sellerResponse": "Respuesta del vendedor: {{response}}",
     "status": {
@@ -2351,7 +2351,7 @@
         "giftHint": "El comprador puede gastar este monto en tu tienda. Si gasta menos, le devuelves el saldo en efectivo.",
         "maxUsesLabel": "Límite de usos (opcional)",
         "minSpendLabel": "Pedido mínimo (Bs, opcional)",
-        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productOptionLabel": "{{name}} — {{price}}",
         "productsLabel": "Productos a los que aplica (vacío = todos)",
         "save": "Guardar",
         "typeLabel": "Tipo de cupón",
@@ -2497,7 +2497,7 @@
         "units": "Por cantidad de un producto"
       },
       "triggerText": {
-        "amount": "Compras desde {{amount}} Bs",
+        "amount": "Compras desde {{amount}}",
         "defaultProduct": "producto",
         "defaultProductGeneric": "un producto",
         "product": "Comprando {{product}}",
@@ -3027,7 +3027,7 @@
         "title": "Responder devolución"
       },
       "empty": "No tienes solicitudes de devolución.",
-      "itemAmount": "Monto del item: Bs {{amount}}",
+      "itemAmount": "Monto del item: {{amount}}",
       "reasons": {
         "noCoincideDescripcion": "No coincide con la descripción",
         "otro": "Otro motivo",
@@ -3147,7 +3147,7 @@
     "breadcrumbHome": "Inicio",
     "close": "Cerrar",
     "contact": "Contactar",
-    "freeShippingFrom": "Envío gratis desde {{amount}} Bs",
+    "freeShippingFrom": "Envío gratis desde {{amount}}",
     "locationNotSpecified": "Ubicación no especificada",
     "locationVerified": "Ubicación verificada por el administrador (tienda física comprobada)",
     "monthlySalesCount": "{{count}} ventas este mes",

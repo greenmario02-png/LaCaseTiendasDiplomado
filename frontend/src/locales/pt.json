@@ -1354,7 +1354,7 @@
       "timeToPay": "⏱️ Faltam {{hours}}h para pagar",
       "title": "Meus leilões",
       "wonBy": "Venceu: {{firstName}}",
-      "wonFor": "Vencido por {{price}} Bs"
+      "wonFor": "Vencido por {{price}}"
     }
   },
   "auth": {
@@ -2240,7 +2240,7 @@
       "notAsDescribed": "Não corresponde à descrição",
       "other": "Outro motivo"
     },
-    "refund": "Reembolso: Bs {{amount}}",
+    "refund": "Reembolso: {{amount}}",
     "requestNote": "Você só pode solicitar uma devolução após receber a compra com o pagamento verificado.",
     "sellerResponse": "Resposta do vendedor: {{response}}",
     "status": {
@@ -2351,7 +2351,7 @@
         "giftHint": "O comprador pode gastar esse valor na sua loja. Se gastar menos, você devolve o saldo em dinheiro.",
         "maxUsesLabel": "Limite de usos (opcional)",
         "minSpendLabel": "Pedido mínimo (Bs, opcional)",
-        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productOptionLabel": "{{name}} — {{price}}",
         "productsLabel": "Produtos aos quais se aplica (vazio = todos)",
         "save": "Salvar",
         "typeLabel": "Tipo de cupom",
@@ -2497,7 +2497,7 @@
         "units": "Por quantidade de um produto"
       },
       "triggerText": {
-        "amount": "Compras a partir de {{amount}} Bs",
+        "amount": "Compras a partir de {{amount}}",
         "defaultProduct": "produto",
         "defaultProductGeneric": "um produto",
         "product": "Comprando {{product}}",
@@ -3027,7 +3027,7 @@
         "title": "Responder devolução"
       },
       "empty": "Você não tem solicitações de devolução.",
-      "itemAmount": "Valor do item: Bs {{amount}}",
+      "itemAmount": "Valor do item: {{amount}}",
       "reasons": {
         "noCoincideDescripcion": "Não corresponde à descrição",
         "otro": "Outro motivo",
@@ -3145,7 +3145,7 @@
     "breadcrumbHome": "Início",
     "close": "Fechar",
     "contact": "Contatar",
-    "freeShippingFrom": "Frete grátis a partir de {{amount}} Bs",
+    "freeShippingFrom": "Frete grátis a partir de {{amount}}",
     "locationNotSpecified": "Localização não especificada",
     "locationVerified": "Localização verificada pelo administrador (loja física comprovada)",
     "monthlySalesCount": "{{count}} vendas este mês",

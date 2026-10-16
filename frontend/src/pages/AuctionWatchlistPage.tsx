@@ -249,7 +249,7 @@ export default function AuctionWatchlistPage() {
                           {a.title}
                         </Typography>
                         <Typography color="text.secondary" gutterBottom>
-                          {tr('auctions.watchlist.wonFor', { price: Number(a.currentPrice).toLocaleString('es-BO', { maximumFractionDigits: 0 }) })}
+                          {tr('auctions.watchlist.wonFor', { price: money(a.currentPrice) })}
                         </Typography>
                         {needsPayment ? (
                           <>

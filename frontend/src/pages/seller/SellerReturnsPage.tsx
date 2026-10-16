@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
 import { api, getErrorMessage } from '../../services/api';
 import { resolveImageUrl } from '../../services/api';
+import { useMoney } from '../../hooks/useMoney';
 
 const STATUS_META: Record<string, { key: string; color: any }> = {
   PENDING: { key: 'pending', color: 'warning' },
@@ -24,6 +25,7 @@ const REASON_KEYS: Record<string, string> = {
 
 export default function SellerReturnsPage() {
   const { t } = useTranslation();
+  const money = useMoney();
   const [returns, setReturns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -112,7 +114,7 @@ export default function SellerReturnsPage() {
                       </Typography>
                     )}
                     <Typography variant="body2" mt={0.5}>
-                      {t('seller.returns.itemAmount', { amount: Number(r.orderItem?.unitPrice ?? 0).toLocaleString('es-BO') })}
+                      {t('seller.returns.itemAmount', { amount: money(r.orderItem?.unitPrice ?? 0) })}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4} sx={{ textAlign: { md: 'right' } }}>

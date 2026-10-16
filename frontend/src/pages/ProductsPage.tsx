@@ -34,7 +34,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import ClearIcon from '@mui/icons-material/Clear';
 import { api } from '../services/api';
 import { useMoney } from '../hooks/useMoney';
-import { useCurrencyStore } from '../stores/currencyStore';
+import { useCurrencyStore, currencySymbol, displayCurrency } from '../stores/currencyStore';
 import { useAuthStore } from '../stores/authStore';
 import { getDivisions, COUNTRIES } from '../data/geo';
 import { ProductCard } from '../components/redesign/ProductCard';
@@ -91,9 +91,11 @@ export default function ProductsPage() {
   const { t } = useTranslation();
   const money = useMoney();
   const selectedCurrency = useCurrencyStore((s) => s.selected);
+  const currencyList = useCurrencyStore((s) => s.currencies);
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
-  const moneyFormat = selectedCurrency === 'USD' ? 'US$' : 'Bs';
+  // Denominación de la moneda elegida para la etiqueta del filtro de precio.
+  const moneyFormat = currencySymbol(displayCurrency(currencyList, selectedCurrency).code, currencyList);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<Filters>({});

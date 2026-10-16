@@ -1354,7 +1354,7 @@
       "timeToPay": "⏱️ Te kedan {{hours}}h taki pagaraña",
       "title": "Nayana subastanaka",
       "wonBy": "Gano: {{firstName}}",
-      "wonFor": "Atipata tama {{price}} Bs"
+      "wonFor": "Atipata tama {{price}}"
     }
   },
   "auth": {
@@ -2240,7 +2240,7 @@
       "notAsDescribed": "Janiw koinside mpi qhanañchawi",
       "other": "Yaqha motiwo"
     },
-    "refund": "Reembolso: Bs {{amount}}",
+    "refund": "Reembolso: {{amount}}",
     "requestNote": "Kikpa atiwta mayiña maya kuttayawi qhiparu katuqaña alasiwi mpi jupa pagarawi werifikado.",
     "sellerResponse": "Kutiyawi aljiri: {{response}}",
     "status": {
@@ -2351,7 +2351,7 @@
         "giftHint": "Jupa alasiri atiwa aljasiña aka jakhu jumana qhatu. Jisa gasta pisi, jupar dewuelwes jupa jakhu qullqi qullqi.",
         "maxUsesLabel": "Limite apnaqawinaka (munpach)",
         "minSpendLabel": "Mayiwi pisin (Bs, munpach)",
-        "productOptionLabel": "{{name}} — {{price}} Bs",
+        "productOptionLabel": "{{name}} — {{price}}",
         "productsLabel": "Aljatanaka ru kuna aplika (wasio = taqi)",
         "save": "Imantaña",
         "typeLabel": "Laya kupun",
@@ -2497,7 +2497,7 @@
         "units": "Tama jakhu maya aljata"
       },
       "triggerText": {
-        "amount": "Alasiwinaka tpacha {{amount}} Bs",
+        "amount": "Alasiwinaka tpacha {{amount}}",
         "defaultProduct": "aljata",
         "defaultProductGeneric": "maya aljata",
         "product": "Komprando {{product}}",
@@ -3027,7 +3027,7 @@
         "title": "Kutiyaña kuttayawi"
       },
       "empty": "Janiw utjtam solisitudes kuttayawi.",
-      "itemAmount": "Jakhu item: Bs {{amount}}",
+      "itemAmount": "Jakhu item: {{amount}}",
       "reasons": {
         "noCoincideDescripcion": "Janiw koinside mpi qhanañchawi",
         "otro": "Yaqha motiwo",
@@ -3145,7 +3145,7 @@
     "breadcrumbHome": "Inisio",
     "close": "Jistt'aña",
     "contact": "Kontaktar",
-    "freeShippingFrom": "Apayawi jani qullqini tpacha {{amount}} Bs",
+    "freeShippingFrom": "Apayawi jani qullqini tpacha {{amount}}",
     "locationNotSpecified": "Utjawi janiw espesifikada",
     "locationVerified": "Utjawi werifikada tama jupa apnaqiri (qhatu fisika komprobada)",
     "monthlySalesCount": "{{count}} aljawinaka aka phaxsi",

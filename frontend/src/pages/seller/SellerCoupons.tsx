@@ -319,7 +319,7 @@ export default function SellerCoupons() {
             <Autocomplete
               multiple
               options={myProducts}
-              getOptionLabel={(p) => tr('seller.coupons.dialog.productOptionLabel', { name: p.name, price: p.price })}
+              getOptionLabel={(p) => tr('seller.coupons.dialog.productOptionLabel', { name: p.name, price: money(p.price) })}
               value={myProducts.filter((p) => form.productIds.includes(p.id))}
               onChange={(_, v) => setForm({ ...form, productIds: v.map((p) => p.id) })}
               renderInput={(params) => <TextField {...params} label={tr('seller.coupons.dialog.productsLabel')} />}

@@ -25,6 +25,7 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import AddIcon from '@mui/icons-material/Add';
 import { api, getErrorMessage } from '../../services/api';
 import toast from 'react-hot-toast';
+import { useMoney } from '../../hooks/useMoney';
 
 interface GiftProduct {
   id: number;
@@ -49,6 +50,7 @@ interface GiftPromo {
 
 export default function SellerGifts() {
   const { t } = useTranslation();
+  const money = useMoney();
   const TRIGGER_LABELS: Record<string, string> = {
     UNITS: t('seller.gifts.triggerLabels.units'),
     AMOUNT: t('seller.gifts.triggerLabels.amount'),
@@ -178,7 +180,7 @@ export default function SellerGifts() {
       });
     }
     if (p.triggerType === 'AMOUNT') {
-      return t('seller.gifts.triggerText.amount', { amount: Number(p.triggerAmount).toLocaleString('es-BO') });
+      return t('seller.gifts.triggerText.amount', { amount: money(p.triggerAmount) });
     }
     return t('seller.gifts.triggerText.product', {
       product: p.triggerProduct?.name ?? t('seller.gifts.triggerText.defaultProductGeneric'),
@@ -313,7 +315,7 @@ export default function SellerGifts() {
             >
               {products.map((p) => (
                 <MenuItem key={p.id} value={p.id}>
-                  {p.name} — {Number(p.price).toLocaleString('es-BO')} Bs
+                  {p.name} — {money(p.price)}
                 </MenuItem>
               ))}
             </TextField>
