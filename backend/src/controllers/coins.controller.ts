@@ -54,7 +54,7 @@ export async function getBalance(req: AuthRequest, res: Response, next: NextFunc
       orderBy: { createdAt: 'desc' },
       take: 20,
     });
-    return ok(res, { balance: user?.gamerCoins ?? 0, transactions });
+    return ok(res, { balance: user?.gamerCoins ?? 0, transactions, purchaseEnabled: COINS_PURCHASE_ENABLED });
   } catch (error) {
     next(error);
   }
@@ -70,6 +70,7 @@ export async function getCoinRate(_req: AuthRequest, res: Response, next: NextFu
     const bobPerCoin = usdPerCoin * usdToBob;
     const bobPerThousand = bobPerCoin * 1000;
     return ok(res, {
+      purchaseEnabled: COINS_PURCHASE_ENABLED,
       coinsPerUsd: COINS_PER_USD,
       usdPerCoin,
       bobPerCoin,
@@ -87,31 +88,12 @@ export async function getCoinRate(_req: AuthRequest, res: Response, next: NextFu
   }
 }
 
-export async function buyCoins(req: AuthRequest, res: Response, next: NextFunction) {
-  try {
-    const amount = Math.floor(Number(req.body?.amount));
-    if (!Number.isInteger(amount) || amount <= 0) {
-      throw ApiError.badRequest('Indica una cantidad válida de monedas a comprar.');
-    }
-    if (amount > 100000) {
-      throw ApiError.badRequest('La cantidad máxima por compra es 100.000 monedas.');
-    }
-    await prisma.user.update({
-      where: { id: req.user!.id },
-      data: { gamerCoins: { increment: amount } },
-    });
-    const tx = await prisma.coinTransaction.create({
-      data: {
-        userId: req.user!.id,
-        amount,
-        type: 'PURCHASE',
-        note: `Compra de ${amount} moneda(s) del proyecto`,
-      },
-    });
-    return ok(res, { balance: await prisma.user.findUnique({ where: { id: req.user!.id }, select: { gamerCoins: true } }).then((u) => u?.gamerCoins ?? 0), transaction: tx });
-  } catch (error) {
-    next(error);
-  }
+/** La compra de monedas está bloqueada hasta integrar un pago real (su valor aún no está decidido).
+ *  Las monedas solo se ganan por reglas del sistema: compra efectiva, invitar y canje de karma. */
+export const COINS_PURCHASE_ENABLED = false;
+
+export async function buyCoins(_req: AuthRequest, _res: Response, next: NextFunction) {
+  next(new ApiError(501, 'COINS_PURCHASE_DISABLED', 'La compra de monedas aún no está disponible'));
 }
 
 /** Monedas que gana el que invita a un amigo a la app. */
