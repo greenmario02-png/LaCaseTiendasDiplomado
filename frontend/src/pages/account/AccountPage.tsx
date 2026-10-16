@@ -13,10 +13,6 @@ import {
   Chip,
   CircularProgress,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert,
   List,
   ListItem,
@@ -54,9 +50,6 @@ export default function AccountPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [coins, setCoins] = useState<any>(null);
   const [invite, setInvite] = useState<any>(null);
-  const [buyOpen, setBuyOpen] = useState(false);
-  const [buyAmount, setBuyAmount] = useState('100');
-  const [buying, setBuying] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -75,26 +68,6 @@ export default function AccountPage() {
     api.get('/coins/balance').then((res) => setCoins(res.data.data)).catch(() => {});
     api.get('/coins/invite').then((res) => setInvite(res.data.data)).catch(() => {});
   }, [user]);
-
-  const handleBuyCoins = async () => {
-    const amount = Number(buyAmount);
-    if (!Number.isInteger(amount) || amount <= 0) {
-      toast.error(t('account.profile.invalidCoinAmount'));
-      return;
-    }
-    setBuying(true);
-    try {
-      const { data } = await api.post('/coins/buy', { amount });
-      setCoins(data.data);
-      if (user) setUser({ ...user, gamerCoins: data.data.balance });
-      toast.success(t('account.profile.boughtCoins', { amount }));
-      setBuyOpen(false);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setBuying(false);
-    }
-  };
 
   const uploadProfileImage = async (file: File) => {
     setUploading(true);
@@ -177,9 +150,11 @@ export default function AccountPage() {
               <CoinChip coins={user?.gamerCoins ?? 0} label={t('account.profile.coinsChipLabel')} />
             </Box>
             <Box mt={1} display="flex" gap={1} justifyContent="center">
-              <GhostButton size="small" onClick={() => setBuyOpen(true)}>
-                {t('account.profile.buyCoins')}
-              </GhostButton>
+              {coins?.purchaseEnabled !== true && (
+                <GhostButton size="small" disabled>
+                  {t('account.profile.comingSoon')}
+                </GhostButton>
+              )}
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box display="flex" flexDirection="column" gap={1}>
@@ -203,9 +178,11 @@ export default function AccountPage() {
               <Typography variant="h6" fontWeight={700}>
                 {t('account.profile.coinsTitle')}
               </Typography>
-              <SecondaryButton size="small" onClick={() => setBuyOpen(true)}>
-                {t('account.profile.buyCoins')}
-              </SecondaryButton>
+              {coins?.purchaseEnabled !== true && (
+                <SecondaryButton size="small" disabled>
+                  {t('account.profile.comingSoon')}
+                </SecondaryButton>
+              )}
             </Box>
             <Alert severity="info" sx={{ mb: 2 }}>
               <Trans i18nKey="account.profile.coinsInfo" components={{ b: <b /> }} />
@@ -348,30 +325,6 @@ export default function AccountPage() {
           </Paper>
         </Grid>
       </Grid>
-
-      <Dialog open={buyOpen} onClose={() => setBuyOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{t('account.profile.buyCoinsDialogTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" mb={2}>
-            {t('account.profile.buyCoinsDialogDescription')}
-          </Typography>
-          <TextField
-            label={t('account.profile.coinsQuantityLabel')}
-            type="number"
-            value={buyAmount}
-            onChange={(e) => setBuyAmount(e.target.value)}
-            fullWidth
-            autoFocus
-            inputProps={{ min: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <GhostButton onClick={() => setBuyOpen(false)}>{t('account.profile.cancel')}</GhostButton>
-          <PrimaryButton color="warning" onClick={handleBuyCoins} disabled={buying}>
-            {buying ? <CircularProgress size={20} /> : t('account.profile.buy')}
-          </PrimaryButton>
-        </DialogActions>
-      </Dialog>
     </Container>
   );
 }
