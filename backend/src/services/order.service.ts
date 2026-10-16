@@ -1,10 +1,12 @@
+import { Prisma } from '@prisma/client';
+
 import { AuthRequest } from '../middlewares/auth';
 import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { calculateShipping } from '../utils/shipping';
 
-import { findOrCreateCart, getCartKey } from './cart.service';
+import { findOrCreateCart, getCartKey, pickSelectedItems } from './cart.service';
 import { getCommissionConfig, calculateCommission, sellerNet } from './commission.service';
 import { evaluateGiftPromotions } from './gift.service';
 import { getEffectivePrices } from './promotion.service';
@@ -24,7 +26,7 @@ export interface ShippingQuote {
   total: number;
 }
 
-export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode: string): Promise<ShippingQuote[]> {
+export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode: string, cartItemIds?: number[]): Promise<ShippingQuote[]> {
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
 
@@ -48,7 +50,7 @@ export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode:
   });
 
   const groups: Record<number, { seller: any; subtotal: number; items: any[] }> = {};
-  for (const item of items) {
+  for (const item of pickSelectedItems(items, cartItemIds)) {
     const sellerId = item.product.seller.id;
     if (!groups[sellerId]) {
       groups[sellerId] = { seller: item.product.seller, subtotal: 0, items: [] };
@@ -74,7 +76,7 @@ export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode:
   });
 }
 
-export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?: number, notes?: string, paymentQrUrl?: string, couponCode?: string, fulfillmentType: 'SHIPPING' | 'PICKUP' = 'SHIPPING', pickupAddress?: string) {
+export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?: number, notes?: string, paymentQrUrl?: string, couponCode?: string, fulfillmentType: 'SHIPPING' | 'PICKUP' = 'SHIPPING', pickupAddress?: string, cartItemIds?: number[]) {
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
 
@@ -87,7 +89,7 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
   }
   if (!req.user) throw ApiError.unauthorized('Debes iniciar sesión para comprar');
 
-  const items = await prisma.cartItem.findMany({
+  const allItems = await prisma.cartItem.findMany({
     where: { cartId: cart.id },
     include: {
       product: {
@@ -100,7 +102,9 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
     },
   });
 
-  if (items.length === 0) throw ApiError.badRequest('El carrito está vacío');
+  if (allItems.length === 0) throw ApiError.badRequest('El carrito está vacío');
+  // Solo lo seleccionado: el resto del carrito queda intacto (abajo se borran solo estas líneas).
+  const items = pickSelectedItems(allItems, cartItemIds);
 
   // Validar y aplicar cupón si se envió
   let coupon: { id: number; type: string; value: number; minSpend: number | null } | null = null;
@@ -271,7 +275,7 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
   }
 
   // Vaciar carrito
-  await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+  await prisma.cartItem.deleteMany({ where: { cartId: cart.id, id: { in: items.map((i) => i.id) } } });
 
   // Registrar el uso del cupón
   if (coupon) {
@@ -399,10 +403,23 @@ export async function validateCouponForOrder(code: string, subtotal: number, pro
   return { id: coupon.id, type: coupon.type, value, minSpend: coupon.minSpend ? Number(coupon.minSpend) : null };
 }
 
-export async function getBuyerOrders(userId: number, page = 1, limit = 20) {
+/**
+ * Pedidos del comprador que todavía esperan su pago: pago pendiente o comprobante rechazado y no cancelados.
+ * Base del contador «Pagar pedidos pendientes» del menú.
+ */
+export function pendingPaymentWhere(userId: number): Prisma.OrderWhereInput {
+  return { buyerId: userId, paymentStatus: { in: ['PENDING', 'REJECTED'] }, status: { not: 'CANCELLED' } };
+}
+
+export async function countPendingPayment(userId: number) {
+  return prisma.order.count({ where: pendingPaymentWhere(userId) });
+}
+
+export async function getBuyerOrders(userId: number, page = 1, limit = 20, filter?: 'pending-payment') {
+  const where: Prisma.OrderWhereInput = filter === 'pending-payment' ? pendingPaymentWhere(userId) : { buyerId: userId };
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
-      where: { buyerId: userId },
+      where,
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: 'desc' },
@@ -411,7 +428,7 @@ export async function getBuyerOrders(userId: number, page = 1, limit = 20) {
         seller: { select: { storeName: true } },
       },
     }),
-    prisma.order.count({ where: { buyerId: userId } }),
+    prisma.order.count({ where }),
   ]);
 
   return { data: orders, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };

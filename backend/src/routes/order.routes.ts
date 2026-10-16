@@ -3,7 +3,7 @@ import { Router } from 'express';
 import * as orderController from '../controllers/order.controller';
 import { validate } from '../middlewares/validate';
 import { requireSeller } from '../middlewares/roles';
-import { createOrderSchema, paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
+import { calculateShippingSchema, createOrderSchema, paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
 import { authenticate } from '../middlewares/auth';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -14,8 +14,9 @@ router.get('/recent-sales', asyncHandler(orderController.recentSales));
 router.use(authenticate);
 
 router.post('/', validate(createOrderSchema), asyncHandler(orderController.createOrders));
-router.post('/calculate-shipping', asyncHandler(orderController.shippingQuotes));
+router.post('/calculate-shipping', validate(calculateShippingSchema), asyncHandler(orderController.shippingQuotes));
 router.get('/buyer', asyncHandler(orderController.buyerOrders));
+router.get('/buyer/pending-payment-count', asyncHandler(orderController.pendingPaymentCount));
 router.get('/buyer/:id', asyncHandler(orderController.buyerOrderDetail));
 router.post('/:id/payment-proof', validate(paymentProofSchema), asyncHandler(orderController.paymentProof));
 router.post('/:id/confirm-delivery', asyncHandler(orderController.confirmDelivery));

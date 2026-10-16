@@ -8,7 +8,7 @@ import { ApiError } from '../utils/errors';
 
 export async function createOrders(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { shippingAddressId, notes, paymentQrUrl, couponCode, fulfillmentType, pickupAddress } = req.body;
+    const { shippingAddressId, notes, paymentQrUrl, couponCode, fulfillmentType, pickupAddress, cartItemIds } = req.body;
     const orders = await orderService.createOrdersFromCart(
       req,
       shippingAddressId,
@@ -17,6 +17,7 @@ export async function createOrders(req: AuthRequest, res: Response, next: NextFu
       couponCode,
       fulfillmentType ?? 'SHIPPING',
       pickupAddress,
+      Array.isArray(cartItemIds) ? cartItemIds : undefined,
     );
     return created(res, orders);
   } catch (error) {
@@ -28,7 +29,7 @@ export async function shippingQuotes(req: AuthRequest, res: Response, next: Next
   try {
     const { buyerPostalCode } = req.body;
     if (!buyerPostalCode) throw ApiError.badRequest('buyerPostalCode obligatorio');
-    const quotes = await orderService.calculateShippingQuotes(req, buyerPostalCode);
+    const quotes = await orderService.calculateShippingQuotes(req, buyerPostalCode, Array.isArray(req.body.cartItemIds) ? req.body.cartItemIds : undefined);
     return ok(res, quotes);
   } catch (error) {
     next(error);
@@ -39,8 +40,19 @@ export async function buyerOrders(req: AuthRequest, res: Response, next: NextFun
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
-    const result = await orderService.getBuyerOrders(req.user!.id, page, limit);
+    const filter = req.query.payment === 'pending' ? 'pending-payment' : undefined;
+    const result = await orderService.getBuyerOrders(req.user!.id, page, limit, filter);
     return res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** Contador para el menú «Pagar pedidos pendientes». Solo los pedidos del propio usuario. */
+export async function pendingPaymentCount(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    res.set('Cache-Control', 'private, no-store');
+    return ok(res, { count: await orderService.countPendingPayment(req.user!.id) });
   } catch (error) {
     next(error);
   }

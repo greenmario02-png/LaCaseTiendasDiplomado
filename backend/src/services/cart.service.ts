@@ -189,3 +189,19 @@ export async function mergeGuestCart(userId: number, sessionId: string) {
 
   await prisma.cart.delete({ where: { id: guestCart.id } });
 }
+
+/**
+ * Pagar solo lo seleccionado: filtra las líneas del carrito por id. Los ids vienen del cliente pero se cruzan con las
+ * líneas YA cargadas del carrito propio (nunca se consulta un id suelto: sin IDOR). Si alguno no está (otra pestaña lo
+ * quitó o compró), 409 para que el cliente recargue en vez de cobrar algo distinto a lo que se ve.
+ */
+export function pickSelectedItems<T extends { id: number }>(items: T[], ids?: number[] | null): T[] {
+  if (!ids) return items;
+  const wanted = new Set(ids);
+  const picked = items.filter((i) => wanted.has(i.id));
+  if (picked.length !== wanted.size) {
+    throw new ApiError(409, 'CART_SELECTION_STALE', 'Tu selección cambió: algunos productos ya no están en el carrito. Revisa el carrito e inténtalo de nuevo.');
+  }
+  if (!picked.length) throw ApiError.badRequest('Selecciona al menos un producto');
+  return picked;
+}

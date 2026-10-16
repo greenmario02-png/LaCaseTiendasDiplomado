@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { isPaymentQrUrl } from '../utils/imageSafety';
+
 // Dominios cerrados (coinciden con los enums OrderStatus y PaymentStatus de Prisma).
 export const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'] as const;
 export const PAYMENT_STATUSES = ['PENDING', 'PROOF_SUBMITTED', 'VERIFIED', 'REJECTED'] as const;
@@ -28,13 +30,28 @@ export const paymentProofSchema = z.object({
   body: z.object({ proofUrl: proofUrlSchema }),
 });
 
+/** Selección de líneas del carrito a pagar: ids únicos, positivos, como mucho 200. Sin el campo = todo el carrito. */
+export const cartItemIdsField = z
+  .array(z.number().int().positive().max(2_147_483_647))
+  .min(1, 'Selecciona al menos un producto')
+  .max(200)
+  .refine((a) => new Set(a).size === a.length, 'Productos repetidos en la selección')
+  .optional();
+
 export const createOrderSchema = z.object({
   body: z.object({
     shippingAddressId: z.number().int().positive().optional(),
     notes: z.string().trim().max(1000).optional(),
-    paymentQrUrl: z.string().trim().max(2000).optional(),
+    // Nunca una URL externa: solo un QR subido a la plataforma. Los clientes actuales no lo envían.
+    paymentQrUrl: z.string().trim().max(300).refine(isPaymentQrUrl, 'QR inválido: no se aceptan enlaces').optional(),
+    // Pagar solo lo seleccionado en el carrito: ids de cart_items del propio carrito; lo demás se queda en el carrito.
+    cartItemIds: cartItemIdsField,
     couponCode: z.string().trim().max(50).optional(),
     fulfillmentType: z.enum(['SHIPPING', 'PICKUP']).optional(),
     pickupAddress: z.string().trim().max(500).optional(),
   }),
+});
+
+export const calculateShippingSchema = z.object({
+  body: z.object({ buyerPostalCode: z.string().trim().min(1).max(20), cartItemIds: cartItemIdsField }),
 });

@@ -1,12 +1,36 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 
 import * as publicController from '../controllers/public.controller';
 import * as couponController from '../controllers/coupon.controller';
 import * as giftController from '../controllers/gift.controller';
-import { authenticate } from '../middlewares/auth';
+import { authenticate, optionalAuth, AuthRequest } from '../middlewares/auth';
 import { asyncHandler } from '../utils/asyncHandler';
+import { storePaymentInfo } from '../services/storePayment.service';
+import { ok } from '../utils/response';
+import { ApiError } from '../utils/errors';
 
 const router = Router();
+
+// Datos de pago de la tienda: QR + titular/banco/cuenta; completos solo para quien tiene algo que pagarle.
+const paymentInfoLimiter = rateLimit({
+  windowMs: 60_000,
+  max: process.env.NODE_ENV === 'test' ? 100000 : 60,
+  message: { error: { code: 'RATE_LIMIT', message: 'Demasiadas consultas. Espera un momento.' } },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+router.get(
+  '/stores/:id/payment-info',
+  paymentInfoLimiter,
+  optionalAuth,
+  asyncHandler(async (req: AuthRequest, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0 || id > 2_147_483_647) throw ApiError.badRequest('Tienda inválida');
+    res.set('Cache-Control', 'private, no-store');
+    return ok(res, await storePaymentInfo(id, req.user ? { id: req.user.id, storeOwnerId: req.user.storeOwnerId } : null));
+  }),
+);
 
 router.get('/app-version', asyncHandler(publicController.appVersion));
 
