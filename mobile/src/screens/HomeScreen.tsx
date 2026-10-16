@@ -9,8 +9,8 @@ import { CountdownTimer } from '../components/redesign/CountdownTimer';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
+import { useMoney } from '../services/money';
 
-const money = (n: number) => `${n.toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
 const MONEDAS = [
   { code: 'BOB', label: 'Boliviano', symbol: 'Bs' },
@@ -21,6 +21,7 @@ const MONEDAS = [
 ];
 
 export default function HomeScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);

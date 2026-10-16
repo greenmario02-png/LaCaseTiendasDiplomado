@@ -9,10 +9,11 @@ import { StatCard } from '../components/redesign/StatCard';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { LoadingState } from '../components/redesign/States';
 import { QuickAddFab } from '../components/redesign/QuickAddFab';
+import { useMoney } from '../services/money';
 
-const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 })} Bs`;
 
 export default function SellerDashboardScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { colors, raised } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { t } = useTranslation();

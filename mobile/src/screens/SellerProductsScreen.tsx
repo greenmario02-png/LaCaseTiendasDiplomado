@@ -7,10 +7,8 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoButton } from '../components/redesign/NeoButton';
+import { useMoney } from '../services/money';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
-}
 
 function estado(p: any, t: (key: string) => string): { label: string; color: string } {
   if (p.isActive === false) return { label: t('mobile.sellerProducts.statusDeleted'), color: themeColors.error };
@@ -19,6 +17,7 @@ function estado(p: any, t: (key: string) => string): { label: string; color: str
 }
 
 export default function SellerProductsScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { t } = useTranslation();

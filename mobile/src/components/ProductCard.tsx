@@ -4,6 +4,7 @@ import { Star } from 'lucide-react-native';
 import { colors } from '../theme';
 import { useAppTheme } from '../theme/ThemeContext';
 import { resolveImageUrl } from '../services/api';
+import { useMoney } from '../services/money';
 
 export interface Product {
   id: number;
@@ -17,11 +18,6 @@ export interface Product {
   seller?: { storeName?: string; rating?: number };
 }
 
-function formatPrice(value: string | number): string {
-  const n = Number(value);
-  return n.toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
-}
-
 function verdict(rating: number): { label: string; color: string } {
   if (rating >= 4.5) return { label: 'Muy recomendado', color: colors.success };
   if (rating >= 3.5) return { label: 'Recomendado', color: colors.info };
@@ -29,6 +25,7 @@ function verdict(rating: number): { label: string; color: string } {
 }
 
 export default function ProductCard({ product, onPress }: { product: Product; onPress: () => void }) {
+  const formatPrice = useMoney(); // moneda elegida con su denominación
   const image = resolveImageUrl(product.images?.[0]?.url);
   const outOfStock = product.stock <= 0;
   const original = product.originalPrice ? Number(product.originalPrice) : 0;

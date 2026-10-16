@@ -12,6 +12,7 @@ export interface User {
   storeName?: string | null;
   storeDescription?: string | null;
   storeLogo?: string | null;
+  paymentQrUrl?: string | null;
   storeCategory?: string | null;
   profileImage?: string | null;
   phone?: string | null;

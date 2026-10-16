@@ -14,10 +14,9 @@ import { Camera, Store, ShieldCheck, ShoppingCart, BadgeCheck, Heart, Package, P
 import { useAppTheme } from '../theme/ThemeContext';
 import { useNotificationsStore } from '../stores/notificationsStore';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
+import { useMoney } from '../services/money';
+import { AccountQuickActions, CurrencyPicker } from '../components/payments/AccountQuickActions';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
-}
 
 const STATUS_LABEL_KEYS: Record<string, string> = {
   PENDING: 'pending',
@@ -47,6 +46,7 @@ function MenuItem({ icon, label, onPress, badge }: { icon: React.ReactNode; labe
 }
 
 export default function ProfileScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { colors } = useAppTheme();
   const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -148,6 +148,10 @@ export default function ProfileScreen({ navigation }: any) {
         </View>
         <LanguageSwitcher />
       </View>
+
+      {/* Accesos directos al pago y selector de moneda */}
+      <AccountQuickActions navigation={navigation} enabled={!!user} />
+      <CurrencyPicker />
 
       <View style={styles.menu}>
         <MenuItem icon={<Bell size={17} color={colors.primary} />} label={t('mobile.profile.notifications')} onPress={() => navigation.navigate('Notifications')} badge={unread} />

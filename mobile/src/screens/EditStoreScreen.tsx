@@ -8,6 +8,8 @@ import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { useAppTheme } from '../theme/ThemeContext';
 import ImagePickerButton from '../components/ImagePickerButton';
+import { QrImageField } from '../components/payments/PaymentBits';
+import { uploadPaymentQr } from '../services/payments';
 
 export default function EditStoreScreen({ navigation }: any) {
   const { colors } = useAppTheme();
@@ -29,6 +31,9 @@ export default function EditStoreScreen({ navigation }: any) {
   });
   const [storeLogo, setStoreLogo] = useState<string>(user?.storeLogo ?? '');
   const [uploading, setUploading] = useState(false);
+  // QR de cobro: imagen SUBIDA (galería o cámara) con vista previa; nunca una URL escrita. Se guarda con el resto.
+  const [qrImage, setQrImage] = useState<string | null>(user?.paymentQrUrl ?? null);
+  const [qrDirty, setQrDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -63,6 +68,7 @@ export default function EditStoreScreen({ navigation }: any) {
         facebookUrl: form.facebookUrl.trim() || undefined,
         tiktokUrl: form.tiktokUrl.trim() || undefined,
         ...(storeLogo ? { storeLogo } : {}),
+        ...(qrDirty ? { paymentQrUrl: qrImage } : {}),
       };
       if (form.freeShippingThreshold.trim()) {
         payload.freeShippingThreshold = Number(form.freeShippingThreshold);
@@ -134,6 +140,17 @@ export default function EditStoreScreen({ navigation }: any) {
       <Text style={styles.label}>{t('mobile.editStore.tiktokLabel')}</Text>
       <NeoInput style={styles.input} value={form.tiktokUrl} onChangeText={(v) => set('tiktokUrl', v)} placeholder={t('mobile.editStore.tiktokPlaceholder')} />
 
+      <View style={styles.qrWrap}>
+        <QrImageField
+          value={qrImage}
+          upload={uploadPaymentQr}
+          onChange={(url) => {
+            setQrImage(url);
+            setQrDirty(true);
+          }}
+        />
+      </View>
+
       <View style={styles.buttonWrap}>
         <NeoButton title={saving ? t('mobile.common.saving') : t('mobile.common.saveChanges')} onPress={save} disabled={saving} />
       </View>
@@ -154,4 +171,5 @@ const makeStyles = (colors: any) =>
   input: {},
   textarea: { minHeight: 84 },
   buttonWrap: { marginTop: 24 },
+  qrWrap: { marginTop: 20 },
 });

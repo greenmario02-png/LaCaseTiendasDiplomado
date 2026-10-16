@@ -8,10 +8,9 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoButton } from '../components/redesign/NeoButton';
+import { useMoney } from '../services/money';
+import '../services/payments';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
-}
 
 const STATUS_COLOR: Record<string, string> = {
   PENDING: themeColors.warning,
@@ -31,7 +30,10 @@ const STATUS_KEY: Record<string, string> = {
   CANCELLED: 'cancelled',
 };
 
-export default function OrdersScreen({ navigation }: any) {
+export default function OrdersScreen({ navigation, route }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
+  // «Pagar pedidos pendientes»: filtro en el servidor; se puede alternar desde la misma pantalla.
+  const [onlyPending, setOnlyPending] = useState<boolean>(!!route?.params?.pendingPayment);
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -41,7 +43,7 @@ export default function OrdersScreen({ navigation }: any) {
 
   const load = useCallback(async () => {
     try {
-      const { data } = await api.get('/orders/buyer', { params: { limit: 100 } });
+      const { data } = await api.get('/orders/buyer', { params: { limit: 100, ...(onlyPending ? { payment: 'pending' } : {}) } });
       setOrders(data.data ?? []);
     } catch (e) {
       Alert.alert(t('mobile.common.error'), getErrorMessage(e));
@@ -49,7 +51,7 @@ export default function OrdersScreen({ navigation }: any) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [onlyPending]);
 
   useFocusEffect(
     useCallback(() => {
@@ -123,6 +125,20 @@ export default function OrdersScreen({ navigation }: any) {
     <View style={styles.flex}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('mobile.orders.title', { count: orders.length })}</Text>
+        <View style={styles.filterRow} accessibilityRole="radiogroup">
+          {[false, true].map((v) => (
+            <TouchableOpacity
+              key={String(v)}
+              testID={v ? 'filter-pending' : 'filter-all'}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: onlyPending === v }}
+              onPress={() => setOnlyPending(v)}
+              style={[styles.filterChip, onlyPending === v && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+            >
+              <Text style={{ color: onlyPending === v ? '#fff' : colors.text, fontWeight: '700' }}>{v ? t('pagos.menu.payPending') : t('pagos.menu.orders')}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
       {loading ? (
         <LoadingState />
@@ -150,6 +166,8 @@ const makeStyles = (colors: any) =>
   flex: { flex: 1, backgroundColor: colors.background },
   header: { paddingHorizontal: 16, paddingVertical: 12 },
   title: { fontSize: 18, fontWeight: '800', color: colors.text },
+  filterRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  filterChip: { minHeight: 44, paddingHorizontal: 14, borderRadius: 22, borderWidth: 1.5, borderColor: colors.border, justifyContent: 'center' },
   card: {
     backgroundColor: colors.surface,
     borderRadius: 12,

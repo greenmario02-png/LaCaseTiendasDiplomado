@@ -11,10 +11,10 @@ import { NeoButton } from '../components/redesign/NeoButton';
 import { LoadingState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
+import { useMoney } from '../services/money';
+import { StorePaymentCard } from '../components/payments/PaymentBits';
+import '../services/payments';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
-}
 
 function verdict(rating: number, t: (key: string) => string): { label: string; color: string } {
   if (rating >= 4.5) return { label: t('mobile.productDetail.verdictHighlyRecommended'), color: themeColors.success };
@@ -23,6 +23,7 @@ function verdict(rating: number, t: (key: string) => string): { label: string; c
 }
 
 export default function ProductDetailScreen({ route, navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -166,6 +167,9 @@ export default function ProductDetailScreen({ route, navigation }: any) {
             </View>
           </TouchableOpacity>
         )}
+
+        {/* Datos de pago de la tienda con la recomendación de seguridad para este precio */}
+        {product.seller?.id ? <StorePaymentCard storeId={product.seller.id} storeName={product.seller.storeName} tipAmountBs={Number(product.price)} /> : null}
 
         {/* Reseñas */}
         <Text style={styles.section}>{t('mobile.productDetail.reviewsTitle', { count: reviews.length })}</Text>

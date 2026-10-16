@@ -7,10 +7,10 @@ import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoButton } from '../components/redesign/NeoButton';
+import { useMoney } from '../services/money';
+import { openOrderChat } from '../services/payments';
+import { StorePaymentCard } from '../components/payments/PaymentBits';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
-}
 
 const STATUS_KEY: Record<string, string> = {
   PENDING: 'pending',
@@ -28,6 +28,7 @@ const PAYMENT_KEY: Record<string, string> = {
 };
 
 export default function OrderDetailScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -35,6 +36,19 @@ export default function OrderDetailScreen({ navigation }: any) {
   const { id } = route.params as { id: number };
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [openingChat, setOpeningChat] = useState(false);
+  // Pagar = abrir (o crear) el chat del pedido: la tienda envía su QR y el comprador sube el comprobante.
+  const payInChat = async () => {
+    setOpeningChat(true);
+    try {
+      const convId = await openOrderChat(Number(id), order?.sellerId);
+      navigation.navigate('ChatThread', { id: convId, orderId: Number(id) });
+    } catch (e) {
+      Alert.alert(t('mobile.common.error'), getErrorMessage(e));
+    } finally {
+      setOpeningChat(false);
+    }
+  };
 
   const load = async () => {
     try {
@@ -168,7 +182,16 @@ export default function OrderDetailScreen({ navigation }: any) {
           {paymentLabel}
         </Text>
         {order.trackingNumber ? <Text style={styles.meta}>{t('mobile.orderDetail.tracking', { number: order.trackingNumber })}</Text> : null}
+        {order.status !== 'CANCELLED' && ['PENDING', 'REJECTED'].includes(order.paymentStatus) && (
+          <View style={{ marginTop: 10, gap: 6 }}>
+            <NeoButton testID="pay-in-chat" title={t('pagos.order.payInChat')} onPress={payInChat} disabled={openingChat} />
+            <Text style={styles.meta}>{t('pagos.order.payHint')}</Text>
+          </View>
+        )}
       </View>
+      {order.sellerId && order.status !== 'CANCELLED' && order.paymentStatus !== 'VERIFIED' ? (
+        <StorePaymentCard storeId={order.sellerId} storeName={order.seller?.storeName} tipAmountBs={Number(order.total)} />
+      ) : null}
 
       {canConfirm && (
         <View style={{ marginTop: 12 }}>

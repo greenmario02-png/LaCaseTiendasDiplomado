@@ -1,4 +1,4 @@
-import React, { useMemo,  useCallback, useState  } from 'react';
+import React, { useMemo,  useCallback, useEffect, useState  } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet,
   Alert, RefreshControl, ScrollView,
@@ -10,12 +10,19 @@ import { api, getErrorMessage } from '../services/api';
 import { useAppTheme } from '../theme/ThemeContext';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoButton } from '../components/redesign/NeoButton';
+import { useMoney } from '../services/money';
+import { isCartSelectionStale, openOrderChat, summarizeSelection, useCartSelection } from '../services/payments';
+import { PaymentSafetyTip, StorePaymentCard } from '../components/payments/PaymentBits';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
-}
 
 export default function CheckoutScreen({ navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
+  // Solo se paga lo seleccionado en el carrito; lo demás se queda en el carrito.
+  const excluded = useCartSelection((s) => s.excluded);
+  const loadSelection = useCartSelection((s) => s.load);
+  useEffect(() => {
+    loadSelection();
+  }, [loadSelection]);
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -56,6 +63,9 @@ export default function CheckoutScreen({ navigation }: any) {
     }, [load])
   );
 
+  const allItems: any[] = cart?.items ?? [];
+  const sel = summarizeSelection(allItems, excluded);
+
   const placeOrder = async () => {
     try {
       if (placing) return;
@@ -77,16 +87,29 @@ export default function CheckoutScreen({ navigation }: any) {
         payload.pickupAddress = pickupAddress.trim();
       }
       if (couponCode.trim()) payload.couponCode = couponCode.trim();
+      payload.cartItemIds = sel.ids;
       const res = await api.post('/orders', payload);
-      const orders = res.data.data ?? [];
-      Alert.alert(t('mobile.checkout.orderCreatedTitle'), t('mobile.checkout.orderCreatedMessage', { count: orders.length }), [
-        { text: t('mobile.checkout.viewMyOrders'), onPress: () => navigation.navigate('Orders') },
-        { text: t('mobile.common.ok') },
-      ]);
+      const orders: Array<{ id: number; sellerId?: number }> = res.data.data ?? [];
       setCouponCode('');
       setNotes('');
       setFulfillmentType('SHIPPING');
+      // Al pagar se abre (o crea) el chat del pedido: la tienda envía su QR y el comprador sube el comprobante.
+      const convIds = await Promise.all(orders.map((o) => openOrderChat(o.id, o.sellerId).catch(() => null)));
+      if (convIds[0]) {
+        navigation.navigate('ChatThread', { id: convIds[0], orderId: orders[0].id });
+        return;
+      }
+      Alert.alert(t('mobile.checkout.orderCreatedTitle'), `${t('mobile.checkout.orderCreatedMessage', { count: orders.length })} ${t('pagos.checkout.chatFallback')}`, [
+        { text: t('mobile.checkout.viewMyOrders'), onPress: () => navigation.navigate('Orders') },
+        { text: t('mobile.common.ok') },
+      ]);
     } catch (e) {
+      if (isCartSelectionStale(e)) {
+        // Lo seleccionado ya no coincide con el carrito: avisar y recargar.
+        Alert.alert(t('mobile.common.error'), t('pagos.cart.stale'));
+        load();
+        return;
+      }
       Alert.alert(t('mobile.common.error'), getErrorMessage(e));
     } finally {
       setPlacing(false);
@@ -101,7 +124,17 @@ export default function CheckoutScreen({ navigation }: any) {
     );
   }
 
-  const items = cart?.items ?? [];
+  const items = allItems.filter((i) => sel.ids.includes(i.id));
+  if (allItems.length > 0 && items.length === 0) {
+    return (
+      <View style={styles.center}>
+        <EmptyState message={t('pagos.cart.noneSelected')} />
+        <View style={{ minWidth: 160, marginTop: 8 }}>
+          <NeoButton title={t('mobile.cart.checkoutButton')} variant="secondary" onPress={() => navigation.navigate('Cart')} />
+        </View>
+      </View>
+    );
+  }
   if (items.length === 0) {
     return (
       <View style={styles.center}>
@@ -131,7 +164,7 @@ export default function CheckoutScreen({ navigation }: any) {
         <View style={styles.divider} />
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>{t('mobile.checkout.subtotal')}</Text>
-          <Text style={styles.totalValue}>{money(cart?.subtotal ?? 0)}</Text>
+          <Text style={styles.totalValue}>{money(sel.subtotal)}</Text>
         </View>
       </View>
 
@@ -218,8 +251,18 @@ export default function CheckoutScreen({ navigation }: any) {
         </View>
       </View>
 
+      {/* Datos de pago de cada tienda, con la recomendación de seguridad antes */}
+      <Text accessibilityRole="header" style={styles.sectionTitle}>{t('pagos.info.title')}</Text>
+      <View style={{ marginHorizontal: 16 }}>
+        <Text style={styles.payText}>{`${t('pagos.cart.paying', { count: sel.count })} ${t('pagos.order.payHint')}`}</Text>
+        <PaymentSafetyTip amountBs={sel.subtotal} />
+        {sel.stores.map((s) => (
+          <StorePaymentCard key={s.storeId} storeId={s.storeId} storeName={s.storeName} />
+        ))}
+      </View>
+
       <View style={{ marginTop: 16 }}>
-        <NeoButton title={placing ? t('mobile.checkout.creatingOrder') : t('mobile.checkout.confirmOrder')} onPress={placeOrder} disabled={placing} />
+        <NeoButton testID="checkout-confirm" title={placing ? t('mobile.checkout.creatingOrder') : t('pagos.checkout.payAndChat')} onPress={placeOrder} disabled={placing} />
       </View>
     </ScrollView>
   );

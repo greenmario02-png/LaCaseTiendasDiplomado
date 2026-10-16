@@ -10,10 +10,13 @@ import { useAuthStore } from '../stores/authStore';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { QuickAddFab } from '../components/redesign/QuickAddFab';
 import { useAppTheme } from '../theme/ThemeContext';
+import { useMoney } from '../services/money';
+import { StorePaymentCard } from '../components/payments/PaymentBits';
+import '../services/payments';
 
-const money = (n: string | number) => `${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 0 })} Bs`;
 
 export default function SellerScreen({ route, navigation }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { t } = useTranslation();
@@ -91,6 +94,8 @@ export default function SellerScreen({ route, navigation }: any) {
         <View style={styles.stat}><Text style={styles.statValue}>{seller.totalSales ?? 0}</Text><Text style={styles.statLabel}>{t('mobile.seller.salesLabel')}</Text></View>
       </View>
       {seller.storeDescription ? <Text style={styles.desc}>{seller.storeDescription}</Text> : null}
+      {/* Datos de pago de la tienda */}
+      {seller.id ? <View style={{ paddingHorizontal: 12 }}><StorePaymentCard storeId={Number(seller.id)} storeName={seller.storeName} tipAmountBs={null} /></View> : null}
       {seller.whatsappPhone ? (
         <View style={styles.waRow}>
           <MessageCircle size={13} color={colors.success} />

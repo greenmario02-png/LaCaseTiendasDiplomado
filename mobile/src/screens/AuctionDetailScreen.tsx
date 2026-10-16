@@ -9,10 +9,8 @@ import { PriceDisplay } from '../components/redesign/PriceDisplay';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
+import { useMoney } from '../services/money';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
-}
 
 function formatCountdown(ms: number, t: (key: string) => string): string {
   if (ms <= 0) return t('mobile.auctionDetail.ended');
@@ -25,6 +23,7 @@ function formatCountdown(ms: number, t: (key: string) => string): string {
 }
 
 export default function AuctionDetailScreen({ route }: any) {
+  const money = useMoney(); // moneda elegida con su denominación
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);

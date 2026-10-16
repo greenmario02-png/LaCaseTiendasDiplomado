@@ -1,5 +1,6 @@
 import React, { useMemo,  useEffect, useState, useCallback  } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, SectionList, TouchableOpacity, Pressable, Image, StyleSheet } from 'react-native';
+import { Check, Minus } from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { api, resolveImageUrl } from '../services/api';
@@ -8,9 +9,20 @@ import { NeoButton } from '../components/redesign/NeoButton';
 import { PriceDisplay } from '../components/redesign/PriceDisplay';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
+import { summarizeSelection, useCartSelection } from '../services/payments';
+import { useMoney } from '../services/money';
 
-function money(v: string | number): string {
-  return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 0 }) + ' Bs';
+/** Casilla accesible de 44 x 44 (estado mixto para «todo» y «por tienda»). */
+function Check44({ state, onPress, label, testID }: { state: boolean | 'mixed'; onPress: () => void; label: string; testID?: string }) {
+  const { colors } = useAppTheme();
+  const on = state === true;
+  return (
+    <Pressable testID={testID} accessibilityRole="checkbox" accessibilityState={{ checked: state }} accessibilityLabel={label} onPress={onPress} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: colors.primary, backgroundColor: state ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+        {on ? <Check size={16} color="#fff" /> : state === 'mixed' ? <Minus size={16} color="#fff" /> : null}
+      </View>
+    </Pressable>
+  );
 }
 
 export default function CartScreen({ navigation }: any) {
@@ -19,6 +31,18 @@ export default function CartScreen({ navigation }: any) {
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [cart, setCart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const money = useMoney();
+  // Lo NO seleccionado se guarda en el teléfono; lo nuevo entra marcado.
+  const excluded = useCartSelection((s) => s.excluded);
+  const sel = useCartSelection();
+  useEffect(() => {
+    sel.load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (cart?.items) sel.prune(cart.items.map((i: any) => i.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
 
   const load = async () => {
     try {
@@ -72,6 +96,16 @@ export default function CartScreen({ navigation }: any) {
   }
 
   const items = cart?.items ?? [];
+  const summary = summarizeSelection(items, excluded);
+  const isSel = (id: number) => !excluded.includes(id);
+  const sections = Object.values(
+    items.reduce((acc: Record<string, { title: string; storeId: number; data: any[] }>, it: any) => {
+      const sid = Number(it.product?.seller?.id ?? 0);
+      (acc[sid] ??= { title: it.product?.seller?.storeName ?? '', storeId: sid, data: [] }).data.push(it);
+      return acc;
+    }, {}),
+  ) as Array<{ title: string; storeId: number; data: any[] }>;
+  const groupState = (data: any[]): boolean | 'mixed' => (data.every((i) => isSel(i.id)) ? true : data.some((i) => isSel(i.id)) ? 'mixed' : false);
 
   return (
     <View style={styles.flex}>
@@ -82,12 +116,34 @@ export default function CartScreen({ navigation }: any) {
         </View>
       ) : (
         <>
-          <FlatList
-            data={items}
+          <View style={styles.selectAll}>
+            <Check44
+              testID="select-all"
+              state={summary.allSelected ? true : summary.count > 0 ? 'mixed' : false}
+              onPress={() => sel.setSelected(items.map((i: any) => i.id), !summary.allSelected)}
+              label={t('pagos.cart.selectAll')}
+            />
+            <Text style={styles.selectAllText}>{t('pagos.cart.selectAll')}</Text>
+            <Text style={styles.selCount} accessibilityLiveRegion="polite">{t('pagos.cart.selectedSummary', { count: summary.count, total: summary.total })}</Text>
+          </View>
+          <SectionList
+            sections={sections}
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ padding: 12, gap: 10, paddingBottom: 16 }}
+            renderSectionHeader={({ section }) => (
+              <View style={styles.storeHeader}>
+                <Check44
+                  testID={`select-store-${section.storeId}`}
+                  state={groupState(section.data)}
+                  onPress={() => sel.setSelected(section.data.map((i: any) => i.id), groupState(section.data) !== true)}
+                  label={t('pagos.cart.selectStore', { store: section.title })}
+                />
+                <Text style={styles.storeName}>{section.title}</Text>
+              </View>
+            )}
             renderItem={({ item }) => (
-              <View style={styles.item}>
+              <View style={[styles.item, !isSel(item.id) && { opacity: 0.6 }]}>
+                <Check44 testID={`select-item-${item.id}`} state={isSel(item.id)} onPress={() => sel.toggle(item.id)} label={t('pagos.cart.selectItem', { name: item.product?.name ?? '' })} />
                 {item.product?.images?.[0]?.url && <Image source={{ uri: resolveImageUrl(item.product.images[0].url) }} style={styles.thumb} />}
                 <View style={styles.itemBody}>
                   <Text style={styles.itemName} numberOfLines={2}>
@@ -111,9 +167,10 @@ export default function CartScreen({ navigation }: any) {
           <View style={styles.footer}>
             <Text style={styles.total}>{t('mobile.cart.total')}</Text>
             <View style={styles.totalRow}>
-              <PriceDisplay price={Number(cart.subtotal)} />
+              <Text testID="cart-selected-total" style={styles.totalValue}>{money(summary.subtotal)}</Text>
+              <Text style={styles.selHint}>{summary.count === 0 ? t('pagos.cart.noneSelected') : t('pagos.cart.keepHint')}</Text>
             </View>
-            <NeoButton title={t('mobile.cart.checkoutButton')} onPress={() => navigation.navigate('Checkout')} />
+            <NeoButton testID="go-pay" title={t('pagos.cart.goPay', { count: summary.count })} disabled={summary.count === 0} onPress={() => navigation.navigate('Checkout')} />
           </View>
         </>
       )}
@@ -131,10 +188,17 @@ const makeStyles = (colors: any) =>
   itemName: { fontSize: 13, fontWeight: '600', color: colors.text },
   itemSeller: { fontSize: 11, color: colors.textSecondary, marginTop: 2 },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6 },
-  qtyBtn: { width: 28, height: 28, borderRadius: 6, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  qtyBtn: { width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   qtyBtnText: { fontSize: 16, fontWeight: '700', color: colors.primary },
-  qty: { fontSize: 14, fontWeight: '700' },
+  qty: { fontSize: 14, fontWeight: '700', color: colors.text },
   footer: { padding: 16, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border },
   total: { fontSize: 18, fontWeight: '900', color: colors.text, marginBottom: 4 },
   totalRow: { marginBottom: 10 },
+  totalValue: { fontSize: 20, fontWeight: '900', color: colors.price ?? colors.text },
+  selHint: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  selectAll: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border },
+  selectAllText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  selCount: { fontSize: 12, color: colors.textSecondary, marginLeft: 'auto', paddingRight: 8 },
+  storeHeader: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  storeName: { fontSize: 14, fontWeight: '800', color: colors.text },
 });

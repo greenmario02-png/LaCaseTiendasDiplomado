@@ -11,6 +11,7 @@ import { useAppTheme } from '../theme/ThemeContext';
 import { colors as themeColors } from '../theme';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { NeoButton } from '../components/redesign/NeoButton';
+import '../services/payments';
 
 function money(v: string | number): string {
   return Number(v).toLocaleString('es-BO', { maximumFractionDigits: 2 }) + ' Bs';
@@ -178,6 +179,14 @@ export default function SellerPayoutsScreen({ navigation }: any) {
           />
         </View>
 
+        {/* El QR de cobro que ve el comprador se sube en «Editar tienda» */}
+        <View style={styles.qrHint}>
+          <Text style={styles.payoutMeta}>{t('pagos.qr.inStoreSettings')}</Text>
+          <TouchableOpacity testID="go-edit-store" accessibilityRole="link" onPress={() => navigation.navigate('EditStore')} style={{ minHeight: 44, justifyContent: 'center' }}>
+            <Text style={{ color: colors.primary, fontWeight: '700' }}>{t('pagos.qr.goToStore')}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Historial */}
         <Text style={styles.section}>{t('mobile.sellerPayouts.historyTitle')}</Text>
         {payouts.length === 0 ? (
@@ -265,4 +274,5 @@ const makeStyles = (colors: any) =>
   modalSub: { fontSize: 12, color: colors.textSecondary, marginBottom: 6 },
   input: { backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 13, color: colors.text },
   notesInput: { minHeight: 50, textAlignVertical: 'top' },
+  qrHint: { backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 14, paddingTop: 10, marginBottom: 4 },
 });
