@@ -4,23 +4,12 @@ import { AuthRequest } from '../middlewares/auth';
 import { prisma } from '../config/database';
 import { ok, created } from '../utils/response';
 import { ApiError } from '../utils/errors';
-import { getIO, emitToUser } from '../config/socket';
 import { Role } from '@prisma/client';
-import { createNotification } from '../services/notification.service';
+import * as chat from '../services/chat/chat.service';
 import { getIcebreakers, getNoSaleReplies, getFollowUps, getRegionName } from '../data/bolivianismos';
 
-const CONVERSATION_INCLUDE = {
-  buyer: { select: { id: true, firstName: true, lastName: true, email: true } },
-  seller: { select: { id: true, storeName: true, firstName: true, lastName: true } },
-  product: {
-    select: { id: true, name: true, price: true, images: { take: 1, select: { url: true } } },
-  },
-  _count: { select: { messages: true } },
-} as const;
-
-function isParticipant(userId: number, conv: { buyerId: number; sellerId: number }): boolean {
-  return conv.buyerId === userId || conv.sellerId === userId;
-}
+const CONVERSATION_INCLUDE = chat.CONVERSATION_INCLUDE;
+const isParticipant = chat.isParticipant;
 
 /**
  * Crea o reutiliza una conversación entre comprador y vendedor.
@@ -48,7 +37,8 @@ export async function createOrGetConversation(req: AuthRequest, res: Response, n
       where: {
         buyerId: userId,
         sellerId,
-        ...(productId ? { productId } : { productId: null }),
+        // La conversacion general (sin producto) nunca es la de un pedido: esa se abre con /order/:orderId/open.
+        ...(productId ? { productId } : { productId: null, orderId: null }),
       },
     });
 
@@ -71,100 +61,27 @@ export async function createOrGetConversation(req: AuthRequest, res: Response, n
 
 export async function listConversations(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const userId = req.user!.id;
-    const conversations = await prisma.conversation.findMany({
-      where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
-      orderBy: { updatedAt: 'desc' },
-      include: {
-        ...CONVERSATION_INCLUDE,
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          select: { id: true, content: true, senderId: true, createdAt: true, readAt: true },
-        },
-      },
-    });
-    return ok(res, conversations);
+    return ok(res, await chat.listConversations(req.user!.id));
   } catch (error) {
     next(error);
   }
 }
 
+/** GET /api/chat/:id?before=<id>&limit=30 — pagina hacia atras; la primera pagina marca leidos. */
 export async function getConversation(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const conversationId = Number(req.params.id);
-    const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
-      include: CONVERSATION_INCLUDE,
-    });
-    if (!conversation) throw ApiError.notFound('Conversación no encontrada');
-    if (!isParticipant(req.user!.id, conversation)) throw ApiError.forbidden('No participás en esta conversación');
-
-    // marcar mensajes como leídos
-    await prisma.message.updateMany({
-      where: { conversationId, senderId: { not: req.user!.id }, readAt: null },
-      data: { readAt: new Date() },
-    });
-
-    const messages = await prisma.message.findMany({
-      where: { conversationId },
-      orderBy: { createdAt: 'asc' },
-      include: { sender: { select: { id: true, firstName: true, lastName: true, storeName: true } } },
-    });
-
-    return ok(res, { ...conversation, messages });
+    const q = req.query as { before?: number; limit?: number };
+    return ok(res, await chat.getConversationPage(req.user!.id, Number(req.params.id), { before: q.before, limit: q.limit }));
   } catch (error) {
     next(error);
   }
 }
 
+/** POST /api/chat/:id/messages — idempotente por clientId (un reintento devuelve 200 con el mismo mensaje). */
 export async function sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const conversationId = Number(req.params.id);
-    const { content } = req.body;
-    if (!content || !content.trim()) throw ApiError.badRequest('Escribe un mensaje');
-
-    const conversation = await prisma.conversation.findUnique({ where: { id: conversationId } });
-    if (!conversation) throw ApiError.notFound('Conversación no encontrada');
-    if (!isParticipant(req.user!.id, conversation)) throw ApiError.forbidden('No participás en esta conversación');
-
-    const message = await prisma.message.create({
-      data: {
-        conversationId,
-        senderId: req.user!.id,
-        content: content.trim().slice(0, 2000),
-      },
-    });
-
-    await prisma.conversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() } });
-
-    // Emitir en tiempo real a la room de la conversación
-    const io = getIO();
-    const messageWithSender = await prisma.message.findUnique({
-      where: { id: message.id },
-      include: { sender: { select: { id: true, firstName: true, lastName: true, storeName: true } } },
-    });
-    if (io) {
-      io.to(`chat:${conversationId}`).emit('chat:message', { conversationId, message: messageWithSender });
-    }
-
-    // Notificar al otro participante (badge unread + notificación persistente)
-    const otherId = conversation.buyerId === req.user!.id ? conversation.sellerId : conversation.buyerId;
-    emitToUser(otherId, 'chat:unread', { conversationId, count: 1 });
-
-    const senderName = messageWithSender?.sender?.storeName
-      ? messageWithSender.sender.storeName
-      : `${messageWithSender?.sender?.firstName ?? 'Usuario'} ${messageWithSender?.sender?.lastName ?? ''}`.trim();
-    await createNotification({
-      userId: otherId,
-      type: 'NEW_MESSAGE',
-      title: `Nuevo mensaje de ${senderName}`,
-      message: content.trim().slice(0, 120),
-      refType: 'chat',
-      refId: conversationId,
-    });
-
-    return created(res, messageWithSender);
+    const r = await chat.sendText(req.user!.id, Number(req.params.id), req.body);
+    return r.created ? created(res, r.message) : ok(res, r.message);
   } catch (error) {
     next(error);
   }
@@ -173,18 +90,15 @@ export async function sendMessage(req: AuthRequest, res: Response, next: NextFun
 export async function unreadCount(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const userId = req.user!.id;
-    const conversations = await prisma.conversation.findMany({
-      where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
-      select: { id: true },
+    const count = await prisma.message.count({
+      where: {
+        conversation: { OR: [{ buyerId: userId }, { sellerId: userId }] },
+        senderId: { not: userId },
+        readAt: null,
+        deletedForAllAt: null,
+        hiddenFor: { none: { userId } },
+      },
     });
-    const ids = conversations.map((c) => c.id);
-
-    const count = ids.length
-      ? await prisma.message.count({
-          where: { conversationId: { in: ids }, senderId: { not: userId }, readAt: null },
-        })
-      : 0;
-
     return ok(res, { count });
   } catch (error) {
     next(error);

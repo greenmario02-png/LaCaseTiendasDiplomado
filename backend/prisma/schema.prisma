@@ -802,7 +802,8 @@ model Conversation {
   seller       User     @relation("ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
   productId    Int?
   product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  orderId      Int?
+  /// Una conversacion por pedido (POST /api/chat/order/:orderId/open).
+  orderId      Int?     @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   messages     Message[]
@@ -874,10 +875,115 @@ model Message {
   contentType    String       @default("text")
   readAt         DateTime?
   createdAt      DateTime     @default(now())
+  /// TEXT | IMAGE | FILE | PAYMENT_QR | PAYMENT_PROOF | SYSTEM. Solo el servidor fija PAYMENT_QR y SYSTEM.
+  kind            String              @default("TEXT") @db.VarChar(16)
+  /// Id del cliente para envio optimista e idempotente (unico por conversacion y remitente).
+  clientId        String?             @db.VarChar(64)
+  replyToId       Int?
+  replyTo         Message?            @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies         Message[]           @relation("MessageReply")
+  /// Pedido al que se vincula (comprobante de pago, eventos del pedido).
+  orderId         Int?
+  /// Datos del servidor: { qrUrl } en PAYMENT_QR, { event, orderId } en SYSTEM.
+  meta            Json?
+  deliveredAt     DateTime?
+  deletedForAllAt DateTime?
+  attachments     ChatAttachment[]
+  hiddenFor       ChatMessageHidden[]
 
+  @@unique([conversationId, senderId, clientId])
   @@index([conversationId])
+  @@index([conversationId, id])
   @@index([senderId])
   @@map("messages")
+}
+
+// Chat: adjuntos privados, preferencias, bloqueos, reportes y privacidad.
+// Tablas laterales; solo `chat_attachments` y `chat_message_hidden` cuelgan de `messages`.
+
+/// Archivo adjunto de un mensaje. NO es publico: vive en private-uploads/chat y se sirve con URL firmada por usuario.
+model ChatAttachment {
+  id             Int      @id @default(autoincrement())
+  messageId      Int
+  message        Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  conversationId Int
+  uploaderId     Int
+  /// Nombre aleatorio en disco (hex + extension); nunca el nombre original.
+  storageKey     String   @unique @db.VarChar(80)
+  mime           String   @db.VarChar(40)
+  size           Int
+  width          Int?
+  height         Int?
+  /// Solo para PDF: nombre saneado para mostrar (texto plano).
+  displayName    String?  @db.VarChar(100)
+  createdAt      DateTime @default(now())
+
+  @@index([conversationId])
+  @@map("chat_attachments")
+}
+
+/// "Eliminar para mi": el mensaje deja de verse solo para ese usuario.
+model ChatMessageHidden {
+  messageId Int
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@id([messageId, userId])
+  @@index([userId])
+  @@map("chat_message_hidden")
+}
+
+/// Preferencias de un participante en una conversacion (silenciar).
+model ChatConversationPref {
+  conversationId Int
+  userId         Int
+  muted          Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+
+  @@id([conversationId, userId])
+  @@index([userId])
+  @@map("chat_conversation_prefs")
+}
+
+/// Bloqueo entre usuarios para el chat (en cualquier sentido impide enviar).
+model ChatBlock {
+  blockerId Int
+  blockedId Int
+  createdAt DateTime @default(now())
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
+  @@map("chat_blocks")
+}
+
+/// Reporte de una conversacion; mientras exista, el personal de moderacion puede revisar sus mensajes y adjuntos.
+model ChatReport {
+  id             Int       @id @default(autoincrement())
+  conversationId Int
+  reporterId     Int
+  reportedId     Int
+  reason         String    @db.VarChar(20)
+  details        String?   @db.VarChar(500)
+  /// OPEN | REVIEWED | DISMISSED
+  status         String    @default("OPEN") @db.VarChar(12)
+  resolvedById   Int?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([conversationId])
+  @@map("chat_reports")
+}
+
+/// Privacidad del chat por usuario y ultima vez en linea.
+model ChatUserSetting {
+  userId       Int       @id
+  hideLastSeen Boolean   @default(false)
+  lastSeenAt   DateTime?
+  updatedAt    DateTime  @updatedAt
+
+  @@map("chat_user_settings")
 }
 
 model Auction {
