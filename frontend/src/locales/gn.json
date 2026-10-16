@@ -756,7 +756,7 @@
         "summary": "Tienda: {{store}} · Kategoría: {{category}} · Stock: {{stock}}"
       },
       "editDialogTitle": "Mbosako'i producto",
-      "emptyPending": "Ndaipóri producto ohaarõva 🎉",
+      "emptyPending": "Ndaipóri producto ohaarõva",
       "featured": "Iporãvéva",
       "form": {
         "brand": "Marca",
@@ -921,7 +921,7 @@
     "reports": {
       "apply": "Emoĩ",
       "bcb": {
-        "title": "📊 Pizarra oficial — Banco Central Bolivia",
+        "title": "Pizarra oficial — Banco Central Bolivia",
         "tre": "TRe",
         "treSub": "Tasa de Referencia",
         "ufv": "UFV",
@@ -985,7 +985,7 @@
         "iueSub": "utilidad oje'éva rehegua (vendehára neto)",
         "iva": "IVA 13%",
         "ivaSub": "débito fiscal oje'éva ñemũ rehegua",
-        "title": "🧾 Impuesto referencial oje'éva (Ley 843)",
+        "title": "Impuesto referencial oje'éva (Ley 843)",
         "total": "Impuesto opavante oje'éva",
         "totalSub": "IVA + IT + IUE"
       },
@@ -1313,7 +1313,7 @@
       "endingSoon": "Opa mboyve",
       "interest": "Nde rehegua (interés + oferta)",
       "mostBids": "Oferta hetavéva",
-      "newest": "🆕 Pyahuvéva",
+      "newest": "Pyahuvéva",
       "priceAsc": "Repy michĩvéva",
       "priceDesc": "Repy tuichavéva"
     },
@@ -1332,7 +1332,7 @@
     "watchlist": {
       "activeInPlay": "{{count}} oĩ hína ñembosarái",
       "empty": {
-        "active": "Ndereoferta mba'eve subasta oĩvape. Ehecha subastakuéra ha eike: pe vy'apavẽ rehupyty hağua oferta porãme oha'arõ nde. ⚡",
+        "active": "Ndereoferta mba'eve subasta oĩvape. Ehecha subastakuéra ha eike: pe vy'apavẽ rehupyty hağua oferta porãme oha'arõ nde.",
         "followed": "Ndereikuaaporãi mba'eve subasta. Eiporu ta'ãnga marcador peteĩ subastápe eikuaaporã hağua.",
         "won": "Nderehupytýi gueteri mba'eve subasta."
       },
@@ -1344,14 +1344,14 @@
       "paid": "Ojehepyme'ẽma",
       "payNow": "Ehepyme'ẽ ko'ağa",
       "paymentWarning": "¡Vy'apavẽ! Erehupyty peteĩ térã hetave subasta. Ereguereko 48 aravo ehepyme'ẽ hağua, upéi ojevy jey subastápe. Eiporu \"Ehepyme'ẽ\" peteĩteĩ tarjetápe.",
-      "pendingPayment": "⏳ Ohaarõ jehepyme'ẽ",
+      "pendingPayment": "Ohaarõ jehepyme'ẽ",
       "remove": "Mboguete",
       "tabs": {
-        "active": "⚡ Oĩva ({{count}})",
+        "active": "Oĩva ({{count}})",
         "followed": "Ojehecháva ({{count}})",
         "won": "Ho'upyre ({{count}})"
       },
-      "timeToPay": "⏱️ Opyta ndéve {{hours}}h ehepyme'ẽ hağua",
+      "timeToPay": "Opyta ndéve {{hours}}h ehepyme'ẽ hağua",
       "title": "Che subastakuéra",
       "wonBy": "Ho'u: {{firstName}}",
       "wonFor": "Ho'upyre {{price}} reheve"
@@ -1472,8 +1472,8 @@
       "purchaseAndSaleConversations": "Ñomongeta jogua ha vende rehegua",
       "viewFullPage": "Ehecha kuatiarogue tuichakue"
     },
-    "icebreakersHint": "💬 Jehechauka ñepyrũ hağua ñomongeta:",
-    "inactivityHint": "⏰ Mbohovái'ỹre gueteri — jehechauka ({{region}}):",
+    "icebreakersHint": "Jehechauka ñepyrũ hağua ñomongeta:",
+    "inactivityHint": "Mbohovái'ỹre gueteri — jehechauka ({{region}}):",
     "loginButton": "Eike",
     "loginPrompt": "Eike ehecha hağua nde ñomongeta",
     "menu": {
@@ -1528,8 +1528,8 @@
     "sellerNotesPlaceholder": "Techapyrã: epuru mboyve eme'ẽ",
     "shipping": "Ñemondo",
     "shippingAddress": "Diresiõ ñemondo hağua",
-    "storePickupFree": "🏬 Ejopy tiendápe (rei)",
-    "storePickupLabel": "🏬 Ejopy tiendápe",
+    "storePickupFree": "Ejopy tiendápe (rei)",
+    "storePickupLabel": "Ejopy tiendápe",
     "storeTotal": "Opa mba'e tienda",
     "subtotal": "Subtotal",
     "title": "Checkout",
@@ -1856,7 +1856,7 @@
     "forYou": {
       "reasonHistory": "Nde jeheka ha mba'e rehecha'akue rupi",
       "reasonPopular": "Mba'e ojekuaaporãva eñepyrũ hağua",
-      "title": "Nde peg̃uarã 👋"
+      "title": "Nde peg̃uarã"
     },
     "hero": {
       "auctions": "Subastakuéra",
@@ -1877,7 +1877,7 @@
     "promotions": {
       "limitedTime": "aravo mbykýpe",
       "offLabel": "{{value}} OFF",
-      "storeLabel": "🏪 {{store}}",
+      "storeLabel": "{{store}}",
       "title": "Oferta pya'e",
       "viewAllFeminine": "Ehecha opavave →"
     },
@@ -1998,7 +1998,7 @@
     "centerTitle": "Notificación renda",
     "countSummary": "{{total}} notificación · {{unread}} moñe'ẽ'ỹva",
     "emptyAll": "Ndereguerekói notificación gueteri",
-    "emptyUnread": "Ndereguerekói notificación moñe'ẽ'ỹva 🎉",
+    "emptyUnread": "Ndereguerekói notificación moñe'ẽ'ỹva",
     "markAllRead": "Emoĩ opavave moñe'ẽmbyre",
     "onlyUnread": "Moñe'ẽ'ỹva añoite",
     "showAll": "Ehechauka opavave",
@@ -2212,7 +2212,7 @@
       "removeStoreFilter": "Mboguete filtro tienda mba'e",
       "searchButton": "Heka",
       "selectedStore": "Tienda jeporavopyre:",
-      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ★ {{rating}}",
       "tabs": {
         "brands": "Marcakuéra",
         "categories": "Kategoríakuéra",
@@ -2676,7 +2676,7 @@
       },
       "emptyState": "Ndehupytýi pedido gueteri",
       "pageTitle": "Pedido ojehupytýva",
-      "pickupChip": "🏬 Ejopy",
+      "pickupChip": "Ejopy",
       "shippingChip": "Ñemondo",
       "toasts": {
         "paymentStatusUpdated": "Jehepyme'ẽ estado oñemoambuéma",
@@ -3084,7 +3084,7 @@
       "sendingButton": "Oñemondohína...",
       "shippingLocationInfo": "Nde renda oñeiporu ekalkula hağua ñemondo hepy jogua hára-pe g̃uarã.",
       "socialHelperText": "Ndahekotevẽiva. Ojehecha nde perfil públicope emohu'ã ramo añoite.",
-      "socialTitle": "🌐 Redes sociales ha ñemongeta",
+      "socialTitle": "Redes sociales ha ñemongeta",
       "stateLabel": "Departamento/Provincia",
       "storeLocationLabel": "Tienda renda",
       "storeNameLabel": "Tienda réra",
@@ -3154,7 +3154,7 @@
     "notFound": "Vendehára ndojejuhúi",
     "privilegedBuyer": "✓ Jogua hára jeporavopyre",
     "privilegedProductsNote": "Ko mba'ekuéra ndojemyerakuãi gueteri opavavépe. Nde eiko umi ypykue ohecháva apytépe.",
-    "privilegedProductsTitle": "Mba'e pyahu — jogua hára jeporavopyre g̃uarã añoite 🔑",
+    "privilegedProductsTitle": "Mba'e pyahu — jogua hára jeporavopyre g̃uarã añoite",
     "productsOf": "{{storeName}} mba'e",
     "purchasedOn": "Ojogua · {{date}}",
     "ratedByCount": "{{count}} tapicha omohalãi",

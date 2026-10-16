@@ -1,4 +1,5 @@
 import { Box, Chip, Typography } from '@mui/material';
+import { CatalogIcon } from '../ui/CatalogIcon';
 import PlaceIcon from '@mui/icons-material/Place';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -87,7 +88,8 @@ export function JobCard({ job, onClick }: JobCardProps) {
         {job.category && (
           <Chip
             size="small"
-            label={`${job.category.icon ? job.category.icon + ' ' : ''}${job.category.name}`}
+            icon={<CatalogIcon value={job.category.icon} fontSize="small" />}
+            label={job.category.name}
             sx={{ bgcolor: `${t.primary}1F`, color: t.primary, fontWeight: 700 }}
           />
         )}

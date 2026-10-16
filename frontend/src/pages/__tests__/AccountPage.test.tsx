@@ -39,7 +39,8 @@ describe('AccountPage', () => {
         <AccountPage />
       </MemoryRouter>,
     );
-    expect(await screen.findByText(/🪙/)).toBeInTheDocument();
+    // El chip de monedas usa el ícono de MUI (sin emoji).
+    expect((await screen.findAllByTestId('MonetizationOnIcon')).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/10 monedas/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Mi cuenta')).toBeInTheDocument();
   });

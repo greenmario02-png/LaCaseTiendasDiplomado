@@ -756,7 +756,7 @@
         "summary": "Loja: {{store}} · Categoria: {{category}} · Estoque: {{stock}}"
       },
       "editDialogTitle": "Editar produto",
-      "emptyPending": "Não há produtos pendentes 🎉",
+      "emptyPending": "Não há produtos pendentes",
       "featured": "Destaque",
       "form": {
         "brand": "Marca",
@@ -921,7 +921,7 @@
     "reports": {
       "apply": "Aplicar",
       "bcb": {
-        "title": "📊 Painel oficial — Banco Central da Bolívia",
+        "title": "Painel oficial — Banco Central da Bolívia",
         "tre": "TRe",
         "treSub": "Taxa de Referência",
         "ufv": "UFV",
@@ -985,7 +985,7 @@
         "iueSub": "sobre lucro estimado (líquido do vendedor)",
         "iva": "IVA 13%",
         "ivaSub": "débito fiscal estimado sobre vendas",
-        "title": "🧾 Impostos referenciais estimados (Lei 843)",
+        "title": "Impostos referenciais estimados (Lei 843)",
         "total": "Total de impostos est.",
         "totalSub": "IVA + IT + IUE"
       },
@@ -1313,7 +1313,7 @@
       "endingSoon": "Terminam em breve",
       "interest": "Para você (interesse + lances)",
       "mostBids": "Mais lances",
-      "newest": "🆕 Mais recentes",
+      "newest": "Mais recentes",
       "priceAsc": "Menor preço",
       "priceDesc": "Maior preço"
     },
@@ -1332,7 +1332,7 @@
     "watchlist": {
       "activeInPlay": "{{count}} ativos em disputa",
       "empty": {
-        "active": "Você não está participando de nenhum leilão ativo. Explore os leilões e participe: a adrenalina de vencer com um bom lance te espera. ⚡",
+        "active": "Você não está participando de nenhum leilão ativo. Explore os leilões e participe: a adrenalina de vencer com um bom lance te espera.",
         "followed": "Você não segue nenhum leilão. Use o ícone de marcador em um leilão para segui-lo.",
         "won": "Você ainda não venceu nenhum leilão."
       },
@@ -1344,14 +1344,14 @@
       "paid": "Pago",
       "payNow": "Pagar agora",
       "paymentWarning": "Parabéns! Você venceu um ou mais leilões. Você tem 48 horas para pagar antes que voltem a ser leiloados. Toque em \"Pagar\" em cada cartão.",
-      "pendingPayment": "⏳ Pendente de pagamento",
+      "pendingPayment": "Pendente de pagamento",
       "remove": "Remover",
       "tabs": {
-        "active": "⚡ Ativos ({{count}})",
+        "active": "Ativos ({{count}})",
         "followed": "Seguidos ({{count}})",
         "won": "Vencidos ({{count}})"
       },
-      "timeToPay": "⏱️ Faltam {{hours}}h para pagar",
+      "timeToPay": "Faltam {{hours}}h para pagar",
       "title": "Meus leilões",
       "wonBy": "Venceu: {{firstName}}",
       "wonFor": "Vencido por {{price}}"
@@ -1472,8 +1472,8 @@
       "purchaseAndSaleConversations": "Conversas de compra e venda",
       "viewFullPage": "Ver página completa"
     },
-    "icebreakersHint": "💬 Sugestões para iniciar a conversa:",
-    "inactivityHint": "⏰ Ainda sem resposta — sugestões ({{region}}):",
+    "icebreakersHint": "Sugestões para iniciar a conversa:",
+    "inactivityHint": "Ainda sem resposta — sugestões ({{region}}):",
     "loginButton": "Entrar",
     "loginPrompt": "Entre para ver suas conversas",
     "menu": {
@@ -1528,8 +1528,8 @@
     "sellerNotesPlaceholder": "Ex: ligar antes de entregar",
     "shipping": "Frete",
     "shippingAddress": "Endereço de entrega",
-    "storePickupFree": "🏬 Retirada na loja (grátis)",
-    "storePickupLabel": "🏬 Retirada na loja",
+    "storePickupFree": "Retirada na loja (grátis)",
+    "storePickupLabel": "Retirada na loja",
     "storeTotal": "Total da loja",
     "subtotal": "Subtotal",
     "title": "Checkout",
@@ -1856,7 +1856,7 @@
     "forYou": {
       "reasonHistory": "Com base nas suas buscas e produtos que você viu",
       "reasonPopular": "Produtos populares para começar",
-      "title": "Para você 👋"
+      "title": "Para você"
     },
     "hero": {
       "auctions": "Leilões",
@@ -1877,7 +1877,7 @@
     "promotions": {
       "limitedTime": "por tempo limitado",
       "offLabel": "{{value}} OFF",
-      "storeLabel": "🏪 {{store}}",
+      "storeLabel": "{{store}}",
       "title": "Ofertas relâmpago",
       "viewAllFeminine": "Ver todas →"
     },
@@ -1998,7 +1998,7 @@
     "centerTitle": "Central de Notificações",
     "countSummary": "{{total}} notificações · {{unread}} não lidas",
     "emptyAll": "Você ainda não tem notificações",
-    "emptyUnread": "Você não tem notificações não lidas 🎉",
+    "emptyUnread": "Você não tem notificações não lidas",
     "markAllRead": "Marcar todas como lidas",
     "onlyUnread": "Somente não lidas",
     "showAll": "Mostrar todas",
@@ -2212,7 +2212,7 @@
       "removeStoreFilter": "Remover filtro de loja",
       "searchButton": "Buscar",
       "selectedStore": "Loja selecionada:",
-      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ★ {{rating}}",
       "tabs": {
         "brands": "Marcas",
         "categories": "Categorias",
@@ -2676,7 +2676,7 @@
       },
       "emptyState": "Você ainda não recebeu pedidos",
       "pageTitle": "Pedidos recebidos",
-      "pickupChip": "🏬 Retirada",
+      "pickupChip": "Retirada",
       "shippingChip": "Frete",
       "toasts": {
         "paymentStatusUpdated": "Status de pagamento atualizado",
@@ -3084,7 +3084,7 @@
       "sendingButton": "Enviando...",
       "shippingLocationInfo": "Sua localização é usada para calcular o custo de frete até o comprador.",
       "socialHelperText": "São opcionais. Só aparecem no seu perfil público se forem preenchidos.",
-      "socialTitle": "🌐 Redes sociais e contato",
+      "socialTitle": "Redes sociais e contato",
       "stateLabel": "Departamento/Província",
       "storeLocationLabel": "Localização da loja",
       "storeNameLabel": "Nome da loja",
@@ -3154,7 +3154,7 @@
     "notFound": "Vendedor não encontrado",
     "privilegedBuyer": "✓ Comprador privilegiado",
     "privilegedProductsNote": "Estes produtos ainda não foram publicados para o público em geral. Você é um dos primeiros a vê-los.",
-    "privilegedProductsTitle": "Produtos novos — somente para compradores privilegiados 🔑",
+    "privilegedProductsTitle": "Produtos novos — somente para compradores privilegiados",
     "productsOf": "Produtos de {{storeName}}",
     "purchasedOn": "Comprou · {{date}}",
     "ratedByCount": "{{count}} pessoa(s) avaliaram",

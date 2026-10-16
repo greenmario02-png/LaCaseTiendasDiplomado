@@ -29,6 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import Autocomplete from '@mui/material/Autocomplete';
 import { api } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
@@ -194,8 +195,8 @@ export default function AdminUsers() {
                       {u.firstName} {u.lastName}
                     </Typography>
                     {u.storeName && (
-                      <Typography variant="caption" color="primary">
-                        🏪 {u.storeName}
+                      <Typography variant="caption" color="primary" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                        <StorefrontOutlinedIcon sx={{ fontSize: 14 }} aria-hidden /> {u.storeName}
                       </Typography>
                     )}
                   </TableCell>

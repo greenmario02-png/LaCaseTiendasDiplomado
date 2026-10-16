@@ -1,4 +1,6 @@
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 export interface EmptyStateProps {
   message: string;
@@ -8,7 +10,7 @@ export interface EmptyStateProps {
 export function EmptyState({ message, action }: EmptyStateProps) {
   return (
     <Stack alignItems="center" spacing={1} sx={{ py: 6, color: 'text.secondary' }}>
-      <Typography variant="h4">🗂️</Typography>
+      <FolderOpenOutlinedIcon sx={{ fontSize: 40 }} aria-hidden />
       <Typography>{message}</Typography>
       {action}
     </Stack>
@@ -31,7 +33,7 @@ export interface ErrorStateProps {
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <Stack alignItems="center" spacing={1} sx={{ py: 6, color: 'error.main' }}>
-      <Typography variant="h4">⚠️</Typography>
+      <WarningAmberIcon sx={{ fontSize: 40 }} aria-hidden />
       <Typography>{message}</Typography>
       {onRetry && (
         <Button variant="outlined" onClick={onRetry} sx={{ textTransform: 'none' }}>

@@ -10,6 +10,7 @@ import {
   DialogTitle,
   FormControlLabel,
   IconButton,
+  MenuItem,
   Stack,
   Switch,
   Tab,
@@ -27,6 +28,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { CatalogIcon, CATALOG_ICON_KEYS, catalogIconKey } from '../../components/ui/CatalogIcon';
 import { api, getErrorMessage } from '../../services/api';
 import { useUnifiedTokens } from '../../theme';
 import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
@@ -256,9 +258,9 @@ export default function AdminJobs() {
             <Stack divider={<Box sx={{ borderBottom: `1px solid ${t.outline}33` }} />}>
               {cats.map((c) => (
                 <Box key={c.id} display="flex" alignItems="center" gap={1.5} py={1} flexWrap="wrap">
-                  <Typography fontSize={24} width={36} textAlign="center">
-                    {c.icon ?? '💼'}
-                  </Typography>
+                  <Box width={36} textAlign="center" fontSize={24} display="flex" justifyContent="center">
+                    <CatalogIcon value={c.icon} />
+                  </Box>
                   <Box flex={1} minWidth={140}>
                     <Typography fontWeight={600} color={c.isActive ? t.onSurface : t.onSurfaceVariant}>
                       {c.name}
@@ -303,7 +305,7 @@ export default function AdminJobs() {
                           {j.store.storeName}
                         </Typography>
                         {j.store.isVerified && <Chip size="small" color="success" variant="outlined" icon={<VerifiedIcon />} label={tr('admin.jobs.verifiedChip')} />}
-                        <Chip size="small" label={`${j.category.icon ?? ''} ${j.category.name}`.trim()} />
+                        <Chip size="small" icon={<CatalogIcon value={j.category.icon} fontSize="small" />} label={j.category.name} />
                       </Stack>
                       <Typography variant="body2" color={t.onSurfaceVariant} mt={0.5}>
                         {j.city}
@@ -398,7 +400,20 @@ export default function AdminJobs() {
         <DialogContent>
           <Stack spacing={2} mt={1}>
             <TextField label={tr('admin.jobs.categoryNameLabel')} size="small" value={catName} onChange={(e) => setCatName(e.target.value)} fullWidth autoFocus />
-            <TextField label={tr('admin.jobs.categoryIconLabel')} size="small" value={catIcon} onChange={(e) => setCatIcon(e.target.value)} placeholder="💼" fullWidth />
+            <TextField
+              select
+              label={tr('admin.jobs.categoryIconLabel')}
+              size="small"
+              value={catalogIconKey(catIcon) ?? 'work'}
+              onChange={(e) => setCatIcon(e.target.value)}
+              fullWidth
+            >
+              {CATALOG_ICON_KEYS.map((k) => (
+                <MenuItem key={k} value={k} sx={{ minHeight: 44, gap: 1 }}>
+                  <CatalogIcon value={k} fontSize="small" /> {k}
+                </MenuItem>
+              ))}
+            </TextField>
             <TextField label={tr('admin.jobs.orderLabel')} size="small" type="number" value={catOrder} onChange={(e) => setCatOrder(e.target.value)} fullWidth />
           </Stack>
         </DialogContent>

@@ -1,6 +1,7 @@
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { useTranslation } from 'react-i18next';
 import { useUnifiedTokens } from '../../theme';
 import { PriceDisplay } from './PriceDisplay';
@@ -33,7 +34,7 @@ export function ProductCard({ product, onAddToCart, onClick }: ProductCardProps)
         <CardMedia component="img" height="140" image={product.image} alt={product.name} />
       ) : (
         <Box sx={{ height: 140, bgcolor: tokens.surfaceContainerLowest, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h4">📦</Typography>
+          <Inventory2OutlinedIcon sx={{ fontSize: 40, color: 'text.disabled' }} aria-hidden />
         </Box>
       )}
       <CardContent sx={{ pb: '8px !important' }}>

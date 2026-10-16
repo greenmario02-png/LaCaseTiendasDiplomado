@@ -756,7 +756,7 @@
         "summary": "Qhatu: {{store}} · Categoria: {{category}} · Stock: {{stock}}"
       },
       "editDialogTitle": "Askichaña aljata",
-      "emptyPending": "Janiw utji aljatanaka suyt'atanaka 🎉",
+      "emptyPending": "Janiw utji aljatanaka suyt'atanaka",
       "featured": "Destakado",
       "form": {
         "brand": "Marka",
@@ -921,7 +921,7 @@
     "reports": {
       "apply": "Aplikaña",
       "bcb": {
-        "title": "📊 Pizarra ofisial — Banco Central Bolivia ukana",
+        "title": "Pizarra ofisial — Banco Central Bolivia ukana",
         "tre": "TRe",
         "treSub": "Tasa Referensia",
         "ufv": "UFV",
@@ -985,7 +985,7 @@
         "iueSub": "utilidad estimada ukana (neto aljiri)",
         "iva": "IVA 13%",
         "ivaSub": "débito fiscal estimado aljawinaka ukana",
-        "title": "🧾 Impuestos referensiales estimados (Ley 843)",
+        "title": "Impuestos referensiales estimados (Ley 843)",
         "total": "Taqpach impuestos est.",
         "totalSub": "IVA + IT + IUE"
       },
@@ -1313,7 +1313,7 @@
       "endingSoon": "Terminan jaykaki",
       "interest": "Taki jumaru (interes + churawinaka)",
       "mostBids": "Jukampi pujas",
-      "newest": "🆕 Jukampi resientes",
+      "newest": "Jukampi resientes",
       "priceAsc": "Chani jukampi bajo",
       "priceDesc": "Chani jukampi alto"
     },
@@ -1332,7 +1332,7 @@
     "watchlist": {
       "activeInPlay": "{{count}} aktiwanaka juego",
       "empty": {
-        "active": "Janiw akanaka pujando ni mayakis subasta aktiwa. Explora subastanaka ukat partisipa: adrenalina atipaña mpi maya buena churawi te espera. ⚡",
+        "active": "Janiw akanaka pujando ni mayakis subasta aktiwa. Explora subastanaka ukat partisipa: adrenalina atipaña mpi maya buena churawi te espera.",
         "followed": "Janiw sigues ni mayakis subasta. Apnaqam jupa ikono markador maya subasta taki seguirla.",
         "won": "Jichhakamasa janiw ganaste ni mayakis subasta."
       },
@@ -1344,14 +1344,14 @@
       "paid": "Pagarata",
       "payNow": "Pagaraña jichha",
       "paymentWarning": "¡Felisidades! Ganaste maya u jukampi subastanaka. Utjtam 48 pachanaka taki pagaraña nayra kuna wuelwan ru subasta. Toka \"Pagaraña\" sapa tarjeta.",
-      "pendingPayment": "⏳ Suyt'ata pagarawi",
+      "pendingPayment": "Suyt'ata pagarawi",
       "remove": "Kitar",
       "tabs": {
-        "active": "⚡ Aktiwanaka ({{count}})",
+        "active": "Aktiwanaka ({{count}})",
         "followed": "Seguidas ({{count}})",
         "won": "Ganadas ({{count}})"
       },
-      "timeToPay": "⏱️ Te kedan {{hours}}h taki pagaraña",
+      "timeToPay": "Te kedan {{hours}}h taki pagaraña",
       "title": "Nayana subastanaka",
       "wonBy": "Gano: {{firstName}}",
       "wonFor": "Atipata tama {{price}}"
@@ -1472,8 +1472,8 @@
       "purchaseAndSaleConversations": "Konwersasiyunes alasiwi ukat aljawi",
       "viewFullPage": "Uñjaña pagina phuqhata"
     },
-    "icebreakersHint": "💬 Sugerensias taki qalltaña konwersasiyun:",
-    "inactivityHint": "⏰ Janiw...mpi kutiyawi jichhakamasa — sugerensias ({{region}}):",
+    "icebreakersHint": "Sugerensias taki qalltaña konwersasiyun:",
+    "inactivityHint": "Janiw...mpi kutiyawi jichhakamasa — sugerensias ({{region}}):",
     "loginButton": "Inisiar mantawi",
     "loginPrompt": "Inisia mantawi taki uñjaña jumana konwersasiyunes",
     "menu": {
@@ -1528,8 +1528,8 @@
     "sellerNotesPlaceholder": "Ej: yamar nayra entregar",
     "shipping": "Apayawi",
     "shippingAddress": "Utjawi apayawi",
-    "storePickupFree": "🏬 Apsuwi qhatu (jani qullqini)",
-    "storePickupLabel": "🏬 Apsuwi qhatu",
+    "storePickupFree": "Apsuwi qhatu (jani qullqini)",
+    "storePickupLabel": "Apsuwi qhatu",
     "storeTotal": "Taqpach qhatu",
     "subtotal": "Subtutal",
     "title": "Checkout",
@@ -1856,7 +1856,7 @@
     "forYou": {
       "reasonHistory": "Ukhamarjama jumana buskedas ukat aljatanaka kuna wiste",
       "reasonPopular": "Aljatanaka populares taki qalltaña",
-      "title": "Taki jumaru 👋"
+      "title": "Taki jumaru"
     },
     "hero": {
       "auctions": "Subastanaka",
@@ -1877,7 +1877,7 @@
     "promotions": {
       "limitedTime": "tama pacha limitado",
       "offLabel": "{{value}} OFF",
-      "storeLabel": "🏪 {{store}}",
+      "storeLabel": "{{store}}",
       "title": "Churawinaka relampago",
       "viewAllFeminine": "Uñjaña taqi →"
     },
@@ -1998,7 +1998,7 @@
     "centerTitle": "Sentro Yatiyawinaka",
     "countSummary": "{{total}} yatiyawinaka · {{unread}} janiw...mpi liyiña",
     "emptyAll": "Janiw utjtam yatiyawinaka jichhakamasa",
-    "emptyUnread": "Janiw utjtam yatiyawinaka janiw...mpi liyiña 🎉",
+    "emptyUnread": "Janiw utjtam yatiyawinaka janiw...mpi liyiña",
     "markAllRead": "Chimpuchaña taqi leidas",
     "onlyUnread": "Kikpa janiw...mpi liyiña",
     "showAll": "Mostrar taqi",
@@ -2212,7 +2212,7 @@
       "removeStoreFilter": "Kitar filtru qhatu",
       "searchButton": "Thaqhaña",
       "selectedStore": "Qhatu seleksiyunada:",
-      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ★ {{rating}}",
       "tabs": {
         "brands": "Markas",
         "categories": "Categorianaka",
@@ -2676,7 +2676,7 @@
       },
       "emptyState": "Jichhakamasa janiw katuqta mayiwinaka",
       "pageTitle": "Mayiwinaka resibidos",
-      "pickupChip": "🏬 Apsuwi",
+      "pickupChip": "Apsuwi",
       "shippingChip": "Apayawi",
       "toasts": {
         "paymentStatusUpdated": "Istadu pagarawi aktualisado",
@@ -3084,7 +3084,7 @@
       "sendingButton": "Apayaskiwa...",
       "shippingLocationInfo": "Jumana utjawi se apnaqam taki jakhuchaña jupa kosto apayawi hasia jupa alasiri.",
       "socialHelperText": "Wa opsiyunales. Kikpa se muestran jumana perfil taqpach jaqi jisa kompletas.",
-      "socialTitle": "🌐 Redes sosiales ukat kuntaktu",
+      "socialTitle": "Redes sosiales ukat kuntaktu",
       "stateLabel": "Tipartamintu/Purwinsya",
       "storeLocationLabel": "Utjawi qhatu",
       "storeNameLabel": "Suti qhatu",
@@ -3154,7 +3154,7 @@
     "notFound": "Aljiri janiw jikxatata",
     "privilegedBuyer": "✓ Alasiri priwilegiado",
     "privilegedProductsNote": "Akanaka aljatanaka jichhakamasa janiw se publikan ru taqpach jaqi general. Eres primeros werlos.",
-    "privilegedProductsTitle": "Aljatanaka machaqanaka — kikpa taki alasirinaka priwilegiados 🔑",
+    "privilegedProductsTitle": "Aljatanaka machaqanaka — kikpa taki alasirinaka priwilegiados",
     "productsOf": "Aljatanaka {{storeName}}",
     "purchasedOn": "Kompro · {{date}}",
     "ratedByCount": "{{count}} jaqi(s) kalifikaron",

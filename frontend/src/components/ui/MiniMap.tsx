@@ -52,7 +52,7 @@ export default function MiniMap({ lat, lng, storeName = 'Tienda', locationVerifi
           <Marker position={[Number(lat), Number(lng)]}>
             <Popup>
               {storeName}
-              {locationVerified ? ' 📍 (verificada)' : ''}
+              {locationVerified ? ' (verificada)' : ''}
             </Popup>
           </Marker>
         </MapContainer>

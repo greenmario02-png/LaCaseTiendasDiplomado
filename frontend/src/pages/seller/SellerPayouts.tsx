@@ -29,6 +29,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import SavingsIcon from '@mui/icons-material/Savings';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { api, getErrorMessage } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import toast from 'react-hot-toast';
@@ -123,8 +124,8 @@ export default function SellerPayouts() {
         </Typography>
       </Box>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        🔒 {t('seller.payouts.escrowInfoBefore')}
+      <Alert severity="info" icon={<LockOutlinedIcon />} sx={{ mb: 3 }}>
+        {t('seller.payouts.escrowInfoBefore')}
         <strong>{t('seller.payouts.escrowInfoStrong')}</strong>
         {t('seller.payouts.escrowInfoAfter')}
       </Alert>

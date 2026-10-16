@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CatalogIcon } from '../components/ui/CatalogIcon';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SendIcon from '@mui/icons-material/Send';
@@ -299,7 +300,8 @@ export default function JobsPage() {
           {categories.map((c) => (
             <Chip
               key={c.id}
-              label={`${c.icon ? c.icon + ' ' : ''}${c.name}`}
+              icon={<CatalogIcon value={c.icon} fontSize="small" />}
+              label={c.name}
               clickable
               onClick={() => pickCategory(c.id)}
               color={categoryId === c.id ? 'primary' : 'default'}

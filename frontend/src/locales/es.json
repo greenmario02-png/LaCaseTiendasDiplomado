@@ -756,7 +756,7 @@
         "summary": "Tienda: {{store}} · Categoría: {{category}} · Stock: {{stock}}"
       },
       "editDialogTitle": "Editar producto",
-      "emptyPending": "No hay productos pendientes 🎉",
+      "emptyPending": "No hay productos pendientes",
       "featured": "Destacado",
       "form": {
         "brand": "Marca",
@@ -921,7 +921,7 @@
     "reports": {
       "apply": "Aplicar",
       "bcb": {
-        "title": "📊 Pizarra oficial — Banco Central de Bolivia",
+        "title": "Pizarra oficial — Banco Central de Bolivia",
         "tre": "TRe",
         "treSub": "Tasa de Referencia",
         "ufv": "UFV",
@@ -985,7 +985,7 @@
         "iueSub": "sobre utilidad estimada (neto vendedor)",
         "iva": "IVA 13%",
         "ivaSub": "débito fiscal estimado sobre ventas",
-        "title": "🧾 Impuestos referenciales estimados (Ley 843)",
+        "title": "Impuestos referenciales estimados (Ley 843)",
         "total": "Total impuestos est.",
         "totalSub": "IVA + IT + IUE"
       },
@@ -1313,7 +1313,7 @@
       "endingSoon": "Terminan pronto",
       "interest": "Para ti (interés + ofertas)",
       "mostBids": "Más pujas",
-      "newest": "🆕 Más recientes",
+      "newest": "Más recientes",
       "priceAsc": "Precio más bajo",
       "priceDesc": "Precio más alto"
     },
@@ -1332,7 +1332,7 @@
     "watchlist": {
       "activeInPlay": "{{count}} activas en juego",
       "empty": {
-        "active": "No estás pujando en ninguna subasta activa. Explora las subastas y participa: la adrenalina de ganar con una buena oferta te espera. ⚡",
+        "active": "No estás pujando en ninguna subasta activa. Explora las subastas y participa: la adrenalina de ganar con una buena oferta te espera.",
         "followed": "No sigues ninguna subasta. Usa el ícono de marcador en una subasta para seguirla.",
         "won": "Aún no ganaste ninguna subasta."
       },
@@ -1344,14 +1344,14 @@
       "paid": "Pagada",
       "payNow": "Pagar ahora",
       "paymentWarning": "¡Felicidades! Ganaste una o más subastas. Tienes 48 horas para pagar antes de que vuelvan a subasta. Toca \"Pagar\" en cada tarjeta.",
-      "pendingPayment": "⏳ Pendiente de pago",
+      "pendingPayment": "Pendiente de pago",
       "remove": "Quitar",
       "tabs": {
-        "active": "⚡ Activas ({{count}})",
+        "active": "Activas ({{count}})",
         "followed": "Seguidas ({{count}})",
         "won": "Ganadas ({{count}})"
       },
-      "timeToPay": "⏱️ Te quedan {{hours}}h para pagar",
+      "timeToPay": "Te quedan {{hours}}h para pagar",
       "title": "Mis subastas",
       "wonBy": "Ganó: {{firstName}}",
       "wonFor": "Ganada por {{price}}"
@@ -1472,8 +1472,8 @@
       "purchaseAndSaleConversations": "Conversaciones de compra y venta",
       "viewFullPage": "Ver página completa"
     },
-    "icebreakersHint": "💬 Sugerencias para empezar la conversación:",
-    "inactivityHint": "⏰ Sin respuesta todavía — sugerencias ({{region}}):",
+    "icebreakersHint": "Sugerencias para empezar la conversación:",
+    "inactivityHint": "Sin respuesta todavía — sugerencias ({{region}}):",
     "loginButton": "Iniciar sesión",
     "loginPrompt": "Inicia sesión para ver tus conversaciones",
     "menu": {
@@ -1528,8 +1528,8 @@
     "sellerNotesPlaceholder": "Ej: llamar antes de entregar",
     "shipping": "Envío",
     "shippingAddress": "Dirección de envío",
-    "storePickupFree": "🏬 Retiro en tienda (gratis)",
-    "storePickupLabel": "🏬 Retiro en tienda",
+    "storePickupFree": "Retiro en tienda (gratis)",
+    "storePickupLabel": "Retiro en tienda",
     "storeTotal": "Total tienda",
     "subtotal": "Subtotal",
     "title": "Checkout",
@@ -1856,7 +1856,7 @@
     "forYou": {
       "reasonHistory": "Según tus búsquedas y productos que viste",
       "reasonPopular": "Productos populares para empezar",
-      "title": "Para ti 👋"
+      "title": "Para ti"
     },
     "hero": {
       "auctions": "Subastas",
@@ -1877,7 +1877,7 @@
     "promotions": {
       "limitedTime": "por tiempo limitado",
       "offLabel": "{{value}} OFF",
-      "storeLabel": "🏪 {{store}}",
+      "storeLabel": "{{store}}",
       "title": "Ofertas relámpago",
       "viewAllFeminine": "Ver todas →"
     },
@@ -1998,7 +1998,7 @@
     "centerTitle": "Centro de Notificaciones",
     "countSummary": "{{total}} notificaciones · {{unread}} sin leer",
     "emptyAll": "No tienes notificaciones todavía",
-    "emptyUnread": "No tienes notificaciones sin leer 🎉",
+    "emptyUnread": "No tienes notificaciones sin leer",
     "markAllRead": "Marcar todas leídas",
     "onlyUnread": "Solo sin leer",
     "showAll": "Mostrar todas",
@@ -2212,7 +2212,7 @@
       "removeStoreFilter": "Quitar filtro de tienda",
       "searchButton": "Buscar",
       "selectedStore": "Tienda seleccionada:",
-      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ★ {{rating}}",
       "tabs": {
         "brands": "Marcas",
         "categories": "Categorías",
@@ -2676,7 +2676,7 @@
       },
       "emptyState": "Todavía no recibiste pedidos",
       "pageTitle": "Pedidos recibidos",
-      "pickupChip": "🏬 Retiro",
+      "pickupChip": "Retiro",
       "shippingChip": "Envío",
       "toasts": {
         "paymentStatusUpdated": "Estado de pago actualizado",
@@ -3084,7 +3084,7 @@
       "sendingButton": "Enviando...",
       "shippingLocationInfo": "Tu ubicación se usa para calcular el costo de envío hacia el comprador.",
       "socialHelperText": "Son opcionales. Solo se muestran en tu perfil público si los completas.",
-      "socialTitle": "🌐 Redes sociales y contacto",
+      "socialTitle": "Redes sociales y contacto",
       "stateLabel": "Departamento/Provincia",
       "storeLocationLabel": "Ubicación de la tienda",
       "storeNameLabel": "Nombre de la tienda",
@@ -3156,7 +3156,7 @@
     "notFound": "Vendedor no encontrado",
     "privilegedBuyer": "✓ Comprador privilegiado",
     "privilegedProductsNote": "Estos productos aún no se publican al público general. Eres de los primeros en verlos.",
-    "privilegedProductsTitle": "Productos nuevos — solo para compradores privilegiados 🔑",
+    "privilegedProductsTitle": "Productos nuevos — solo para compradores privilegiados",
     "productsOf": "Productos de {{storeName}}",
     "purchasedOn": "Compró · {{date}}",
     "ratedByCount": "{{count}} persona(s) calificaron",

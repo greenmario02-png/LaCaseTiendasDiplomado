@@ -756,7 +756,7 @@
         "summary": "Tienda: {{store}} · Categoría: {{category}} · Stock: {{stock}}"
       },
       "editDialogTitle": "Editar producto",
-      "emptyPending": "No hay productos pendientes 🎉",
+      "emptyPending": "No hay productos pendientes",
       "featured": "Destacado",
       "form": {
         "brand": "Marca",
@@ -921,7 +921,7 @@
     "reports": {
       "apply": "Aplicar",
       "bcb": {
-        "title": "📊 Pizarra oficial — Banco Central de Bolivia",
+        "title": "Pizarra oficial — Banco Central de Bolivia",
         "tre": "TRe",
         "treSub": "Tasa de Referencia",
         "ufv": "UFV",
@@ -985,7 +985,7 @@
         "iueSub": "sobre utilidad estimada (neto vendedor)",
         "iva": "IVA 13%",
         "ivaSub": "débito fiscal estimado sobre ventas",
-        "title": "🧾 Impuestos referenciales estimados (Ley 843)",
+        "title": "Impuestos referenciales estimados (Ley 843)",
         "total": "Total impuestos est.",
         "totalSub": "IVA + IT + IUE"
       },
@@ -1313,7 +1313,7 @@
       "endingSoon": "Utqhaylla tukukun",
       "interest": "Qampaq (munasqa + ofertakuna)",
       "mostBids": "Aswan achka ofertayuq",
-      "newest": "🆕 Musuqniyuq",
+      "newest": "Musuqniyuq",
       "priceAsc": "Chanin pisiyaq",
       "priceDesc": "Chanin hatunyaq"
     },
@@ -1332,7 +1332,7 @@
     "watchlist": {
       "activeInPlay": "{{count}} kawsachkaqkuna pukllayllapi",
       "empty": {
-        "active": "Manam huk kawsachkaq subastapipas ofertashankichu. Subastakunata qhaway hinaspa yaykuy: allin ofertawan atipaq kusikuyqa suyashasunkin. ⚡",
+        "active": "Manam huk kawsachkaq subastapipas ofertashankichu. Subastakunata qhaway hinaspa yaykuy: allin ofertawan atipaq kusikuyqa suyashasunkin.",
         "followed": "Manam subastatapas qatishankichu. Huk subastapi señal-cha ícono-ta llamk'achiy qatinaykipaq.",
         "won": "Manaraq ni hayk'aq subastatapas atipankichu."
       },
@@ -1344,14 +1344,14 @@
       "paid": "Pagasqa",
       "payNow": "Kunan pagay",
       "paymentWarning": "¡Kusikuyta! Huk utaq aswan achka subastakunata atiparqanki. 48 horayki kachkan pagananaykipaq, ñataq subastaman kutinqa. \"Pagay\" nisqata sapa tarjetapi llamk'achiy.",
-      "pendingPayment": "⏳ Pago suyashan",
+      "pendingPayment": "Pago suyashan",
       "remove": "Hurquy",
       "tabs": {
-        "active": "⚡ Kawsachkaqkuna ({{count}})",
+        "active": "Kawsachkaqkuna ({{count}})",
         "followed": "Qatisqakuna ({{count}})",
         "won": "Atipasqakuna ({{count}})"
       },
-      "timeToPay": "⏱️ {{hours}}h qhipanki pagananaykipaq",
+      "timeToPay": "{{hours}}h qhipanki pagananaykipaq",
       "title": "Subastasniykuna",
       "wonBy": "Atiparqan: {{firstName}}",
       "wonFor": "{{price}}-wan atipasqa"
@@ -1472,8 +1472,8 @@
       "purchaseAndSaleConversations": "Rantikuy hinaspa ranqhay rimanakuykuna",
       "viewFullPage": "Llapan p'anqata qhaway"
     },
-    "icebreakersHint": "💬 Rimanakuyta qallarinapaq yuyaychaykuna:",
-    "inactivityHint": "⏰ Manaraq kutichisqa — yuyaychaykuna ({{region}}):",
+    "icebreakersHint": "Rimanakuyta qallarinapaq yuyaychaykuna:",
+    "inactivityHint": "Manaraq kutichisqa — yuyaychaykuna ({{region}}):",
     "loginButton": "Yaykuy",
     "loginPrompt": "Rimanakuyniykikunata rikunaykipaq yaykuy",
     "menu": {
@@ -1528,8 +1528,8 @@
     "sellerNotesPlaceholder": "Ej: qayamuy apachiyta ñawpaqta",
     "shipping": "Apachiy",
     "shippingAddress": "Apachiy tiyasqa",
-    "storePickupFree": "🏬 Qhatupi hurquy (mana qullqiyuq)",
-    "storePickupLabel": "🏬 Qhatupi hurquy",
+    "storePickupFree": "Qhatupi hurquy (mana qullqiyuq)",
+    "storePickupLabel": "Qhatupi hurquy",
     "storeTotal": "Qhatupa tukuynin",
     "subtotal": "Sapa tukuy",
     "title": "Checkout",
@@ -1856,7 +1856,7 @@
     "forYou": {
       "reasonHistory": "Maskhasqaykikunaman hina hinaspa rikusqayki ranqhanakunaman hina",
       "reasonPopular": "Munasqa ranqhanakuna qallarinaykipaq",
-      "title": "Qampaq 👋"
+      "title": "Qampaq"
     },
     "hero": {
       "auctions": "Subastakuna",
@@ -1877,7 +1877,7 @@
     "promotions": {
       "limitedTime": "pisi pachallapaq",
       "offLabel": "{{value}} OFF",
-      "storeLabel": "🏪 {{store}}",
+      "storeLabel": "{{store}}",
       "title": "Utqhay descuentokuna",
       "viewAllFeminine": "Llapanta qhaway →"
     },
@@ -1998,7 +1998,7 @@
     "centerTitle": "Willakuykunapa Chawpin",
     "countSummary": "{{total}} willakuykuna · {{unread}} mana leesqa",
     "emptyAll": "Manam willakuykuna kanchu",
-    "emptyUnread": "Manam mana leesqa willakuykuna kanchu 🎉",
+    "emptyUnread": "Manam mana leesqa willakuykuna kanchu",
     "markAllRead": "Llapanta leesqa hina señalay",
     "onlyUnread": "Mana leesqallanta",
     "showAll": "Llapanta rikuchiy",
@@ -2212,7 +2212,7 @@
       "removeStoreFilter": "Qhatupa filtronta hurquy",
       "searchButton": "Maskhay",
       "selectedStore": "Akllasqa qhatu:",
-      "sellerSecondary": "{{city}}, {{state}}{{category}} · ⭐ {{rating}}",
+      "sellerSecondary": "{{city}}, {{state}}{{category}} · ★ {{rating}}",
       "tabs": {
         "brands": "Marcakuna",
         "categories": "Rikch'aqkuna",
@@ -2676,7 +2676,7 @@
       },
       "emptyState": "Manaraq mañakuykunata chaskirqankichu",
       "pageTitle": "Chaskisqa mañakuykuna",
-      "pickupChip": "🏬 Hurquy",
+      "pickupChip": "Hurquy",
       "shippingChip": "Apachiy",
       "toasts": {
         "paymentStatusUpdated": "Pagopa kaynin musuqchasqa",
@@ -3084,7 +3084,7 @@
       "sendingButton": "Apachishan...",
       "shippingLocationInfo": "Tiyasqaykiqa apachiy chaninta rantiqman yupanapaq llamk'achisqa kachkan.",
       "socialHelperText": "Mana obligatoriochu. Perfil publicoykipi rikhurinqaku hunt'achinki chayllapi.",
-      "socialTitle": "🌐 Redes sociales hinaspa rimanakuy",
+      "socialTitle": "Redes sociales hinaspa rimanakuy",
       "stateLabel": "Wamani",
       "storeLocationLabel": "Qhatupa tiyasqan",
       "storeNameLabel": "Qhatupa sutin",
@@ -3154,7 +3154,7 @@
     "notFound": "Ranqhaq mana tarisqa",
     "privilegedBuyer": "✓ Privilegiado rantiq",
     "privilegedProductsNote": "Kay ranqhanakunaqa manaraq llapan runakunapaq rikhurichisqachu. Ñawpaqkunapim kanki rikunaykipaq.",
-    "privilegedProductsTitle": "Musuq ranqhanakuna — privilegiado rantiqkunallapaq 🔑",
+    "privilegedProductsTitle": "Musuq ranqhanakuna — privilegiado rantiqkunallapaq",
     "productsOf": "{{storeName}}-pa ranqhanakunan",
     "purchasedOn": "Rantirqan · {{date}}",
     "ratedByCount": "{{count}} runa(kuna) chaninchirqanku",

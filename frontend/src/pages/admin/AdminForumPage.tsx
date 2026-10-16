@@ -52,6 +52,8 @@ import {
   type ForumCategory,
 } from '../../services/forum.api';
 import { useForumPalette } from '../../theme/forumTheme';
+import { CategoryIcon } from '../../theme/forumIcons';
+import FlagIcon from '@mui/icons-material/Flag';
 import { useUnifiedTokens } from '../../theme';
 import { StatCard } from '../../components/redesign/StatCard';
 import { PrimaryButton, SecondaryButton, GhostButton } from '../../components/redesign/Buttons';
@@ -327,7 +329,7 @@ export default function AdminForumPage() {
       slug: catForm.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-'),
       name: catForm.name.trim(),
       description: catForm.description.trim() || undefined,
-      icon: catForm.icon.trim() || 'general',
+      icon: catForm.icon.trim() || 'Forum',
       color: catForm.color.trim() || '#FF6B35',
       sortOrder: Number(catForm.sortOrder) || 0,
     };
@@ -413,7 +415,7 @@ export default function AdminForumPage() {
 
           <Card sx={{ bgcolor: forumPalette.bgCard, border: `1px solid ${forumPalette.border}` }}>
             <CardContent>
-              <Typography variant="h6" fontWeight={700} mb={2}>🚩 {t('admin.forum.pendingReportsTitle', { count: reports.length })}</Typography>
+              <Typography variant="h6" fontWeight={700} mb={2} display="flex" alignItems="center" gap={1}><FlagIcon color="error" aria-hidden /> {t('admin.forum.pendingReportsTitle', { count: reports.length })}</Typography>
               {reports.length === 0 ? (
                 <Alert severity="success">{t('admin.forum.noPendingReports')}</Alert>
               ) : (
@@ -528,7 +530,9 @@ export default function AdminForumPage() {
                 {cats.map((c) => (
                   <Box key={c.id} display="flex" alignItems="center" gap={1} flexWrap="wrap"
                     sx={{ borderBottom: `1px solid ${forumPalette.border}`, pb: 1 }}>
-                    <Typography sx={{ fontSize: 20 }}>{c.icon}</Typography>
+                    <Box component="span" sx={{ display: 'inline-flex', width: 24, justifyContent: 'center' }} aria-hidden>
+                      <CategoryIcon slug={c.slug} size={20} />
+                    </Box>
                     <Typography fontWeight={700} sx={{ minWidth: 150 }}>{c.name}</Typography>
                     <Chip label={c.slug} size="small" variant="outlined" />
                     <Chip label={c.isActive ? t('admin.common.active') : t('admin.common.inactive')} size="small"

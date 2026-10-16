@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CatalogIcon } from '../../components/ui/CatalogIcon';
 import { Link } from 'react-router-dom';
 import {
   Alert,
@@ -658,7 +659,7 @@ export default function SellerJobs() {
                           <Chip size="small" label={meta.label} color={meta.color} />
                         </Stack>
                         <Typography variant="body2" color={t.onSurfaceVariant}>
-                          {j.category.icon ?? ''} {j.category.name} ·{' '}
+                          <CatalogIcon value={j.category.icon} /> {j.category.name} ·{' '}
                           <PlaceOutlinedIcon sx={{ fontSize: 14, verticalAlign: 'text-bottom' }} /> {j.city}
                           {j.locationState ? `, ${j.locationState}` : ''} · {tr('seller.jobs.vacancyCount', { count: j.vacancies })}
                         </Typography>
@@ -727,7 +728,8 @@ export default function SellerJobs() {
               >
                 {categories.map((c) => (
                   <MenuItem key={c.id} value={c.id}>
-                    {c.icon ?? ''} {c.name}
+                    <CatalogIcon value={c.icon} fontSize="small" sx={{ mr: 1 }} />
+                    {c.name}
                   </MenuItem>
                 ))}
               </Select>

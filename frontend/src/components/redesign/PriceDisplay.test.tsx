@@ -24,15 +24,15 @@ describe('PriceDisplay', () => {
 });
 
 describe('CoinChip', () => {
-  it('muestra las monedas con el chip ámbar', () => {
-    render(<CoinChip coins={251} />);
-    expect(screen.getByText('🪙 251')).toBeInTheDocument();
-    const chip = screen.getByText('🪙 251').closest('span');
-    expect(chip).toBeInTheDocument();
+  it('muestra las monedas con el chip ámbar e ícono (sin emoji)', () => {
+    const { container } = render(<CoinChip coins={251} />);
+    expect(screen.getByText('251')).toBeInTheDocument();
+    expect(screen.getByTestId('MonetizationOnIcon')).toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/\p{Extended_Pictographic}/u);
   });
 
   it('acepta label personalizado', () => {
     render(<CoinChip coins={10} label="monedas" />);
-    expect(screen.getByText('🪙 10 monedas')).toBeInTheDocument();
+    expect(screen.getByText('10 monedas')).toBeInTheDocument();
   });
 });

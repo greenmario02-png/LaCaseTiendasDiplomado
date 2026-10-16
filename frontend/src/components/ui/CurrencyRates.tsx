@@ -113,8 +113,8 @@ export default function CurrencyRates() {
             title={
               <Box sx={{ fontSize: '0.75rem' }}>
                 <Box>Dólar: Bs {rates.rates.usd.toFixed(2)} — {rates.source.usd}</Box>
-                <Box>💶 Euro: Bs {rates.rates.eur.toFixed(2)} — {rates.source.eur}</Box>
-                <Box>💴 Yen: Bs {rates.rates.jpy.toFixed(4)} — {rates.source.jpy}</Box>
+                <Box>Euro: Bs {rates.rates.eur.toFixed(2)} — {rates.source.eur}</Box>
+                <Box>Yen: Bs {rates.rates.jpy.toFixed(4)} — {rates.source.jpy}</Box>
                 <Box>🇦🇷 Peso arg.: Bs {rates.rates.ars.toFixed(4)} — {rates.source.ars}</Box>
                 <Box>🇵🇪 Sol: Bs {rates.rates.pen.toFixed(2)} — {rates.source.pen}</Box>
                 <Box>🇨🇱 Peso chileno: Bs {rates.rates.clp.toFixed(5)} — {rates.source.clp}</Box>

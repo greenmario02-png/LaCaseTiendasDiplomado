@@ -26,6 +26,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import GavelIcon from '@mui/icons-material/Gavel';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { api } from '../services/api';
 import { useMoney } from '../hooks/useMoney';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
@@ -251,7 +252,7 @@ export default function AuctionsPage() {
                             {a.seller?.storeName}
                           </Typography>
                           <Typography variant="caption" color={isHot ? t.error : t.onSurfaceVariant} fontWeight={600}>
-                            ⏱ {formatTimeLeft(a.timeLeftMs, tr)}
+                            <TimerOutlinedIcon sx={{ fontSize: 14, verticalAlign: 'text-bottom', mr: 0.25 }} aria-hidden /> {formatTimeLeft(a.timeLeftMs, tr)}
                           </Typography>
                         </Box>
                       </CardContent>

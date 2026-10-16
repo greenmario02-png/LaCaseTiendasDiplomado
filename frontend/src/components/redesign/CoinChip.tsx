@@ -13,7 +13,7 @@ export function CoinChip({ coins, label }: CoinChipProps) {
   return (
     <Chip
       icon={<MonetizationOnIcon />}
-      label={label != null ? `🪙 ${coins} ${label}` : `🪙 ${coins}`}
+      label={label != null ? `${coins} ${label}` : `${coins}`}
       size="small"
       sx={{
         bgcolor: tokens.secondaryContainer,
