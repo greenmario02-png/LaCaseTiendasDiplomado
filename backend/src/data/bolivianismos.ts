@@ -41,7 +41,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Todavía está en venta?',
     ],
     sellerIcebreakers: [
-      '¡Hola case! Sí, está disponible 😊',
+      '¡Hola case! Sí, está disponible',
       '¿En qué le puedo ayudar, case?',
       'Todavía lo tengo, case, ¿le interesa?',
       'Dígame qué necesita, case, y le ayudo',
@@ -79,7 +79,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Último precio?',
     ],
     sellerIcebreakers: [
-      '¡Hola mi chiqui! Sí, está disponible 😊',
+      '¡Hola mi chiqui! Sí, está disponible',
       '¿En qué le ayudo, mi chiqui?',
       'Todavía lo tengo, mi chiqui, ¿le interesa?',
       'Cuénteme qué busca, mi chiqui',
@@ -117,7 +117,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Cuánto me lo deja de contado?',
     ],
     sellerIcebreakers: [
-      '¡Hola pana! Sí, está disponible 😊',
+      '¡Hola pana! Sí, está disponible',
       '¿En qué le ayudo, pana?',
       'Todavía lo tengo, pana, ¿le interesa?',
       'Dígame qué necesita, pana',
@@ -155,7 +155,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Último precio, pues?',
     ],
     sellerIcebreakers: [
-      '¡Hola che! Sí, está disponible 😊',
+      '¡Hola che! Sí, está disponible',
       '¿En qué le ayudo, che?',
       'Todavía lo tengo, che, ¿le interesa?',
       'Dígame qué necesita, che',
@@ -193,7 +193,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Cuál es el precio final?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible 😊',
+      '¡Hola! Sí, está disponible',
       '¿En qué le puedo ayudar?',
       'Todavía lo tengo, ¿le interesa?',
       'Cuénteme qué necesita',
@@ -231,7 +231,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Último precio?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible nomás 😊',
+      '¡Hola! Sí, está disponible nomás',
       '¿En qué le puedo ayudar?',
       'Todavía lo tengo, ¿le interesa?',
       'Dígame qué necesita nomás',
@@ -269,7 +269,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Cuál es su mejor precio?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible 😊',
+      '¡Hola! Sí, está disponible',
       '¿En qué le ayudo?',
       'Todavía lo tengo, ¿le interesa?',
       'Cuénteme qué busca',
@@ -307,7 +307,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Cuánto sale el envío?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible 😊',
+      '¡Hola! Sí, está disponible',
       '¿En qué le ayudo?',
       'Todavía lo tengo, ¿le interesa?',
       'Sí, hago envío hasta Trinidad',
@@ -345,7 +345,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿El envío cuánto sale?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible 😊',
+      '¡Hola! Sí, está disponible',
       '¿En qué le ayudo?',
       'Todavía lo tengo, ¿le interesa?',
       'Sí, envío hasta Cobija',
@@ -383,7 +383,7 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Cuál es el último precio?',
     ],
     sellerIcebreakers: [
-      '¡Hola! Sí, está disponible 😊',
+      '¡Hola! Sí, está disponible',
       '¿En qué le puedo ayudar?',
       'Todavía lo tengo, ¿le interesa?',
       'Cuénteme qué necesita',
