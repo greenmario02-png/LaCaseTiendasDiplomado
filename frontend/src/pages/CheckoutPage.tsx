@@ -28,6 +28,13 @@ import { apiErrorInfo, openOrderChat, usePayT } from '../lib/payments';
 import StorePaymentCard from '../components/payments/StorePaymentCard';
 import PaymentSafetyTip from '../components/payments/PaymentSafetyTip';
 
+interface PickupOption {
+  sellerId: number;
+  storeName: string | null;
+  storePickup: boolean;
+  storePickupAddress: string | null;
+}
+
 interface ShippingQuote {
   sellerId: number;
   sellerName: string;
@@ -50,7 +57,7 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [fulfillmentType, setFulfillmentType] = useState<'SHIPPING' | 'PICKUP'>('SHIPPING');
-  const [pickupAddress, setPickupAddress] = useState('');
+  const [pickupOptions, setPickupOptions] = useState<PickupOption[] | null>(null);
   const [quotes, setQuotes] = useState<ShippingQuote[]>([]);
   const [notes, setNotes] = useState('');
   const [checkingShipping, setCheckingShipping] = useState(false);
@@ -71,9 +78,19 @@ export default function CheckoutPage() {
         if (def) setSelectedAddress(def.id);
       })
       .catch(() => {});
+    // Retiro en tienda: solo las tiendas que configuraron la dirección real de su local lo ofrecen.
+    api
+      .get('/orders/checkout-options')
+      .then((res) => setPickupOptions(res.data.data?.sellers ?? []))
+      .catch(() => setPickupOptions([]));
   }, [fetchCart]);
 
   const selectedAddr = addresses.find((a) => a.id === selectedAddress);
+  // Solo las tiendas de lo seleccionado; el retiro se habilita si TODAS tienen dirección (el servidor valida lo mismo).
+  const selectedSellerIds = sel.groups.map((g) => g.seller.id);
+  const pickupSellers = (pickupOptions ?? []).filter((o) => selectedSellerIds.includes(o.sellerId));
+  // Mientras se cargan las opciones, el retiro queda deshabilitado (no se puede elegir antes de saberlo).
+  const storePickupAvailable = pickupSellers.length > 0 && pickupSellers.length === selectedSellerIds.length && pickupSellers.every((o) => o.storePickup);
 
   /** 409 CART_SELECTION_STALE: el carrito cambió en otra pestaña o dispositivo; se avisa y se recarga. */
   const handleStale = (err: unknown): boolean => {
@@ -88,10 +105,6 @@ export default function CheckoutPage() {
 
   const checkShipping = async () => {
     if (fulfillmentType === 'PICKUP') {
-      if (!pickupAddress.trim()) {
-        setError(t('checkout.errors.pickupAddressRequired'));
-        return;
-      }
       setQuotes([]);
       setCheckedShipping(true);
       setError('');
@@ -125,7 +138,6 @@ export default function CheckoutPage() {
       const { data } = await api.post('/orders', {
         shippingAddressId: fulfillmentType === 'SHIPPING' ? selectedAddress : undefined,
         fulfillmentType,
-        pickupAddress: fulfillmentType === 'PICKUP' ? pickupAddress.trim() : undefined,
         notes,
         couponCode: couponCode || undefined,
         cartItemIds,
@@ -212,8 +224,13 @@ export default function CheckoutPage() {
               }}
             >
               <FormControlLabel value="SHIPPING" control={<Radio />} label={t('checkout.homeDelivery')} />
-              <FormControlLabel value="PICKUP" control={<Radio />} label={t('checkout.storePickupFree')} />
+              <FormControlLabel value="PICKUP" control={<Radio />} label={t('checkout.storePickupFree')} disabled={!storePickupAvailable} />
             </RadioGroup>
+            {pickupOptions !== null && !storePickupAvailable && (
+              <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
+                {t('checkout.pickupUnavailable')}
+              </Typography>
+            )}
           </Paper>
 
           <Paper sx={{ p: 3, mb: 2 }}>
@@ -221,13 +238,21 @@ export default function CheckoutPage() {
               {fulfillmentType === 'PICKUP' ? t('checkout.pickupAddress') : t('checkout.shippingAddress')}
             </Typography>
             {fulfillmentType === 'PICKUP' ? (
-              <TextField
-                fullWidth
-                value={pickupAddress}
-                onChange={(e) => setPickupAddress(e.target.value)}
-                placeholder={t('checkout.pickupAddressPlaceholder')}
-                helperText={t('checkout.pickupAddressHelper')}
-              />
+              <Box data-testid="pickup-addresses">
+                <Typography variant="body2" color="text.secondary" mb={1.5}>
+                  {t('checkout.pickupAtStoreHelp')}
+                </Typography>
+                {pickupSellers.map((s) => (
+                  <Box key={s.sellerId} mb={1.5}>
+                    {pickupSellers.length > 1 && (
+                      <Typography variant="subtitle2" fontWeight={700}>
+                        {s.storeName}
+                      </Typography>
+                    )}
+                    <Typography variant="body2">{s.storePickupAddress}</Typography>
+                  </Box>
+                ))}
+              </Box>
             ) : addresses.length === 0 ? (
               <Alert severity="warning">
                 {t('checkout.noAddressesPrefix')} <a href="/cuenta/direcciones">{t('checkout.myAddressesLink')}</a>.

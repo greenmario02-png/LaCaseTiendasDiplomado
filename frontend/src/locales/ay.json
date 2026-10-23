@@ -1508,7 +1508,6 @@
     "couponPlaceholder": "Ej: BIENWENIDO10",
     "deliveryType": "Laya churawi",
     "errors": {
-      "pickupAddressRequired": "Qhanañcham utjawi apsuwi",
       "shippingAddressRequired": "Ajllim maya utjawi apayawi"
     },
     "freePickup": "Jani qullqini (apsuwi qhatu)",
@@ -1521,8 +1520,6 @@
     "paymentQrInfoStrong": "QR aljiri",
     "paymentQrInfoSuffix": ". Ru chiqapachaña weras jupa QR ukat deberas apkataña jupa qillqata comprobante transfirinsya.",
     "pickupAddress": "Utjawi apsuwi",
-    "pickupAddressHelper": "Qhanañcham kawkina retiraras jupa mayiwi (punto aljawi qhatu).",
-    "pickupAddressPlaceholder": "Ej: Aw. 16 Julio 1523, qhatu Lakase, Pas",
     "pickupPaymentInfoPrefix": "Retiras jupa mayiwi utjawi kuna indikaste. Jupa pagarawi se luri tama",
     "sellerNotes": "Notas taki jupa aljiri (munpach)",
     "sellerNotesPlaceholder": "Ej: yamar nayra entregar",

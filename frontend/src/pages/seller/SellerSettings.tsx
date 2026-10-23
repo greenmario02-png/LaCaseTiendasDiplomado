@@ -37,6 +37,7 @@ export default function SellerSettings() {
     locationCity: '',
     locationState: '',
     locationPostalCode: '',
+    storeAddress: '',
     latitude: '',
     longitude: '',
     youtubeUrl: '',
@@ -103,6 +104,7 @@ export default function SellerSettings() {
         locationCity: (user as any).locationCity || '',
         locationState: (user as any).locationState || '',
         locationPostalCode: (user as any).locationPostalCode || '',
+        storeAddress: (user as any).storeAddress || '',
         latitude: (user as any).latitude != null ? String((user as any).latitude) : '',
         longitude: (user as any).longitude != null ? String((user as any).longitude) : '',
         youtubeUrl: (user as any).youtubeUrl || '',
@@ -290,6 +292,17 @@ export default function SellerSettings() {
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField label={t('seller.settings.postalCodeLabel')} value={form.locationPostalCode} onChange={(e) => setForm({ ...form, locationPostalCode: e.target.value })} fullWidth />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label={t('seller.settings.storeAddressLabel')}
+              value={form.storeAddress}
+              onChange={(e) => setForm({ ...form, storeAddress: e.target.value })}
+              placeholder={t('seller.settings.storeAddressPlaceholder')}
+              helperText={t('seller.settings.storeAddressHelper')}
+              inputProps={{ maxLength: 300 }}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight={700} mb={1}>

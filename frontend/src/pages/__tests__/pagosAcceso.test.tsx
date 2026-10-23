@@ -47,9 +47,15 @@ vi.mock('../../stores/authStore', () => ({
 
 const PAYINFO = { storeId: 7, storeName: 'Tienda Siete', available: true, approved: true, full: true, qrUrl: '/uploads/payment-qr/q7-aa.png', method: 'BANK', bankName: 'BNB', accountHolder: 'Luis Mamani Cruz', accountNumber: '4455667788', phoneQr: null };
 
+let PICKUP_OPTIONS: Array<{ sellerId: number; storeName: string; storePickup: boolean; storePickupAddress: string | null }> = [
+  { sellerId: 7, storeName: 'Tienda Siete', storePickup: true, storePickupAddress: 'Calle Sucre 7, Tarija' },
+  { sellerId: 9, storeName: 'Tienda Nueve', storePickup: true, storePickupAddress: 'Calle Bolívar 9, Tarija' },
+];
+
 function routeApi() {
   apiGet.mockImplementation((url: string) => {
     if (url === '/account/addresses') return Promise.resolve({ data: { data: [] } });
+    if (url === '/orders/checkout-options') return Promise.resolve({ data: { data: { sellers: PICKUP_OPTIONS } } });
     if (url.startsWith('/stores/')) return Promise.resolve({ data: { data: { ...PAYINFO, storeId: Number(url.split('/')[2]) } } });
     if (url === '/orders/buyer/pending-payment-count') return Promise.resolve({ data: { data: { count: 3 } } });
     if (url === '/orders/buyer') return Promise.resolve({ data: { data: [], meta: { totalPages: 1 } } });
@@ -136,14 +142,65 @@ describe('Checkout: solo lo seleccionado, datos de pago, aviso y chat al pagar',
     expect(screen.getByRole('button', { name: 'Copiar Número de cuenta' })).toBeInTheDocument();
     expect(screen.getAllByTestId('payment-safety-tip').length).toBeGreaterThan(0);
     // retiro en tienda -> confirmar
+    await waitFor(() => expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeEnabled());
     await user.click(screen.getByLabelText(/Retiro en tienda \(gratis\)/));
-    fireEvent.change(screen.getByPlaceholderText(/Av\. 16 de Julio/), { target: { value: 'En la tienda' } });
     await user.click(screen.getByRole('button', { name: 'Continuar sin envío' }));
     await user.click(await screen.findByRole('button', { name: 'Confirmar y abrir el chat de pago' }));
     await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/mensajes/77'));
     const body = apiPost.mock.calls.find((c) => c[0] === '/orders')![1];
     expect(body.cartItemIds).toEqual([11]);
     expect(apiPost).toHaveBeenCalledWith('/chat/order/501/open');
+  });
+
+  it('retiro en tienda: muestra la dirección real de la tienda (sin campo para escribirla) y no la envía', async () => {
+    useCartSelection.setState({ excluded: [12] });
+    apiPost.mockImplementation((url: string) => {
+      if (url === '/orders') return Promise.resolve({ data: { data: [{ id: 503, sellerId: 7 }] } });
+      return Promise.reject(new Error('sin chat'));
+    });
+    const { default: CheckoutPage } = await import('../CheckoutPage');
+    const user = userEvent.setup();
+    render(<MemoryRouter><CheckoutPage /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeEnabled());
+    await user.click(screen.getByLabelText(/Retiro en tienda \(gratis\)/));
+    const box = screen.getByTestId('pickup-addresses');
+    expect(within(box).getByText('Calle Sucre 7, Tarija')).toBeInTheDocument();
+    // solo la tienda seleccionada, y sin nombre porque es una sola
+    expect(within(box).queryByText('Calle Bolívar 9, Tarija')).toBeNull();
+    expect(within(box).queryByRole('textbox')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Continuar sin envío' }));
+    await user.click(await screen.findByRole('button', { name: 'Confirmar y abrir el chat de pago' }));
+    await waitFor(() => expect(apiPost.mock.calls.some((c) => c[0] === '/orders')).toBe(true));
+    const body = apiPost.mock.calls.find((c) => c[0] === '/orders')![1];
+    expect(body.fulfillmentType).toBe('PICKUP');
+    expect(body.pickupAddress).toBeUndefined();
+  });
+
+  it('retiro en tienda deshabilitado si alguna tienda seleccionada no registró su dirección', async () => {
+    const prev = PICKUP_OPTIONS;
+    PICKUP_OPTIONS = [prev[0], { ...prev[1], storePickup: false, storePickupAddress: null }];
+    try {
+      const { default: CheckoutPage } = await import('../CheckoutPage');
+      render(<MemoryRouter><CheckoutPage /></MemoryRouter>);
+      expect(await screen.findByText(/Retiro en tienda no disponible/)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeDisabled();
+    } finally {
+      PICKUP_OPTIONS = prev;
+    }
+  });
+
+  it('con solo la tienda que sí tiene dirección seleccionada, el retiro se habilita', async () => {
+    const prev = PICKUP_OPTIONS;
+    PICKUP_OPTIONS = [prev[0], { ...prev[1], storePickup: false, storePickupAddress: null }];
+    useCartSelection.setState({ excluded: [12] });
+    try {
+      const { default: CheckoutPage } = await import('../CheckoutPage');
+      render(<MemoryRouter><CheckoutPage /></MemoryRouter>);
+      await waitFor(() => expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeEnabled());
+      expect(screen.queryByText(/Retiro en tienda no disponible/)).toBeNull();
+    } finally {
+      PICKUP_OPTIONS = prev;
+    }
   });
 
   it('si el servidor responde 409 CART_SELECTION_STALE, lo avisa y recarga el carrito', async () => {
@@ -154,8 +211,8 @@ describe('Checkout: solo lo seleccionado, datos de pago, aviso y chat al pagar',
     const { default: CheckoutPage } = await import('../CheckoutPage');
     const user = userEvent.setup();
     render(<MemoryRouter><CheckoutPage /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeEnabled());
     await user.click(screen.getByLabelText(/Retiro en tienda \(gratis\)/));
-    fireEvent.change(screen.getByPlaceholderText(/Av\. 16 de Julio/), { target: { value: 'En la tienda' } });
     await user.click(screen.getByRole('button', { name: 'Continuar sin envío' }));
     cartState.fetchCart.mockClear();
     await user.click(await screen.findByRole('button', { name: 'Confirmar y abrir el chat de pago' }));
@@ -178,8 +235,8 @@ describe('Checkout: solo lo seleccionado, datos de pago, aviso y chat al pagar',
         </Routes>
       </MemoryRouter>,
     );
+    await waitFor(() => expect(screen.getByLabelText(/Retiro en tienda \(gratis\)/)).toBeEnabled());
     await user.click(screen.getByLabelText(/Retiro en tienda \(gratis\)/));
-    fireEvent.change(screen.getByPlaceholderText(/Av\. 16 de Julio/), { target: { value: 'En la tienda' } });
     await user.click(screen.getByRole('button', { name: 'Continuar sin envío' }));
     await user.click(await screen.findByRole('button', { name: 'Confirmar y abrir el chat de pago' }));
     await waitFor(() => expect(screen.getByTestId('where').textContent).toBe('/checkout/confirmacion/502'));

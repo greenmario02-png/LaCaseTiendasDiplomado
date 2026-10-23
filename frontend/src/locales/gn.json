@@ -1508,7 +1508,6 @@
     "couponPlaceholder": "Ej: BIENVENIDO10",
     "deliveryType": "Mba'éichapa oñeme'ẽ",
     "errors": {
-      "pickupAddressRequired": "Emombe'u diresiõ ejopy hağua",
       "shippingAddressRequired": "Eiporavo peteĩ diresiõ ñemondo hağua"
     },
     "freePickup": "Rei (ejopy tiendápe)",
@@ -1521,8 +1520,6 @@
     "paymentQrInfoStrong": "QR vendehára mba'e",
     "paymentQrInfoSuffix": ". Emoañete rire rehecháta QR ha reupload va'erã komprobante transferencia mba'e.",
     "pickupAddress": "Diresiõ ejopy hağua",
-    "pickupAddressHelper": "Emombe'u moõpa erejopyta pedido (tienda renda).",
-    "pickupAddressPlaceholder": "Ej: Av. 16 de Julio 1523, tienda LaCase, La Paz",
     "pickupPaymentInfoPrefix": "Erejopyta pedido diresiõ eremombe'u'akuépe. Jehepyme'ẽ ojejapo",
     "sellerNotes": "Kuatia'i vendehára-pe g̃uarã (ndahekotevẽiva)",
     "sellerNotesPlaceholder": "Techapyrã: epuru mboyve eme'ẽ",

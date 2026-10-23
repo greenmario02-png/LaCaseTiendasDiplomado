@@ -1508,7 +1508,6 @@
     "couponPlaceholder": "Ej: BIENVENIDO10",
     "deliveryType": "Apachiy rikch'aqnin",
     "errors": {
-      "pickupAddressRequired": "Hurqunapaq tiyasqata churay",
       "shippingAddressRequired": "Huk apachiy tiyasqata akllay"
     },
     "freePickup": "Mana qullqiyuq (qhatupi hurquy)",
@@ -1521,8 +1520,6 @@
     "paymentQrInfoStrong": "ranqhaqpa QR-nin",
     "paymentQrInfoSuffix": ". Chiqapchaptiykiqa QR-ta rikunki, hinaspa transferencia comprobanteta churanayki tiyan.",
     "pickupAddress": "Hurqunapaq tiyasqa",
-    "pickupAddressHelper": "Maypi mañakusqaykita hurqunayki kaqta churay (qhatupa ranqhana puntun).",
-    "pickupAddressPlaceholder": "Ej: Av. 16 de Julio 1523, qhatu LaCase, La Paz",
     "pickupPaymentInfoPrefix": "Mañakusqaykita churasqayki tiyasqapi hurqunki. Pagoqa kaywan ruwakun:",
     "sellerNotes": "Ranqhaqpaq qillqa (mana obligatorio)",
     "sellerNotesPlaceholder": "Ej: qayamuy apachiyta ñawpaqta",
