@@ -815,6 +815,7 @@ const RBAC_PERMISSIONS = [
   { code: 'forum.post', module: 'forum', name: 'Publicar en el foro' },
   { code: 'forum.moderate', module: 'forum', name: 'Moderar el foro' },
   { code: 'forum.geo.manage', module: 'forum', name: 'Configurar zona/geolocalización' },
+  { code: 'catalog.reports.moderate', module: 'catalog', name: 'Revisar denuncias del catálogo (vendedor, tienda o producto)' },
 ];
 
 const RBAC_MENUS: Array<{ code: string; label: string; path: string; module: string; sortOrder: number }> = [
@@ -863,6 +864,7 @@ const RBAC_MENUS: Array<{ code: string; label: string; path: string; module: str
   { code: 'admin.calendar', label: 'Calendario', path: '/admin/calendario', module: 'admin', sortOrder: 18 },
   { code: 'admin.rbac', label: 'Roles y permisos', path: '/admin/rbac', module: 'admin', sortOrder: 19 },
   { code: 'admin.jobs', label: 'Empleos', path: '/admin/empleos', module: 'admin', sortOrder: 20 },
+  { code: 'admin.catalogReports', label: 'Denuncias del catálogo', path: '/admin/denuncias', module: 'admin', sortOrder: 21 },
 ];
 
 async function seedRbac() {
@@ -914,13 +916,13 @@ async function seedRbac() {
     ADMIN: RBAC_PERMISSIONS.map((p) => p.code),
     SELLER: ['seller.products.manage', 'seller.store.manage', 'forum.post'],
     CUSTOMER: ['forum.post'],
-    MODERADOR_FORO: ['forum.post', 'forum.moderate', 'forum.geo.manage'],
+    MODERADOR_FORO: ['forum.post', 'forum.moderate', 'forum.geo.manage', 'catalog.reports.moderate'],
   };
   const menuCodes: Record<string, string[]> = {
     ADMIN: RBAC_MENUS.map((m) => m.code),
     SELLER: RBAC_MENUS.filter((m) => m.module === 'seller' || m.module === 'public').map((m) => m.code),
     CUSTOMER: RBAC_MENUS.filter((m) => m.module === 'public').map((m) => m.code),
-    MODERADOR_FORO: [...RBAC_MENUS.filter((m) => m.module === 'public').map((m) => m.code), 'admin.forum'],
+    MODERADOR_FORO: [...RBAC_MENUS.filter((m) => m.module === 'public').map((m) => m.code), 'admin.forum', 'admin.catalogReports'],
   };
 
   for (const [code, perms] of Object.entries(permissionCodes)) {

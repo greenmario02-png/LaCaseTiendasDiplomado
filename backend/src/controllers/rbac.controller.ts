@@ -28,6 +28,7 @@ const FALLBACK_PERMISSIONS: Record<string, string[]> = {
     'forum.post',
     'forum.moderate',
     'forum.geo.manage',
+    'catalog.reports.moderate',
   ],
   SELLER: ['seller.products.manage', 'seller.store.manage', 'forum.post'],
   CUSTOMER: ['forum.post'],

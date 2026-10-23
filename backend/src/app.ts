@@ -25,6 +25,7 @@ import conoRoutes from './routes/cono.routes';
 import botAccountRoutes from './routes/bot-account.routes';
 import chatRoutes from './routes/chat.routes';
 import catalogReportRoutes from './routes/catalogReport.routes';
+import catalogReportAdminRoutes from './routes/catalogReportAdmin.routes';
 import trackingRoutes from './routes/tracking.routes';
 import auctionRoutes from './routes/auction.routes';
 import notificationRoutes from './routes/notification.routes';
@@ -133,6 +134,8 @@ export function createApp() {
   app.use('/api/products', productRoutes);
   app.use('/api/seller', sellerRoutes);
   app.use('/api/payout-account', payoutAccountRoutes);
+  // Antes de /api/admin (solo ADMIN): la cola de denuncias también la atiende el moderador asignado.
+  app.use('/api/admin/catalog-reports', catalogReportAdminRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/cart', cartRoutes);
   app.use('/api/orders', orderRoutes);

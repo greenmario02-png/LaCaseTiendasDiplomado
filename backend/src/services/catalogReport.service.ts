@@ -52,3 +52,94 @@ export async function createCatalogReport(reporterId: number, input: CreateCatal
     },
   });
 }
+
+// ── Cola de revisión (ADMIN o moderador asignado) ───────────────────────────────────────────────
+// CatalogReport no declara relaciones: el denunciante, el revisor y el objetivo se completan aquí.
+
+export interface AdminListCatalogReportsFilters {
+  status?: 'OPEN' | 'REVIEWED' | 'DISCARDED';
+  targetType?: CatalogReportTarget;
+  reason?: CatalogReportReason;
+  page: number;
+  limit: number;
+}
+
+function publicUser(u?: { id: number; firstName: string; lastName: string; email: string } | null) {
+  if (!u) return null;
+  return { id: u.id, name: `${u.firstName} ${u.lastName}`.trim(), email: u.email };
+}
+
+export async function adminListCatalogReports(f: AdminListCatalogReportsFilters) {
+  const where = {
+    status: f.status ?? 'OPEN',
+    ...(f.targetType ? { targetType: f.targetType } : {}),
+    ...(f.reason ? { reason: f.reason } : {}),
+  };
+  const [rows, total] = await Promise.all([
+    prisma.catalogReport.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (f.page - 1) * f.limit, take: f.limit }),
+    prisma.catalogReport.count({ where }),
+  ]);
+
+  const userIds = new Set<number>();
+  const productIds = new Set<number>();
+  for (const r of rows) {
+    userIds.add(r.reporterId);
+    if (r.reviewedBy) userIds.add(r.reviewedBy);
+    if (r.targetType === 'PRODUCT') productIds.add(r.targetId);
+    else userIds.add(r.targetId);
+  }
+  const [users, products] = await Promise.all([
+    userIds.size
+      ? prisma.user.findMany({ where: { id: { in: [...userIds] } }, select: { id: true, firstName: true, lastName: true, email: true, storeName: true } })
+      : [],
+    productIds.size ? prisma.product.findMany({ where: { id: { in: [...productIds] } }, select: { id: true, name: true, sellerId: true } }) : [],
+  ]);
+  const userById = new Map(users.map((u) => [u.id, u]));
+  const productById = new Map(products.map((p) => [p.id, p]));
+
+  return {
+    items: rows.map((r) => {
+      const targetUser = r.targetType === 'PRODUCT' ? undefined : userById.get(r.targetId);
+      const product = r.targetType === 'PRODUCT' ? productById.get(r.targetId) : undefined;
+      return {
+        id: r.id,
+        targetType: r.targetType,
+        targetId: r.targetId,
+        reason: r.reason,
+        detail: r.detail,
+        status: r.status,
+        createdAt: r.createdAt,
+        reviewedAt: r.reviewedAt,
+        adminNote: r.adminNote,
+        reporter: publicUser(userById.get(r.reporterId)),
+        reviewer: r.reviewedBy ? publicUser(userById.get(r.reviewedBy)) : null,
+        target:
+          r.targetType === 'PRODUCT'
+            ? { type: 'PRODUCT', id: r.targetId, name: product?.name ?? null, sellerId: product?.sellerId ?? null }
+            : { type: r.targetType, id: r.targetId, name: targetUser?.storeName || publicUser(targetUser)?.name || null, sellerId: r.targetId },
+      };
+    }),
+    total,
+  };
+}
+
+export interface UpdateCatalogReportInput {
+  status: 'REVIEWED' | 'DISCARDED';
+  note?: string;
+}
+
+export async function adminUpdateCatalogReportStatus(reviewerId: number, reportId: number, input: UpdateCatalogReportInput) {
+  const note = input.note?.trim().slice(0, 300) || null;
+  // updateMany con status OPEN es atómico: si dos personas procesan la misma denuncia a la vez,
+  // solo una la actualiza y la otra recibe 409 en lugar de pisar el resultado.
+  const result = await prisma.catalogReport.updateMany({
+    where: { id: reportId, status: 'OPEN' },
+    data: { status: input.status, reviewedAt: new Date(), reviewedBy: reviewerId, adminNote: note },
+  });
+  if (result.count === 0) {
+    const existing = await prisma.catalogReport.findUnique({ where: { id: reportId }, select: { id: true } });
+    if (!existing) throw ApiError.notFound('Denuncia no encontrada');
+    throw ApiError.conflict('Esta denuncia ya fue procesada');
+  }
+  return prisma.catalogReport.findUniqueOrThrow({ where: { id: reportId } });
+}
