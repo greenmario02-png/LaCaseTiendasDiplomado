@@ -102,6 +102,8 @@ export default function ChatPage() {
   const readColor = theme.palette.mode === 'dark' ? tokens.tertiaryContainer : '#A7F3D0';
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  // El resumen del pedido no dice si ya se calificó al comprador: se recuerda aquí tras un 201 o un 409.
+  const [ratedBuyerOrders, setRatedBuyerOrders] = useState<Set<number>>(new Set());
   const [activeId, setActiveId] = useState<number | null>(id ? Number(id) : null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<TabKind>('compras');
@@ -470,7 +472,17 @@ export default function ChatPage() {
             </Stack>
           </Box>
           {active.order && (
-            <OrderContextCard order={active.order} role={active.role} tokens={tokens} canSend={active.canSend} onSendQr={sendQr} onSendProof={() => setProofRequest((n) => n + 1)} />
+            <OrderContextCard
+              order={active.order}
+              role={active.role}
+              tokens={tokens}
+              canSend={active.canSend}
+              onSendQr={sendQr}
+              onSendProof={() => setProofRequest((n) => n + 1)}
+              buyerName={active.role === 'SELLER' ? headerTitle : undefined}
+              buyerRated={ratedBuyerOrders.has(active.order.id)}
+              onBuyerRated={(orderId) => setRatedBuyerOrders((prev) => new Set(prev).add(orderId))}
+            />
           )}
 
           <Box ref={scrollRef} onScroll={onScroll} sx={{ flex: 1, overflow: 'auto', p: 2, bgcolor: tokens.background, position: 'relative' }} role="log" aria-live="polite" aria-relevant="additions">

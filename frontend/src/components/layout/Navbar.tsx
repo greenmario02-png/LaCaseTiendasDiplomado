@@ -29,6 +29,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import ReportIcon from '@mui/icons-material/Report';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { styled, alpha } from '@mui/material/styles';
@@ -277,6 +278,9 @@ export default function Navbar() {
                 <Divider />
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta'); }}>
                   <AccountCircleIcon sx={{ mr: 1 }} /> {t('nav.menu.myAccount')}
+                </MenuItem>
+                <MenuItem onClick={() => { handleClose(); navigate('/cuenta/mi-calificacion'); }}>
+                  <StarBorderIcon sx={{ mr: 1 }} /> {t('nav.menu.myBuyerRating', { defaultValue: 'Mi calificación como comprador' })}
                 </MenuItem>
                 <MenuItem onClick={() => { handleClose(); navigate('/cuenta/postulaciones'); }}>
                   <AssignmentIndIcon sx={{ mr: 1 }} /> {t('nav.menu.myApplications')}

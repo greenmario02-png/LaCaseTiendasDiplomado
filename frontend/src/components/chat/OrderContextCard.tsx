@@ -11,6 +11,7 @@ import type { OrderSummary } from '../../services/chat.api';
 import { resolveImageUrl } from '../../services/api';
 import { useMoney } from '../../hooks/useMoney';
 import { useC } from '../../lib/chat/i18n';
+import RateBuyerAction from '../reviews/RateBuyerAction';
 
 interface Props {
   order: OrderSummary;
@@ -20,10 +21,15 @@ interface Props {
   canSend: boolean;
   onSendQr: () => void;
   onSendProof: () => void;
+  /** Nombre del comprador (el otro participante cuando role === 'SELLER'), para el diálogo de calificación. */
+  buyerName?: string;
+  /** true si ya se sabe que el vendedor calificó al comprador de este pedido. */
+  buyerRated?: boolean;
+  onBuyerRated?: (orderId: number) => void;
 }
 
 /** Tarjeta fija del pedido arriba del chat: productos, monto en la moneda elegida, estado y atajo de pago. */
-export default function OrderContextCard({ order, role, tokens, busy, canSend, onSendQr, onSendProof }: Props) {
+export default function OrderContextCard({ order, role, tokens, busy, canSend, onSendQr, onSendProof, buyerName, buyerRated, onBuyerRated }: Props) {
   const c = useC();
   const [open, setOpen] = useState(false);
   // Monto en la moneda elegida (si su tasa no se conoce, en Bs).
@@ -57,6 +63,16 @@ export default function OrderContextCard({ order, role, tokens, busy, canSend, o
           <Button size="small" variant="contained" startIcon={<QrCode2Icon />} onClick={onSendQr} disabled={busy || !canSend} sx={{ minHeight: 44 }}>
             {c('order.sendQr')}
           </Button>
+        )}
+        {role === 'SELLER' && (
+          <RateBuyerAction
+            orderId={order.id}
+            buyerName={buyerName}
+            status={order.status}
+            paymentStatus={order.paymentStatus}
+            rated={!!buyerRated}
+            onRated={(id) => onBuyerRated?.(id)}
+          />
         )}
         {role === 'BUYER' && (
           <Button size="small" variant="contained" startIcon={<UploadFileIcon />} onClick={onSendProof} disabled={busy || !canSend} sx={{ minHeight: 44 }}>

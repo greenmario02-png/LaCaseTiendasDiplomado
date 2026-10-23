@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { api } from '../../services/api';
 import { ordersApi, type SellerOrderPaymentStatus } from '../../services/orders.api';
+import RateBuyerAction from '../../components/reviews/RateBuyerAction';
 import { Truck } from 'lucide-react';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
@@ -40,6 +41,8 @@ export default function SellerOrders() {
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState('');
+  // La lista no dice si ya se calificó al comprador: se recuerda aquí tras un 201 o un 409.
+  const [ratedOrders, setRatedOrders] = useState<Set<number>>(new Set());
 
   const load = (p = 1) => {
     api
@@ -103,6 +106,7 @@ export default function SellerOrders() {
               <TableCell>{t('seller.orders.columns.delivery')}</TableCell>
               <TableCell>{t('seller.orders.columns.status')}</TableCell>
               <TableCell>{t('seller.orders.columns.payment')}</TableCell>
+              <TableCell>{t('seller.orders.columns.buyerRating', { defaultValue: 'Calificar' })}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -166,6 +170,16 @@ export default function SellerOrders() {
                   ) : (
                     <Chip label={paymentLabel(o.paymentStatus)} size="small" variant="outlined" />
                   )}
+                </TableCell>
+                <TableCell>
+                  <RateBuyerAction
+                    orderId={o.id}
+                    buyerName={`${o.buyer?.firstName ?? ''} ${o.buyer?.lastName ?? ''}`.trim() || undefined}
+                    status={o.status}
+                    paymentStatus={o.paymentStatus}
+                    rated={ratedOrders.has(o.id)}
+                    onRated={(id) => setRatedOrders((prev) => new Set(prev).add(id))}
+                  />
                 </TableCell>
               </TableRow>
             ))}

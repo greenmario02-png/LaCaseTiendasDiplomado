@@ -89,6 +89,7 @@ const AdminCalendar = lazy(() => import('./pages/admin/AdminCalendar'));
 const AdminRbac = lazy(() => import('./pages/admin/AdminRbac'));
 const AdminForumPage = lazy(() => import('./pages/admin/AdminForumPage'));
 const AdminCatalogReports = lazy(() => import('./pages/admin/AdminCatalogReports'));
+const MyBuyerRatingPage = lazy(() => import('./pages/account/MyBuyerRatingPage'));
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
 const JobsPage = lazy(() => import('./pages/JobsPage'));
 const MyApplicationsPage = lazy(() => import('./pages/account/MyApplicationsPage'));
@@ -340,6 +341,14 @@ export default function App() {
           <Route path="devoluciones" element={<SellerReturns />} />
         </Route>
 
+        <Route
+          path="/cuenta/mi-calificacion"
+          element={
+            <Protected>
+              <MyBuyerRatingPage />
+            </Protected>
+          }
+        />
         <Route
           path="/moderacion/denuncias"
           element={
