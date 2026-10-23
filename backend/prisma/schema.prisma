@@ -979,6 +979,30 @@ model ChatReport {
   @@map("chat_reports")
 }
 
+/// Denuncia de un vendedor, una tienda o un producto desde la ficha del producto. Sin relaciones
+/// declaradas a propósito: el objetivo puede ser un usuario o un producto según targetType.
+model CatalogReport {
+  id         Int       @id @default(autoincrement())
+  reporterId Int
+  /// SELLER | STORE | PRODUCT
+  targetType String    @db.VarChar(10)
+  targetId   Int
+  /// VENDEDOR_SOSPECHOSO | TIENDA_SOSPECHOSA | PRODUCTO_INADECUADO | OTRO
+  reason     String    @db.VarChar(30)
+  detail     String?   @db.VarChar(300)
+  /// OPEN | REVIEWED | DISCARDED
+  status     String    @default("OPEN") @db.VarChar(10)
+  reviewedAt DateTime?
+  reviewedBy Int?
+  adminNote  String?   @db.VarChar(300)
+  createdAt  DateTime  @default(now())
+
+  @@index([reporterId, createdAt])
+  @@index([targetType, targetId, status])
+  @@index([status, createdAt])
+  @@map("catalog_reports")
+}
+
 /// Privacidad del chat por usuario y ultima vez en linea.
 model ChatUserSetting {
   userId       Int       @id

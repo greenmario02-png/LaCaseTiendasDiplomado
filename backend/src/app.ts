@@ -24,6 +24,7 @@ import forumExtensionsRoutes from './routes/forum-extensions.routes';
 import conoRoutes from './routes/cono.routes';
 import botAccountRoutes from './routes/bot-account.routes';
 import chatRoutes from './routes/chat.routes';
+import catalogReportRoutes from './routes/catalogReport.routes';
 import trackingRoutes from './routes/tracking.routes';
 import auctionRoutes from './routes/auction.routes';
 import notificationRoutes from './routes/notification.routes';
@@ -138,6 +139,7 @@ export function createApp() {
   app.use('/api/account', accountRoutes);
   app.use('/api/builds', buildRoutes);
   app.use('/api/chat', chatRoutes);
+  app.use('/api/catalog-reports', catalogReportRoutes);
   app.use('/api/tracking', trackingRoutes);
   app.use('/api/jobs', jobRoutes);
   app.use('/api/auctions', auctionRoutes);
