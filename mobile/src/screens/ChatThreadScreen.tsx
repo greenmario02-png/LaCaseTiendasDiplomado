@@ -74,6 +74,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
   const [reportOpen, setReportOpen] = useState(false);
   const [atBottom, setAtBottom] = useState(true);
   const [incoming, setIncoming] = useState(0);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
   const socketRef = useRef<Socket | null>(null);
   const listRef = useRef<FlatList<Row>>(null);
   const jobs = useRef(new Map<string, Job>());
@@ -246,6 +247,39 @@ export default function ChatThreadScreen({ route, navigation }: any) {
     run(clientId, { type: 'qr' });
   };
 
+  /**
+   * El vendedor confirma o rechaza el comprobante de pago que mandó el comprador (doc 62 + acción nueva
+   * de este cambio). Pide confirmación (acción con efecto real sobre el pedido), llama al endpoint ya
+   * existente del backend y actualiza el pedido de la conversación en el momento, sin recargar la pantalla.
+   */
+  const updatePaymentStatus = async (status: 'VERIFIED' | 'REJECTED') => {
+    if (!conv?.order || verifyingPayment) return;
+    const orderId = conv.order.id;
+    setVerifyingPayment(true);
+    try {
+      const updated = await chatApi.updatePaymentStatus(orderId, status);
+      setConv((cv: any) => (cv?.order ? { ...cv, order: { ...cv.order, paymentStatus: updated.paymentStatus } } : cv));
+    } catch (err) {
+      Alert.alert(status === 'VERIFIED' ? c('order.markPaid') : c('order.rejectProof'), getErrorMessage(err));
+    } finally {
+      setVerifyingPayment(false);
+    }
+  };
+
+  const confirmVerifyPayment = () => {
+    Alert.alert(c('order.markPaid'), c('order.markPaidConfirm'), [
+      { text: c('cancel'), style: 'cancel' },
+      { text: c('order.markPaid'), onPress: () => updatePaymentStatus('VERIFIED') },
+    ]);
+  };
+
+  const confirmRejectPayment = () => {
+    Alert.alert(c('order.rejectProof'), c('order.rejectProofConfirm'), [
+      { text: c('cancel'), style: 'cancel' },
+      { text: c('order.rejectProof'), style: 'destructive', onPress: () => updatePaymentStatus('REJECTED') },
+    ]);
+  };
+
   const retry = (m: ChatMessage) => {
     const job = m.clientId ? jobs.current.get(m.clientId) : undefined;
     if (job && m.clientId) run(m.clientId, job);
@@ -401,6 +435,9 @@ export default function ChatThreadScreen({ route, navigation }: any) {
             proofMode.current = true;
             setAttachOpen(true);
           }}
+          onVerifyPayment={confirmVerifyPayment}
+          onRejectPayment={confirmRejectPayment}
+          verifyingPayment={verifyingPayment}
         />
       )}
 

@@ -50,6 +50,9 @@ export interface OrderSummary {
   items: Array<{ productId: number | null; name: string; quantity: number; unitPrice: number; image: string | null }>;
 }
 
+/** Estados que el vendedor puede fijar a mano (PENDING es el inicial, lo pone el sistema). */
+export type SellerPaymentStatus = 'VERIFIED' | 'REJECTED';
+
 export interface Presence {
   visible: boolean;
   online: boolean;
@@ -230,6 +233,13 @@ export const chatApi = {
     return data.data as ChatMessage;
   },
   sendQr: (id: number, clientId: string) => api.post(`/chat/${id}/payment-qr`, { clientId }).then((r) => r.data.data as ChatMessage),
+  /**
+   * El vendedor marca el pago como verificado o rechaza el comprobante que mandó el comprador
+   * (`PUT /orders/seller/:id/payment-status`, ya existe en el backend -- ver order.controller.ts/order.service.ts).
+   * orderId es el pedido de la conversación, no el id del mensaje.
+   */
+  updatePaymentStatus: (orderId: number, paymentStatus: SellerPaymentStatus) =>
+    api.put(`/orders/seller/${orderId}/payment-status`, { paymentStatus }).then((r) => r.data.data as { id: number; status: string; paymentStatus: string }),
   read: (id: number) => api.post(`/chat/${id}/read`),
   remove: (id: number, messageId: number, scope: 'me' | 'all') => api.delete(`/chat/${id}/messages/${messageId}`, { params: { scope } }),
   mute: (id: number, muted: boolean) => api.put(`/chat/${id}/mute`, { muted }),

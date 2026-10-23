@@ -1,6 +1,7 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import React from 'react';
+import { Alert } from 'react-native';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({ getItem: jest.fn(async () => null), setItem: jest.fn(async () => undefined), removeItem: jest.fn(async () => undefined) }));
 jest.mock('@react-navigation/native', () => {
@@ -25,8 +26,9 @@ jest.mock('socket.io-client', () => ({ io: () => mockSocket }));
 
 const mockGet = jest.fn<(...a: any[]) => Promise<any>>();
 const mockPost = jest.fn<(...a: any[]) => Promise<any>>();
+const mockPut = jest.fn<(...a: any[]) => Promise<any>>();
 jest.mock('../services/api', () => ({
-  api: { get: (...a: any[]) => mockGet(...a), post: (...a: any[]) => mockPost(...a), put: jest.fn(async () => ({ data: { data: {} } })), delete: jest.fn(async () => ({ data: { data: {} } })) },
+  api: { get: (...a: any[]) => mockGet(...a), post: (...a: any[]) => mockPost(...a), put: (...a: any[]) => mockPut(...a), delete: jest.fn(async () => ({ data: { data: {} } })) },
   getErrorMessage: (e: any) => e?.message ?? 'err',
   onAuthExpired: () => undefined,
   tokenStore: { get: async () => 'tok', set: async () => undefined, clear: async () => undefined },
@@ -55,11 +57,18 @@ const PAGE = {
     { id: 6, conversationId: 3, senderId: 7, kind: 'TEXT', content: 'Listo, pago ahora', createdAt: now, deliveredAt: now, readAt: now },
   ],
 };
+// Misma conversación #3, pero vista del vendedor (id 20) con un comprobante recién enviado por el comprador.
+const PAGE_SELLER_PROOF = {
+  ...PAGE,
+  role: 'SELLER',
+  order: { ...PAGE.order, paymentStatus: 'PROOF_SUBMITTED' },
+};
 
 beforeEach(() => {
   __resetChatSocket();
   mockGet.mockReset();
   mockPost.mockReset();
+  mockPut.mockReset();
   void i18n.changeLanguage('es');
   useAuthStore.setState({ user: { id: 7, email: 'a@a.com', firstName: 'Ana', lastName: 'Paz', role: 'CUSTOMER' } as any });
   mockGet.mockImplementation(async (url: string) => {
@@ -71,6 +80,7 @@ beforeEach(() => {
     if (url === '/chat/3/messages') return { data: { data: { id: 50, conversationId: 3, senderId: 7, kind: 'TEXT', content: body.content, clientId: body.clientId, createdAt: new Date().toISOString() } } };
     return { data: { data: {} } };
   });
+  mockPut.mockImplementation(async () => ({ data: { data: {} } }));
 });
 
 describe('Chat (móvil) — lista', () => {
@@ -107,5 +117,71 @@ describe('Chat (móvil) — conversación', () => {
     const clientId = (mockPost.mock.calls.find((c) => c[0] === '/chat/3/messages')![1] as any).clientId;
     mockHandlers['chat:message']?.({ conversationId: 3, message: { id: 50, conversationId: 3, senderId: 7, kind: 'TEXT', content: 'Hola tienda', clientId, createdAt: new Date().toISOString() } });
     await waitFor(() => expect(getAllByText('Hola tienda')).toHaveLength(1));
+  });
+
+  it('el comprador nunca ve los botones de verificación de pago, ni aunque el comprobante ya esté enviado', async () => {
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: { ...PAGE, order: { ...PAGE.order, paymentStatus: 'PROOF_SUBMITTED' } } } };
+      return { data: { data: null } };
+    });
+    const { findByText, queryByText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(queryByText('Marcar como pagado')).toBeNull();
+    expect(queryByText('Rechazar comprobante')).toBeNull();
+  });
+
+  it('el vendedor ve "Marcar como pagado"/"Rechazar comprobante" solo cuando el comprobante está enviado (PROOF_SUBMITTED)', async () => {
+    // Vista del vendedor (id 20) con paymentStatus PENDING todavía: no hay nada que verificar.
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: { ...PAGE, role: 'SELLER' } } };
+      return { data: { data: null } };
+    });
+    const { findByText, queryByText, getByText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(queryByText('Marcar como pagado')).toBeNull();
+    expect(getByText('Enviar mi QR')).toBeTruthy();
+  });
+
+  it('el vendedor marca el pago como confirmado: pide confirmación, llama al PUT ya existente del backend y actualiza el estado sin recargar', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_PROOF } };
+      return { data: { data: null } };
+    });
+    mockPut.mockImplementation(async () => ({ data: { data: { id: 77, status: 'CONFIRMED', paymentStatus: 'VERIFIED' } } }));
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation((_t, _m, buttons) => { void buttons?.[1]?.onPress?.(); });
+
+    const { findByText, getByText, queryByText, getByLabelText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(getByText('Marcar como pagado')).toBeTruthy();
+    expect(getByText('Rechazar comprobante')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Marcar como pagado'));
+
+    expect(alert).toHaveBeenCalledWith('Marcar como pagado', expect.any(String), expect.any(Array));
+    await waitFor(() => expect(mockPut).toHaveBeenCalledWith('/orders/seller/77/payment-status', { paymentStatus: 'VERIFIED' }));
+    await waitFor(() => expect(queryByText('Marcar como pagado')).toBeNull());
+    expect(getByText('Pago confirmado')).toBeTruthy();
+    alert.mockRestore();
+  });
+
+  it('el vendedor rechaza el comprobante: llama al PUT con REJECTED tras confirmar', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_PROOF } };
+      return { data: { data: null } };
+    });
+    mockPut.mockImplementation(async () => ({ data: { data: { id: 77, status: 'PENDING', paymentStatus: 'REJECTED' } } }));
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation((_t, _m, buttons) => { void buttons?.[1]?.onPress?.(); });
+
+    const { findByText, getByLabelText, queryByText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+
+    fireEvent.press(getByLabelText('Rechazar comprobante'));
+
+    await waitFor(() => expect(mockPut).toHaveBeenCalledWith('/orders/seller/77/payment-status', { paymentStatus: 'REJECTED' }));
+    await waitFor(() => expect(queryByText('Rechazar comprobante')).toBeNull());
+    alert.mockRestore();
   });
 });

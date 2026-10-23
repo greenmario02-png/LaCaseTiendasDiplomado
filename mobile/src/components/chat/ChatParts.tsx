@@ -234,13 +234,38 @@ export function MessageActions({ msg, myId, colors, onClose, onReply, onDelete }
 }
 
 /** Tarjeta fija del pedido arriba del chat. */
-export function OrderCard({ order, role, canSend, colors, onSendQr, onSendProof }: { order: OrderSummary; role: 'BUYER' | 'SELLER'; canSend: boolean; colors: AppColors; onSendQr: () => void; onSendProof: () => void }) {
+export function OrderCard({
+  order,
+  role,
+  canSend,
+  colors,
+  onSendQr,
+  onSendProof,
+  onVerifyPayment,
+  onRejectPayment,
+  verifyingPayment,
+}: {
+  order: OrderSummary;
+  role: 'BUYER' | 'SELLER';
+  canSend: boolean;
+  colors: AppColors;
+  onSendQr: () => void;
+  onSendProof: () => void;
+  /** Vendedor confirma que recibió el pago tras revisar el comprobante. Solo tiene efecto con paymentStatus PROOF_SUBMITTED. */
+  onVerifyPayment?: () => void;
+  /** Vendedor rechaza el comprobante (p. ej. monto o datos incorrectos). */
+  onRejectPayment?: () => void;
+  verifyingPayment?: boolean;
+}) {
   const c = useChatText();
   const s = stylesFor(colors);
   const [open, setOpen] = useState(false);
   const money = useMoney(); // monto del pedido en la moneda elegida, con su denominación
   const first = order.items.slice(0, 2).map((i) => `${i.quantity}× ${i.name}`).join(', ');
   const rest = order.items.length - 2;
+  // El vendedor solo actúa sobre un comprobante recién enviado; ya verificado, se muestra como estado.
+  const showVerifyActions = role === 'SELLER' && order.paymentStatus === 'PROOF_SUBMITTED' && !!(onVerifyPayment || onRejectPayment);
+  const showConfirmedBadge = role === 'SELLER' && order.paymentStatus === 'VERIFIED';
   return (
     <View style={s.orderCard} accessibilityLabel={c('order.title', { id: order.id })}>
       <View style={s.row}>
@@ -262,7 +287,37 @@ export function OrderCard({ order, role, canSend, colors, onSendQr, onSendProof 
         <Text style={s.chip}>{c(`order.status.${order.status}`)}</Text>
         <Text style={s.chip}>{c(`order.payment.${order.paymentStatus}`)}</Text>
         <View style={{ flex: 1 }} />
-        {role === 'SELLER' ? (
+        {showVerifyActions ? (
+          <View style={[s.row, { gap: 8 }]}>
+            <Pressable
+              onPress={onRejectPayment}
+              disabled={verifyingPayment || !onRejectPayment}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: verifyingPayment || !onRejectPayment }}
+              accessibilityLabel={c('order.rejectProof')}
+              style={[s.ctaSmall, { backgroundColor: colors.error }, (verifyingPayment || !onRejectPayment) && { opacity: 0.5 }]}
+            >
+              <X size={16} color="#fff" />
+              <Text style={s.ctaText}>{c('order.rejectProof')}</Text>
+            </Pressable>
+            <Pressable
+              onPress={onVerifyPayment}
+              disabled={verifyingPayment || !onVerifyPayment}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: verifyingPayment || !onVerifyPayment }}
+              accessibilityLabel={c('order.markPaid')}
+              style={[s.ctaSmall, { backgroundColor: colors.primaryDark }, (verifyingPayment || !onVerifyPayment) && { opacity: 0.5 }]}
+            >
+              <Check size={16} color="#fff" />
+              <Text style={s.ctaText}>{c('order.markPaid')}</Text>
+            </Pressable>
+          </View>
+        ) : showConfirmedBadge ? (
+          <View style={[s.row, s.confirmedBadge]} accessibilityRole="text" accessibilityLabel={c('order.paymentConfirmed')}>
+            <Check size={14} color={colors.primary} />
+            <Text style={s.confirmedText}>{c('order.paymentConfirmed')}</Text>
+          </View>
+        ) : role === 'SELLER' ? (
           <Pressable onPress={onSendQr} disabled={!canSend} accessibilityRole="button" accessibilityState={{ disabled: !canSend }} style={[s.cta, !canSend && { opacity: 0.5 }]}>
             <QrCode size={16} color="#fff" />
             <Text style={s.ctaText}>{c('order.sendQr')}</Text>
@@ -535,7 +590,10 @@ const makeStyles = (colors: AppColors) =>
     orderItems: { fontSize: 12, color: colors.textSecondary },
     chip: { fontSize: 11, color: colors.text, backgroundColor: colors.background, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, marginRight: 6, overflow: 'hidden' },
     cta: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primaryDark, borderRadius: 22, paddingHorizontal: 12, minHeight: 44 },
+    ctaSmall: { flexDirection: 'row', alignItems: 'center', borderRadius: 20, paddingHorizontal: 10, minHeight: 44 },
     ctaText: { color: '#fff', fontWeight: '700', fontSize: 13, marginLeft: 6 },
+    confirmedBadge: { backgroundColor: colors.background, borderRadius: 18, paddingHorizontal: 10, minHeight: 36, borderWidth: 1, borderColor: colors.primary },
+    confirmedText: { color: colors.primary, fontWeight: '700', fontSize: 12, marginLeft: 5 },
     iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
     thumb: { width: 34, height: 34, borderRadius: 6 },
     previewWrap: { flex: 1, padding: 16, paddingTop: 48 },
