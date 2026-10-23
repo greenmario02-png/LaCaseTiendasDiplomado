@@ -15,6 +15,7 @@ import {
   Pagination,
 } from '@mui/material';
 import { api } from '../../services/api';
+import { ordersApi, type SellerOrderPaymentStatus } from '../../services/orders.api';
 import { Truck } from 'lucide-react';
 import { useMoney } from '../../hooks/useMoney';
 import { getErrorMessage } from '../../services/api';
@@ -66,7 +67,7 @@ export default function SellerOrders() {
 
   const changePayment = async (orderId: number, paymentStatus: string) => {
     try {
-      await api.put(`/orders/seller/${orderId}/payment-status`, { paymentStatus });
+      await ordersApi.updateSellerPaymentStatus(orderId, paymentStatus as SellerOrderPaymentStatus);
       toast.success(t('seller.orders.toasts.paymentStatusUpdated'));
       load(page);
     } catch (err) {

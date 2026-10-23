@@ -16,6 +16,7 @@ import { systemText, timeOf, useC } from '../../lib/chat/i18n';
 import { fileUrl } from '../../services/chat.api';
 import { resolveImageUrl } from '../../services/api';
 import MessageTicks from './MessageTicks';
+import PaymentProofQuickAction from './PaymentProofQuickAction';
 
 interface Props {
   msg: ChatMessage;
@@ -28,10 +29,15 @@ interface Props {
   onDelete?: (m: ChatMessage, scope: 'me' | 'all') => void;
   onRetry?: (m: ChatMessage) => void;
   onOpenImage?: (src: string, alt: string) => void;
+  /** true si quien ve el chat es el vendedor de la orden de esta conversacion (habilita la accion rapida del comprobante). */
+  isSellerOfOrder?: boolean;
+  /** Estado de pago vigente de la orden (de la conversacion, no del mensaje) para decidir boton vs. insignia. */
+  orderPaymentStatus?: string | null;
+  onPaymentStatusChange?: (orderId: number, status: 'VERIFIED' | 'REJECTED') => void;
 }
 
 /** Burbuja de mensaje: mismo estilo que el chat anterior; anade adjuntos, QR, comprobante, cita, estados y acciones. */
-function MessageBubble({ msg: m, myId, otherName, tokens, readColor, compact, onReply, onDelete, onRetry, onOpenImage }: Props) {
+function MessageBubble({ msg: m, myId, otherName, tokens, readColor, compact, onReply, onDelete, onRetry, onOpenImage, isSellerOfOrder, orderPaymentStatus, onPaymentStatusChange }: Props) {
   const c = useC();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const mine = m.senderId === myId;
@@ -88,9 +94,14 @@ function MessageBubble({ msg: m, myId, otherName, tokens, readColor, compact, on
     return (
       <>
         {m.kind === 'PAYMENT_PROOF' && (
-          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, mb: 0.5 }}>
-            <ReceiptLongOutlinedIcon sx={{ fontSize: 16 }} aria-hidden /> {m.orderId ? c('proofFor', { id: m.orderId }) : c('kind.PAYMENT_PROOF')}
-          </Typography>
+          <>
+            <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, mb: 0.5 }}>
+              <ReceiptLongOutlinedIcon sx={{ fontSize: 16 }} aria-hidden /> {m.orderId ? c('proofFor', { id: m.orderId }) : c('kind.PAYMENT_PROOF')}
+            </Typography>
+            {isSellerOfOrder && m.orderId != null && (
+              <PaymentProofQuickAction orderId={m.orderId} paymentStatus={orderPaymentStatus} onChanged={onPaymentStatusChange} />
+            )}
+          </>
         )}
         {m.kind === 'PAYMENT_QR' && (
           <Box sx={{ mb: 0.5 }}>

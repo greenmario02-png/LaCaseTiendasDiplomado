@@ -517,6 +517,9 @@ export default function ChatPage() {
                   onDelete={onDelete}
                   onRetry={thread.retry}
                   onOpenImage={(src, alt) => setViewer({ src, alt })}
+                  isSellerOfOrder={active.role === 'SELLER'}
+                  orderPaymentStatus={active.order?.paymentStatus}
+                  onPaymentStatusChange={(_orderId, status) => active.order && thread.setConv({ ...active, order: { ...active.order, paymentStatus: status } })}
                 />
               ),
             )}

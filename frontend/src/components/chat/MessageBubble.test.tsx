@@ -5,6 +5,12 @@ import MessageBubble from './MessageBubble';
 import { unifiedLight } from '../../theme/unifiedTokens';
 import type { ChatMessage } from '../../lib/chat/chatModel';
 
+const updateSellerPaymentStatus = vi.fn();
+vi.mock('../../services/orders.api', () => ({
+  ordersApi: { updateSellerPaymentStatus: (...args: unknown[]) => updateSellerPaymentStatus(...args) },
+}));
+vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
+
 const base = (extra: Partial<ChatMessage> = {}): ChatMessage => ({
   id: 10,
   conversationId: 1,
@@ -68,6 +74,57 @@ describe('MessageBubble (chat mejorado)', () => {
     renderBubble(base({ kind: 'PAYMENT_PROOF', content: '', orderId: 55, attachment: { id: 4, mime: 'application/pdf', size: 2048, width: null, height: null, name: 'pago.pdf', url: '/api/chat/files/4?u=7&e=1&s=abc', hidden: false } }));
     expect(screen.getByText('Comprobante del pedido #55')).toBeInTheDocument();
     expect(screen.getByText('pago.pdf').closest('a')).toHaveAttribute('href', '/api/chat/files/4?u=7&e=1&s=abc');
+  });
+
+  it('accion rapida del comprobante: solo el vendedor la ve, y solo mientras el pago esta por verificar', () => {
+    const proof = (extra: Partial<ChatMessage> = {}) =>
+      base({
+        senderId: 8,
+        kind: 'PAYMENT_PROOF',
+        content: '',
+        orderId: 55,
+        attachment: { id: 4, mime: 'application/pdf', size: 2048, width: null, height: null, name: 'pago.pdf', url: '/api/chat/files/4?u=7&e=1&s=abc', hidden: false },
+        ...extra,
+      });
+
+    // Vendedor, comprobante recien enviado: ve los botones de accion rapida.
+    let r = renderBubble(proof(), { isSellerOfOrder: true, orderPaymentStatus: 'PROOF_SUBMITTED' });
+    expect(screen.getByRole('button', { name: 'Marcar como pagado' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Rechazar comprobante' })).toBeInTheDocument();
+    r.unmount();
+
+    // Comprador (no es el vendedor de la orden): no ve ninguna accion.
+    r = renderBubble(proof(), { isSellerOfOrder: false, orderPaymentStatus: 'PROOF_SUBMITTED' });
+    expect(screen.queryByRole('button', { name: 'Marcar como pagado' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Rechazar comprobante' })).toBeNull();
+    r.unmount();
+
+    // Vendedor, pero ya verificado: insignia en vez de botones.
+    r = renderBubble(proof(), { isSellerOfOrder: true, orderPaymentStatus: 'VERIFIED' });
+    expect(screen.getByText('Pago confirmado ✓')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Marcar como pagado' })).toBeNull();
+    r.unmount();
+
+    // Vendedor, pero ya rechazado: insignia de rechazo, sin botones.
+    r = renderBubble(proof(), { isSellerOfOrder: true, orderPaymentStatus: 'REJECTED' });
+    expect(screen.getByText('Comprobante rechazado')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Rechazar comprobante' })).toBeNull();
+    r.unmount();
+  });
+
+  it('accion rapida del comprobante: confirmar llama al endpoint compartido con SellerOrders.tsx', async () => {
+    updateSellerPaymentStatus.mockReset();
+    updateSellerPaymentStatus.mockResolvedValue({});
+    const onPaymentStatusChange = vi.fn();
+    renderBubble(
+      base({ senderId: 8, kind: 'PAYMENT_PROOF', content: '', orderId: 55, attachment: { id: 4, mime: 'application/pdf', size: 2048, width: null, height: null, name: 'pago.pdf', url: '/x', hidden: false } }),
+      { isSellerOfOrder: true, orderPaymentStatus: 'PROOF_SUBMITTED', onPaymentStatusChange },
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Marcar como pagado' }));
+    expect(updateSellerPaymentStatus).not.toHaveBeenCalled();
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Marcar como pagado' }));
+    expect(updateSellerPaymentStatus).toHaveBeenCalledWith(55, 'VERIFIED');
+    expect(onPaymentStatusChange).toHaveBeenCalledWith(55, 'VERIFIED');
   });
 
   it('mensaje eliminado y aviso del sistema', () => {
