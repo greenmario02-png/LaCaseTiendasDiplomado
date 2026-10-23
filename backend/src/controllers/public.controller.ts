@@ -5,6 +5,8 @@ import { prisma } from '../config/database';
 import { ApiError } from '../utils/errors';
 import { ok, created } from '../utils/response';
 import { APP_VERSION_INFO } from '../config/appVersion';
+import { assertReviewWindow } from '../utils/reviewWindow';
+import { getBuyerReviews } from '../services/order.service';
 
 /** Consultado por la app móvil al iniciar para avisar si hay una actualización disponible. */
 export async function appVersion(_req: AuthRequest, res: Response, next: NextFunction) {
@@ -44,23 +46,6 @@ export const REVIEW_TAG_PAIRS = [
 
 export const ALL_REVIEW_TAGS = REVIEW_TAG_PAIRS.flatMap((p) => [p.positive, p.negative]);
 
-/** Valida la ventana de 3 a 7 días para calificar (si la entrega tiene fecha registrada). */
-function assertReviewWindow(deliveredAt: Date | null | undefined) {
-  if (!deliveredAt) return; // órdenes viejas sin fecha de entrega: se permite
-  const now = Date.now();
-  const min = deliveredAt.getTime() + 3 * 24 * 3600000; // +3 días
-  const max = deliveredAt.getTime() + 7 * 24 * 3600000; // +7 días
-  if (now < min) {
-    throw ApiError.forbidden(
-      'Todavía no puedes calificar. Puedes hacerlo entre 3 y 7 días después de recibir tu compra.'
-    );
-  }
-  if (now > max) {
-    throw ApiError.forbidden(
-      'El período para calificar (3 a 7 días después de recibir tu compra) ya venció.'
-    );
-  }
-}
 
 export async function searchSellers(req: AuthRequest, res: Response, next: NextFunction) {
   try {
@@ -334,6 +319,17 @@ export async function addProductReview(req: AuthRequest, res: Response, next: Ne
     });
 
     return created(res, review);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** Calificaciones que recibió un comprador (privadas: el propio comprador o un ADMIN). */
+export async function buyerReviews(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const result = await getBuyerReviews(req.user!.id, req.user!.role, Number(req.params.id));
+    res.set('Cache-Control', 'private, no-store');
+    return ok(res, result);
   } catch (error) {
     next(error);
   }

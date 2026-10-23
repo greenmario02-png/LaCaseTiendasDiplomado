@@ -57,3 +57,11 @@ export const createOrderSchema = z.object({
 export const calculateShippingSchema = z.object({
   body: z.object({ buyerPostalCode: z.string().trim().min(1).max(20), cartItemIds: cartItemIdsField }),
 });
+
+/** El vendedor califica al comprador del pedido: 1 a 5 y comentario opcional. */
+export const buyerReviewSchema = z.object({
+  body: z.object({
+    rating: z.number().int().min(1).max(5),
+    comment: z.string().trim().max(1000).nullish(),
+  }),
+});

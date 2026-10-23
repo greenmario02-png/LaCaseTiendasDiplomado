@@ -13,6 +13,7 @@ import { getEffectivePrices } from './promotion.service';
 import { createNotification } from './notification.service';
 import { creditPurchaseCoins } from '../controllers/coins.controller';
 import { getIO } from '../config/socket';
+import { assertReviewWindow } from '../utils/reviewWindow';
 
 export interface ShippingQuote {
   sellerId: number;
@@ -686,3 +687,64 @@ export async function updatePaymentStatus(sellerId: number, orderId: number, pay
 }
 
 export { getCartKey };
+
+/**
+ * El vendedor de un pedido califica a su comprador: solo con el pedido entregado y el pago verificado,
+ * una vez por pedido y en la misma ventana de 3 a 7 días que usa la reseña del comprador al vendedor.
+ */
+export async function addBuyerReview(sellerId: number, orderId: number, rating: number, comment?: string | null) {
+  const order = await prisma.order.findFirst({ where: { id: orderId, sellerId } });
+  if (!order) throw ApiError.notFound('Orden no encontrada');
+  if (order.buyerId === sellerId) throw ApiError.badRequest('No puedes calificarte a ti mismo');
+  if (order.status !== 'DELIVERED' || order.paymentStatus !== 'VERIFIED') {
+    throw ApiError.forbidden('Solo puedes calificar al comprador después de que el pedido esté entregado y el pago verificado.');
+  }
+  assertReviewWindow(order.deliveredAt);
+
+  const existing = await prisma.buyerReview.findUnique({ where: { orderId } });
+  if (existing) throw ApiError.conflict('Ya calificaste al comprador de este pedido.');
+
+  let review;
+  try {
+    review = await prisma.buyerReview.create({
+      data: { orderId, sellerId, buyerId: order.buyerId, rating, comment: comment?.trim() || null },
+    });
+  } catch (e) {
+    // Dos envíos simultáneos: el índice único de orderId deja pasar solo uno.
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') throw ApiError.conflict('Ya calificaste al comprador de este pedido.');
+    throw e;
+  }
+
+  // Promedio del comprador, con el mismo redondeo que el rating de la tienda.
+  const agg = await prisma.buyerReview.aggregate({ where: { buyerId: order.buyerId }, _avg: { rating: true }, _count: true });
+  await prisma.user.update({
+    where: { id: order.buyerId },
+    data: { buyerRating: Math.round((agg._avg.rating ?? 0) * 10) / 10, buyerRatingsCount: agg._count },
+  });
+
+  return { ...review, avgRating: agg._avg.rating ?? 0, totalReviews: agg._count };
+}
+
+/**
+ * Calificaciones que recibió un comprador. Privadas: solo el propio comprador o un ADMIN (igual que su
+ * historial de compras); a diferencia de la reseña de una tienda, describen a una persona, no a un negocio.
+ */
+export async function getBuyerReviews(requesterId: number, requesterRole: string, buyerId: number) {
+  if (requesterId !== buyerId && requesterRole !== 'ADMIN') {
+    throw ApiError.forbidden('No puedes ver las calificaciones de otro comprador.');
+  }
+  const [reviews, agg] = await Promise.all([
+    prisma.buyerReview.findMany({ where: { buyerId }, orderBy: { createdAt: 'desc' }, take: 50 }),
+    prisma.buyerReview.aggregate({ where: { buyerId }, _avg: { rating: true }, _count: true }),
+  ]);
+  const sellerIds = [...new Set(reviews.map((r) => r.sellerId))];
+  const sellers = sellerIds.length
+    ? await prisma.user.findMany({ where: { id: { in: sellerIds } }, select: { id: true, storeName: true, storeLogo: true } })
+    : [];
+  const sellerById = new Map(sellers.map((s) => [s.id, s]));
+  return {
+    reviews: reviews.map((r) => ({ ...r, seller: sellerById.get(r.sellerId) ?? null })),
+    avgRating: agg._avg.rating ?? 0,
+    totalReviews: agg._count,
+  };
+}

@@ -108,6 +108,9 @@ facebookUrl        String?
 whatsappPhone      String?
   rating             Float     @default(0)
   totalSales         Int       @default(0)
+  // Calificación como comprador (la que le ponen los vendedores, ver model BuyerReview): promedio y conteo.
+  buyerRating        Float     @default(0)
+  buyerRatingsCount  Int       @default(0)
   freeShippingThreshold Decimal? @db.Decimal(12, 2)
   isVerified         Boolean   @default(false)
   nit                String?
@@ -977,6 +980,23 @@ model ChatReport {
   @@index([status, createdAt])
   @@index([conversationId])
   @@map("chat_reports")
+}
+
+/// Calificación del vendedor al comprador de un pedido (la del comprador al vendedor es `Review`).
+/// Modelo propio en vez de ampliar `Review`: aquí el vínculo con el pedido es 1:1 y obligatorio
+/// (una calificación por pedido entregado y pagado). Sin relaciones declaradas: se valida en el servicio.
+model BuyerReview {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @unique
+  sellerId  Int
+  buyerId   Int
+  rating    Int
+  comment   String?  @db.VarChar(1000)
+  createdAt DateTime @default(now())
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@map("buyer_reviews")
 }
 
 /// Denuncia de un vendedor, una tienda o un producto desde la ficha del producto. Sin relaciones

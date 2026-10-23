@@ -25,6 +25,16 @@ export async function createOrders(req: AuthRequest, res: Response, next: NextFu
   }
 }
 
+/** El vendedor del pedido califica a su comprador. */
+export async function addBuyerReview(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { rating, comment } = req.body;
+    return created(res, await orderService.addBuyerReview(req.user!.id, Number(req.params.id), rating, comment));
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function checkoutOptions(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     return ok(res, { sellers: await orderService.checkoutOptions(req) });

@@ -3,7 +3,7 @@ import { Router } from 'express';
 import * as orderController from '../controllers/order.controller';
 import { validate } from '../middlewares/validate';
 import { requireSeller } from '../middlewares/roles';
-import { calculateShippingSchema, createOrderSchema, paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
+import { buyerReviewSchema, calculateShippingSchema, createOrderSchema, paymentProofSchema, updateOrderStatusSchema, updatePaymentStatusSchema } from '../schemas/order.schemas';
 import { authenticate } from '../middlewares/auth';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -21,6 +21,8 @@ router.get('/buyer/pending-payment-count', asyncHandler(orderController.pendingP
 router.get('/buyer/:id', asyncHandler(orderController.buyerOrderDetail));
 router.post('/:id/payment-proof', validate(paymentProofSchema), asyncHandler(orderController.paymentProof));
 router.post('/:id/confirm-delivery', asyncHandler(orderController.confirmDelivery));
+// El vendedor de este pedido califica a su comprador (la pertenencia se comprueba en el servicio).
+router.post('/:id/buyer-review', requireSeller, validate(buyerReviewSchema), asyncHandler(orderController.addBuyerReview));
 router.get('/seller', requireSeller, asyncHandler(orderController.sellerOrders));
 router.put('/seller/:id/status', requireSeller, validate(updateOrderStatusSchema), asyncHandler(orderController.updateOrderStatus));
 router.put('/seller/:id/payment-status', requireSeller, validate(updatePaymentStatusSchema), asyncHandler(orderController.updatePaymentStatus));

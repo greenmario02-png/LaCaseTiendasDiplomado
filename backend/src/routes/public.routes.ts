@@ -45,6 +45,8 @@ router.get('/sellers/:id/products', asyncHandler(publicController.sellerProducts
 router.get('/sellers/:id/overview', asyncHandler(publicController.sellerOverview));
 router.get('/sellers/:id/reviews', asyncHandler(publicController.sellerReviews));
 router.post('/sellers/:id/reviews', authenticate, asyncHandler(publicController.addSellerReview));
+// Calificaciones recibidas como comprador: privadas (el propio comprador o un ADMIN).
+router.get('/users/:id/buyer-reviews', authenticate, asyncHandler(publicController.buyerReviews));
 router.post('/sellers/:id/tag-vote', authenticate, asyncHandler(publicController.voteSellerTag));
 router.get('/sellers/:id/tag-votes/mine', authenticate, asyncHandler(publicController.getMySellerTagVotes));
 
