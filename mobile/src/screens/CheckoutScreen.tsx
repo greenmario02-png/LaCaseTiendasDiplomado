@@ -15,6 +15,13 @@ import { isCartSelectionStale, openOrderChat, summarizeSelection, useCartSelecti
 import { PaymentSafetyTip, StorePaymentCard } from '../components/payments/PaymentBits';
 
 
+interface PickupOption {
+  sellerId: number;
+  storeName: string | null;
+  storePickup: boolean;
+  storePickupAddress: string | null;
+}
+
 export default function CheckoutScreen({ navigation }: any) {
   const money = useMoney(); // moneda elegida con su denominación
   // Solo se paga lo seleccionado en el carrito; lo demás se queda en el carrito.
@@ -30,7 +37,8 @@ export default function CheckoutScreen({ navigation }: any) {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [fulfillmentType, setFulfillmentType] = useState<'SHIPPING' | 'PICKUP'>('SHIPPING');
-  const [pickupAddress, setPickupAddress] = useState('');
+  // Retiro en tienda: solo las tiendas que registraron la dirección real de su local lo ofrecen.
+  const [pickupOptions, setPickupOptions] = useState<PickupOption[]>([]);
   const [couponCode, setCouponCode] = useState('');
   const [notes, setNotes] = useState('');
   const [placing, setPlacing] = useState(false);
@@ -38,11 +46,13 @@ export default function CheckoutScreen({ navigation }: any) {
 
   const load = useCallback(async () => {
     try {
-      const [{ data: cartRes }, { data: addrRes }] = await Promise.all([
+      const [{ data: cartRes }, { data: addrRes }, { data: optRes }] = await Promise.all([
         api.get('/cart'),
         api.get('/account/addresses').catch(() => ({ data: { data: [] } })),
+        api.get('/orders/checkout-options').catch(() => ({ data: { data: { sellers: [] } } })),
       ]);
       setCart(cartRes.data);
+      setPickupOptions(optRes.data?.sellers ?? []);
       const addrs = addrRes.data ?? [];
       setAddresses(addrs);
       if (!selectedAddressId) {
@@ -65,26 +75,23 @@ export default function CheckoutScreen({ navigation }: any) {
 
   const allItems: any[] = cart?.items ?? [];
   const sel = summarizeSelection(allItems, excluded);
+  // Solo las tiendas de lo seleccionado; el retiro se habilita si TODAS tienen dirección (el servidor valida lo mismo).
+  const pickupStores = sel.stores.map((s) => pickupOptions.find((o) => o.sellerId === s.storeId));
+  const pickupAvailable = pickupStores.length > 0 && pickupStores.every((o) => !!o?.storePickup);
+  const effectiveType = fulfillmentType === 'PICKUP' && !pickupAvailable ? 'SHIPPING' : fulfillmentType;
 
   const placeOrder = async () => {
     try {
       if (placing) return;
       setPlacing(true);
-      const payload: any = { fulfillmentType, notes: notes.trim() || undefined };
-      if (fulfillmentType === 'SHIPPING') {
+      const payload: any = { fulfillmentType: effectiveType, notes: notes.trim() || undefined };
+      if (effectiveType === 'SHIPPING') {
         if (!selectedAddressId) {
           Alert.alert(t('mobile.checkout.missingAddressTitle'), t('mobile.checkout.missingAddressMessage'));
           setPlacing(false);
           return;
         }
         payload.shippingAddressId = selectedAddressId;
-      } else {
-        if (!pickupAddress.trim()) {
-          Alert.alert(t('mobile.checkout.missingPickupAddressTitle'), t('mobile.checkout.missingPickupAddressMessage'));
-          setPlacing(false);
-          return;
-        }
-        payload.pickupAddress = pickupAddress.trim();
       }
       if (couponCode.trim()) payload.couponCode = couponCode.trim();
       payload.cartItemIds = sel.ids;
@@ -173,22 +180,27 @@ export default function CheckoutScreen({ navigation }: any) {
       <View style={styles.card}>
         <View style={styles.typeRow}>
           <TouchableOpacity
-            style={[styles.typeBtn, fulfillmentType === 'SHIPPING' && styles.typeBtnActive]}
+            style={[styles.typeBtn, effectiveType === 'SHIPPING' && styles.typeBtnActive]}
             onPress={() => setFulfillmentType('SHIPPING')}
           >
-            <Truck size={15} color={fulfillmentType === 'SHIPPING' ? '#fff' : colors.textSecondary} />
-            <Text style={[styles.typeBtnText, fulfillmentType === 'SHIPPING' && styles.typeBtnTextActive]}>{t('mobile.checkout.shipping')}</Text>
+            <Truck size={15} color={effectiveType === 'SHIPPING' ? '#fff' : colors.textSecondary} />
+            <Text style={[styles.typeBtnText, effectiveType === 'SHIPPING' && styles.typeBtnTextActive]}>{t('mobile.checkout.shipping')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.typeBtn, fulfillmentType === 'PICKUP' && styles.typeBtnActive]}
+            testID="checkout-pickup"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !pickupAvailable, selected: effectiveType === 'PICKUP' }}
+            disabled={!pickupAvailable}
+            style={[styles.typeBtn, effectiveType === 'PICKUP' && styles.typeBtnActive, !pickupAvailable && styles.typeBtnDisabled]}
             onPress={() => setFulfillmentType('PICKUP')}
           >
-            <Store size={15} color={fulfillmentType === 'PICKUP' ? '#fff' : colors.textSecondary} />
-            <Text style={[styles.typeBtnText, fulfillmentType === 'PICKUP' && styles.typeBtnTextActive]}>{t('mobile.checkout.pickupInStore')}</Text>
+            <Store size={15} color={effectiveType === 'PICKUP' ? '#fff' : colors.textSecondary} />
+            <Text style={[styles.typeBtnText, effectiveType === 'PICKUP' && styles.typeBtnTextActive]}>{t('mobile.checkout.pickupInStore')}</Text>
           </TouchableOpacity>
         </View>
+        {!pickupAvailable && <Text style={styles.hint}>{t('mobile.checkout.pickupUnavailable')}</Text>}
 
-        {fulfillmentType === 'SHIPPING' ? (
+        {effectiveType === 'SHIPPING' ? (
           addresses.length === 0 ? (
             <TouchableOpacity onPress={() => navigation.navigate('Addresses')}>
               <Text style={styles.link}>{t('mobile.checkout.noAddresses')}</Text>
@@ -211,13 +223,20 @@ export default function CheckoutScreen({ navigation }: any) {
             ))
           )
         ) : (
-          <TextInput
-            style={styles.input}
-            value={pickupAddress}
-            onChangeText={setPickupAddress}
-            placeholder={t('mobile.checkout.pickupPlaceholder')}
-            placeholderTextColor={colors.textSecondary}
-          />
+          <View testID="pickup-addresses" style={{ gap: 8 }}>
+            <Text style={styles.hint}>{t('mobile.checkout.pickupAtStoreHelp')}</Text>
+            {pickupStores.map((o) =>
+              o ? (
+                <View key={o.sellerId} style={styles.addrItem}>
+                  <Store size={14} color={colors.primary} />
+                  <View style={{ flex: 1 }}>
+                    {pickupStores.length > 1 && <Text style={styles.addrLine1}>{o.storeName}</Text>}
+                    <Text style={pickupStores.length > 1 ? styles.addrLine2 : styles.addrLine1}>{o.storePickupAddress}</Text>
+                  </View>
+                </View>
+              ) : null,
+            )}
+          </View>
         )}
       </View>
 
@@ -290,6 +309,8 @@ const makeStyles = (colors: any) =>
   typeBtnActive: { borderColor: colors.primary, backgroundColor: colors.primary },
   typeBtnText: { fontSize: 13, color: colors.text },
   typeBtnTextActive: { color: '#fff', fontWeight: '700' },
+  typeBtnDisabled: { opacity: 0.45 },
+  hint: { fontSize: 12, color: colors.textSecondary, lineHeight: 16 },
   addrItem: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border },
   addrItemActive: { borderColor: colors.primary, backgroundColor: colors.primary + '12' },
   addrLine1: { fontSize: 13, fontWeight: '700', color: colors.text },

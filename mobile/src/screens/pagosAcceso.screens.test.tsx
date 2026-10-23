@@ -46,6 +46,10 @@ const CART = {
     { id: 12, quantity: 1, unitPrice: '70', lineTotal: 70, product: { id: 2, name: 'Azúcar', price: '70', images: [], seller: { id: 9, storeName: 'Tienda Nueve' } } },
   ],
 };
+const PICKUP_OPTIONS = [
+  { sellerId: 7, storeName: 'Tienda Siete', storePickup: true, storePickupAddress: 'Calle Sucre 7, Tarija' },
+  { sellerId: 9, storeName: 'Tienda Nueve', storePickup: false, storePickupAddress: null },
+];
 const PAYINFO = { storeId: 7, storeName: 'Tienda Siete', available: true, approved: true, full: true, qrUrl: '/uploads/payment-qr/q7-a.png', method: 'BANK', bankName: 'BNB', accountHolder: 'Luis Mamani Cruz', accountNumber: '4455667788', phoneQr: null };
 
 beforeEach(() => {
@@ -186,6 +190,7 @@ describe('Checkout (app): solo lo seleccionado y chat al pagar', () => {
     mockGet.mockImplementation(async (url: string) => {
       if (url === '/cart') return { data: { data: CART } };
       if (url === '/account/addresses') return { data: { data: [] } };
+      if (url === '/orders/checkout-options') return { data: { data: { sellers: PICKUP_OPTIONS } } };
       if (url.startsWith('/stores/')) return { data: { data: PAYINFO } };
       throw Object.assign(new Error('404'), { response: { status: 404 } });
     });
@@ -200,15 +205,33 @@ describe('Checkout (app): solo lo seleccionado y chat al pagar', () => {
     expect(s.queryByText('Datos de pago · Tienda Nueve')).toBeNull();
     expect(s.queryByText('Azúcar')).toBeNull();
     expect(s.getAllByTestId('payment-safety-tip').length).toBeGreaterThan(0);
-    // retiro en tienda con dirección
-    const pickup = s.queryByLabelText(/Retiro en tienda/i) ?? s.queryByText(/Retiro en tienda/i);
-    if (pickup) await fireEvent.press(pickup);
-    const addr = s.queryByPlaceholderText(i18n.t('mobile.checkout.pickupPlaceholder'));
-    if (addr) await fireEvent.changeText(addr, 'En la tienda');
+    // retiro en tienda: se muestra la dirección real de la tienda (sin campo para escribirla)
+    await fireEvent.press(s.getByTestId('checkout-pickup'));
+    expect(s.getByTestId('pickup-addresses')).toBeTruthy();
+    expect(s.getByText('Calle Sucre 7, Tarija')).toBeTruthy();
+    expect(s.queryByText(i18n.t('mobile.checkout.pickupUnavailable'))).toBeNull();
     await fireEvent.press(s.getByTestId('checkout-confirm'));
     await waitFor(() => expect(nav.navigate).toHaveBeenCalledWith('ChatThread', { id: 77, orderId: 501 }));
     const body = mockPost.mock.calls.find((c) => c[0] === '/orders')![1] as any;
     expect(body.cartItemIds).toEqual([11]);
+    expect(body.fulfillmentType).toBe('PICKUP');
+    expect(body.pickupAddress).toBeUndefined();
+  });
+
+  it('retiro en tienda deshabilitado si alguna tienda seleccionada no registró su dirección', async () => {
+    const CheckoutScreen = require('./CheckoutScreen').default;
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/cart') return { data: { data: CART } };
+      if (url === '/account/addresses') return { data: { data: [] } };
+      if (url === '/orders/checkout-options') return { data: { data: { sellers: PICKUP_OPTIONS } } };
+      if (url.startsWith('/stores/')) return { data: { data: PAYINFO } };
+      throw Object.assign(new Error('404'), { response: { status: 404 } });
+    });
+    const s = await render(<CheckoutScreen navigation={{ navigate: jest.fn() }} />);
+    await s.findByText('Datos de pago · Tienda Siete');
+    expect(s.getByText(i18n.t('mobile.checkout.pickupUnavailable'))).toBeTruthy();
+    await fireEvent.press(s.getByTestId('checkout-pickup'));
+    expect(s.queryByTestId('pickup-addresses')).toBeNull();
   });
 });
 

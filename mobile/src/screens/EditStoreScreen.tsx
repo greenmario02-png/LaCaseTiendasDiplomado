@@ -24,6 +24,7 @@ export default function EditStoreScreen({ navigation }: any) {
     whatsappPhone: user?.whatsappPhone ?? '',
     locationCity: user?.locationCity ?? '',
     locationState: user?.locationState ?? '',
+    storeAddress: user?.storeAddress ?? '',
     instagramUrl: user?.instagramUrl ?? '',
     facebookUrl: user?.facebookUrl ?? '',
     tiktokUrl: user?.tiktokUrl ?? '',
@@ -64,6 +65,8 @@ export default function EditStoreScreen({ navigation }: any) {
         whatsappPhone: form.whatsappPhone.trim() || undefined,
         locationCity: form.locationCity.trim() || undefined,
         locationState: form.locationState.trim() || undefined,
+        // Vacía = sin retiro en tienda (se envía '' para poder borrarla).
+        storeAddress: form.storeAddress.trim(),
         instagramUrl: form.instagramUrl.trim() || undefined,
         facebookUrl: form.facebookUrl.trim() || undefined,
         tiktokUrl: form.tiktokUrl.trim() || undefined,
@@ -125,6 +128,16 @@ export default function EditStoreScreen({ navigation }: any) {
       <NeoInput style={styles.input} value={form.locationState} onChangeText={(v) => set('locationState', v)} placeholder={t('mobile.editStore.statePlaceholder')} />
 
       <Text style={styles.hint}>{t('mobile.editStore.identityNotice')}</Text>
+
+      <Text style={styles.label}>{t('mobile.editStore.storeAddressLabel')}</Text>
+      <NeoInput
+        testID="store-address"
+        style={styles.input}
+        value={form.storeAddress}
+        onChangeText={(v) => set('storeAddress', v)}
+        placeholder={t('mobile.editStore.storeAddressPlaceholder')}
+      />
+      <Text style={styles.hint}>{t('mobile.editStore.storeAddressHint')}</Text>
 
       <Text style={styles.label}>{t('mobile.editStore.freeShippingLabel')}</Text>
       <NeoInput style={styles.input} value={form.freeShippingThreshold} onChangeText={(v) => set('freeShippingThreshold', v)} placeholder={t('mobile.editStore.freeShippingPlaceholder')} keyboardType="numeric" />

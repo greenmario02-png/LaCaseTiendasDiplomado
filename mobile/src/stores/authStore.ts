@@ -20,6 +20,7 @@ export interface User {
   country?: string | null;
   locationCity?: string | null;
   locationState?: string | null;
+  storeAddress?: string | null;
   whatsappPhone?: string | null;
   instagramUrl?: string | null;
   facebookUrl?: string | null;
