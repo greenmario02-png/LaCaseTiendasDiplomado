@@ -1,9 +1,11 @@
 /**
  * Modismos bolivianos por región para el chat con vendedores.
- * Cada región tiene:
- * - icebreakers: 3-4 oraciones sugeridas para INICIAR la conversación con el vendedor.
- * - noSaleReplies: respuestas pre-programadas sugeridas cuando NO se concreta la venta.
- * - followUps: frases de seguimiento sugeridas cuando hay inactividad en la conversación.
+ * Cada región tiene dos variantes según el rol de quien ve el chat EN ESA conversación:
+ * - Comprador (campos originales, sin prefijo): frases para INICIAR la conversación con el
+ *   vendedor, respuestas cuando NO se concreta la venta, y seguimientos por inactividad.
+ * - Vendedor (campos `seller*`): frases para responder a un interesado -- saludo confirmando
+ *   disponibilidad, respuesta amable cuando no hay stock, y seguimientos (envío, forma de pago).
+ * Mismo tono cálido/regional en ambas variantes.
  */
 
 export interface RegionModismos {
@@ -12,6 +14,9 @@ export interface RegionModismos {
   icebreakers: string[];
   noSaleReplies: string[];
   followUps: string[];
+  sellerIcebreakers: string[];
+  sellerNoSaleReplies: string[];
+  sellerFollowUps: string[];
 }
 
 export const BOLIVIANISMOS: RegionModismos[] = [
@@ -35,6 +40,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Qué dice, se lo lleva?',
       '¿Todavía está en venta?',
     ],
+    sellerIcebreakers: [
+      '¡Hola case! Sí, está disponible 😊',
+      '¿En qué le puedo ayudar, case?',
+      'Todavía lo tengo, case, ¿le interesa?',
+      'Dígame qué necesita, case, y le ayudo',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, case, disculpe',
+      'Por ahora no tengo stock, case, pero le aviso cuando llegue',
+      'Ya no queda, case, pero tengo otros parecidos',
+      'Lo siento case, ya no hay, pero puedo conseguirle otro',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido, case?',
+      '¿Cómo le va a pagar, case, QR o efectivo?',
+      '¿Le envío o pasa a recogerlo, case?',
+    ],
   },
   {
     region: 'Santa Cruz',
@@ -55,6 +77,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo guarda hasta el fin de semana?',
       '¿Sigue disponible? Lo estaba pensando',
       '¿Último precio?',
+    ],
+    sellerIcebreakers: [
+      '¡Hola mi chiqui! Sí, está disponible 😊',
+      '¿En qué le ayudo, mi chiqui?',
+      'Todavía lo tengo, mi chiqui, ¿le interesa?',
+      'Cuénteme qué busca, mi chiqui',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, mi chiqui, disculpe',
+      'Por ahora no tengo stock, mi chiqui, pero le aviso cuando llegue',
+      'Ya no queda, mi chiqui, pero tengo otros parecidos',
+      'Lo siento mi chiqui, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido, mi chiqui?',
+      '¿Cómo prefiere pagar, QR o efectivo?',
+      '¿Le mando a domicilio o pasa a verlo?',
     ],
   },
   {
@@ -77,6 +116,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo puede separar?',
       '¿Cuánto me lo deja de contado?',
     ],
+    sellerIcebreakers: [
+      '¡Hola pana! Sí, está disponible 😊',
+      '¿En qué le ayudo, pana?',
+      'Todavía lo tengo, pana, ¿le interesa?',
+      'Dígame qué necesita, pana',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, pana, disculpe',
+      'Por ahora no tengo stock, pana, pero le aviso cuando llegue',
+      'Ya no queda, pana, pero tengo otros parecidos',
+      'Lo siento pana, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido, pana?',
+      '¿Cómo le va a pagar, pana?',
+      '¿Le envío o pasa a recogerlo?',
+    ],
   },
   {
     region: 'Tarija',
@@ -97,6 +153,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Sigue ahí, che?',
       '¿Me lo guarda hasta el finde?',
       '¿Último precio, pues?',
+    ],
+    sellerIcebreakers: [
+      '¡Hola che! Sí, está disponible 😊',
+      '¿En qué le ayudo, che?',
+      'Todavía lo tengo, che, ¿le interesa?',
+      'Dígame qué necesita, che',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, che, disculpe',
+      'Por ahora no tengo stock, che, pero le aviso cuando llegue',
+      'Ya no queda, che, pero tengo otros parecidos',
+      'Lo siento che, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido, che?',
+      '¿Cómo le va a pagar, che?',
+      '¿Le envío o pasa a recogerlo?',
     ],
   },
   {
@@ -119,6 +192,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo puede guardar?',
       '¿Cuál es el precio final?',
     ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible 😊',
+      '¿En qué le puedo ayudar?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Cuénteme qué necesita',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda, pero tengo otros parecidos',
+      'Lo siento, ya no hay disponible',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo prefiere pagar?',
+      '¿Le envío o pasa a recogerlo?',
+    ],
   },
   {
     region: 'Potosí',
@@ -139,6 +229,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Sigue en venta?',
       '¿Me lo aparta?',
       '¿Último precio?',
+    ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible nomás 😊',
+      '¿En qué le puedo ayudar?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Dígame qué necesita nomás',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese nomás, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda nomás, pero tengo otros parecidos',
+      'Lo siento, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo le va a pagar?',
+      '¿Le envío o pasa a recogerlo nomás?',
     ],
   },
   {
@@ -161,6 +268,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo guarda?',
       '¿Cuál es su mejor precio?',
     ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible 😊',
+      '¿En qué le ayudo?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Cuénteme qué busca',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda, pero tengo otros parecidos',
+      'Lo siento, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo prefiere pagar?',
+      '¿Le envío o pasa a recogerlo?',
+    ],
   },
   {
     region: 'Beni',
@@ -181,6 +305,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Sigue disponible?',
       '¿Me lo aparta?',
       '¿Cuánto sale el envío?',
+    ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible 😊',
+      '¿En qué le ayudo?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Sí, hago envío hasta Trinidad',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda, pero tengo otros parecidos',
+      'Lo siento, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo le va a pagar?',
+      '¿Le envío a Trinidad o pasa a recogerlo?',
     ],
   },
   {
@@ -203,6 +344,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo guarda?',
       '¿El envío cuánto sale?',
     ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible 😊',
+      '¿En qué le ayudo?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Sí, envío hasta Cobija',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda, pero tengo otros parecidos',
+      'Lo siento, ya no hay',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo le va a pagar?',
+      '¿Le envío a Cobija o pasa a recogerlo?',
+    ],
   },
   {
     region: 'General',
@@ -224,6 +382,23 @@ export const BOLIVIANISMOS: RegionModismos[] = [
       '¿Me lo puede reservar?',
       '¿Cuál es el último precio?',
     ],
+    sellerIcebreakers: [
+      '¡Hola! Sí, está disponible 😊',
+      '¿En qué le puedo ayudar?',
+      'Todavía lo tengo, ¿le interesa?',
+      'Cuénteme qué necesita',
+    ],
+    sellerNoSaleReplies: [
+      'Uy, ya se vendió ese, disculpe',
+      'Por ahora no tengo stock, pero le aviso cuando llegue',
+      'Ya no queda, pero tengo otros parecidos',
+      'Lo siento, ya no hay disponible',
+    ],
+    sellerFollowUps: [
+      '¿Seguimos con el pedido?',
+      '¿Cómo prefiere pagar?',
+      '¿Le envío o pasa a recogerlo?',
+    ],
   },
 ];
 
@@ -235,19 +410,26 @@ export function detectRegion(city?: string | null): RegionModismos {
   return found ?? BOLIVIANISMOS[BOLIVIANISMOS.length - 1];
 }
 
-/** 3-4 oraciones para iniciar la conversación según la región. */
-export function getIcebreakers(city?: string | null): string[] {
-  return detectRegion(city).icebreakers.slice(0, 4);
+/**
+ * 3-4 oraciones para iniciar/responder la conversación según la región.
+ * `isBuyer` es el rol de quien va a usar la frase EN ESA conversación puntual (default true,
+ * comprador, para no romper a quien ya llamaba esta función sin el parámetro).
+ */
+export function getIcebreakers(city?: string | null, isBuyer = true): string[] {
+  const r = detectRegion(city);
+  return (isBuyer ? r.icebreakers : r.sellerIcebreakers).slice(0, 4);
 }
 
-/** Respuestas pre-programadas cuando NO se concreta la venta. */
-export function getNoSaleReplies(city?: string | null): string[] {
-  return detectRegion(city).noSaleReplies;
+/** Respuestas pre-programadas cuando NO se concreta la venta (comprador) o no hay stock (vendedor). */
+export function getNoSaleReplies(city?: string | null, isBuyer = true): string[] {
+  const r = detectRegion(city);
+  return isBuyer ? r.noSaleReplies : r.sellerNoSaleReplies;
 }
 
 /** Frases de seguimiento sugeridas cuando hay inactividad. */
-export function getFollowUps(city?: string | null): string[] {
-  return detectRegion(city).followUps;
+export function getFollowUps(city?: string | null, isBuyer = true): string[] {
+  const r = detectRegion(city);
+  return isBuyer ? r.followUps : r.sellerFollowUps;
 }
 
 export function getRegionName(city?: string | null): string {

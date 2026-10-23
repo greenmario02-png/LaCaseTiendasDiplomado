@@ -10,5 +10,5 @@ const base = require('./jest.config.js');
 module.exports = {
   ...base,
   globalSetup: undefined,
-  testMatch: ['**/unit.test.ts', '**/auction-unit.test.ts', '**/geo.service.test.ts', '**/chat-files.test.ts'],
+  testMatch: ['**/unit.test.ts', '**/auction-unit.test.ts', '**/geo.service.test.ts', '**/chat-files.test.ts', '**/bolivianismos.test.ts'],
 };

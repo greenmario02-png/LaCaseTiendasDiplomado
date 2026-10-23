@@ -106,18 +106,49 @@ export async function unreadCount(req: AuthRequest, res: Response, next: NextFun
 }
 
 /**
- * Frases para iniciar una conversación con un vendedor, según la región del comprador.
- * GET /api/chat/icebreakers
+ * Frases para iniciar una conversación, según la región y el rol del usuario EN esa conversación.
+ * `conversationId` es opcional (query param) por retrocompatibilidad: sin él, cae al comportamiento
+ * anterior (perspectiva de comprador, región de la propia ciudad del usuario). Con él, se calcula
+ * `isBuyer` igual que en `getChatSuggestions` y se usa la región del OTRO participante.
+ * GET /api/chat/icebreakers?conversationId=123
  */
 export async function getChatIcebreakers(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    const userId = req.user!.id;
+    const conversationId = Number(req.query.conversationId);
+
+    if (Number.isInteger(conversationId) && conversationId > 0) {
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+          buyer: { select: { id: true, locationCity: true, locationState: true } },
+          seller: { select: { id: true, locationCity: true, locationState: true } },
+        },
+      });
+      if (!conversation) throw ApiError.notFound('Conversación no encontrada');
+      if (!isParticipant(userId, conversation)) throw ApiError.forbidden('No participas en esta conversación');
+
+      const isBuyer = conversation.buyerId === userId;
+      const otherCity = isBuyer
+        ? conversation.seller.locationCity ?? conversation.seller.locationState
+        : conversation.buyer.locationCity ?? conversation.buyer.locationState;
+
+      return ok(res, {
+        region: getRegionName(otherCity),
+        icebreakers: getIcebreakers(otherCity, isBuyer),
+        noSaleReplies: getNoSaleReplies(otherCity, isBuyer),
+        followUps: getFollowUps(otherCity, isBuyer),
+      });
+    }
+
+    // Retrocompatibilidad: sin conversationId, comportamiento anterior (perspectiva de comprador).
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     const city = user?.locationCity ?? user?.locationState ?? null;
     return ok(res, {
       region: getRegionName(city),
-      icebreakers: getIcebreakers(city),
-      noSaleReplies: getNoSaleReplies(city),
-      followUps: getFollowUps(city),
+      icebreakers: getIcebreakers(city, true),
+      noSaleReplies: getNoSaleReplies(city, true),
+      followUps: getFollowUps(city, true),
     });
   } catch (error) {
     next(error);
@@ -161,8 +192,8 @@ export async function getChatSuggestions(req: AuthRequest, res: Response, next: 
       region: getRegionName(otherCity),
       inactive,
       elapsedMinutes: Math.round(elapsedMinutes),
-      followUps: getFollowUps(otherCity),
-      noSaleReplies: getNoSaleReplies(otherCity),
+      followUps: getFollowUps(otherCity, isBuyer),
+      noSaleReplies: getNoSaleReplies(otherCity, isBuyer),
     });
   } catch (error) {
     next(error);

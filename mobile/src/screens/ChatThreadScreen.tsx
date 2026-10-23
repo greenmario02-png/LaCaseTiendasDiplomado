@@ -98,7 +98,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
 
   // Bolivianismos: sugerencias para iniciar (sin mensajes) y respuestas por inactividad.
   useEffect(() => {
-    api.get('/chat/icebreakers').then((r: any) => setIcebreakers(r.data.data?.icebreakers ?? [])).catch(() => {});
+    api.get('/chat/icebreakers', { params: { conversationId: id } }).then((r: any) => setIcebreakers(r.data.data?.icebreakers ?? [])).catch(() => {});
     api.get(`/chat/${id}/suggestions?inactivityMinutes=10`).then((r: any) => setSuggestions(r.data.data ?? null)).catch(() => {});
   }, [id]);
 
