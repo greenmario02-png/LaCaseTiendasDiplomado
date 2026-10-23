@@ -32,6 +32,7 @@ import {
   MessageBubble,
   OrderCard,
   PreviewModal,
+  RateBuyerModal,
   ReportModal,
   dayLabel,
   presenceLabel,
@@ -75,6 +76,9 @@ export default function ChatThreadScreen({ route, navigation }: any) {
   const [atBottom, setAtBottom] = useState(true);
   const [incoming, setIncoming] = useState(0);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [rateBuyerOpen, setRateBuyerOpen] = useState(false);
+  const [buyerReviewed, setBuyerReviewed] = useState(false);
+  const [ratingBuyer, setRatingBuyer] = useState(false);
   const socketRef = useRef<Socket | null>(null);
   const listRef = useRef<FlatList<Row>>(null);
   const jobs = useRef(new Map<string, Job>());
@@ -248,9 +252,9 @@ export default function ChatThreadScreen({ route, navigation }: any) {
   };
 
   /**
-   * El vendedor confirma o rechaza el comprobante de pago que mandó el comprador (doc 62 + acción nueva
-   * de este cambio). Pide confirmación (acción con efecto real sobre el pedido), llama al endpoint ya
-   * existente del backend y actualiza el pedido de la conversación en el momento, sin recargar la pantalla.
+   * El vendedor confirma o rechaza el comprobante de pago que mandó el comprador. Pide confirmación
+   * (acción con efecto real sobre el pedido), llama al endpoint de pedidos del vendedor y actualiza el
+   * pedido de la conversación en el momento, sin recargar la pantalla.
    */
   const updatePaymentStatus = async (status: 'VERIFIED' | 'REJECTED') => {
     if (!conv?.order || verifyingPayment) return;
@@ -278,6 +282,29 @@ export default function ChatThreadScreen({ route, navigation }: any) {
       { text: c('cancel'), style: 'cancel' },
       { text: c('order.rejectProof'), style: 'destructive', onPress: () => updatePaymentStatus('REJECTED') },
     ]);
+  };
+
+  /**
+   * El vendedor califica al comprador del pedido. Un 409 significa que este pedido ya fue calificado
+   * antes (p. ej. en otra sesión): se trata igual que un éxito, mostrando el estado en vez del botón.
+   */
+  const submitBuyerReview = async (body: { rating: number; comment?: string }) => {
+    if (!conv?.order || ratingBuyer) return;
+    setRatingBuyer(true);
+    try {
+      await chatApi.addBuyerReview(conv.order.id, body);
+      setBuyerReviewed(true);
+      setRateBuyerOpen(false);
+    } catch (err) {
+      if ((err as any)?.response?.status === 409) {
+        setBuyerReviewed(true);
+        setRateBuyerOpen(false);
+      } else {
+        Alert.alert(c('order.rateBuyerTitle'), getErrorMessage(err));
+      }
+    } finally {
+      setRatingBuyer(false);
+    }
   };
 
   const retry = (m: ChatMessage) => {
@@ -438,6 +465,8 @@ export default function ChatThreadScreen({ route, navigation }: any) {
           onVerifyPayment={confirmVerifyPayment}
           onRejectPayment={confirmRejectPayment}
           verifyingPayment={verifyingPayment}
+          onRateBuyer={() => setRateBuyerOpen(true)}
+          buyerReviewed={buyerReviewed}
         />
       )}
 
@@ -561,6 +590,7 @@ export default function ChatThreadScreen({ route, navigation }: any) {
       <AttachSheet visible={attachOpen} colors={colors} onClose={() => setAttachOpen(false)} onPick={pick} />
       <PreviewModal file={preview} colors={colors} onCancel={() => setPreview(null)} onSend={sendFile} />
       <ImageViewerModal uri={viewer} onClose={() => setViewer(null)} />
+      <RateBuyerModal visible={rateBuyerOpen} colors={colors} busy={ratingBuyer} onClose={() => setRateBuyerOpen(false)} onSend={submitBuyerReview} />
       <MessageActions msg={actionsFor} myId={myId} colors={colors} onClose={() => setActionsFor(null)} onReply={setReplyTo} onDelete={remove} />
       <ReportModal
         visible={reportOpen}

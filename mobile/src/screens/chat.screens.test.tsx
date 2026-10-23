@@ -63,6 +63,12 @@ const PAGE_SELLER_PROOF = {
   role: 'SELLER',
   order: { ...PAGE.order, paymentStatus: 'PROOF_SUBMITTED' },
 };
+// Misma conversación #3, vista del vendedor, pedido ya entregado y pago verificado: aquí puede calificar al comprador.
+const PAGE_SELLER_DELIVERED = {
+  ...PAGE,
+  role: 'SELLER',
+  order: { ...PAGE.order, status: 'DELIVERED', paymentStatus: 'VERIFIED' },
+};
 
 beforeEach(() => {
   __resetChatSocket();
@@ -182,6 +188,100 @@ describe('Chat (móvil) — conversación', () => {
 
     await waitFor(() => expect(mockPut).toHaveBeenCalledWith('/orders/seller/77/payment-status', { paymentStatus: 'REJECTED' }));
     await waitFor(() => expect(queryByText('Rechazar comprobante')).toBeNull());
+    alert.mockRestore();
+  });
+
+  it('"Calificar comprador" solo aparece para el vendedor con el pedido entregado y el pago verificado, sin calificar aún', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_DELIVERED } };
+      return { data: { data: null } };
+    });
+    const { findByText, getByLabelText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(getByLabelText('Calificar comprador')).toBeTruthy();
+  });
+
+  it('el comprador nunca ve el botón "Calificar comprador", aunque el pedido esté entregado y verificado', async () => {
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: { ...PAGE_SELLER_DELIVERED, role: 'BUYER' } } };
+      return { data: { data: null } };
+    });
+    const { findByText, queryByLabelText, queryByText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(queryByLabelText('Calificar comprador')).toBeNull();
+    expect(queryByText('Comprador calificado')).toBeNull();
+  });
+
+  it('el vendedor no ve "Calificar comprador" si el pedido todavía no fue entregado', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_PROOF } };
+      return { data: { data: null } };
+    });
+    const { findByText, queryByLabelText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+    expect(queryByLabelText('Calificar comprador')).toBeNull();
+  });
+
+  it('el vendedor califica al comprador: estrellas + comentario -> POST /orders/:id/buyer-review -> éxito muestra el estado en vez del botón', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_DELIVERED } };
+      return { data: { data: null } };
+    });
+    mockPost.mockImplementation(async (url: string, body: any) => {
+      if (url === '/orders/77/buyer-review') return { data: { data: { id: 1, orderId: 77, sellerId: 20, buyerId: 7, rating: body.rating, comment: body.comment ?? null, createdAt: new Date().toISOString(), avgRating: body.rating, totalReviews: 1 } } };
+      return { data: { data: {} } };
+    });
+
+    const { findByText, getByLabelText, getByText, queryByText, queryByLabelText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+
+    fireEvent.press(getByLabelText('Calificar comprador'));
+    await findByText('Calificar a este comprador');
+
+    fireEvent.press(getByLabelText('5 de 5'));
+    await waitFor(() => expect(getByLabelText('5 de 5').props.accessibilityState?.selected).toBe(true));
+    fireEvent.changeText(getByLabelText('Comentario (opcional)'), 'Pagó rápido y fue puntual');
+    await waitFor(() => expect(getByLabelText('Comentario (opcional)').props.value).toBe('Pagó rápido y fue puntual'));
+    fireEvent.press(getByLabelText('Enviar calificación'));
+
+    await waitFor(() => expect(mockPost).toHaveBeenCalledWith('/orders/77/buyer-review', { rating: 5, comment: 'Pagó rápido y fue puntual' }));
+    await waitFor(() => expect(queryByText('Calificar a este comprador')).toBeNull());
+    expect(getByText('Comprador calificado')).toBeTruthy();
+    expect(queryByLabelText('Calificar comprador')).toBeNull();
+  });
+
+  it('el vendedor intenta calificar una orden ya calificada (409): se trata como éxito y muestra el estado, sin alerta de error', async () => {
+    useAuthStore.setState({ user: { id: 20, email: 'v@a.com', firstName: 'Mateo', lastName: '', role: 'SELLER' } as any });
+    mockGet.mockImplementation(async (url: string) => {
+      if (url === '/chat/3') return { data: { data: PAGE_SELLER_DELIVERED } };
+      return { data: { data: null } };
+    });
+    mockPost.mockImplementation(async (url: string) => {
+      if (url === '/orders/77/buyer-review') {
+        const err: any = new Error('Conflict');
+        err.response = { status: 409, data: { error: { message: 'Ya calificaste esta orden.' } } };
+        throw err;
+      }
+      return { data: { data: {} } };
+    });
+    const alert = jest.spyOn(Alert, 'alert');
+
+    const { findByText, getByLabelText, getByText, queryByText } = await render(<ChatThreadScreen route={{ params: { id: 3 } }} navigation={{ goBack: jest.fn() }} />);
+    await findByText(/Pedido #77/);
+
+    fireEvent.press(getByLabelText('Calificar comprador'));
+    await findByText('Calificar a este comprador');
+    fireEvent.press(getByLabelText('3 de 5'));
+    await waitFor(() => expect(getByLabelText('3 de 5').props.accessibilityState?.selected).toBe(true));
+    fireEvent.press(getByLabelText('Enviar calificación'));
+
+    await waitFor(() => expect(mockPost).toHaveBeenCalledWith('/orders/77/buyer-review', { rating: 3, comment: undefined }));
+    await waitFor(() => expect(queryByText('Calificar a este comprador')).toBeNull());
+    expect(getByText('Comprador calificado')).toBeTruthy();
+    expect(alert).not.toHaveBeenCalled();
     alert.mockRestore();
   });
 });

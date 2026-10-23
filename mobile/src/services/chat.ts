@@ -53,6 +53,18 @@ export interface OrderSummary {
 /** Estados que el vendedor puede fijar a mano (PENDING es el inicial, lo pone el sistema). */
 export type SellerPaymentStatus = 'VERIFIED' | 'REJECTED';
 
+export interface BuyerReview {
+  id: number;
+  orderId: number;
+  sellerId: number;
+  buyerId: number;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  avgRating: number;
+  totalReviews: number;
+}
+
 export interface Presence {
   visible: boolean;
   online: boolean;
@@ -240,6 +252,13 @@ export const chatApi = {
    */
   updatePaymentStatus: (orderId: number, paymentStatus: SellerPaymentStatus) =>
     api.put(`/orders/seller/${orderId}/payment-status`, { paymentStatus }).then((r) => r.data.data as { id: number; status: string; paymentStatus: string }),
+  /**
+   * El vendedor califica al comprador tras una compra entregada y con pago verificado
+   * (`POST /orders/:id/buyer-review`). 409 si ya se calificó ese pedido, 403 si no corresponde
+   * o está fuera de la ventana de 3 a 7 días.
+   */
+  addBuyerReview: (orderId: number, body: { rating: number; comment?: string }) =>
+    api.post(`/orders/${orderId}/buyer-review`, body).then((r) => r.data.data as BuyerReview),
   read: (id: number) => api.post(`/chat/${id}/read`),
   remove: (id: number, messageId: number, scope: 'me' | 'all') => api.delete(`/chat/${id}/messages/${messageId}`, { params: { scope } }),
   mute: (id: number, muted: boolean) => api.put(`/chat/${id}/mute`, { muted }),

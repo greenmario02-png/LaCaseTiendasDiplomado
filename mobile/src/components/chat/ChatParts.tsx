@@ -19,6 +19,7 @@ import {
   ChevronDown,
   ChevronUp,
   Upload,
+  Star,
 } from 'lucide-react-native';
 import '../../i18n/chat';
 import { canDeleteForAll, fileUrl, formatBytes, relativeDay, statusOf, type ChatMessage, type MsgStatus, type OrderSummary } from '../../services/chat';
@@ -244,6 +245,8 @@ export function OrderCard({
   onVerifyPayment,
   onRejectPayment,
   verifyingPayment,
+  onRateBuyer,
+  buyerReviewed,
 }: {
   order: OrderSummary;
   role: 'BUYER' | 'SELLER';
@@ -256,6 +259,10 @@ export function OrderCard({
   /** Vendedor rechaza el comprobante (p. ej. monto o datos incorrectos). */
   onRejectPayment?: () => void;
   verifyingPayment?: boolean;
+  /** Vendedor abre el modal para calificar al comprador. Solo tiene efecto con order DELIVERED + paymentStatus VERIFIED. */
+  onRateBuyer?: () => void;
+  /** true si esta orden ya fue calificada por el vendedor (lo sabe la pantalla tras el POST exitoso o un 409). */
+  buyerReviewed?: boolean;
 }) {
   const c = useChatText();
   const s = stylesFor(colors);
@@ -266,6 +273,8 @@ export function OrderCard({
   // El vendedor solo actúa sobre un comprobante recién enviado; ya verificado, se muestra como estado.
   const showVerifyActions = role === 'SELLER' && order.paymentStatus === 'PROOF_SUBMITTED' && !!(onVerifyPayment || onRejectPayment);
   const showConfirmedBadge = role === 'SELLER' && order.paymentStatus === 'VERIFIED';
+  // El vendedor califica al comprador una vez entregado el pedido y verificado el pago (el backend valida también la ventana de días).
+  const showRateBuyer = role === 'SELLER' && order.status === 'DELIVERED' && order.paymentStatus === 'VERIFIED' && !!onRateBuyer;
   return (
     <View style={s.orderCard} accessibilityLabel={c('order.title', { id: order.id })}>
       <View style={s.row}>
@@ -329,6 +338,21 @@ export function OrderCard({
           </Pressable>
         )}
       </View>
+      {showRateBuyer && (
+        <View style={[s.row, { marginTop: 6 }]}>
+          {buyerReviewed ? (
+            <View style={[s.row, s.confirmedBadge]} accessibilityRole="text" accessibilityLabel={c('order.buyerReviewed')}>
+              <Check size={14} color={colors.primary} />
+              <Text style={s.confirmedText}>{c('order.buyerReviewed')}</Text>
+            </View>
+          ) : (
+            <Pressable onPress={onRateBuyer} accessibilityRole="button" accessibilityLabel={c('order.rateBuyer')} style={[s.cta, { backgroundColor: colors.primaryDark }]}>
+              <Star size={16} color="#fff" />
+              <Text style={s.ctaText}>{c('order.rateBuyer')}</Text>
+            </Pressable>
+          )}
+        </View>
+      )}
       {open &&
         order.items.map((it, i) => (
           <View key={`${it.productId ?? 'x'}-${i}`} style={[s.row, { marginTop: 6 }]}>
@@ -537,6 +561,95 @@ export function ReportModal({ visible, colors, onClose, onSend }: { visible: boo
               style={[s.btn, { backgroundColor: colors.error }]}
             >
               <Text style={{ color: '#fff', fontWeight: '700' }}>{c('reportSend')}</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+/**
+ * Estrellas 1..5 accesibles: cada una es un botón de 44 px con etiqueta «N de 5» y estado seleccionado;
+ * el estado no depende solo del color (estrella rellena o vacía).
+ */
+function StarPicker({ value, onChange, color, offColor, label, optionLabel }: { value: number; onChange: (n: number) => void; color: string; offColor: string; label: string; optionLabel: (n: number) => string }) {
+  return (
+    <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: 'row' }}>
+      {[1, 2, 3, 4, 5].map((n) => {
+        const on = n <= value;
+        return (
+          <Pressable
+            key={n}
+            onPress={() => onChange(n)}
+            accessibilityRole="radio"
+            accessibilityLabel={optionLabel(n)}
+            accessibilityState={{ selected: value === n }}
+            style={{ minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Star size={28} color={on ? color : offColor} fill={on ? color : 'transparent'} />
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Modal para que el vendedor califique al comprador (1-5 estrellas + comentario opcional) tras una entrega verificada. */
+export function RateBuyerModal({
+  visible,
+  colors,
+  busy,
+  onClose,
+  onSend,
+}: {
+  visible: boolean;
+  colors: AppColors;
+  busy?: boolean;
+  onClose: () => void;
+  onSend: (body: { rating: number; comment?: string }) => void;
+}) {
+  const c = useChatText();
+  const s = stylesFor(colors);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  useEffect(() => {
+    if (visible) {
+      setRating(0);
+      setComment('');
+    }
+  }, [visible]);
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={s.backdrop} onPress={onClose}>
+        <Pressable style={s.sheet} onPress={() => undefined} accessibilityViewIsModal>
+          <Text style={s.sheetTitle} accessibilityRole="header">
+            {c('order.rateBuyerTitle')}
+          </Text>
+          <StarPicker value={rating} onChange={setRating} color={colors.warning} offColor={colors.textSecondary} label={c('order.rateBuyerStars')} optionLabel={(n) => c('order.rateBuyerStarsOption', { n })} />
+          <TextInput
+            value={comment}
+            onChangeText={setComment}
+            placeholder={c('order.rateBuyerComment')}
+            accessibilityLabel={c('order.rateBuyerComment')}
+            placeholderTextColor={colors.textSecondary}
+            maxLength={500}
+            multiline
+            style={[s.captionInput, { marginTop: 10 }]}
+          />
+          <View style={[s.row, { gap: 10, marginTop: 12 }]}>
+            <Pressable onPress={onClose} accessibilityRole="button" style={[s.btn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>{c('cancel')}</Text>
+            </Pressable>
+            <Pressable
+              disabled={busy || rating < 1}
+              onPress={() => onSend({ rating, comment: comment.trim() || undefined })}
+              accessibilityRole="button"
+              accessibilityLabel={c('order.rateBuyerSend')}
+              accessibilityState={{ disabled: busy || rating < 1 }}
+              style={[s.btn, { backgroundColor: colors.primaryDark }, (busy || rating < 1) && { opacity: 0.5 }]}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700' }}>{c('order.rateBuyerSend')}</Text>
             </Pressable>
           </View>
         </Pressable>

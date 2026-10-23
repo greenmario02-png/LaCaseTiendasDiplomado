@@ -83,6 +83,13 @@
       "viewOrder": "Ver pedido",
       "collapse": "Ocultar detalle del pedido",
       "expand": "Ver detalle del pedido",
+      "rateBuyer": "Calificar comprador",
+      "rateBuyerTitle": "Calificar a este comprador",
+      "rateBuyerStars": "Calificación del comprador",
+      "rateBuyerStarsOption": "{{n}} de 5",
+      "rateBuyerComment": "Comentario (opcional)",
+      "rateBuyerSend": "Enviar calificación",
+      "buyerReviewed": "Comprador calificado",
       "status": {
         "PENDING": "Pendiente",
         "CONFIRMED": "Confirmado",
