@@ -203,6 +203,7 @@ export async function findUserById(userId: number) {
       locationCity: true,
       locationState: true,
       locationPostalCode: true,
+      storeAddress: true,
       latitude: true,
       longitude: true,
       locationVerified: true,

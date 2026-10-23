@@ -20,6 +20,7 @@ export const updateSellerProfileSchema = z.object({
     locationCity: text(100),
     locationState: text(100),
     locationPostalCode: text(20),
+    storeAddress: text(300),
     latitude: numeric,
     longitude: numeric,
     youtubeUrl: text(2000),

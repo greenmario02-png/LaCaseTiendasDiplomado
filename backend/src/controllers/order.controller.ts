@@ -25,6 +25,14 @@ export async function createOrders(req: AuthRequest, res: Response, next: NextFu
   }
 }
 
+export async function checkoutOptions(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    return ok(res, { sellers: await orderService.checkoutOptions(req) });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function shippingQuotes(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const { buyerPostalCode } = req.body;

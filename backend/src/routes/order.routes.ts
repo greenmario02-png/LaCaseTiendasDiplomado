@@ -14,6 +14,7 @@ router.get('/recent-sales', asyncHandler(orderController.recentSales));
 router.use(authenticate);
 
 router.post('/', validate(createOrderSchema), asyncHandler(orderController.createOrders));
+router.get('/checkout-options', asyncHandler(orderController.checkoutOptions));
 router.post('/calculate-shipping', validate(calculateShippingSchema), asyncHandler(orderController.shippingQuotes));
 router.get('/buyer', asyncHandler(orderController.buyerOrders));
 router.get('/buyer/pending-payment-count', asyncHandler(orderController.pendingPaymentCount));

@@ -461,6 +461,7 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
       'locationCity',
       'locationState',
       'locationPostalCode',
+      'storeAddress',
       'latitude',
       'longitude',
       'youtubeUrl',
@@ -497,6 +498,9 @@ export async function updateSellerProfile(req: AuthRequest, res: Response, next:
         }
         if (key === 'freeShippingThreshold' && req.body[key] !== null && req.body[key] !== '') {
           (data as any)[key] = Number(req.body[key]);
+        } else if (key === 'storeAddress') {
+          // Vacía = la tienda no ofrece retiro en tienda.
+          (data as any)[key] = typeof req.body[key] === 'string' && req.body[key].trim() ? req.body[key].trim() : null;
         } else if (key === 'latitude' || key === 'longitude') {
           (data as any)[key] = req.body[key] === '' || req.body[key] === null ? null : Number(req.body[key]);
         } else {

@@ -26,6 +26,47 @@ export interface ShippingQuote {
   total: number;
 }
 
+/**
+ * Retiro en tienda: solo disponible cuando el vendedor configuró la dirección real de su tienda
+ * (`storeAddress`). Sin ella (muchos emprendedores no tienen local) no hay retiro en tienda, y el
+ * comprador nunca puede escribir ni inventar una dirección de retiro.
+ */
+export async function storePickupBySeller(sellerIds: number[]): Promise<Map<number, { storePickup: boolean; address: string | null }>> {
+  const ids = [...new Set(sellerIds)];
+  const map = new Map<number, { storePickup: boolean; address: string | null }>();
+  if (!ids.length) return map;
+  const rows = await prisma.user.findMany({ where: { id: { in: ids } }, select: { id: true, storeAddress: true } });
+  for (const r of rows) {
+    const address = r.storeAddress?.trim() || null;
+    map.set(r.id, { storePickup: !!address, address });
+  }
+  for (const id of ids) if (!map.has(id)) map.set(id, { storePickup: false, address: null });
+  return map;
+}
+
+export interface CheckoutSellerOption {
+  sellerId: number;
+  storeName: string | null;
+  storePickup: boolean;
+  storePickupAddress: string | null;
+}
+
+/** Opciones de entrega por tienda del carrito (hoy: si cada tienda ofrece retiro y en qué dirección). */
+export async function checkoutOptions(req: AuthRequest): Promise<CheckoutSellerOption[]> {
+  const cart = await findOrCreateCart(getCartKey(req));
+  const items = await prisma.cartItem.findMany({
+    where: { cartId: cart.id },
+    select: { product: { select: { seller: { select: { id: true, storeName: true } } } } },
+  });
+  const sellers = new Map<number, string | null>();
+  for (const i of items) sellers.set(i.product.seller.id, i.product.seller.storeName);
+  const pickup = await storePickupBySeller([...sellers.keys()]);
+  return [...sellers.entries()].map(([sellerId, storeName]) => {
+    const p = pickup.get(sellerId);
+    return { sellerId, storeName, storePickup: !!p?.storePickup, storePickupAddress: p?.address ?? null };
+  });
+}
+
 export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode: string, cartItemIds?: number[]): Promise<ShippingQuote[]> {
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
@@ -76,7 +117,7 @@ export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode:
   });
 }
 
-export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?: number, notes?: string, paymentQrUrl?: string, couponCode?: string, fulfillmentType: 'SHIPPING' | 'PICKUP' = 'SHIPPING', pickupAddress?: string, cartItemIds?: number[]) {
+export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?: number, notes?: string, paymentQrUrl?: string, couponCode?: string, fulfillmentType: 'SHIPPING' | 'PICKUP' = 'SHIPPING', _pickupAddress?: string, cartItemIds?: number[]) {
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
 
@@ -84,9 +125,8 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
     throw ApiError.badRequest('fulfillmentType debe ser SHIPPING o PICKUP');
   }
   const isPickup = fulfillmentType === 'PICKUP';
-  if (isPickup && !pickupAddress?.trim()) {
-    throw ApiError.badRequest('Indica la direccion de retiro para el pedido en tienda');
-  }
+  // `_pickupAddress` (texto libre del comprador) ya no se usa: se acepta solo por compatibilidad con
+  // clientes anteriores. El retiro usa siempre la dirección real de cada tienda.
   if (!req.user) throw ApiError.unauthorized('Debes iniciar sesión para comprar');
 
   const allItems = await prisma.cartItem.findMany({
@@ -128,6 +168,21 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
     const sellerId = item.product.sellerId;
     if (!groups[sellerId]) groups[sellerId] = [];
     groups[sellerId].push(item);
+  }
+
+  // Retiro en tienda: CADA tienda del pedido necesita su propia dirección real. Si alguna no la
+  // tiene se rechaza el pedido completo (no se crea ninguna orden a medias).
+  const pickupAddressBySeller = new Map<number, string>();
+  if (isPickup) {
+    const pickupInfo = await storePickupBySeller(Object.keys(groups).map(Number));
+    for (const [sellerIdStr, sellerItems] of Object.entries(groups)) {
+      const info = pickupInfo.get(Number(sellerIdStr));
+      if (!info?.storePickup || !info.address) {
+        const storeName = sellerItems[0]?.product.seller.storeName ?? 'Esta tienda';
+        throw ApiError.badRequest(`${storeName} no tiene retiro en tienda disponible`);
+      }
+      pickupAddressBySeller.set(Number(sellerIdStr), info.address);
+    }
   }
 
   const orders = [];
@@ -203,7 +258,8 @@ export async function createOrdersFromCart(req: AuthRequest, shippingAddressId?:
           paymentQrUrl: paymentQrUrl || null,
           shippingAddressId: !isPickup ? address?.id ?? null : null,
           fulfillmentType,
-          pickupAddress: isPickup ? pickupAddress?.trim() : null,
+          // Retiro: siempre la dirección real de la tienda, nunca un texto escrito por el comprador.
+          pickupAddress: isPickup ? pickupAddressBySeller.get(sellerId) ?? null : null,
           notes: notes || null,
           items: {
             create: [

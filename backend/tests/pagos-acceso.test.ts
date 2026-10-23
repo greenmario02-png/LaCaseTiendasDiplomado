@@ -33,6 +33,8 @@ async function mkUser(role: 'CUSTOMER' | 'SELLER' | 'ADMIN' = 'CUSTOMER', extra:
       storeRole: 'OWNER',
       locationCity: role === 'SELLER' ? 'Tarija' : null,
       locationPostalCode: '0001',
+      // Con dirección real de la tienda, para poder usar el retiro en tienda como atajo en estas pruebas.
+      storeAddress: role === 'SELLER' ? 'Calle Sucre 100, Tarija' : null,
       ...extra,
     } as any,
   });

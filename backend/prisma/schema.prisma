@@ -89,6 +89,9 @@ country            String?
 locationCity       String?
 locationState      String?
 locationPostalCode String?
+// Dirección física de la tienda (calle y número) que se muestra al comprador para el retiro en
+// tienda. Opcional: sin ella la tienda no ofrece retiro (muchos emprendedores no tienen local).
+storeAddress       String?
 latitude           Float?
 longitude          Float?
 locationVerified   Boolean   @default(false)

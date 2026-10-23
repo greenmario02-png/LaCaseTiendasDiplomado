@@ -48,6 +48,8 @@ export const createOrderSchema = z.object({
     cartItemIds: cartItemIdsField,
     couponCode: z.string().trim().max(50).optional(),
     fulfillmentType: z.enum(['SHIPPING', 'PICKUP']).optional(),
+    // Solo por compatibilidad con clientes anteriores: se ignora. El retiro en tienda usa siempre la
+    // dirección real de cada tienda (storeAddress), nunca un texto escrito por el comprador.
     pickupAddress: z.string().trim().max(500).optional(),
   }),
 });

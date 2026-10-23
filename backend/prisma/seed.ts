@@ -1097,6 +1097,7 @@ async function main() {
       locationCity: 'Cochabamba',
       locationState: 'Cochabamba',
       locationPostalCode: '3000',
+      storeAddress: 'Av. Heroínas 345, Cochabamba',
       country: 'BO',
       paymentQrUrl: flickrImage('qr-code', 300),
       rating: 4.7,
