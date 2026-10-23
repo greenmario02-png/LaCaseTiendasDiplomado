@@ -4,6 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Layout from './components/layout/Layout';
 import { useAuthStore } from './stores/authStore';
+import { useRbacStore } from './stores/rbacStore';
 import { useWishlistStore } from './stores/wishlistStore';
 import { useCurrencyStore } from './stores/currencyStore';
 
@@ -87,6 +88,7 @@ const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'));
 const AdminCalendar = lazy(() => import('./pages/admin/AdminCalendar'));
 const AdminRbac = lazy(() => import('./pages/admin/AdminRbac'));
 const AdminForumPage = lazy(() => import('./pages/admin/AdminForumPage'));
+const AdminCatalogReports = lazy(() => import('./pages/admin/AdminCatalogReports'));
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
 const JobsPage = lazy(() => import('./pages/JobsPage'));
 const MyApplicationsPage = lazy(() => import('./pages/account/MyApplicationsPage'));
@@ -114,6 +116,17 @@ function Protected({ children, roles }: { children: React.ReactNode; roles?: str
   if (roles && !roles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
+  return <>{children}</>;
+}
+
+/** Exige un permiso RBAC (p. ej. el moderador asignado con catalog.reports.moderate). ADMIN siempre pasa. */
+function RequirePermission({ code, children }: { code: string; children: React.ReactNode }) {
+  const user = useAuthStore((s) => s.user);
+  const permissions = useRbacStore((s) => s.permissions);
+  const loaded = useRbacStore((s) => s.loaded);
+  if (user?.role === 'ADMIN') return <>{children}</>;
+  if (!loaded) return null;
+  if (!permissions.includes(code)) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -328,6 +341,18 @@ export default function App() {
         </Route>
 
         <Route
+          path="/moderacion/denuncias"
+          element={
+            <Protected>
+              <RequirePermission code="catalog.reports.moderate">
+                <Box sx={{ py: 3 }}>
+                  <AdminCatalogReports />
+                </Box>
+              </RequirePermission>
+            </Protected>
+          }
+        />
+        <Route
           path="/admin"
           element={
             <Protected roles={['ADMIN']}>
@@ -354,6 +379,7 @@ export default function App() {
           <Route path="logs" element={<AdminLogs />} />
           <Route path="calendario" element={<AdminCalendar />} />
           <Route path="foro" element={<AdminForumPage />} />
+          <Route path="denuncias" element={<AdminCatalogReports />} />
           <Route path="configuracion" element={<AdminSettingsPage />} />
           <Route path="empleos" element={<AdminJobs />} />
           <Route path="postulaciones" element={<AdminJobApplications />} />

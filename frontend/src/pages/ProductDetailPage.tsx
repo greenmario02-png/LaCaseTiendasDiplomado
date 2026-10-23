@@ -45,6 +45,7 @@ import { ProductCard } from '../components/redesign/ProductCard';
 import { PrimaryButton, SecondaryButton } from '../components/redesign/Buttons';
 import { ProductGridSkeleton } from '../components/ui/LoadingSkeleton';
 import StorePaymentCard from '../components/payments/StorePaymentCard';
+import ReportCatalogButton from '../components/catalog/ReportCatalogButton';
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
@@ -307,9 +308,12 @@ export default function ProductDetailPage() {
               {t('product.detail.contact')}
             </SecondaryButton>
           </Box>
-          <Typography variant="caption" color="text.secondary">
-            {t('product.detail.soldAndShippedBy', { store: product.seller.storeName })}
-          </Typography>
+          <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} flexWrap="wrap">
+            <Typography variant="caption" color="text.secondary">
+              {t('product.detail.soldAndShippedBy', { store: product.seller.storeName })}
+            </Typography>
+            {product.seller?.id && <ReportCatalogButton productId={Number(product.id)} sellerId={Number(product.seller.id)} />}
+          </Box>
 
           {/* Datos de pago de la tienda, con la recomendación de seguridad para el precio del producto. */}
           {product.seller?.id && (

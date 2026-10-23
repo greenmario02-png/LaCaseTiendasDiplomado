@@ -28,11 +28,13 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ForumIcon from '@mui/icons-material/Forum';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import ReportIcon from '@mui/icons-material/Report';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { styled, alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
+import { useRbacStore } from '../../stores/rbacStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { useCartStore } from '../../stores/cartStore';
 import { useCurrencyStore } from '../../stores/currencyStore';
@@ -92,6 +94,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
+  // Moderador asignado (no ADMIN) con permiso para revisar denuncias del catálogo.
+  const canModerateReports = useRbacStore((s) => s.permissions.includes('catalog.reports.moderate'));
   const logout = useAuthStore((s) => s.logout);
   const darkMode = useThemeStore((s) => s.darkMode);
   const toggle = useThemeStore((s) => s.toggle);
@@ -285,6 +289,11 @@ export default function Navbar() {
                 {user.role === 'ADMIN' && (
                   <MenuItem onClick={() => { handleClose(); navigate('/admin'); }}>
                     <AdminPanelSettingsIcon sx={{ mr: 1 }} /> {t('nav.menu.adminPanel')}
+                  </MenuItem>
+                )}
+                {user.role !== 'ADMIN' && canModerateReports && (
+                  <MenuItem onClick={() => { handleClose(); navigate('/moderacion/denuncias'); }}>
+                    <ReportIcon sx={{ mr: 1 }} /> {t('nav.menu.catalogReports', { defaultValue: 'Denuncias del catálogo' })}
                   </MenuItem>
                 )}
                 <Divider />

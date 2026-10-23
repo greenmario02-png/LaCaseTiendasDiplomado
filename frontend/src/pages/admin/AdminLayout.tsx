@@ -67,6 +67,7 @@ const MENU = [
   { to: '/admin/logs', labelKey: 'admin.menu.logs', fallback: 'Logs de acciones', icon: <HistoryIcon /> },
   { to: '/admin/calendario', labelKey: 'admin.menu.calendar', fallback: 'Calendario', icon: <CalendarMonthIcon /> },
   { to: '/admin/foro', labelKey: 'admin.menu.forum', fallback: 'Foro LaCASE', icon: <ForumIcon /> },
+  { to: '/admin/denuncias', labelKey: 'admin.menu.catalogReports', fallback: 'Denuncias del catálogo', icon: <ReportIcon /> },
   { to: '/admin/configuracion', labelKey: 'admin.menu.settings', fallback: 'Configuración global', icon: <SettingsIcon /> },
   { to: '/admin/rbac', labelKey: 'admin.menu.rbac', fallback: 'Roles y permisos', icon: <ManageAccountsIcon /> },
 ];
@@ -97,6 +98,7 @@ const ADMIN_CODE_TO_KEY: Record<string, string> = {
   'admin.calendar': 'admin.menu.calendar',
   'admin.forum': 'admin.menu.forum',
   'admin.rbac': 'admin.menu.rbac',
+  'admin.catalogReports': 'admin.menu.catalogReports',
 };
 
 // Iconos por path (para los menús dinámicos del RBAC; fallback DashboardIcon).

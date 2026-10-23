@@ -696,6 +696,7 @@
       "coupons": "Cupones",
       "currency": "Moneda",
       "dashboard": "Dashboard",
+      "catalogReports": "Denuncias del catálogo",
       "forum": "Foro LaCASE",
       "jobApplications": "Postulaciones",
       "jobs": "Empleos",
@@ -1973,6 +1974,7 @@
       "tooltip": "Empleos"
     },
     "menu": {
+      "catalogReports": "Denuncias del catálogo",
       "adminPanel": "Panel admin",
       "logout": "Cerrar sesión",
       "myAccount": "Mi cuenta",
