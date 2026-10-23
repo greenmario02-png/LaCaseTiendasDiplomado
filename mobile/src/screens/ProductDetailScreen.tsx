@@ -1,10 +1,10 @@
 import React, { useMemo,  useEffect, useState  } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { api, getErrorMessage, resolveImageUrl } from '../services/api';
 import { queuePush } from '../services/offlineCache';
 import { useAuthStore } from '../stores/authStore';
-import { BadgeCheck, Truck, Store, Star, Eye } from 'lucide-react-native';
+import { BadgeCheck, Truck, Store, Star, Eye, MoreVertical } from 'lucide-react-native';
 import { PriceDisplay } from '../components/redesign/PriceDisplay';
 import { RatingStars } from '../components/redesign/RatingStars';
 import { NeoButton } from '../components/redesign/NeoButton';
@@ -14,6 +14,7 @@ import { colors as themeColors } from '../theme';
 import { useMoney } from '../services/money';
 import { StorePaymentCard } from '../components/payments/PaymentBits';
 import '../services/payments';
+import { CATALOG_REPORT_OPTIONS, catalogReportPayload, type CatalogReportOption } from '../services/productActions';
 
 
 function verdict(rating: number, t: (key: string) => string): { label: string; color: string } {
@@ -35,6 +36,7 @@ export default function ProductDetailScreen({ route, navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -82,6 +84,39 @@ export default function ProductDetailScreen({ route, navigation }: any) {
     }
   };
 
+  const reportLabel = (option: CatalogReportOption) =>
+    option === 'REPORT_SELLER'
+      ? t('mobile.catalogReport.reportSeller')
+      : option === 'REPORT_STORE'
+        ? t('mobile.catalogReport.reportStore')
+        : t('mobile.catalogReport.reportProduct');
+
+  // Denuncia (vendedor, tienda o producto): confirmar con 2 botones y enviar; sin sesión se pide iniciarla.
+  const confirmReport = (option: CatalogReportOption) => {
+    setMenuVisible(false);
+    if (!user) {
+      Alert.alert(t('mobile.productDetail.loginRequiredTitle'), t('mobile.catalogReport.loginRequired'), [
+        { text: t('mobile.common.cancel'), style: 'cancel' },
+        { text: t('mobile.productDetail.loginButton'), onPress: () => navigation.navigate('Login') },
+      ]);
+      return;
+    }
+    Alert.alert(reportLabel(option), t('mobile.catalogReport.confirmBody'), [
+      { text: t('mobile.common.cancel'), style: 'cancel' },
+      {
+        text: t('mobile.catalogReport.send'),
+        onPress: async () => {
+          try {
+            await api.post('/catalog-reports', catalogReportPayload(option, product));
+            Alert.alert(t('mobile.catalogReport.sentTitle'), t('mobile.catalogReport.sentBody'));
+          } catch (err) {
+            Alert.alert(t('mobile.common.error'), getErrorMessage(err));
+          }
+        },
+      },
+    ]);
+  };
+
   if (loading) {
     return <LoadingState />;
   }
@@ -103,7 +138,20 @@ export default function ProductDetailScreen({ route, navigation }: any) {
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.name}>{product.name}</Text>
+        <View style={styles.nameRow}>
+          <Text style={[styles.name, styles.nameText]}>{product.name}</Text>
+          {product.seller && (
+            <TouchableOpacity
+              onPress={() => setMenuVisible(true)}
+              style={styles.moreBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t('mobile.productDetail.moreOptions')}
+              testID="more-options-button"
+            >
+              <MoreVertical size={20} color={colors.text} />
+            </TouchableOpacity>
+          )}
+        </View>
         {product.condition === 'NEW' && <Text style={styles.new}>{t('mobile.productDetail.new')}</Text>}
         {product.condition === 'USED' && <Text style={styles.used}>{t('mobile.productDetail.used', { score: product.conditionScore })}</Text>}
         {product.saleCount ? (
@@ -256,6 +304,22 @@ export default function ProductDetailScreen({ route, navigation }: any) {
 
         {!user && <Text style={styles.loginHint}>{t('mobile.productDetail.loginHint')}</Text>}
       </View>
+
+      {/* Menú "...": denunciar vendedor, tienda o producto. Modal propio: Android muestra solo 3 botones en Alert. */}
+      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={() => setMenuVisible(false)}>
+        <Pressable style={styles.menuBackdrop} onPress={() => setMenuVisible(false)} testID="more-options-backdrop">
+          <View style={styles.menuSheet}>
+            {CATALOG_REPORT_OPTIONS.map((opt) => (
+              <TouchableOpacity key={opt} style={styles.menuItem} onPress={() => confirmReport(opt)} accessibilityRole="button" testID={`report-${opt}`}>
+                <Text style={styles.menuItemText}>{reportLabel(opt)}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.menuItem} onPress={() => setMenuVisible(false)} accessibilityRole="button">
+              <Text style={styles.menuItemText}>{t('mobile.common.cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 }
@@ -328,4 +392,11 @@ const makeStyles = (colors: any) =>
   qty: { fontSize: 15, fontWeight: '700', minWidth: 24, textAlign: 'center' },
   addBtn: { flex: 1 },
   loginHint: { textAlign: 'center', color: colors.textSecondary, fontSize: 12, marginTop: 12 },
+  nameRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  nameText: { flex: 1 },
+  moreBtn: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: -10, marginRight: -10 },
+  menuBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  menuSheet: { backgroundColor: colors.background, borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingBottom: 24 },
+  menuItem: { paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: colors.border },
+  menuItemText: { fontSize: 15, fontWeight: '600', color: colors.text },
 });

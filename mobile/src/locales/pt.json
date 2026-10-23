@@ -1,5 +1,15 @@
 {
   "mobile": {
+    "catalogReport": {
+      "reportSeller": "Denunciar vendedor",
+      "reportStore": "Denunciar loja",
+      "reportProduct": "Produto inadequado",
+      "confirmBody": "Quer enviar esta denúncia? Nossa equipe vai analisá-la.",
+      "send": "Enviar",
+      "sentTitle": "Denúncia enviada",
+      "sentBody": "Obrigado, vamos analisar sua denúncia.",
+      "loginRequired": "Para enviar uma denúncia você precisa entrar."
+    },
     "addresses": {
       "addButton": "+ Adicionar endereço",
       "cityPlaceholder": "Cidade",
@@ -614,6 +624,7 @@
       "title": "Meus pedidos ({{count}})"
     },
     "productDetail": {
+      "moreOptions": "Mais opções",
       "addToCart": "Adicionar ao carrinho",
       "addedMessage": "Produto adicionado ao carrinho",
       "addedTitle": "Pronto!",
