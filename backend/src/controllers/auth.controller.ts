@@ -39,7 +39,8 @@ export async function refresh(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
-  if (!req.body.refreshToken) throw ApiError.badRequest('refreshToken obligatorio');
+  // `req.body` puede venir vacio (POST sin cuerpo): 400 claro en vez de un 500 por TypeError.
+  if (!req.body?.refreshToken) throw ApiError.badRequest('refreshToken obligatorio');
   await authService.logout(req.body.refreshToken);
   return ok(res, { message: 'Sesión cerrada' });
 }

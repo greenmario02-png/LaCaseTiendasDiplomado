@@ -130,7 +130,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await api.post('/auth/logout').catch(() => {});
+      // Igual que la web: sin el refreshToken el servidor no puede revocarlo (antes respondia 500 y la sesion seguia viva).
+      const refreshToken = await refreshTokenStore.get();
+      if (refreshToken) await api.post('/auth/logout', { refreshToken }).catch(() => {});
     } catch {}
     await tokenStore.clear();
     await refreshTokenStore.clear();
