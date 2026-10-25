@@ -18,10 +18,10 @@ async function setupBuyerWithCart() {
     .post('/api/account/addresses')
     .set('Authorization', `Bearer ${token}`)
     .send({
-      street: 'Av. Libertador',
+      street: 'Av. 16 de Julio',
       number: '1500',
-      city: 'Buenos Aires',
-      state: 'CABA',
+      city: 'La Paz',
+      state: 'La Paz',
       postalCode: '1000',
       isDefault: true,
     });
@@ -54,12 +54,23 @@ describe('Orders API — E2E flujo de compra', () => {
     }
   });
 
-  it('POST /api/orders/calculate-shipping — valida CP obligatorio', async () => {
+  it('POST /api/orders/calculate-shipping — sin CP (Bolivia no lo usa) cotiza el costo base, igual que la orden', async () => {
     const { token } = await setupBuyerWithCart();
     const res = await request(app)
       .post('/api/orders/calculate-shipping')
       .set('Authorization', `Bearer ${token}`)
       .send({});
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(2);
+    for (const quote of res.body.data) expect(quote.shippingCost).toBe(25);
+  });
+
+  it('POST /api/orders/calculate-shipping — CP demasiado largo → 400', async () => {
+    const { token } = await setupBuyerWithCart();
+    const res = await request(app)
+      .post('/api/orders/calculate-shipping')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ buyerPostalCode: 'x'.repeat(21) });
     expect(res.status).toBe(400);
   });
 
@@ -146,8 +157,8 @@ describe('Account API (integración)', () => {
     const created = await request(app).post('/api/account/addresses').set(auth).send({
       street: 'Calle 1',
       number: '100',
-      city: 'Rosario',
-      state: 'Santa Fe',
+      city: 'Cochabamba',
+      state: 'Cochabamba',
       postalCode: '2000',
       isDefault: true,
     });

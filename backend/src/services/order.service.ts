@@ -68,7 +68,7 @@ export async function checkoutOptions(req: AuthRequest): Promise<CheckoutSellerO
   });
 }
 
-export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode: string, cartItemIds?: number[]): Promise<ShippingQuote[]> {
+export async function calculateShippingQuotes(req: AuthRequest, buyerPostalCode: string | null, cartItemIds?: number[]): Promise<ShippingQuote[]> {
   const key = getCartKey(req);
   const cart = await findOrCreateCart(key);
 

@@ -55,7 +55,8 @@ export const createOrderSchema = z.object({
 });
 
 export const calculateShippingSchema = z.object({
-  body: z.object({ buyerPostalCode: z.string().trim().min(1).max(20), cartItemIds: cartItemIdsField }),
+  // Opcional: en Bolivia no hay código postal; sin él se cotiza el costo base, igual que al crear la orden.
+  body: z.object({ buyerPostalCode: z.union([z.string().trim().max(20), z.null()]).optional(), cartItemIds: cartItemIdsField }),
 });
 
 /** El vendedor califica al comprador del pedido: 1 a 5 y comentario opcional. */

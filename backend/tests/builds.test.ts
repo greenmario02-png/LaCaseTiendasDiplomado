@@ -121,7 +121,7 @@ describe('Reviews & Wishlist API (integración)', () => {
     const addr = await request(app)
       .post('/api/account/addresses')
       .set('Authorization', `Bearer ${token}`)
-      .send({ street: 'Av. Libertador', number: '1500', city: 'Buenos Aires', state: 'CABA', postalCode: '1000', isDefault: true });
+      .send({ street: 'Av. 16 de Julio', number: '1500', city: 'La Paz', state: 'La Paz', postalCode: '1000', isDefault: true });
     await request(app).post('/api/cart/items').set('Authorization', `Bearer ${token}`).send({ productId: p.id, quantity: 1 });
     const orders = await request(app).post('/api/orders').set('Authorization', `Bearer ${token}`).send({ shippingAddressId: addr.body.data.id });
     const order = orders.body.data.find((o: any) => o.items?.some((i: any) => i.productId === p.id)) || orders.body.data[0];

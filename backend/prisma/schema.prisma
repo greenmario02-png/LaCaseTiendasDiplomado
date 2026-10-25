@@ -425,8 +425,10 @@ model Address {
   number     String
   floor      String?
   city       String
+  /// Departamento de Bolivia (uno de los 9, validado por address.schemas.ts). Se mantiene el nombre de columna `state`.
   state      String
-  postalCode String
+  /// Opcional: Bolivia no usa código postal (sirve si se abre a otros países). SQL: prisma/sql/direcciones-bolivia.sql
+  postalCode String?
   isDefault  Boolean @default(false)
   orders     Order[]
 

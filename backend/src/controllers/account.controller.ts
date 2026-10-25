@@ -83,6 +83,7 @@ export async function listAddresses(req: AuthRequest, res: Response, next: NextF
 
 export async function createAddress(req: AuthRequest, res: Response, next: NextFunction) {
   try {
+    // Ya validado por `createAddressSchema`: `state` es uno de los 9 departamentos y `postalCode` es opcional (null).
     const { street, number, floor, city, state, postalCode, isDefault } = req.body;
 
     if (isDefault) {
@@ -100,7 +101,7 @@ export async function createAddress(req: AuthRequest, res: Response, next: NextF
         floor: floor || null,
         city,
         state,
-        postalCode,
+        postalCode: postalCode ?? null,
         isDefault: isDefault ?? false,
       },
     });

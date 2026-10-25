@@ -45,8 +45,7 @@ export async function checkoutOptions(req: AuthRequest, res: Response, next: Nex
 
 export async function shippingQuotes(req: AuthRequest, res: Response, next: NextFunction) {
   try {
-    const { buyerPostalCode } = req.body;
-    if (!buyerPostalCode) throw ApiError.badRequest('buyerPostalCode obligatorio');
+    const buyerPostalCode: string | null = req.body.buyerPostalCode || null;
     const quotes = await orderService.calculateShippingQuotes(req, buyerPostalCode, Array.isArray(req.body.cartItemIds) ? req.body.cartItemIds : undefined);
     return ok(res, quotes);
   } catch (error) {
