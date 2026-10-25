@@ -24,6 +24,7 @@ import { FadeIn } from '../../components/motion/FadeIn';
 import StorePaymentCard from '../../components/payments/StorePaymentCard';
 import { openOrderChat, usePayT } from '../../lib/payments';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import { formatAddressLine } from '../../lib/address';
 
 export default function OrderDetailPage() {
   const { t: tt } = useTranslation();
@@ -235,9 +236,7 @@ export default function OrderDetailPage() {
             {tt('orders.shipTo')}
           </Typography>
           <Typography variant="body2" color={t.onSurfaceVariant}>
-            {order.shippingAddress.street} {order.shippingAddress.number}
-            {order.shippingAddress.floor ? ', ' + order.shippingAddress.floor : ''} — {order.shippingAddress.city},{' '}
-            {order.shippingAddress.state} (CP {order.shippingAddress.postalCode})
+            {formatAddressLine(order.shippingAddress)}
           </Typography>
         </SurfaceCard>
       )}

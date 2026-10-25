@@ -4,6 +4,7 @@ import {
   Typography,
   Box,
   TextField,
+  Autocomplete,
   Button,
   IconButton,
   Grid,
@@ -28,7 +29,9 @@ import { PageHeader, SurfaceCard } from '../../components/redesign/PageHeader';
 import { PrimaryButton } from '../../components/redesign/Buttons';
 import { EmptyState } from '../../components/redesign/States';
 import { StaggerContainer, StaggerItem } from '../../components/motion/StaggerList';
+import { BOLIVIA_DEPARTMENTS, canonicalDepartment } from '../../lib/boliviaDepartments';
 
+/** Formato de Bolivia: `state` es el DEPARTAMENTO (uno de los 9) y el código postal es opcional. */
 const EMPTY_FORM = { street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: false };
 
 export default function AddressesPage() {
@@ -38,6 +41,7 @@ export default function AddressesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [departmentError, setDepartmentError] = useState('');
 
   const load = () => api.get('/account/addresses').then((res) => setAddresses(res.data.data));
   useEffect(() => {
@@ -46,6 +50,7 @@ export default function AddressesPage() {
 
   const openNew = () => {
     setForm(EMPTY_FORM);
+    setDepartmentError('');
     setEditingId(null);
     setDialogOpen(true);
   };
@@ -56,20 +61,29 @@ export default function AddressesPage() {
       number: a.number,
       floor: a.floor || '',
       city: a.city,
-      state: a.state,
-      postalCode: a.postalCode,
+      // Direcciones antiguas pueden tener "la paz" o una provincia: se muestra el nombre oficial si es uno de los 9.
+      state: canonicalDepartment(a.state) ?? a.state ?? '',
+      postalCode: a.postalCode ?? '',
       isDefault: a.isDefault,
     });
+    setDepartmentError('');
     setEditingId(a.id);
     setDialogOpen(true);
   };
 
   const save = async () => {
+    const department = canonicalDepartment(form.state);
+    if (!department) {
+      setDepartmentError(tt('account.addresses.departmentError'));
+      return;
+    }
+    setDepartmentError('');
+    const payload = { ...form, state: department, postalCode: form.postalCode.trim() || null };
     try {
       if (editingId) {
-        await api.put(`/account/addresses/${editingId}`, form);
+        await api.put(`/account/addresses/${editingId}`, payload);
       } else {
-        await api.post('/account/addresses', form);
+        await api.post('/account/addresses', payload);
       }
       toast.success(tt('account.addresses.saved'));
       setDialogOpen(false);
@@ -118,7 +132,8 @@ export default function AddressesPage() {
               {a.floor ? ', ' + a.floor : ''}
             </Typography>
             <Typography variant="body2" color={t.onSurfaceVariant}>
-              {a.city}, {a.state} — CP {a.postalCode}
+              {a.city}, {a.state}
+              {a.postalCode ? ` — CP ${a.postalCode}` : ''}
             </Typography>
             {a.isDefault && (
               <Typography variant="caption" color={t.primary} fontWeight={600} display="inline-flex" alignItems="center" gap={0.5}>
@@ -154,10 +169,20 @@ export default function AddressesPage() {
               <TextField label={tt('account.addresses.city')} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label={tt('account.addresses.state')} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} fullWidth />
+              <Autocomplete
+                options={[...BOLIVIA_DEPARTMENTS]}
+                value={canonicalDepartment(form.state)}
+                onChange={(_, v) => {
+                  setDepartmentError('');
+                  setForm({ ...form, state: v ?? '' });
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label={tt('account.addresses.state')} error={!!departmentError} helperText={departmentError} fullWidth />
+                )}
+              />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField label={tt('account.addresses.postalCode')} value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} fullWidth />
+              <TextField label={tt('account.addresses.postalCodeOptional')} value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} fullWidth />
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel

@@ -27,6 +27,7 @@ import { summarizeSelection, useCartSelection } from '../stores/cartSelectionSto
 import { apiErrorInfo, openOrderChat, usePayT } from '../lib/payments';
 import StorePaymentCard from '../components/payments/StorePaymentCard';
 import PaymentSafetyTip from '../components/payments/PaymentSafetyTip';
+import { formatAddressLine } from '../lib/address';
 
 interface PickupOption {
   sellerId: number;
@@ -117,7 +118,7 @@ export default function CheckoutPage() {
     setCheckingShipping(true);
     setError('');
     try {
-      const { data } = await api.post('/orders/calculate-shipping', { buyerPostalCode: selectedAddr.postalCode, cartItemIds });
+      const { data } = await api.post('/orders/calculate-shipping', { buyerPostalCode: selectedAddr.postalCode || undefined, cartItemIds });
       setQuotes(data.data);
       setCheckedShipping(true);
     } catch (err) {
@@ -264,7 +265,7 @@ export default function CheckoutPage() {
                     key={a.id}
                     value={a.id}
                     control={<Radio />}
-                    label={`${a.street} ${a.number}${a.floor ? ', ' + a.floor : ''} — ${a.city}, ${a.state} (CP ${a.postalCode})`}
+                    label={formatAddressLine(a)}
                   />
                 ))}
               </RadioGroup>
