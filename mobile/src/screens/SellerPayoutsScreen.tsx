@@ -68,7 +68,8 @@ export default function SellerPayoutsScreen({ navigation }: any) {
   );
 
   const saveAccount = async () => {
-    if (!accountHolder.trim() || !accountNumber.trim()) {
+    const isQr = method.trim().toUpperCase() === 'QR';
+    if (!accountHolder.trim() || !accountNumber.trim() || (isQr && !phoneQr.trim())) {
       Alert.alert(t('mobile.sellerPayouts.missingDataTitle'), t('mobile.sellerPayouts.missingDataMessage'));
       return;
     }
@@ -221,6 +222,7 @@ export default function SellerPayoutsScreen({ navigation }: any) {
             <TextInput style={styles.input} value={accountNumber} onChangeText={setAccountNumber} placeholder={t('mobile.sellerPayouts.accountNumberPlaceholder')} placeholderTextColor={colors.textSecondary} />
             <TextInput style={styles.input} value={bankName} onChangeText={setBankName} placeholder={t('mobile.sellerPayouts.bankNamePlaceholder')} placeholderTextColor={colors.textSecondary} />
             <TextInput style={styles.input} value={phoneQr} onChangeText={setPhoneQr} placeholder={t('mobile.sellerPayouts.phoneQrPlaceholder')} placeholderTextColor={colors.textSecondary} />
+            {method.trim().toUpperCase() === 'QR' ? <Text style={styles.payoutMeta}>{t('mobile.sellerPayouts.phoneQrHint')}</Text> : null}
             <View style={{ marginTop: 8 }}>
               <NeoButton title={saving ? t('mobile.sellerPayouts.savingAccount') : t('mobile.sellerPayouts.saveAccountButton')} onPress={saveAccount} disabled={saving} />
             </View>
