@@ -8,6 +8,10 @@ import { NeoInput } from '../components/redesign/NeoInput';
 import { NeoButton } from '../components/redesign/NeoButton';
 import { LoadingState, EmptyState } from '../components/redesign/States';
 import { useAppTheme } from '../theme/ThemeContext';
+import { DepartmentPicker } from '../components/addresses/DepartmentPicker';
+import { canonicalDepartment } from '../services/boliviaDepartments';
+
+const EMPTY_FORM = { street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: true };
 
 export default function AddressesScreen({ navigation }: any) {
   const { t } = useTranslation();
@@ -16,16 +20,10 @@ export default function AddressesScreen({ navigation }: any) {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    street: '',
-    number: '',
-    floor: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    isDefault: true,
-  });
+  // Formato de Bolivia: `state` es el DEPARTAMENTO (uno de los 9, elegido en DepartmentPicker) y el CP es opcional.
+  const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [departmentError, setDepartmentError] = useState<string | null>(null);
 
   const load = async () => {
     try {
@@ -42,15 +40,26 @@ export default function AddressesScreen({ navigation }: any) {
   );
 
   const save = async () => {
-    if (!form.street || !form.city || !form.state) {
+    const department = canonicalDepartment(form.state);
+    if (!form.street.trim() || !form.city.trim() || !department) {
+      setDepartmentError(department ? null : t('mobile.addresses.departmentInvalid'));
       Alert.alert(t('mobile.addresses.missingFieldsTitle'), t('mobile.addresses.missingFieldsMessage'));
       return;
     }
+    setDepartmentError(null);
     setSaving(true);
     try {
-      await api.post('/account/addresses', { ...form, number: form.number || '0' });
+      await api.post('/account/addresses', {
+        ...form,
+        street: form.street.trim(),
+        city: form.city.trim(),
+        state: department,
+        number: form.number.trim() || '0',
+        floor: form.floor.trim() || null,
+        postalCode: form.postalCode.trim() || null,
+      });
       setShowForm(false);
-      setForm({ street: '', number: '', floor: '', city: '', state: '', postalCode: '', isDefault: true });
+      setForm(EMPTY_FORM);
       load();
     } catch (err) {
       Alert.alert(t('mobile.common.error'), getErrorMessage(err));
@@ -108,7 +117,9 @@ export default function AddressesScreen({ navigation }: any) {
                   {item.isDefault ? <Star size={13} color={colors.warning} fill={colors.warning} /> : null}
                 </View>
                 <Text style={styles.cardMeta}>
-                  {t('mobile.addresses.cityStateZip', { city: item.city, state: item.state, postalCode: item.postalCode })}
+                  {item.postalCode
+                    ? t('mobile.addresses.cityStateZip', { city: item.city, state: item.state, postalCode: item.postalCode })
+                    : t('mobile.addresses.cityState', { city: item.city, state: item.state })}
                 </Text>
                 {item.floor ? <Text style={styles.cardMeta}>{t('mobile.addresses.floorLabel', { floor: item.floor })}</Text> : null}
               </View>
@@ -131,7 +142,15 @@ export default function AddressesScreen({ navigation }: any) {
           <NeoInput style={styles.input} placeholder={t('mobile.addresses.numberPlaceholder')} value={form.number} onChangeText={(v) => setForm({ ...form, number: v })} keyboardType="numeric" />
           <NeoInput style={styles.input} placeholder={t('mobile.addresses.floorPlaceholder')} value={form.floor} onChangeText={(v) => setForm({ ...form, floor: v })} />
           <NeoInput style={styles.input} placeholder={t('mobile.addresses.cityPlaceholder')} value={form.city} onChangeText={(v) => setForm({ ...form, city: v })} />
-          <NeoInput style={styles.input} placeholder={t('mobile.addresses.statePlaceholder')} value={form.state} onChangeText={(v) => setForm({ ...form, state: v })} />
+          <DepartmentPicker
+            label={t('mobile.addresses.statePlaceholder')}
+            value={form.state}
+            error={departmentError}
+            onChange={(d) => {
+              setDepartmentError(null);
+              setForm((cur) => ({ ...cur, state: d }));
+            }}
+          />
           <NeoInput style={styles.input} placeholder={t('mobile.addresses.postalCodePlaceholder')} value={form.postalCode} onChangeText={(v) => setForm({ ...form, postalCode: v })} />
           <View style={styles.saveWrap}>
             <NeoButton title={saving ? t('mobile.addresses.saving') : t('mobile.addresses.saveButton')} onPress={save} disabled={saving} />

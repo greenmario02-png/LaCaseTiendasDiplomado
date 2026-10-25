@@ -10,6 +10,7 @@ import { NeoButton } from '../components/redesign/NeoButton';
 import { useMoney } from '../services/money';
 import { openOrderChat } from '../services/payments';
 import { StorePaymentCard } from '../components/payments/PaymentBits';
+import { formatShippingAddress } from '../services/address';
 
 
 const STATUS_KEY: Record<string, string> = {
@@ -201,7 +202,7 @@ export default function OrderDetailScreen({ navigation }: any) {
       {order.fulfillmentType === 'SHIPPING' && (
         <View style={[styles.card, { marginTop: 12, flexDirection: 'row', gap: 6 }]}>
           <Truck size={14} color={colors.textSecondary} />
-          <Text style={styles.meta}>{t('mobile.orderDetail.shippingTo', { address: order.shippingAddress ? `${order.shippingAddress.addressLine1}, ${order.shippingAddress.city}` : t('mobile.orderDetail.shippingAddressFallback') })}</Text>
+          <Text style={styles.meta}>{t('mobile.orderDetail.shippingTo', { address: order.shippingAddress ? formatShippingAddress(order.shippingAddress) : t('mobile.orderDetail.shippingAddressFallback') })}</Text>
         </View>
       )}
     </ScrollView>
