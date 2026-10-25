@@ -76,12 +76,58 @@ export async function payoutSummary(sellerId: number) {
   };
 }
 
+/**
+ * Compara dos teléfonos tolerando formato (espacios, guiones, +591/591/00591 al inicio). Este
+ * repo no tiene un util compartido de teléfono boliviano (a diferencia de la versión completa del
+ * marketplace, que sí trae `utils/boPhone.ts`), así que se compara solo por dígitos quitando el
+ * prefijo de país si aparece.
+ */
+function phonesMatch(a: string, b: string): boolean {
+  const onlyDigits = (v: string) => {
+    let digits = v.replace(/\D/g, '');
+    if (digits.startsWith('00591')) digits = digits.slice(5);
+    else if (digits.startsWith('591') && digits.length > 8) digits = digits.slice(3);
+    return digits;
+  };
+  const da = onlyDigits(a);
+  const db = onlyDigits(b);
+  return !!da && da === db;
+}
+
+/**
+ * El teléfono del método QR no es "cualquier número": es el WhatsApp de la tienda, para que el
+ * comprador pueda verificar el titular antes de pagar. Solo se exige a vendedores (rol SELLER); si
+ * quien guarda la cuenta es un empleado de la tienda (storeOwnerId), se compara contra el WhatsApp
+ * del dueño, que es quien realmente figura como "la tienda".
+ * Si la tienda todavía no registró su WhatsApp, se acepta el número enviado tal cual (no hay nada
+ * con qué comparar); el vendedor puede declarar su WhatsApp cuando quiera en "Mi tienda" y desde ahí
+ * sí deberá coincidir en los próximos cambios de cuenta.
+ */
+export async function assertQrMatchesStoreWhatsapp(userId: number, phoneQr: string): Promise<void> {
+  const u = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, storeOwnerId: true } });
+  if (!u || u.role !== 'SELLER') return;
+  const ownerId = u.storeOwnerId ?? userId;
+  const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { whatsappPhone: true } });
+  const wa = (owner?.whatsappPhone ?? '').trim();
+  if (!wa) return;
+  if (!phonesMatch(phoneQr, wa)) {
+    throw new ApiError(400, 'QR_PHONE_NOT_STORE_WHATSAPP', 'El teléfono del QR debe coincidir con el WhatsApp de tu tienda.');
+  }
+}
+
 /** Configura (crea o actualiza) la cuenta de cobro del vendedor. */
 export async function upsertAccount(sellerId: number, data: { method?: string; accountHolder?: string; accountNumber?: string; bankName?: string; phoneQr?: string }) {
+  // Importante: trim antes de evaluar como vacío, o un valor de solo espacios se consideraría "con dato".
+  const phoneQr = (data.phoneQr ?? '').trim() || undefined;
+  if (data.method === 'QR') {
+    if (!phoneQr) throw ApiError.badRequest('Indica el teléfono del QR');
+    await assertQrMatchesStoreWhatsapp(sellerId, phoneQr);
+  }
+  const next = { ...data, phoneQr };
   return prisma.payoutAccount.upsert({
     where: { sellerId },
-    create: { sellerId, ...data },
-    update: data,
+    create: { sellerId, ...next },
+    update: next,
   });
 }
 

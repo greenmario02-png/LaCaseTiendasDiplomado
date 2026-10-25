@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app, registerUser, getAdminToken, getApprovedSellerToken } from './helpers';
+import { app, registerUser, registerSeller, loginUser, getAdminToken, getApprovedSellerToken } from './helpers';
 
 describe('Payouts y escrow (integración)', () => {
   let sellerToken: string;
@@ -54,5 +54,74 @@ describe('Payouts y escrow (integración)', () => {
   it('admin — rechazar payout inexistente → 404', async () => {
     const res = await request(app).put('/api/admin/payouts/99999').set('Authorization', `Bearer ${adminToken}`).send({ status: 'APPROVED' });
     expect(res.status).toBe(404);
+  });
+});
+
+describe('QR de cobro = WhatsApp de la tienda (obligatorio y debe coincidir)', () => {
+  async function newSeller(whatsappPhone?: string) {
+    const { prisma } = await import('../src/config/database');
+    const reg = await registerSeller();
+    const email = reg.body.data.email;
+    if (whatsappPhone !== undefined) {
+      await prisma.user.update({ where: { email }, data: { whatsappPhone } });
+    }
+    const login = await loginUser(email, 'password123');
+    return login.body.data.accessToken as string;
+  }
+
+  it('método QR sin phoneQr → 400', async () => {
+    const token = await newSeller();
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'QR', accountHolder: 'Juan Pérez' });
+    expect(res.status).toBe(400);
+  });
+
+  it('un phoneQr de solo espacios se trata como vacío → 400', async () => {
+    const token = await newSeller();
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'QR', accountHolder: 'Juan Pérez', phoneQr: '   ' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rechaza con mensaje claro si el phoneQr no coincide con el WhatsApp registrado de la tienda', async () => {
+    const token = await newSeller('71234567');
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'QR', accountHolder: 'Juan Pérez', phoneQr: '79999999' });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('QR_PHONE_NOT_STORE_WHATSAPP');
+    expect(res.body.error.message).toMatch(/WhatsApp/);
+  });
+
+  it('acepta cuando el phoneQr coincide con el WhatsApp registrado (tolera +591/espacios)', async () => {
+    const token = await newSeller('+591 71234567');
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'QR', accountHolder: 'Juan Pérez', phoneQr: '71234567' });
+    expect(res.status).toBe(200);
+  });
+
+  it('sin WhatsApp registrado todavía, acepta el phoneQr enviado tal cual', async () => {
+    const token = await newSeller();
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'QR', accountHolder: 'Juan Pérez', phoneQr: '71234567' });
+    expect(res.status).toBe(200);
+  });
+
+  it('otros métodos (BNB/BANK) no exigen que coincida nada', async () => {
+    const token = await newSeller('71234567');
+    const res = await request(app)
+      .put('/api/seller/payouts/account')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ method: 'BNB', accountHolder: 'Juan Pérez', accountNumber: '76543210' });
+    expect(res.status).toBe(200);
   });
 });
