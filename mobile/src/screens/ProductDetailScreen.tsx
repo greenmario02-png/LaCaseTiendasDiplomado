@@ -60,6 +60,12 @@ export default function ProductDetailScreen({ route, navigation }: any) {
       await api.post('/cart/items', { productId: id, quantity: qty });
       Alert.alert(t('mobile.productDetail.addedTitle'), t('mobile.productDetail.addedMessage'));
     } catch (err) {
+      // El servidor respondió con un error real (p. ej. 400 "Stock insuficiente", 429): mostrarlo tal cual.
+      // Encolarlo como "sin conexión" sería engañoso y el reintento fallaría igual.
+      if ((err as any)?.response) {
+        Alert.alert(t('mobile.common.error'), getErrorMessage(err));
+        return;
+      }
       // Sin conexión: encolar para que se agregue cuando vuelva la red
       await queuePush({ method: 'post', url: '/cart/items', data: { productId: id, quantity: qty } });
       Alert.alert(t('mobile.productDetail.offlineTitle'), t('mobile.productDetail.offlineMessage'));
