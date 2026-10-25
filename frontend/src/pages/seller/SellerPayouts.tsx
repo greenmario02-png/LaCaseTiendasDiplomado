@@ -230,6 +230,18 @@ export default function SellerPayouts() {
               <TextField label={t('seller.payouts.accountSection.idLabel')} value={account.phoneQr} onChange={(e) => setAccount({ ...account, phoneQr: e.target.value })} fullWidth />
             </Grid>
           )}
+          {account.method === 'QR' && (
+            <Grid item xs={12} md={3}>
+              <TextField
+                required
+                label={t('seller.payouts.accountSection.phoneQrLabel')}
+                helperText={t('seller.payouts.accountSection.phoneQrHelp')}
+                value={account.phoneQr}
+                onChange={(e) => setAccount({ ...account, phoneQr: e.target.value })}
+                fullWidth
+              />
+            </Grid>
+          )}
         </Grid>
         <Box sx={{ mt: 2 }}>
           <SecondaryButton onClick={saveAccount} disabled={savingAccount}>
