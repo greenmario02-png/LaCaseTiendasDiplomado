@@ -1362,9 +1362,11 @@
   "auth": {
     "login": {
       "emailLabel": "Email",
+      "hidePassword": "Ocultar senha",
       "noAccount": "Não tem conta?",
       "openStore": "Abra sua loja",
       "passwordLabel": "Senha",
+      "showPassword": "Mostrar senha",
       "signUp": "Cadastre-se",
       "submit": "Entrar",
       "subtitle": "Entre para comprar, vender e participar do fórum",

@@ -1362,9 +1362,11 @@
   "auth": {
     "login": {
       "emailLabel": "Email",
+      "hidePassword": "Emokañy ñe'ẽñemi",
       "noAccount": "¿Ndereguerekói kuenta?",
       "openStore": "Emopyenda nde tienda",
       "passwordLabel": "Ñe'ẽñemi",
+      "showPassword": "Ehechauka ñe'ẽñemi",
       "signUp": "Ejehaipy",
       "submit": "Eike",
       "subtitle": "Eike ejogua, evende ha eike foro-pe hağua",

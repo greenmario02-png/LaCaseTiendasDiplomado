@@ -1363,9 +1363,11 @@
   "auth": {
     "login": {
       "emailLabel": "Email",
+      "hidePassword": "Ocultar contraseña",
       "noAccount": "¿No tienes cuenta?",
       "openStore": "Abre tu tienda",
       "passwordLabel": "Contraseña",
+      "showPassword": "Mostrar contraseña",
       "signUp": "Regístrate",
       "submit": "Ingresar",
       "subtitle": "Ingresa para comprar, vender y participar en el foro",

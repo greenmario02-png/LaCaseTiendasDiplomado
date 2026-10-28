@@ -1362,9 +1362,11 @@
   "auth": {
     "login": {
       "emailLabel": "Email",
+      "hidePassword": "Pakasqa simita pakay",
       "noAccount": "¿Manachu kuintayki kan?",
       "openStore": "Qhatuykita kichay",
       "passwordLabel": "Pakasqa simi",
+      "showPassword": "Pakasqa simita rikuchiy",
       "signUp": "Qillqakuy",
       "submit": "Yaykuy",
       "subtitle": "Yaykuy rantinaykipaq, ranqhanaykipaq hinaspa tantanakuypi kanaykipaq",

@@ -1362,9 +1362,11 @@
   "auth": {
     "login": {
       "emailLabel": "Imeyl",
+      "hidePassword": "Kuntrasiña imantaña",
       "noAccount": "¿Janiw utjtam kwinta?",
       "openStore": "Jist'aram jumana qhatu",
       "passwordLabel": "Kuntrasiña",
+      "showPassword": "Kuntrasiña uñachayaña",
       "signUp": "Regístrate",
       "submit": "Mantaña",
       "subtitle": "Mantam taki alasiña, aljaña ukat partisipar jupa foru",
