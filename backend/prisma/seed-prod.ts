@@ -221,7 +221,7 @@ async function seedReview(password: string) {
   await renameAccount(['comprador.demo@lacase.bo', 'comprador.revision@lacase.test'], 'comprador@lacase.test', Role.CUSTOMER);
   await prisma.user.upsert({
     where: { email: 'vendedor@lacase.test' },
-    update: { passwordHash, isActive: true, isApproved: true },
+    update: { passwordHash, isActive: true, isApproved: true, storeAddress: 'Calle Bolívar esquina Sucre, Tarija' },
     create: {
       email: 'vendedor@lacase.test',
       passwordHash,
@@ -230,6 +230,7 @@ async function seedReview(password: string) {
       role: Role.SELLER,
       storeName: 'TecnoCase Demo',
       storeDescription: 'Tienda de demostración (datos ficticios).',
+      storeAddress: 'Calle Bolívar esquina Sucre, Tarija',
       locationCity: 'Tarija',
       locationState: 'Tarija',
       country: 'BO',
