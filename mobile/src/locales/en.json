@@ -467,7 +467,7 @@
       "quotesTitle": "Cotizaciones",
       "seeAll": "Ver todos",
       "sourcesLabel": "Fuentes: {{usd}} · {{eur}} · {{usdt}}",
-      "title": "LaCase Multi Tiendas"
+      "title": "La Case Tiendas"
     },
     "jobs": {
       "applicationSentMessage": "La tienda va a revisar tu postulación. Puedes seguirla en \"Mis postulaciones\".",
@@ -507,7 +507,7 @@
       "yourApplicationLabel": "Tu postulación:"
     },
     "login": {
-      "brandTitle": "LaCase Multi Tiendas",
+      "brandTitle": "La Case Tiendas",
       "errorMissingFields": "Ingresa tu email y contraseña",
       "noAccountLink": "¿No tienes cuenta? Regístrate",
       "submit": "Ingresar",

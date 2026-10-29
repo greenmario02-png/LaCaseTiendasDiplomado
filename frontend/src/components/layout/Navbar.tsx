@@ -149,7 +149,7 @@ export default function Navbar() {
       <Toolbar sx={{ gap: 2, flexWrap: 'wrap', py: 0.5 }}>
         <Box component={Link} to="/" display="flex" alignItems="center" sx={{ textDecoration: 'none', color: 'inherit', mr: 1 }}>
           <StorefrontIcon sx={{ mr: 0.5 }} />
-          <Box sx={{ fontWeight: 800, fontSize: '1.2rem' }}>LaCase Multi Tiendas</Box>
+          <Box sx={{ fontWeight: 800, fontSize: '1.2rem' }}>La Case Tiendas</Box>
         </Box>
 
         <Box component="form" onSubmit={handleSearch} sx={{ flex: { xs: '1 1 100%', md: 1 }, minWidth: 0, display: 'flex', justifyContent: 'center' }}>
